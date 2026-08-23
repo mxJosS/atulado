@@ -45,7 +45,7 @@ class MoodTrackerController extends Controller
         if ($request->wantsJson() || $request->ajax()) {
             return response()->json([
                 'success' => true,
-                'message' => '¡Tu registro emocional ha sido guardado exitosamente! 🌱',
+                'message' => '¡Tu registro emocional ha sido guardado exitosamente!',
                 'log' => $moodLog,
             ]);
         }

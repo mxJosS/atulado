@@ -75,7 +75,7 @@ class ResourceController extends Controller
                 'resource_id' => $resource->id,
             ]);
             $status = 'added';
-            $message = '¡Recurso guardado en tus favoritos! ⭐';
+            $message = '¡Recurso guardado en tus favoritos!';
         }
 
         if ($request->wantsJson() || $request->ajax()) {
@@ -101,7 +101,7 @@ class ResourceController extends Controller
         $fav->save();
 
         $message = $fav->is_completed
-            ? '¡Felicitaciones por completar este ejercicio! 🌱'
+            ? '¡Felicitaciones por completar este ejercicio!'
             : 'Ejercicio marcado como pendiente.';
 
         if ($request->wantsJson() || $request->ajax()) {

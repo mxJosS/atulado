@@ -39,10 +39,10 @@ Route::get('/crisis', [ToolController::class, 'crisis'])->name('crisis');
 */
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:6,1');
 
     Route::get('/registro', [AuthController::class, 'showRegister'])->name('register');
-    Route::post('/registro', [AuthController::class, 'register']);
+    Route::post('/registro', [AuthController::class, 'register'])->middleware('throttle:6,1');
 });
 
 /*
@@ -72,9 +72,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/mis-favoritos', [ResourceController::class, 'userFavorites'])->name('favorites.index');
 
     // Profile Settings
-    Route::get('/perfil', function () {
-        return view('dashboard.perfil', ['user' => auth()->user()]);
-    })->name('profile.show');
+    Route::get('/perfil', [AuthController::class, 'showProfile'])->name('profile.show');
     Route::put('/perfil', [AuthController::class, 'updateProfile'])->name('profile.update');
     Route::put('/perfil/password', [AuthController::class, 'updatePassword'])->name('profile.password');
 });

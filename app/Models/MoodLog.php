@@ -51,15 +51,27 @@ class MoodLog extends Model
         };
     }
 
+    public function getFaIconAttribute(): string
+    {
+        return match ($this->score) {
+            1 => 'fa-regular fa-face-angry',
+            2 => 'fa-regular fa-face-frown',
+            3 => 'fa-regular fa-face-meh',
+            4 => 'fa-regular fa-face-smile',
+            5 => 'fa-regular fa-face-laugh-beam',
+            default => 'fa-regular fa-face-smile',
+        };
+    }
+
     public function getEmojiAttribute(): string
     {
         return match ($this->score) {
-            1 => '🌧️',
-            2 => '☁️',
-            3 => '🌱',
-            4 => '🌤️',
-            5 => '✨',
-            default => '🌿',
+            1 => 'fa-regular fa-face-angry',
+            2 => 'fa-regular fa-face-frown',
+            3 => 'fa-regular fa-face-meh',
+            4 => 'fa-regular fa-face-smile',
+            5 => 'fa-regular fa-face-laugh-beam',
+            default => 'fa-regular fa-face-smile',
         };
     }
 

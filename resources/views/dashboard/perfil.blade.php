@@ -2,19 +2,26 @@
 
 @section('title', 'Mi Perfil y Preferencias')
 
+@php
+  $errors = $errors ?? new \Illuminate\Support\ViewErrorBag();
+@endphp
+
 @section('content')
 <div style="max-width: 800px; margin: 0 auto;">
 
-  <div style="margin-bottom: 2rem;">
-    <span class="mono-tag" style="color: var(--sage-600);">Configuración de Cuenta</span>
-    <h1 style="font-size: 2rem; margin-top: 0.2rem;">Mi Perfil</h1>
-    <p style="color: var(--ink-600); font-size: 0.95rem;">Personaliza tu experiencia, contactos de emergencia y credenciales de acceso.</p>
+  <div style="margin-bottom: 1.75rem;">
+    <span class="mono-tag" style="color: var(--sage-base);">— CONFIGURACIÓN DE CUENTA</span>
+    <h1 style="font-size: 1.85rem; margin-top: 0.15rem; color: var(--text-near-black);">Mi Perfil</h1>
+    <p style="color: var(--text-medium-gray); font-size: 0.9rem;">Personaliza tu experiencia, contactos de emergencia y credenciales de acceso.</p>
   </div>
 
   <!-- PROFILE DETAILS FORM -->
-  <div class="card" style="margin-bottom: 2rem;">
-    <div class="card-body">
-      <h2 style="font-size: 1.3rem; margin-bottom: 1.25rem;">Datos Personales</h2>
+  <div class="card" style="margin-bottom: 1.75rem;">
+    <div class="card-body" style="padding: 1.5rem;">
+      <h2 style="font-size: 1.25rem; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem; color: var(--text-near-black);">
+        <i class="fa-solid fa-user-gear" style="color: var(--sage-base);"></i>
+        <span>Datos Personales</span>
+      </h2>
 
       <form method="POST" action="{{ route('profile.update') }}">
         @csrf
@@ -34,72 +41,76 @@
 
         <div class="form-group">
           <label for="bio" class="form-label">Frase o intención personal (bio)</label>
-          <input type="text" name="bio" id="bio" value="{{ old('bio', $user->bio) }}" class="form-control" placeholder="Ej. Un día a la vez 🌱">
+          <input type="text" name="bio" id="bio" value="{{ old('bio', $user->bio) }}" class="form-control" placeholder="Ej. Un día a la vez, con paciencia y compasión...">
           @error('bio') <div class="form-error">{{ $message }}</div> @enderror
         </div>
 
         <!-- Avatar Color Choice -->
         <div class="form-group" style="margin-top: 1.25rem;">
-          <label class="form-label">Color de tu árbol avatar:</label>
-          <div style="display: flex; gap: 1rem; margin-top: 0.35rem;">
+          <label class="form-label">Tono de tu avatar:</label>
+          <div style="display: flex; gap: 0.85rem; margin-top: 0.35rem;">
             @php
               $colors = [
-                'sage' => ['label' => 'Menta', 'bg' => '#4d7c5f'],
-                'terra' => ['label' => 'Terra', 'bg' => '#b86b4a'],
-                'lav' => ['label' => 'Lavanda', 'bg' => '#7a6faa'],
-                'sky' => ['label' => 'Cielo', 'bg' => '#4a7fa5'],
-                'amber' => ['label' => 'Ámbar', 'bg' => '#c4901a'],
+                'sage' => ['label' => 'Sage', 'bg' => '#2E5D4B'],
+                'mint' => ['label' => 'Menta', 'bg' => '#5AB56E'],
+                'lav' => ['label' => 'Lavanda', 'bg' => '#5B4A8A'],
+                'amber' => ['label' => 'Dorado', 'bg' => '#C8B87A'],
+                'terra' => ['label' => 'Tierra', 'bg' => '#6B3A1F'],
               ];
               $currentColor = old('avatar_color', $user->avatar_color ?? 'sage');
             @endphp
             @foreach($colors as $val => $c)
-              <label style="cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 0.3rem;">
+              <label style="cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 0.25rem;">
                 <input type="radio" name="avatar_color" value="{{ $val }}" {{ $currentColor === $val ? 'checked' : '' }} style="display: none;" class="avatar-radio">
-                <span class="avatar-swatch" style="width: 36px; height: 36px; border-radius: 50%; background: {{ $c['bg'] }}; display: flex; align-items: center; justify-content: center; border: 2px solid {{ $currentColor === $val ? 'var(--ink-900)' : 'transparent' }};">
-                  <span class="check-mark" style="color: #ffffff; font-size: 0.85rem; display: {{ $currentColor === $val ? 'block' : 'none' }};">✓</span>
+                <span class="avatar-swatch" style="width: 34px; height: 34px; border-radius: 50%; background: {{ $c['bg'] }}; display: flex; align-items: center; justify-content: center; border: 2px solid {{ $currentColor === $val ? 'var(--sage-base)' : 'transparent' }};">
+                  <i class="fa-solid fa-check check-mark" style="color: #ffffff; font-size: 0.75rem; display: {{ $currentColor === $val ? 'block' : 'none' }};"></i>
                 </span>
-                <span style="font-size: 0.72rem; color: var(--ink-600); font-family: var(--font-mono);">{{ $c['label'] }}</span>
+                <span style="font-size: 0.7rem; color: var(--text-medium-gray); font-family: var(--font-mono);">{{ $c['label'] }}</span>
               </label>
             @endforeach
           </div>
         </div>
 
         <!-- Emergency Crisis Contact Quick Fields -->
-        <div style="background: var(--bg-subtle); border-radius: var(--radius-md); padding: 1.25rem; margin-top: 1.5rem;">
-          <h3 style="font-size: 1.05rem; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.4rem;">
-            <span>🚨</span>
+        <div style="background: var(--bg-subtle); border-radius: var(--radius-md); padding: 1.25rem; margin-top: 1.5rem; border: 1px solid var(--border-light);">
+          <h3 style="font-size: 1rem; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.5rem; color: var(--clinical-red);">
+            <i class="fa-solid fa-phone"></i>
             <span>Contacto Principal de Emergencia</span>
           </h3>
-          <p style="font-size: 0.82rem; color: var(--ink-600); margin-bottom: 1rem;">
+          <p style="font-size: 0.82rem; color: var(--text-medium-gray); margin-bottom: 0.85rem;">
             Esta persona podrá ser llamada rápidamente desde tu botón de auxilio personal.
           </p>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="responsive-two-col">
             <div class="form-group" style="margin-bottom: 0;">
-              <label for="crisis_contact_name" class="form-label">Nombre y parentesco:</label>
+              <label for="crisis_contact_name" class="form-label" style="font-size: 0.82rem;">Nombre y parentesco:</label>
               <input type="text" name="crisis_contact_name" id="crisis_contact_name" value="{{ old('crisis_contact_name', $user->crisis_contact_name) }}" class="form-control" placeholder="Ej. Sofía López (Hermana)">
             </div>
 
             <div class="form-group" style="margin-bottom: 0;">
-              <label for="crisis_contact_phone" class="form-label">Teléfono:</label>
+              <label for="crisis_contact_phone" class="form-label" style="font-size: 0.82rem;">Teléfono:</label>
               <input type="text" name="crisis_contact_phone" id="crisis_contact_phone" value="{{ old('crisis_contact_phone', $user->crisis_contact_phone) }}" class="form-control" placeholder="Ej. 55 1234 5678">
             </div>
           </div>
         </div>
 
         <div style="margin-top: 1.5rem; text-align: right;">
-          <button type="submit" class="btn btn-primary">
-            Guardar Cambios de Perfil
+          <button type="submit" class="btn btn-primary" style="gap: 6px;">
+            <i class="fa-solid fa-floppy-disk"></i>
+            <span>Guardar Cambios de Perfil</span>
           </button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- PASSWORD CHANGER FORM -->
+  <!-- PASSWORD UPDATE FORM -->
   <div class="card">
-    <div class="card-body">
-      <h2 style="font-size: 1.3rem; margin-bottom: 1.25rem;">Seguridad y Contraseña</h2>
+    <div class="card-body" style="padding: 1.5rem;">
+      <h2 style="font-size: 1.25rem; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem; color: var(--text-near-black);">
+        <i class="fa-solid fa-key" style="color: var(--sage-base);"></i>
+        <span>Cambiar Contraseña</span>
+      </h2>
 
       <form method="POST" action="{{ route('profile.password') }}">
         @csrf
@@ -112,19 +123,20 @@
         </div>
 
         <div class="form-group">
-          <label for="new_password" class="form-label">Nueva contraseña (mínimo 6 caracteres)</label>
+          <label for="new_password" class="form-label">Nueva contraseña</label>
           <input type="password" name="password" id="new_password" class="form-control" required>
           @error('password') <div class="form-error">{{ $message }}</div> @enderror
         </div>
 
         <div class="form-group">
-          <label for="new_password_confirmation" class="form-label">Confirma la nueva contraseña</label>
-          <input type="password" name="password_confirmation" id="new_password_confirmation" class="form-control" required>
+          <label for="password_confirmation" class="form-label">Confirmar nueva contraseña</label>
+          <input type="password" name="password_confirmation" id="password_confirmation" class="form-control" required>
         </div>
 
         <div style="margin-top: 1.5rem; text-align: right;">
-          <button type="submit" class="btn btn-secondary">
-            Actualizar Contraseña
+          <button type="submit" class="btn btn-secondary" style="gap: 6px;">
+            <i class="fa-solid fa-lock"></i>
+            <span>Actualizar Contraseña</span>
           </button>
         </div>
       </form>
@@ -133,19 +145,3 @@
 
 </div>
 @endsection
-
-@push('scripts')
-<script>
-  document.querySelectorAll('.avatar-radio').forEach(radio => {
-    radio.addEventListener('change', () => {
-      document.querySelectorAll('.avatar-swatch').forEach(sw => {
-        sw.style.borderColor = 'transparent';
-        sw.querySelector('.check-mark').style.display = 'none';
-      });
-      const selectedSwatch = radio.closest('label').querySelector('.avatar-swatch');
-      selectedSwatch.style.borderColor = 'var(--ink-900)';
-      selectedSwatch.querySelector('.check-mark').style.display = 'block';
-    });
-  });
-</script>
-@endpush

@@ -59,7 +59,7 @@ class AppFlowTest extends TestCase
 
         // Interactive tools
         $this->get('/sientes')->assertStatus(200)->assertSee('¿Cómo te sientes');
-        $this->get('/herramientas/respiracion')->assertStatus(200)->assertSee('Respira con nosotros');
+        $this->get('/herramientas/respiracion')->assertStatus(200)->assertSee('Respira conmigo');
         $this->get('/herramientas/grounding')->assertStatus(200)->assertSee('5-4-3-2-1');
         $this->get('/herramientas/stop')->assertStatus(200)->assertSee('Técnica STOP');
         $this->get('/crisis')->assertStatus(200)->assertSee('Línea de la Vida');

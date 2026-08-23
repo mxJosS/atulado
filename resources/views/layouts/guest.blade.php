@@ -7,57 +7,69 @@
   <title>@yield('title', 'A tu lado — Apoyo y Bienestar Emocional')</title>
   <meta name="description" content="Plataforma de acompañamiento psicológico, regulación emocional basada en evidencia DBT, plan de seguridad personal y directorio de crisis 24/7.">
   
-  <!-- Favicon / Brand -->
-  <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+  <!-- Favicon / Brand CSS with Cache Buster -->
+  <link rel="stylesheet" href="{{ asset('css/style.css') }}?v={{ file_exists(public_path('css/style.css')) ? filemtime(public_path('css/style.css')) : time() }}">
+  <!-- Google Fonts: Fraunces, Instrument Serif, Manrope, IBM Plex Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Instrument+Serif:ital@0;1&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- FontAwesome Pro/Free Kit -->
+  <script src="https://kit.fontawesome.com/6244811c40.js" crossorigin="anonymous"></script>
   @stack('styles')
 </head>
-<body>
+<body style="background-color: #F8FAF9; color: #1A2620;">
 
   <!-- PUBLIC NAVBAR -->
-  <nav class="site-navbar" id="siteNavbar">
-    <div class="nav-container">
-      <a href="{{ route('home') }}" class="nav-brand" aria-label="Ir a inicio">
-        <svg class="ptree nav-brand-tree" viewBox="0 0 16 16" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
-          <rect x="5" y="0" width="6" height="2" fill="#5a9060"/>
-          <rect x="3" y="2" width="10" height="2" fill="#6B8F71"/>
-          <rect x="2" y="4" width="12" height="2" fill="#7ab870"/>
-          <rect x="3" y="6" width="10" height="2" fill="#6B8F71"/>
-          <rect x="5" y="8" width="6" height="2" fill="#5a9060"/>
-          <rect x="7" y="10" width="2" height="4" fill="#8B5e30"/>
-          <rect x="4" y="1" width="1" height="1" fill="#e84040"/>
-          <rect x="11" y="3" width="1" height="1" fill="#e84040"/>
-          <rect x="9" y="7" width="1" height="1" fill="#e84040"/>
+  <nav class="site-navbar" id="siteNavbar" style="background: #080C0A; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding: 0.85rem 1.5rem; position: sticky; top: 0; z-index: 100;">
+    <div class="nav-container" style="max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem;">
+      
+      <!-- Brand Logo -->
+      <a href="{{ route('home') }}" class="nav-brand" style="display: flex; align-items: center; gap: 0.65rem; font-family: var(--font-display); font-size: 1.35rem; font-weight: 700; color: #FFFFFF; text-decoration: none;" aria-label="Ir a inicio">
+        <svg class="ptree" viewBox="0 0 16 16" width="28" height="28" xmlns="http://www.w3.org/2000/svg">
+          <rect x="5" y="0" width="6" height="2" fill="#2D6B3A"/>
+          <rect x="3" y="2" width="10" height="2" fill="#3D8C4F"/>
+          <rect x="2" y="4" width="12" height="2" fill="#5AB56E"/>
+          <rect x="3" y="6" width="10" height="2" fill="#3D8C4F"/>
+          <rect x="5" y="8" width="6" height="2" fill="#2D6B3A"/>
+          <rect x="7" y="10" width="2" height="4" fill="#6B3A1F"/>
+          <rect x="4" y="1" width="1" height="1" fill="#C0392B"/>
+          <rect x="11" y="3" width="1" height="1" fill="#C0392B"/>
+          <rect x="9" y="7" width="1" height="1" fill="#C0392B"/>
         </svg>
-        <span>a tu lado</span>
+        <span>a tu <em class="editorial-italic" style="color: #A8E6C0;">lado</em></span>
       </a>
 
-      <ul class="nav-menu">
+      <!-- Menu Links -->
+      <ul class="nav-menu" style="display: flex; align-items: center; gap: 0.35rem; list-style: none; margin: 0; padding: 0;">
         <li><a href="{{ route('home') }}" class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}">Inicio</a></li>
+        <li><a href="{{ route('sientes') }}" class="nav-link {{ request()->routeIs('sientes') ? 'active' : '' }}">¿Cómo te sientes?</a></li>
+        <li><a href="{{ route('tools.respiracion') }}" class="nav-link {{ request()->routeIs('tools.respiracion') ? 'active' : '' }}">Respira Conmigo</a></li>
         <li><a href="{{ route('recursos.index') }}" class="nav-link {{ request()->routeIs('recursos.*') ? 'active' : '' }}">Recursos</a></li>
         <li><a href="{{ route('revista.index') }}" class="nav-link {{ request()->routeIs('revista.*') ? 'active' : '' }}">Revista</a></li>
-        <li><a href="{{ route('sientes') }}" class="nav-link {{ request()->routeIs('sientes') ? 'active' : '' }}">¿Cómo te sientes?</a></li>
         <li><a href="{{ route('crisis') }}" class="nav-link {{ request()->routeIs('crisis') ? 'active' : '' }}">Líneas de Ayuda</a></li>
       </ul>
 
-      <div class="nav-actions">
+      <!-- Action Buttons -->
+      <div class="nav-actions" style="display: flex; align-items: center; gap: 0.75rem;">
         <a href="tel:8002900024" class="nav-crisis-pill" title="Llamar a Línea de la Vida">
-          <span class="nav-crisis-dot"></span>
-          <span>Crisis: 800 290 0024</span>
+          <i class="fa-solid fa-phone" style="font-size: 0.75rem;"></i>
+          <span>CRISIS: 800 290 0024</span>
         </a>
 
         @auth
           <a href="{{ route('dashboard') }}" class="nav-btn-access">
+            <i class="fa-solid fa-user-shield"></i>
             <span>Mi Espacio</span>
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M6 12l4-4-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
           </a>
         @else
           <a href="{{ route('login') }}" class="nav-btn-access">
+            <i class="fa-solid fa-arrow-right-to-bracket"></i>
             <span>Acceder</span>
           </a>
         @endauth
 
         <button class="nav-hamburger" id="navHamburgerBtn" aria-label="Abrir menú de navegación">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <i class="fa-solid fa-bars" style="font-size: 1.25rem;"></i>
         </button>
       </div>
     </div>
@@ -65,48 +77,51 @@
 
   <!-- MOBILE DRAWER -->
   <div class="nav-mobile-drawer" id="navMobileDrawer">
-    <a href="{{ route('home') }}" class="nav-mobile-link">Inicio</a>
-    <a href="{{ route('recursos.index') }}" class="nav-mobile-link">Recursos y Ejercicios</a>
-    <a href="{{ route('revista.index') }}" class="nav-mobile-link">Revista de Bienestar</a>
-    <a href="{{ route('sientes') }}" class="nav-mobile-link">¿Cómo te sientes hoy?</a>
-    <a href="{{ route('tools.respiracion') }}" class="nav-mobile-link">Respiración Guiada</a>
-    <a href="{{ route('crisis') }}" class="nav-mobile-link" style="color: #ff9999;">Directorio de Crisis 24/7</a>
+    <a href="{{ route('home') }}" class="nav-mobile-link"><i class="fa-solid fa-house" style="margin-right: 8px; color: #A8E6C0;"></i> Inicio</a>
+    <a href="{{ route('sientes') }}" class="nav-mobile-link"><i class="fa-solid fa-heart-pulse" style="margin-right: 8px; color: #A8E6C0;"></i> ¿Cómo te sientes hoy?</a>
+    <a href="{{ route('tools.respiracion') }}" class="nav-mobile-link"><i class="fa-solid fa-lungs" style="margin-right: 8px; color: #A8E6C0;"></i> Respira Conmigo</a>
+    <a href="{{ route('recursos.index') }}" class="nav-mobile-link"><i class="fa-solid fa-book-bookmark" style="margin-right: 8px; color: #A8E6C0;"></i> Recursos y Ejercicios</a>
+    <a href="{{ route('revista.index') }}" class="nav-mobile-link"><i class="fa-solid fa-newspaper" style="margin-right: 8px; color: #A8E6C0;"></i> Revista de Bienestar</a>
+    <a href="{{ route('crisis') }}" class="nav-mobile-link" style="color: #FFA59C;"><i class="fa-solid fa-phone-volume" style="margin-right: 8px;"></i> Directorio de Crisis 24/7</a>
     @auth
-      <a href="{{ route('dashboard') }}" class="btn btn-primary" style="margin-top: 1rem;">Ir a Mi Espacio</a>
+      <a href="{{ route('dashboard') }}" class="btn btn-primary" style="margin-top: 1rem;"><i class="fa-solid fa-user-shield"></i> Ir a Mi Espacio</a>
     @else
       <div style="display: flex; gap: 0.75rem; margin-top: 1rem;">
-        <a href="{{ route('login') }}" class="btn btn-secondary" style="flex: 1;">Iniciar Sesión</a>
-        <a href="{{ route('register') }}" class="btn btn-primary" style="flex: 1;">Crear Cuenta</a>
+        <a href="{{ route('login') }}" class="btn btn-secondary" style="flex: 1;"><i class="fa-solid fa-arrow-right-to-bracket"></i> Iniciar Sesión</a>
+        <a href="{{ route('register') }}" class="btn btn-primary" style="flex: 1;"><i class="fa-solid fa-user-plus"></i> Crear Cuenta</a>
       </div>
     @endauth
   </div>
 
-  <!-- FLASH ALERTS -->
-  @if(session('success') || session('error') || session('info'))
-    <div class="container" style="margin-top: 1.5rem;">
-      @if(session('success'))
-        <div class="alert-banner alert-success">
-          <span>🌿</span>
-          <div>{{ session('success') }}</div>
-        </div>
-      @endif
-      @if(session('error'))
-        <div class="alert-banner alert-error">
-          <span>⚠️</span>
-          <div>{{ session('error') }}</div>
-        </div>
-      @endif
-      @if(session('info'))
-        <div class="alert-banner alert-info">
-          <span>💡</span>
-          <div>{{ session('info') }}</div>
-        </div>
-      @endif
-    </div>
-  @endif
+  <!-- GLOBAL FLOATING TOAST CONTAINER (FUERA DE LAS TARJETAS) -->
+  <div id="zenToastContainer">
+    @if(session('success'))
+      <div class="zen-toast-pill success" onclick="this.remove()">
+        <i class="fa-solid fa-circle-check" style="font-size: 1.15rem; color: #1E4A25;"></i>
+        <span>{{ session('success') }}</span>
+        <div class="toast-fill-bar"></div>
+      </div>
+    @endif
+    @if(session('error'))
+      <div class="zen-toast-pill error" onclick="this.remove()">
+        <i class="fa-solid fa-triangle-exclamation" style="font-size: 1.15rem; color: #922B21;"></i>
+        <span>{{ session('error') }}</span>
+        <div class="toast-fill-bar"></div>
+      </div>
+    @endif
+    @if(session('info'))
+      <div class="zen-toast-pill info" onclick="this.remove()">
+        <i class="fa-solid fa-circle-info" style="font-size: 1.15rem; color: #4A3575;"></i>
+        <span>{{ session('info') }}</span>
+        <div class="toast-fill-bar"></div>
+      </div>
+    @endif
+  </div>
 
-  <!-- MAIN PAGE CONTENT -->
-  <main>
+  <div id="spaProgressBar"></div>
+
+  <!-- MAIN PAGE CONTENT (SPA TRANSITION WRAPPER) -->
+  <main id="spaContent">
     @yield('content')
   </main>
 
@@ -114,45 +129,46 @@
   <footer class="site-footer">
     <div class="footer-grid">
       <div>
-        <div class="nav-brand" style="margin-bottom: 0.85rem;">
-          <svg class="ptree" viewBox="0 0 16 16" width="22" height="22" xmlns="http://www.w3.org/2000/svg">
-            <rect x="5" y="0" width="6" height="2" fill="#5a9060"/>
-            <rect x="3" y="2" width="10" height="2" fill="#6B8F71"/>
-            <rect x="2" y="4" width="12" height="2" fill="#7ab870"/>
-            <rect x="3" y="6" width="10" height="2" fill="#6B8F71"/>
-            <rect x="5" y="8" width="6" height="2" fill="#5a9060"/>
-            <rect x="7" y="10" width="2" height="4" fill="#8B5e30"/>
-            <rect x="4" y="1" width="1" height="1" fill="#e84040"/>
-            <rect x="11" y="3" width="1" height="1" fill="#e84040"/>
-            <rect x="9" y="7" width="1" height="1" fill="#e84040"/>
+        <div class="footer-brand">
+          <svg class="ptree" viewBox="0 0 16 16" width="26" height="26" xmlns="http://www.w3.org/2000/svg">
+            <rect x="5" y="0" width="6" height="2" fill="#2D6B3A"/>
+            <rect x="3" y="2" width="10" height="2" fill="#3D8C4F"/>
+            <rect x="2" y="4" width="12" height="2" fill="#5AB56E"/>
+            <rect x="3" y="6" width="10" height="2" fill="#3D8C4F"/>
+            <rect x="5" y="8" width="6" height="2" fill="#2D6B3A"/>
+            <rect x="7" y="10" width="2" height="4" fill="#6B3A1F"/>
+            <rect x="4" y="1" width="1" height="1" fill="#C0392B"/>
+            <rect x="11" y="3" width="1" height="1" fill="#C0392B"/>
+            <rect x="9" y="7" width="1" height="1" fill="#C0392B"/>
           </svg>
-          <span>a tu lado</span>
+          <span>a tu <em class="editorial-italic" style="color: #A8E6C0;">lado</em></span>
         </div>
-        <p style="color: rgba(255, 255, 255, 0.55); font-size: 0.9rem; max-width: 320px; line-height: 1.7; margin-bottom: 1.25rem;">
+        <p class="footer-desc">
           Un espacio seguro y confidencial de acompañamiento psicológico, herramientas DBT y prevención en crisis para México y Latinoamérica.
         </p>
-        <div class="badge badge-crisis" style="padding: 0.4rem 0.9rem;">
-          Línea de la Vida: 800 290 0024 · Gratuita 24h
-        </div>
+        <a href="tel:8002900024" class="badge badge-crisis" style="padding: 0.5rem 1rem; gap: 8px; text-decoration: none;">
+          <i class="fa-solid fa-phone"></i>
+          <span>Línea 24h: 800 290 0024</span>
+        </a>
       </div>
 
       <div>
         <h4 class="footer-col-title">Explorar</h4>
         <ul class="footer-links">
-          <li><a href="{{ route('home') }}">Inicio</a></li>
-          <li><a href="{{ route('recursos.index') }}">Biblioteca de Recursos</a></li>
-          <li><a href="{{ route('revista.index') }}">Revista de Salud Mental</a></li>
-          <li><a href="{{ route('sientes') }}">Test Emocional</a></li>
+          <li><a href="{{ route('home') }}"><i class="fa-solid fa-chevron-right" style="font-size: 0.65rem; color: #A8E6C0;"></i> Inicio</a></li>
+          <li><a href="{{ route('sientes') }}"><i class="fa-solid fa-chevron-right" style="font-size: 0.65rem; color: #A8E6C0;"></i> ¿Cómo te sientes hoy?</a></li>
+          <li><a href="{{ route('recursos.index') }}"><i class="fa-solid fa-chevron-right" style="font-size: 0.65rem; color: #A8E6C0;"></i> Biblioteca de Recursos</a></li>
+          <li><a href="{{ route('revista.index') }}"><i class="fa-solid fa-chevron-right" style="font-size: 0.65rem; color: #A8E6C0;"></i> Revista de Salud Mental</a></li>
         </ul>
       </div>
 
       <div>
         <h4 class="footer-col-title">Herramientas</h4>
         <ul class="footer-links">
-          <li><a href="{{ route('tools.respiracion') }}">Respiración Diafragmática (4-7-8)</a></li>
-          <li><a href="{{ route('tools.grounding') }}">Grounding Sensorial 5-4-3-2-1</a></li>
-          <li><a href="{{ route('tools.stop') }}">Técnica STOP (DBT)</a></li>
-          <li><a href="{{ route('crisis') }}">Líneas Internacionales</a></li>
+          <li><a href="{{ route('tools.respiracion') }}"><i class="fa-solid fa-chevron-right" style="font-size: 0.65rem; color: #A8E6C0;"></i> Respira Conmigo (4-7-8)</a></li>
+          <li><a href="{{ route('tools.grounding') }}"><i class="fa-solid fa-chevron-right" style="font-size: 0.65rem; color: #A8E6C0;"></i> Grounding 5-4-3-2-1</a></li>
+          <li><a href="{{ route('tools.stop') }}"><i class="fa-solid fa-chevron-right" style="font-size: 0.65rem; color: #A8E6C0;"></i> Técnica STOP (DBT)</a></li>
+          <li><a href="{{ route('crisis') }}"><i class="fa-solid fa-chevron-right" style="font-size: 0.65rem; color: #A8E6C0;"></i> Líneas de Crisis 24h</a></li>
         </ul>
       </div>
 
@@ -160,14 +176,14 @@
         <h4 class="footer-col-title">Tu Espacio</h4>
         <ul class="footer-links">
           @auth
-            <li><a href="{{ route('dashboard') }}">Panel Principal</a></li>
-            <li><a href="{{ route('mood.history') }}">Historial de Emociones</a></li>
-            <li><a href="{{ route('safety-plan.show') }}">Mi Plan de Seguridad</a></li>
-            <li><a href="{{ route('favorites.index') }}">Mis Favoritos</a></li>
+            <li><a href="{{ route('dashboard') }}"><i class="fa-solid fa-chevron-right" style="font-size: 0.65rem; color: #A8E6C0;"></i> Panel Principal</a></li>
+            <li><a href="{{ route('mood.history') }}"><i class="fa-solid fa-chevron-right" style="font-size: 0.65rem; color: #A8E6C0;"></i> Historial de Emociones</a></li>
+            <li><a href="{{ route('safety-plan.show') }}"><i class="fa-solid fa-chevron-right" style="font-size: 0.65rem; color: #A8E6C0;"></i> Plan de Seguridad</a></li>
+            <li><a href="{{ route('favorites.index') }}"><i class="fa-solid fa-chevron-right" style="font-size: 0.65rem; color: #A8E6C0;"></i> Mis Favoritos</a></li>
           @else
-            <li><a href="{{ route('login') }}">Iniciar Sesión</a></li>
-            <li><a href="{{ route('register') }}">Crear Cuenta Gratis</a></li>
-            <li><a href="{{ route('login') }}">Acceso a Diario Personal</a></li>
+            <li><a href="{{ route('login') }}"><i class="fa-solid fa-chevron-right" style="font-size: 0.65rem; color: #A8E6C0;"></i> Iniciar Sesión</a></li>
+            <li><a href="{{ route('register') }}"><i class="fa-solid fa-chevron-right" style="font-size: 0.65rem; color: #A8E6C0;"></i> Crear Cuenta Gratis</a></li>
+            <li><a href="{{ route('login') }}"><i class="fa-solid fa-chevron-right" style="font-size: 0.65rem; color: #A8E6C0;"></i> Diario Personal</a></li>
           @endauth
         </ul>
       </div>
@@ -175,13 +191,13 @@
 
     <div class="footer-bottom">
       <p>© {{ date('Y') }} A tu lado · Plataforma de Bienestar y Salud Mental</p>
-      <p style="font-size: 0.78rem; opacity: 0.7;">
+      <p style="font-size: 0.76rem; opacity: 0.75; max-width: 600px;">
         *Este servicio es complementario y no sustituye la psicoterapia profesional individualizada. En emergencias severas, comunícate de inmediato a la Línea de la Vida.
       </p>
     </div>
   </footer>
 
-  <script src="{{ asset('js/main.js') }}"></script>
+  <script src="{{ asset('js/main.js') }}?v={{ file_exists(public_path('js/main.js')) ? filemtime(public_path('js/main.js')) : time() }}"></script>
   @stack('scripts')
 </body>
 </html>

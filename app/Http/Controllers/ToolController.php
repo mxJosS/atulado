@@ -38,7 +38,7 @@ class ToolController extends Controller
         }
 
         $crisisLines = $query->orderBy('order_index')->get();
-        $countries = CrisisLine::select('country', 'country_code')->distinct()->get();
+        $countries = CrisisLine::select('country', 'country_code')->get()->unique('country_code');
 
         return view('crisis', compact('crisisLines', 'countries'));
     }

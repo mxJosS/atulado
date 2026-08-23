@@ -34,7 +34,7 @@ class AuthController extends Controller
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
             return redirect()->intended(route('dashboard'))
-                ->with('success', '¡Bienvenido de vuelta, ' . Auth::user()->name . '! 🌱');
+                ->with('success', '¡Bienvenido de vuelta, ' . Auth::user()->name . '!');
         }
 
         return back()->withErrors([
@@ -89,6 +89,11 @@ class AuthController extends Controller
         return redirect()->route('home')->with('info', 'Has cerrado sesión con tranquilidad. Estamos aquí cuando nos necesites.');
     }
 
+    public function showProfile()
+    {
+        return view('dashboard.perfil', ['user' => Auth::user()]);
+    }
+
     public function updateProfile(Request $request)
     {
         $user = Auth::user();
@@ -96,7 +101,7 @@ class AuthController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email,' . $user->id],
-            'avatar_color' => ['required', 'string', 'in:sage,terra,lav,sky,amber,dark'],
+            'avatar_color' => ['required', 'string', 'in:sage,terra,lav,sky,amber,dark,mint'],
             'bio' => ['nullable', 'string', 'max:300'],
             'crisis_contact_name' => ['nullable', 'string', 'max:100'],
             'crisis_contact_phone' => ['nullable', 'string', 'max:50'],

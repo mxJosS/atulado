@@ -1,196 +1,62 @@
 @extends('layouts.guest')
 
-@section('title', 'Respiración Diafragmática Guiada (4-7-8) — A tu lado')
+@section('title', 'Respira Conmigo — Biorregulación Guiada 4-7-8')
 
 @section('content')
-<div style="background: var(--dark-900); color: #ffffff; min-height: 88vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 3rem 1.5rem; position: relative; overflow: hidden;">
-  <!-- Ambient glow halo -->
-  <div class="hero-halo" style="top: 50%; left: 50%;"></div>
+<div id="mainRespiracionContainer" style="background: #080C0A !important; color: #FFFFFF !important; min-height: 88vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 4rem 1.5rem; position: relative; overflow: hidden;">
+  
+  <div style="position: absolute; width: 650px; height: 650px; border-radius: 50%; background: radial-gradient(circle, rgba(90,181,110,0.2) 0%, transparent 70%); top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none;"></div>
 
-  <div style="position: relative; z-index: 2; text-align: center; max-width: 600px;">
-    <div class="mono-tag" style="color: var(--sage-300); margin-bottom: 0.5rem;">Herramienta de Biorregulación</div>
-    <h1 style="color: #ffffff; font-size: clamp(2rem, 5vw, 3rem); margin-bottom: 0.5rem;">
-      Respira con nosotros
+  <div style="position: relative; z-index: 2; text-align: center; max-width: 650px;">
+    <span class="mono-tag" style="color: #A8E6C0; margin-bottom: 0.5rem; display: block;">Herramienta de Biorregulación</span>
+    <h1 style="color: #FFFFFF !important; font-size: clamp(2.2rem, 5vw, 3.4rem); margin-bottom: 0.5rem; font-weight: 700;">
+      Respira conmigo
     </h1>
-    <p style="color: rgba(255, 255, 255, 0.65); font-size: 0.95rem; margin-bottom: 2rem;">
-      Sigue el ritmo del círculo. Al inhalar se expande, sostén con calma y exhala lentamente para activar tu sistema parasimpático.
+    <p style="color: #C8DDD1 !important; font-size: 1rem; line-height: 1.6; margin-bottom: 2rem;">
+      Sigue el ritmo del círculo. Al inhalar se expande suavemente, sostén en calma y exhala despacio para estimular tu nervio vago.
     </p>
 
     <!-- MODE PICKER PILLS -->
     <div style="display: flex; gap: 0.5rem; justify-content: center; margin-bottom: 2rem; flex-wrap: wrap;">
-      <button class="btn btn-sm mode-pill active" data-mode="478" style="background: var(--sage-500); color: #fff; border-radius: var(--radius-full);">
+      <button class="btn btn-sm page-breath-mode active" data-mode="478" style="background: #2E5D4B !important; color: #FFFFFF !important; border-radius: 9999px; border: 1px solid #3D7A5F;">
         Técnica 4-7-8 (Calma Profunda)
       </button>
-      <button class="btn btn-sm mode-pill" data-mode="box" style="background: rgba(255,255,255,0.1); color: #fff; border-radius: var(--radius-full);">
+      <button class="btn btn-sm page-breath-mode" data-mode="box" style="background: rgba(255,255,255,0.08) !important; color: #E8F0EA !important; border-radius: 9999px; border: 1px solid rgba(255,255,255,0.2);">
         Box 4-4-4-4 (Enfoque)
       </button>
-      <button class="btn btn-sm mode-pill" data-mode="calm" style="background: rgba(255,255,255,0.1); color: #fff; border-radius: var(--radius-full);">
+      <button class="btn btn-sm page-breath-mode" data-mode="calm" style="background: rgba(255,255,255,0.08) !important; color: #E8F0EA !important; border-radius: 9999px; border: 1px solid rgba(255,255,255,0.2);">
         Suave 4-4 (Relajación)
       </button>
     </div>
 
     <!-- BREATHING CIRCLE -->
-    <div class="breathing-box">
-      <div class="breathing-circle-outer"></div>
-      <div class="breathing-circle-core" id="breathingCore">
-        <div id="breathStateText" style="font-family: var(--font-display); font-size: 1.4rem; font-weight: 700;">
-          Comenzar
-        </div>
-        <div id="breathSecondsCounter" style="font-family: var(--font-mono); font-size: 1.5rem; font-weight: 700; margin-top: 0.2rem;">
-          0s
-        </div>
+    <div class="breathing-zen-circle" id="mainBreathCircle" style="width: 240px; height: 240px; border-radius: 50%; margin: 2rem auto; background: radial-gradient(circle, #2E5D4B 0%, #1E4A25 75%, #0D1410 100%); border: 3px solid #5AB56E; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 0 40px rgba(90, 181, 110, 0.35); position: relative; user-select: none;" title="Toca para iniciar o pausar">
+      <div class="circle-action-text" id="mainBreathAction" style="font-family: var(--font-editorial); font-style: italic; font-size: 1.65rem; color: #FFFFFF; line-height: 1.1; padding: 0 1rem; text-align: center;">
+        Toca para comenzar
+      </div>
+      <div class="circle-counter-text" id="mainBreathCounter" style="display: none; font-family: var(--font-mono); font-size: 1.6rem; font-weight: 700; color: #A8E6C0; margin-top: 4px;">
+        4s
       </div>
     </div>
 
-    <!-- CYCLES COUNTER & CONTROLS -->
-    <div style="margin-top: 2rem; display: flex; align-items: center; justify-content: center; gap: 1.5rem;">
-      <button id="toggleBreathBtn" class="btn btn-primary btn-lg" style="min-width: 180px;">
-        ▶ Iniciar Ejercicio
-      </button>
-      <button id="soundToggleBtn" class="btn btn-outline-white btn-sm" title="Activar/desactivar campanas sonoras">
-        🔔 Sonido: Activado
+    <!-- CONTROLS -->
+    <div style="margin-top: 2rem; display: flex; align-items: center; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+      <button id="mainToggleBreathBtn" class="btn btn-primary btn-lg" style="min-width: 240px; gap: 8px; font-family: var(--font-mono); font-size: 0.9rem; letter-spacing: 0.05em; background: #2E5D4B !important; color: #FFFFFF !important;">
+        <i id="mainPlayIcon" class="fa-solid fa-play"></i>
+        <span id="mainPlayText">INICIAR EJERCICIO</span>
       </button>
     </div>
 
-    <div style="margin-top: 1.5rem; font-family: var(--font-mono); font-size: 0.85rem; color: rgba(255,255,255,0.5);">
-      Ciclos completados: <span id="cycleCount" style="color: #ffd166; font-weight: 700;">0</span>
+    <div style="margin-top: 1.5rem; font-family: var(--font-mono); font-size: 0.88rem; color: #8EADA4;">
+      Ciclos completados: <span id="mainCycleCount" style="color: #C8B87A; font-weight: 700;">0</span>
     </div>
 
-    <div style="margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1); font-size: 0.85rem; color: rgba(255,255,255,0.5);">
-      <a href="{{ route('sientes') }}" style="color: var(--sage-300); text-decoration: underline;">← Volver al Test Emocional</a>
-      &nbsp;·&nbsp;
-      <a href="{{ route('recursos.index') }}" style="color: var(--sage-300); text-decoration: underline;">Más herramientas</a>
+    <div style="margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1); font-size: 0.88rem; color: #8EADA4;">
+      <a href="{{ route('sientes') }}" style="color: #A8E6C0; text-decoration: underline; display: inline-flex; align-items: center; gap: 6px;">
+        <i class="fa-solid fa-arrow-left"></i>
+        <span>Volver a ¿Cómo te sientes?</span>
+      </a>
     </div>
   </div>
 </div>
 @endsection
-
-@push('scripts')
-<script>
-  let isRunning = false;
-  let currentMode = '478';
-  let soundEnabled = true;
-  let intervalId = null;
-  let cycleCount = 0;
-
-  const core = document.getElementById('breathingCore');
-  const stateText = document.getElementById('breathStateText');
-  const counterText = document.getElementById('breathSecondsCounter');
-  const toggleBtn = document.getElementById('toggleBreathBtn');
-  const soundBtn = document.getElementById('soundToggleBtn');
-  const cycleDisplay = document.getElementById('cycleCount');
-
-  // Mode intervals (inhale, hold, exhale, hold2)
-  const modes = {
-    '478':  { inhale: 4, hold: 7, exhale: 8, hold2: 0 },
-    'box':  { inhale: 4, hold: 4, exhale: 4, hold2: 4 },
-    'calm': { inhale: 4, hold: 0, exhale: 4, hold2: 0 },
-  };
-
-  soundBtn.addEventListener('click', () => {
-    soundEnabled = !soundEnabled;
-    window.zenAudio.enabled = soundEnabled;
-    soundBtn.textContent = soundEnabled ? '🔔 Sonido: Activado' : '🔕 Sonido: Desactivado';
-  });
-
-  document.querySelectorAll('.mode-pill').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.mode-pill').forEach(b => {
-        b.style.background = 'rgba(255,255,255,0.1)';
-      });
-      btn.style.background = 'var(--sage-500)';
-      currentMode = btn.getAttribute('data-mode');
-      if (isRunning) stopExercise();
-    });
-  });
-
-  toggleBtn.addEventListener('click', () => {
-    if (isRunning) {
-      stopExercise();
-    } else {
-      startExercise();
-    }
-  });
-
-  function startExercise() {
-    isRunning = true;
-    toggleBtn.innerHTML = '⏸ Pausar Ejercicio';
-    toggleBtn.classList.remove('btn-primary');
-    toggleBtn.classList.add('btn-secondary');
-    runBreathingCycle();
-  }
-
-  function stopExercise() {
-    isRunning = false;
-    clearTimeout(intervalId);
-    toggleBtn.innerHTML = '▶ Iniciar Ejercicio';
-    toggleBtn.classList.remove('btn-secondary');
-    toggleBtn.classList.add('btn-primary');
-    core.className = 'breathing-circle-core';
-    stateText.textContent = 'En pausa';
-    counterText.textContent = '0s';
-  }
-
-  async function runBreathingCycle() {
-    if (!isRunning) return;
-    const cfg = modes[currentMode];
-
-    // INHALE
-    core.className = 'breathing-circle-core inhale';
-    stateText.textContent = 'Inhala';
-    window.zenAudio.playChime(440, 'sine', 2.0); // A4
-    await countdown(cfg.inhale);
-    if (!isRunning) return;
-
-    // HOLD
-    if (cfg.hold > 0) {
-      core.className = 'breathing-circle-core hold';
-      stateText.textContent = 'Sostén';
-      window.zenAudio.playChime(523.25, 'sine', 1.5); // C5
-      await countdown(cfg.hold);
-      if (!isRunning) return;
-    }
-
-    // EXHALE
-    core.className = 'breathing-circle-core exhale';
-    stateText.textContent = 'Exhala suave';
-    window.zenAudio.playChime(349.23, 'sine', 2.2); // F4
-    await countdown(cfg.exhale);
-    if (!isRunning) return;
-
-    // HOLD 2 (For Box)
-    if (cfg.hold2 > 0) {
-      core.className = 'breathing-circle-core';
-      stateText.textContent = 'Sostén vacío';
-      await countdown(cfg.hold2);
-      if (!isRunning) return;
-    }
-
-    cycleCount++;
-    cycleDisplay.textContent = cycleCount;
-    runBreathingCycle();
-  }
-
-  function countdown(seconds) {
-    return new Promise(resolve => {
-      let remaining = seconds;
-      counterText.textContent = `${remaining}s`;
-      
-      const timer = setInterval(() => {
-        remaining--;
-        if (!isRunning) {
-          clearInterval(timer);
-          resolve();
-          return;
-        }
-        if (remaining > 0) {
-          counterText.textContent = `${remaining}s`;
-        } else {
-          clearInterval(timer);
-          resolve();
-        }
-      }, 1000);
-    });
-  }
-</script>
-@endpush

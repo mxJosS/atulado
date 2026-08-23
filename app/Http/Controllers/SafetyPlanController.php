@@ -62,7 +62,7 @@ class SafetyPlanController extends Controller
             ]
         );
 
-        return back()->with('success', '¡Tu Plan de Seguridad Personal ha sido actualizado y guardado! 🛡️');
+        return back()->with('success', '¡Tu Plan de Seguridad Personal ha sido actualizado y guardado!');
     }
 
     public function printView()

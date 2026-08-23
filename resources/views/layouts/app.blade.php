@@ -4,215 +4,212 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="csrf-token" content="{{ csrf_token() }}">
+  @php
+    $errors = $errors ?? new \Illuminate\Support\ViewErrorBag();
+  @endphp
   <title>@yield('title', 'Mi Espacio') — A tu lado</title>
   
-  <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+  <!-- CSS & Official Fonts with Cache Buster -->
+  <link rel="stylesheet" href="{{ asset('css/style.css') }}?v={{ file_exists(public_path('css/style.css')) ? filemtime(public_path('css/style.css')) : time() }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Instrument+Serif:ital@0;1&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Pro/Free Kit -->
+  <script src="https://kit.fontawesome.com/6244811c40.js" crossorigin="anonymous"></script>
   @stack('styles')
 </head>
-<body style="background: var(--bg-canvas);">
+<body style="background: #F8FAF9; color: #1A2620;">
 
-  <!-- DASHBOARD WRAPPER -->
   <div class="dashboard-layout">
 
-    <!-- SIDEBAR -->
+    <!-- ════ COMPACT STICKY SIDEBAR (NO-SCROLL PINNED LOGOUT) ════ -->
     <aside class="dashboard-sidebar" id="dashboardSidebar">
+      
+      <!-- Brand Header -->
       <div class="sidebar-header">
         <a href="{{ route('home') }}" class="sidebar-brand">
           <svg class="ptree" viewBox="0 0 16 16" width="22" height="22" xmlns="http://www.w3.org/2000/svg">
-            <rect x="5" y="0" width="6" height="2" fill="#5a9060"/>
-            <rect x="3" y="2" width="10" height="2" fill="#6B8F71"/>
-            <rect x="2" y="4" width="12" height="2" fill="#7ab870"/>
-            <rect x="3" y="6" width="10" height="2" fill="#6B8F71"/>
-            <rect x="5" y="8" width="6" height="2" fill="#5a9060"/>
-            <rect x="7" y="10" width="2" height="4" fill="#8B5e30"/>
-            <rect x="4" y="1" width="1" height="1" fill="#e84040"/>
-            <rect x="11" y="3" width="1" height="1" fill="#e84040"/>
-            <rect x="9" y="7" width="1" height="1" fill="#e84040"/>
+            <rect x="5" y="0" width="6" height="2" fill="#2D6B3A"/>
+            <rect x="3" y="2" width="10" height="2" fill="#3D8C4F"/>
+            <rect x="2" y="4" width="12" height="2" fill="#5AB56E"/>
+            <rect x="3" y="6" width="10" height="2" fill="#3D8C4F"/>
+            <rect x="5" y="8" width="6" height="2" fill="#2D6B3A"/>
+            <rect x="7" y="10" width="2" height="4" fill="#6B3A1F"/>
+            <rect x="4" y="1" width="1" height="1" fill="#C0392B"/>
+            <rect x="11" y="3" width="1" height="1" fill="#C0392B"/>
+            <rect x="9" y="7" width="1" height="1" fill="#C0392B"/>
           </svg>
-          <span>a tu lado</span>
+          <span>a tu <em class="editorial-italic" style="color: #A8E6C0;">lado</em></span>
         </a>
       </div>
 
+      <!-- Navigation Menu -->
       <nav class="sidebar-nav-group">
-        <div class="sidebar-section-title">Mi Espacio Seguro</div>
+        <div class="sidebar-section-title">Mi Espacio</div>
         
         <a href="{{ route('dashboard') }}" class="sidebar-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
-          <div class="sidebar-item-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2"/><rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2"/><rect x="14" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2"/><rect x="3" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2"/></svg>
-          </div>
+          <div class="sidebar-item-icon"><i class="fa-solid fa-table-cells-large"></i></div>
           <span>Dashboard</span>
         </a>
 
         <a href="{{ route('mood.history') }}" class="sidebar-item {{ request()->routeIs('mood.history') ? 'active' : '' }}">
-          <div class="sidebar-item-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 17l6-6 4 4 8-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 7h7v7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </div>
-          <span>Historial & Analíticas</span>
+          <div class="sidebar-item-icon"><i class="fa-solid fa-chart-line"></i></div>
+          <span>Historial & Racha</span>
         </a>
 
         <a href="{{ route('safety-plan.show') }}" class="sidebar-item {{ request()->routeIs('safety-plan.*') ? 'active' : '' }}">
-          <div class="sidebar-item-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </div>
+          <div class="sidebar-item-icon"><i class="fa-solid fa-shield-heart"></i></div>
           <span>Plan de Seguridad</span>
         </a>
 
         <a href="{{ route('favorites.index') }}" class="sidebar-item {{ request()->routeIs('favorites.*') ? 'active' : '' }}">
-          <div class="sidebar-item-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </div>
-          <span>Mis Favoritos</span>
+          <div class="sidebar-item-icon"><i class="fa-solid fa-star"></i></div>
+          <span>Favoritos</span>
         </a>
 
-        <div class="sidebar-section-title" style="margin-top: 0.75rem;">Herramientas en Vivo</div>
+        <div class="sidebar-section-title">Herramientas</div>
 
         <a href="{{ route('tools.respiracion') }}" class="sidebar-item {{ request()->routeIs('tools.respiracion') ? 'active' : '' }}">
-          <div class="sidebar-item-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-          </div>
-          <span>Respiración Guiada</span>
+          <div class="sidebar-item-icon"><i class="fa-solid fa-lungs"></i></div>
+          <span>Respira Conmigo</span>
         </a>
 
         <a href="{{ route('tools.grounding') }}" class="sidebar-item {{ request()->routeIs('tools.grounding') ? 'active' : '' }}">
-          <div class="sidebar-item-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M2 12h20M12 2v20M5 5l14 14M5 19L19 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-          </div>
+          <div class="sidebar-item-icon"><i class="fa-solid fa-hand-holding-heart"></i></div>
           <span>Grounding 5-4-3-2-1</span>
         </a>
 
         <a href="{{ route('tools.stop') }}" class="sidebar-item {{ request()->routeIs('tools.stop') ? 'active' : '' }}">
-          <div class="sidebar-item-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="4" stroke="currentColor" stroke-width="2"/><path d="M8 12h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-          </div>
+          <div class="sidebar-item-icon"><i class="fa-solid fa-circle-pause"></i></div>
           <span>Técnica STOP (DBT)</span>
         </a>
 
-        <div class="sidebar-section-title" style="margin-top: 0.75rem;">Explorar</div>
+        <div class="sidebar-section-title">Explorar</div>
 
-        <a href="{{ route('recursos.index') }}" class="sidebar-item">
-          <div class="sidebar-item-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke="currentColor" stroke-width="2"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" stroke="currentColor" stroke-width="2"/></svg>
-          </div>
-          <span>Biblioteca de Recursos</span>
+        <a href="{{ route('sientes') }}" class="sidebar-item">
+          <div class="sidebar-item-icon"><i class="fa-solid fa-heart-pulse"></i></div>
+          <span>¿Cómo te sientes?</span>
         </a>
 
-        <a href="{{ route('crisis') }}" class="sidebar-item" style="color: #ff9999;">
-          <div class="sidebar-item-icon">
-            <span class="nav-crisis-dot"></span>
-          </div>
-          <span>Líneas de Crisis 24/7</span>
+        <a href="{{ route('recursos.index') }}" class="sidebar-item">
+          <div class="sidebar-item-icon"><i class="fa-solid fa-book-bookmark"></i></div>
+          <span>Recursos</span>
+        </a>
+
+        <a href="{{ route('revista.index') }}" class="sidebar-item">
+          <div class="sidebar-item-icon"><i class="fa-solid fa-newspaper"></i></div>
+          <span>Revista</span>
+        </a>
+
+        <a href="{{ route('crisis') }}" class="sidebar-item" style="color: #FFA59C;">
+          <div class="sidebar-item-icon"><i class="fa-solid fa-phone-volume"></i></div>
+          <span>Líneas de Crisis</span>
         </a>
       </nav>
 
-      <!-- CRISIS CALL SIDEBAR PILL -->
-      <div style="padding: 0.75rem 1.25rem;">
-        <a href="tel:8002900024" class="btn btn-crisis btn-sm" style="width: 100%; border-radius: var(--radius-full); justify-content: center; font-size: 0.76rem;">
-          <span class="nav-crisis-dot"></span>
-          <span>Crisis: 800 290 0024</span>
-        </a>
-      </div>
-
-      <!-- FOOTER USER PROFILE -->
+      <!-- PINNED USER PROFILE & LOGOUT AT BOTTOM -->
       <div class="sidebar-footer">
-        <a href="{{ route('profile.show') }}" class="user-profile-badge">
-          @php
-            $avatarColors = [
-              'sage' => 'linear-gradient(135deg, #4d7c5f, #2e4f3a)',
-              'terra' => 'linear-gradient(135deg, #b86b4a, #743922)',
-              'lav' => 'linear-gradient(135deg, #7a6faa, #4a3e72)',
-              'sky' => 'linear-gradient(135deg, #4a7fa5, #2a4c66)',
-              'amber' => 'linear-gradient(135deg, #c4901a, #7c5908)',
-              'dark' => 'linear-gradient(135deg, #242e29, #0e1310)',
-            ];
-            $userBg = $avatarColors[auth()->user()->avatar_color ?? 'sage'] ?? $avatarColors['sage'];
-          @endphp
-          <div class="user-avatar-circle" style="background: {{ $userBg }};">
-            {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
-          </div>
-          <div class="user-info-text">
-            <div class="user-name-text">{{ auth()->user()->name }}</div>
-            <div class="user-role-text">Ver perfil y ajustes</div>
-          </div>
-        </a>
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
+          <a href="{{ route('profile.show') }}" class="user-profile-badge">
+            <div class="user-avatar-circle" style="background: #2E5D4B;">
+              {{ strtoupper(substr(auth()->user()?->name ?? 'U', 0, 1)) }}
+            </div>
+            <div class="user-info-text">
+              <div class="user-name-text">{{ auth()->user()?->name ?? 'Usuario' }}</div>
+              <div class="user-role-text">Mi Perfil <i class="fa-solid fa-chevron-right" style="font-size: 0.65rem;"></i></div>
+            </div>
+          </a>
 
-        <form action="{{ route('logout') }}" method="POST" style="margin-top: 0.85rem;">
-          @csrf
-          <button type="submit" style="background: none; border: none; color: rgba(255, 255, 255, 0.45); font-size: 0.78rem; display: flex; align-items: center; gap: 0.4rem; cursor: pointer; transition: color var(--transition-fast);">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <span>Cerrar sesión</span>
-          </button>
-        </form>
+          <!-- Instant 1-Click Logout -->
+          <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
+            @csrf
+            <button type="submit" title="Cerrar Sesión" style="background: rgba(192, 57, 43, 0.18); border: 1px solid rgba(192, 57, 43, 0.35); color: #FFA59C; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s;">
+              <i class="fa-solid fa-arrow-right-from-bracket" style="font-size: 0.82rem;"></i>
+            </button>
+          </form>
+        </div>
       </div>
     </aside>
 
-    <!-- OVERLAY FOR MOBILE SIDEBAR -->
+    <!-- Overlay for Mobile Sidebar -->
     <div id="sidebarOverlay" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 85;"></div>
 
-    <!-- MAIN AREA -->
+    <!-- ════ MAIN DASHBOARD AREA ════ -->
     <div class="dashboard-main">
 
-      <!-- TOPBAR -->
+      <!-- TOPBAR WITH INSTANT SHORTCUTS -->
       <header class="dashboard-topbar">
-        <div style="display: flex; align-items: center; gap: 1rem;">
-          <button id="sidebarToggleBtn" class="nav-hamburger" style="display: none; color: var(--ink-800);" aria-label="Abrir barra lateral">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <div style="display: flex; align-items: center; gap: 0.85rem;">
+          <button id="mobileSidebarToggle" class="btn btn-sm btn-secondary" style="display: none; padding: 0.4rem 0.65rem;" aria-label="Abrir menú">
+            <i class="fa-solid fa-bars"></i>
           </button>
-          <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--ink-600); letter-spacing: 0.04em;">
-            {{ Carbon\Carbon::now()->translatedFormat('l, d \d\e F \d\e Y') }}
+          <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: #556860; font-family: var(--font-mono);">
+            <i class="fa-regular fa-calendar" style="color: #2E5D4B;"></i>
+            <span>{{ now()->locale('es')->isoFormat('dddd, D [de] MMMM') }}</span>
           </div>
         </div>
 
-        <div style="display: flex; align-items: center; gap: 1rem;">
-          <a href="{{ route('tools.respiracion') }}" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 0.4rem;">
-            <span>🌸</span>
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <!-- Quick Breath Shortcut -->
+          <a href="{{ route('tools.respiracion') }}" class="btn btn-sm btn-secondary" style="gap: 6px;">
+            <i class="fa-solid fa-lungs" style="color: #2E5D4B;"></i>
             <span>Respirar</span>
           </a>
-          <a href="tel:8002900024" class="nav-crisis-pill">
-            <span class="nav-crisis-dot"></span>
+
+          <!-- Crisis Button -->
+          <a href="tel:8002900024" class="btn btn-sm btn-crisis" style="gap: 6px;">
+            <i class="fa-solid fa-phone"></i>
             <span>Línea 24h</span>
           </a>
+
+          <!-- Topbar Direct Logout Button -->
+          <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
+            @csrf
+            <button type="submit" class="btn btn-sm btn-secondary" title="Cerrar sesión" style="color: #C0392B; gap: 6px;">
+              <i class="fa-solid fa-arrow-right-from-bracket"></i>
+              <span>Salir</span>
+            </button>
+          </form>
         </div>
       </header>
 
-      <!-- FLASH MESSAGES -->
-      @if(session('success') || session('error') || session('info'))
-        <div style="padding: 1.5rem 2rem 0;">
-          @if(session('success'))
-            <div class="alert-banner alert-success">
-              <span>🌿</span>
-              <div>{{ session('success') }}</div>
-            </div>
-          @endif
-          @if(session('error'))
-            <div class="alert-banner alert-error">
-              <span>⚠️</span>
-              <div>{{ session('error') }}</div>
-            </div>
-          @endif
-          @if(session('info'))
-            <div class="alert-banner alert-info">
-              <span>💡</span>
-              <div>{{ session('info') }}</div>
-            </div>
-          @endif
-        </div>
-      @endif
+      <!-- GLOBAL FLOATING TOAST CONTAINER (FUERA DE LAS TARJETAS) -->
+      <div id="zenToastContainer">
+        @if(session('success'))
+          <div class="zen-toast-pill success" onclick="this.remove()">
+            <i class="fa-solid fa-circle-check" style="font-size: 1.15rem; color: #1E4A25;"></i>
+            <span>{{ session('success') }}</span>
+            <div class="toast-fill-bar"></div>
+          </div>
+        @endif
+        @if(session('error'))
+          <div class="zen-toast-pill error" onclick="this.remove()">
+            <i class="fa-solid fa-triangle-exclamation" style="font-size: 1.15rem; color: #922B21;"></i>
+            <span>{{ session('error') }}</span>
+            <div class="toast-fill-bar"></div>
+          </div>
+        @endif
+        @if(session('info'))
+          <div class="zen-toast-pill info" onclick="this.remove()">
+            <i class="fa-solid fa-circle-info" style="font-size: 1.15rem; color: #4A3575;"></i>
+            <span>{{ session('info') }}</span>
+            <div class="toast-fill-bar"></div>
+          </div>
+        @endif
+      </div>
 
-      <!-- INNER VIEW CONTENT -->
-      <main class="dashboard-content">
+      <div id="spaProgressBar"></div>
+
+      <!-- MAIN PAGE CONTENT -->
+      <main class="dashboard-content" id="spaContent">
         @yield('content')
       </main>
 
     </div>
   </div>
 
-  <script src="{{ asset('js/main.js') }}"></script>
-  <style>
-    @media (max-width: 960px) {
-      #sidebarToggleBtn { display: block !important; }
-      #sidebarOverlay.open { display: block !important; }
-    }
-  </style>
+  <script src="{{ asset('js/main.js') }}?v={{ file_exists(public_path('js/main.js')) ? filemtime(public_path('js/main.js')) : time() }}"></script>
   @stack('scripts')
 </body>
 </html>
