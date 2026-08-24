@@ -7,6 +7,7 @@ use App\Models\CrisisLine;
 use App\Models\MoodLog;
 use App\Models\Resource;
 use App\Models\SafetyPlan;
+use App\Models\TopicArea;
 use App\Models\User;
 use App\Models\UserResourceFavorite;
 use Carbon\Carbon;
@@ -260,84 +261,173 @@ Puedes acceder y personalizar tu plan directamente en la sección **Plan de Segu
             }
         }
 
-        // 5. Seed Magazine Articles
+        // 5. Seed Topic Areas
+        $topicAreas = [
+            'dbt' => TopicArea::create([
+                'name' => 'Terapia DBT & Conductual',
+                'slug' => 'terapia-dbt-conductual',
+                'description' => 'Herramientas de aceptación radical, regulación de la intensidad emocional y tolerancia al malestar.',
+                'icon' => 'fa-brain',
+                'color' => 'lav',
+            ]),
+            'neuro' => TopicArea::create([
+                'name' => 'Neurobiología & Fisiología',
+                'slug' => 'neurobiologia-fisiologia',
+                'description' => 'El impacto del sistema nervioso, nervio vago, neuroquímica y respuesta somática al estrés.',
+                'icon' => 'fa-dna',
+                'color' => 'sky',
+            ]),
+            'regulacion' => TopicArea::create([
+                'name' => 'Regulación Emocional',
+                'slug' => 'regulacion-emocional',
+                'description' => 'Estrategias basadas en evidencia para navegar tormentas emocionales y prevenir crisis agudas.',
+                'icon' => 'fa-heart-pulse',
+                'color' => 'sage',
+            ]),
+            'ansiedad' => TopicArea::create([
+                'name' => 'Ansiedad & Pánico',
+                'slug' => 'ansiedad-panico',
+                'description' => 'Desactivación de la respuesta de lucha o huida, desensibilización sistemática y grounding.',
+                'icon' => 'fa-wind',
+                'color' => 'sky',
+            ]),
+            'crisis' => TopicArea::create([
+                'name' => 'Prevención del Suicidio & Crisis',
+                'slug' => 'prevencion-suicidio-crisis',
+                'description' => 'Protocolos de seguridad, primeros auxilios psicológicos y acompañamiento en momentos de desesperanza.',
+                'icon' => 'fa-life-ring',
+                'color' => 'terra',
+            ]),
+            'mindfulness' => TopicArea::create([
+                'name' => 'Mindfulness & Atención Plena',
+                'slug' => 'mindfulness-atencion-plena',
+                'description' => 'Presencia compasiva, respiración consciente y desapego de rumiaciones mentales.',
+                'icon' => 'fa-seedling',
+                'color' => 'sage',
+            ]),
+            'habitos' => TopicArea::create([
+                'name' => 'Psicoeducación & Hábitos',
+                'slug' => 'psicoeducacion-habitos',
+                'description' => 'Higiene del sueño, descanso restaurador, límites saludables y autocuidado sostenible.',
+                'icon' => 'fa-book-open-reader',
+                'color' => 'amber',
+            ]),
+        ];
+
+        // Seed Magazine Articles (Full Scientific Schema)
         $articles = [
             [
+                'user_id' => $demoUser->id,
+                'topic_area_id' => $topicAreas['dbt']->id,
                 'title' => '¿Qué es la Terapia Dialéctico Conductual (DBT) y cómo ayuda en el día a día?',
                 'slug' => 'que-es-dbt-bienestar-diario',
                 'author_name' => 'Dra. Elena Vázquez',
-                'author_role' => 'Especialista en Psicología Clínica',
-                'category' => 'DBT y Regulación',
-                'read_time' => '5 min',
-                'color_tag' => 'sage',
-                'excerpt' => 'Descubre cómo los cuatro pilares de DBT —mindfulness, tolerancia al malestar, regulación emocional y efectividad interpersonal— transforman nuestra respuesta al estrés.',
+                'author_credentials' => 'Psicóloga Clínica · Terapeuta DBT Certificada (Linehan Institute)',
+                'visual_theme' => 'lav',
+                'publication_type' => 'revision',
+                'target_audience' => 'general',
+                'summary' => 'Descubre cómo los cuatro pilares de DBT —mindfulness, tolerancia al malestar, regulación emocional y efectividad interpersonal— transforman nuestra respuesta al estrés.',
                 'content' => "La Terapia Dialéctico Conductual (DBT), desarrollada por la Dra. Marsha Linehan, nació originalmente para tratar la desregulación emocional severa, pero hoy sus herramientas han demostrado ser extraordinariamente útiles para cualquier persona que experimente estrés, ansiedad o relaciones interpersonales complejas.
 
 ### Los cuatro pilares fundamentales:
-1. **Mindfulness (Atención Plena)**: La capacidad de estar presente en el momento sin juzgar.
-2. **Tolerancia al Malestar**: Estrategias para sobrevivir a momentos de crisis sin empeorar la situación (técnicas como TIPP y STOP).
-3. **Regulación Emocional**: Identificar, comprender y modular la intensidad de las emociones sin reprimirlas.
-4. **Efectividad Interpersonal**: Aprender a pedir lo que necesitamos y decir 'no' mientras preservamos el respeto propio y las relaciones con los demás.
+1. **Mindfulness (Atención Plena)**: La capacidad de estar presente en el momento sin juzgar ni reaccionar automáticamente.
+2. **Tolerancia al Malestar**: Estrategias para sobrevivir a momentos de crisis sin empeorar la situación (técnicas como TIPP, STOP y Aceptación Radical).
+3. **Regulación Emocional**: Identificar, comprender y modular la intensidad de las emociones sin reprimirlas ni temerles.
+4. **Efectividad Interpersonal**: Aprender a pedir lo que necesitamos y decir 'no' asertivamente, preservando tanto el autorrespeto como el vínculo con los demás.
 
-Aprender estas habilidades es como entrenar un músculo: entre más las practiques en momentos de calma, más naturales serán en momentos de tormenta.",
+Aprender estas habilidades es como entrenar un músculo neurológico: entre más las practiques en momentos de calma, más automáticas serán ante una tormenta.",
+                'references' => "Linehan, M. M. (2015). DBT Skills Training Manual (2nd ed.). Guilford Publications.\nNeacsiu, A. D., et al. (2014). Dialectical behavior therapy skills for emotion dysregulation. Emotion Review, 6(4), 334-345.",
+                'discussion_prompt' => '¿Cuál de los cuatro pilares de DBT sientes que te hace más falta fortalecer en tu vida cotidiana y por qué?',
+                'reading_time_min' => 5,
+                'allow_comments' => true,
+                'is_disclaimer_accepted' => true,
+                'status' => 'published',
                 'is_featured' => true,
+                'is_peer_reviewed' => true,
                 'published_at' => Carbon::now()->subDays(5),
             ],
             [
+                'user_id' => $demoUser->id,
+                'topic_area_id' => $topicAreas['neuro']->id,
                 'title' => 'La neurociencia del Grounding: cómo tu cuerpo apaga la alarma de ansiedad',
                 'slug' => 'neurociencia-del-grounding-ansiedad',
                 'author_name' => 'Lic. Roberto Valdés',
-                'author_role' => 'Neuropsicólogo',
-                'category' => 'Ansiedad y Ciencia',
-                'read_time' => '4 min',
-                'color_tag' => 'sky',
-                'excerpt' => 'Cuando la mente entra en pánico, el cuerpo debe ser el ancla. Conoce el circuito biológico que conecta tus 5 sentidos con el nervio vago.',
+                'author_credentials' => 'Neuropsicólogo Clínico · Especialista en Trauma y Sistema Nervioso',
+                'visual_theme' => 'sky',
+                'publication_type' => 'divulgacion',
+                'target_audience' => 'estudiantes',
+                'summary' => 'Cuando la mente entra en pánico, el cuerpo debe ser el ancla. Conoce el circuito biológico que conecta tus 5 sentidos con el nervio vago.',
                 'content' => "Cuando experimentamos un ataque de pánico o un episodio agudo de ansiedad, nuestro sistema nervioso autónomo activa la rama simpática: ritmo cardíaco acelerado, respiración superficial y pensamientos catastróficos.
 
-El cerebro primitivo interpreta que estamos en peligro de muerte frente a un depredador, aunque solo estemos frente a una pantalla de computadora.
+El cerebro primitivo interpreta que estamos en peligro inminente de muerte frente a un depredador, aunque solo estemos frente a una pantalla de computadora.
 
 ### ¿Por qué los sentidos son la llave maestra?
-No podemos 'pensar' para salir de un ataque de pánico mediante la lógica pura, porque la corteza prefrontal está temporalmente inhibida por la adrenalina. Sin embargo, los receptores sensoriales (la piel, la vista, el oído) envían señales directas al tronco encefálico.
+No podemos 'pensar' para salir de un ataque de pánico mediante la lógica pura, porque la corteza prefrontal está temporalmente inhibida por la cascada de adrenalina y cortisol. Sin embargo, las vías sensoriales periféricas (la propiocepción, la piel, la vista, el oído) envían aferencias directas hacia el tronco encefálico y el núcleo del tracto solitario.
 
-Al tocar una superficie fría, nombrar 5 colores distintos o escuchar el sonido de un reloj, le enviamos un mensaje biológico inequívoco al cerebro: **'Aquí y ahora, no hay peligro inminente'**.",
+Al tocar una superficie fría, nombrar 5 colores concretos o escuchar el zumbido de un reloj, le enviamos un mensaje biológico inequívoco al sistema parasimpático: **'Aquí y ahora, no hay peligro mortal'**.",
+                'references' => "Porges, S. W. (2011). The Polyvagal Theory: Neurophysiological Foundations of Emotions, Attachment, Communication, and Self-regulation. W. W. Norton & Company.\nVan der Kolk, B. (2014). The Body Keeps the Score: Brain, Mind, and Body in the Healing of Trauma. Penguin Books.",
+                'discussion_prompt' => '¿Has probado anclar tus sentidos durante un pico de ansiedad? ¿Qué estímulo físico te devuelve el centro con mayor rapidez?',
+                'reading_time_min' => 4,
+                'allow_comments' => true,
+                'is_disclaimer_accepted' => true,
+                'status' => 'published',
                 'is_featured' => true,
+                'is_peer_reviewed' => true,
                 'published_at' => Carbon::now()->subDays(8),
             ],
             [
+                'user_id' => $demoUser->id,
+                'topic_area_id' => $topicAreas['crisis']->id,
                 'title' => 'Cómo acompañar a alguien que está atravesando una crisis emocional',
                 'slug' => 'como-acompanar-crisis-emocional',
                 'author_name' => 'Equipo A tu lado',
-                'author_role' => 'Primeros Auxilios Psicológicos',
-                'category' => 'Apoyo y Empatía',
-                'read_time' => '6 min',
-                'color_tag' => 'terra',
-                'excerpt' => 'Qué decir, qué evitar y cómo brindar presencia compasiva sin intentar "arreglar" inmediatamente lo que la otra persona siente.',
-                'content' => "Ver sufrir a alguien que queremos genera un impulso natural de querer arreglar la situación de inmediato. Sin embargo, frases bienintencionadas como *'todo va a estar bien'*, *'no te pongas así'* o *'hay personas que la pasan peor'* suelen provocar mayor aislamiento y culpa.
+                'author_credentials' => 'Primeros Auxilios Psicológicos & Prevención en Crisis',
+                'visual_theme' => 'terra',
+                'publication_type' => 'guia',
+                'target_audience' => 'general',
+                'summary' => 'Qué decir, qué evitar y cómo brindar presencia compasiva sin intentar "arreglar" inmediatamente lo que la otra persona siente.',
+                'content' => "Ver sufrir a alguien que queremos genera un impulso natural de querer arreglar la situación de inmediato. Sin embargo, frases bienintencionadas como *'todo va a estar bien'*, *'no te pongas así'* o *'hay personas que la pasan peor'* suelen provocar mayor aislamiento, invalidez y culpa.
 
-### Lo que sí ayuda:
-- **Estar presente en silencio**: A veces, sentarse al lado de la persona sin exigirle explicaciones es el mayor acto de amor.
-- **Validar su dolor**: *'Entiendo que esto es muy pesado para ti ahora mismo, y está bien sentirse así.'*
-- **Ofrecer ayuda concreta**: En lugar de *'cualquier cosa me avisas'*, ofrece: *'¿Quieres que te prepare un té o que te acompañe a dar una vuelta de 5 minutos?'*
-- **Tener a la mano las líneas de crisis**: Si notas señales de riesgo, acompáñale con amabilidad a llamar al 800 290 0024.",
+### Lo que sí ayuda en primeros auxilios psicológicos:
+- **Estar presente en silencio**: A veces, sentarse al lado de la persona sin exigirle explicaciones es el mayor acto de sostén y amor.
+- **Validar el dolor sin juzgar**: *'Entiendo que esto es muy pesado para ti ahora mismo, y es completamente comprensible sentirse desbordado.'*
+- **Ofrecer soporte concreto**: En lugar de la fórmula abstracta *'cualquier cosa me avisas'*, ofrece: *'¿Quieres que te prepare un té tibio o que te acompañe a respirar 2 minutos en el balcón?'*
+- **Tener a la mano las líneas de crisis**: Si notas señales de riesgo vital o desesperanza extrema, acompáñale con calidez y sin regaños a comunicarse a la Línea de la Vida (800 290 0024).",
+                'references' => "World Health Organization. (2011). Psychological first aid: Guide for field workers. WHO Press.\nJoiner, T. (2005). Why People Die by Suicide. Harvard University Press.",
+                'discussion_prompt' => '¿Qué frase o actitud te ha ayudado más cuando has pasado por un momento de tristeza profunda o desesperanza?',
+                'reading_time_min' => 6,
+                'allow_comments' => true,
+                'is_disclaimer_accepted' => true,
+                'status' => 'published',
                 'is_featured' => false,
+                'is_peer_reviewed' => true,
                 'published_at' => Carbon::now()->subDays(12),
             ],
             [
+                'user_id' => $demoUser->id,
+                'topic_area_id' => $topicAreas['habitos']->id,
                 'title' => 'Productividad tóxica vs. Descanso genuino: sanando la culpa de no hacer nada',
                 'slug' => 'productividad-toxica-descanso-genuino',
                 'author_name' => 'Mtra. Sofía Camargo',
-                'author_role' => 'Psicóloga Organizacional',
-                'category' => 'Hábitos y Estilo de Vida',
-                'read_time' => '4 min',
-                'color_tag' => 'lav',
-                'excerpt' => '¿Sientes inquietud o culpa cuando intentas tomar una siesta o un fin de semana libre? Identifica cómo desmantelar la necesidad constante de rendimiento.',
+                'author_credentials' => 'Psicóloga Organizacional · Máster en Bienestar Subjetivo y Hábitos',
+                'visual_theme' => 'salvia',
+                'publication_type' => 'caso_estudio',
+                'target_audience' => 'profesionales',
+                'summary' => '¿Sientes inquietud o culpa cuando intentas tomar una siesta o un fin de semana libre? Identifica cómo desmantelar la necesidad constante de rendimiento.',
                 'content' => "Vivimos en una cultura hiperconectada que premia el agotamiento como si fuera una medalla de honor. Muchas personas sienten taquicardia o ansiedad cuando intentan relajarse, un fenómeno conocido como *ansiedad por inactividad*.
 
 ### El descanso no es un premio que te ganas: es un requisito biológico
-Así como un teléfono no puede funcionar eternamente sin recargar su batería, el sistema nervioso requiere ciclos de reparación celular y reposo mental.
+Así como un teléfono no puede funcionar eternamente sin recargar su batería, el sistema nervioso requiere ciclos de reparación celular, reposo mental y procesamiento subconsciente.
 
-Aprender a descansar sin culpa es un acto de resistencia y salud preventiva.",
+Aprender a descansar sin culpa es un acto de resistencia y salud preventiva esencial para evitar el síndrome de Burnout.",
+                'references' => "Maslach, C., & Leiter, M. P. (2016). Understanding the burnout experience: recent research and its implications for psychiatry. World Psychiatry, 15(2), 103-111.\nNeff, K. D. (2003). Self-compassion: An alternative conceptualization of a healthy attitude toward oneself. Self and Identity, 2(2), 85-101.",
+                'discussion_prompt' => '¿Cómo experimentas la pausa en tu día a día? ¿Te resulta fácil desconectar o aparece la urgencia de seguir produciendo?',
+                'reading_time_min' => 4,
+                'allow_comments' => true,
+                'is_disclaimer_accepted' => true,
+                'status' => 'published',
                 'is_featured' => false,
+                'is_peer_reviewed' => true,
                 'published_at' => Carbon::now()->subDays(16),
             ],
         ];

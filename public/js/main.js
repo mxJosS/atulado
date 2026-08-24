@@ -88,6 +88,140 @@ window.showZenToast = function(message, type = 'success', duration = 5000) {
   }, duration);
 };
 
+/* ════ GLOBAL ZEN CONFIRMATION & ALERT MODALS (REEMPLAZO TOTAL DE DIÁLOGOS NATIVOS) ════ */
+window.showZenConfirm = function(options = {}) {
+  const {
+    title = '¿Confirmar acción?',
+    message = '¿Deseas continuar con esta acción?',
+    confirmText = 'Sí, continuar',
+    cancelText = 'Cancelar',
+    type = 'danger',
+    icon = null
+  } = (typeof options === 'string' ? { message: options } : options);
+
+  return new Promise((resolve) => {
+    let overlay = document.getElementById('zenGlobalModalOverlay');
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.id = 'zenGlobalModalOverlay';
+      overlay.className = 'zen-global-modal-overlay';
+      document.body.appendChild(overlay);
+    }
+
+    const defaultIcon = type === 'danger' 
+      ? 'fa-triangle-exclamation' 
+      : (type === 'warning' ? 'fa-circle-exclamation' : (type === 'success' ? 'fa-circle-check' : 'fa-circle-question'));
+
+    const iconHtml = icon 
+      ? (icon.startsWith('game-icons:') || icon.startsWith('ra-') 
+          ? `<iconify-icon icon="${icon}" style="font-size: 2rem;"></iconify-icon>` 
+          : `<i class="fa-solid ${icon}"></i>`)
+      : `<i class="fa-solid ${defaultIcon}"></i>`;
+
+    const confirmBtnClass = type === 'danger' ? 'btn-danger-zen' : 'btn-primary-zen';
+
+    overlay.innerHTML = `
+      <div class="zen-modal-card" role="dialog" aria-modal="true">
+        <div class="zen-modal-icon-circle ${type}">
+          ${iconHtml}
+        </div>
+        <h3 class="zen-modal-title">${title}</h3>
+        <p class="zen-modal-message">${message}</p>
+        <div class="zen-modal-actions">
+          <button type="button" class="btn btn-secondary zen-modal-btn-cancel">${cancelText}</button>
+          <button type="button" class="btn ${confirmBtnClass} zen-modal-btn-confirm">${confirmText}</button>
+        </div>
+      </div>
+    `;
+
+    overlay.style.display = 'flex';
+    requestAnimationFrame(() => {
+      overlay.classList.add('active');
+    });
+
+    const closeDialog = (result) => {
+      overlay.classList.remove('active');
+      setTimeout(() => {
+        overlay.style.display = 'none';
+        resolve(result);
+      }, 200);
+    };
+
+    const cancelBtn = overlay.querySelector('.zen-modal-btn-cancel');
+    const confirmBtn = overlay.querySelector('.zen-modal-btn-confirm');
+
+    if (cancelBtn) cancelBtn.onclick = (e) => { e.preventDefault(); closeDialog(false); };
+    if (confirmBtn) confirmBtn.onclick = (e) => { e.preventDefault(); closeDialog(true); };
+
+    overlay.onclick = (e) => {
+      if (e.target === overlay) closeDialog(false);
+    };
+  });
+};
+
+window.showZenAlert = function(options = {}) {
+  const {
+    title = 'Notificación',
+    message = '',
+    buttonText = 'Entendido',
+    type = 'info',
+    icon = null
+  } = (typeof options === 'string' ? { message: options } : options);
+
+  return new Promise((resolve) => {
+    let overlay = document.getElementById('zenGlobalModalOverlay');
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.id = 'zenGlobalModalOverlay';
+      overlay.className = 'zen-global-modal-overlay';
+      document.body.appendChild(overlay);
+    }
+
+    const defaultIcon = type === 'danger' 
+      ? 'fa-triangle-exclamation' 
+      : (type === 'warning' ? 'fa-circle-exclamation' : (type === 'success' ? 'fa-circle-check' : 'fa-circle-info'));
+
+    const iconHtml = icon 
+      ? (icon.startsWith('game-icons:') || icon.startsWith('ra-') 
+          ? `<iconify-icon icon="${icon}" style="font-size: 2rem;"></iconify-icon>` 
+          : `<i class="fa-solid ${icon}"></i>`)
+      : `<i class="fa-solid ${defaultIcon}"></i>`;
+
+    overlay.innerHTML = `
+      <div class="zen-modal-card" role="dialog" aria-modal="true">
+        <div class="zen-modal-icon-circle ${type}">
+          ${iconHtml}
+        </div>
+        <h3 class="zen-modal-title">${title}</h3>
+        <p class="zen-modal-message">${message}</p>
+        <div class="zen-modal-actions">
+          <button type="button" class="btn btn-primary-zen zen-modal-btn-confirm" style="width: 100%;">${buttonText}</button>
+        </div>
+      </div>
+    `;
+
+    overlay.style.display = 'flex';
+    requestAnimationFrame(() => {
+      overlay.classList.add('active');
+    });
+
+    const closeDialog = () => {
+      overlay.classList.remove('active');
+      setTimeout(() => {
+        overlay.style.display = 'none';
+        resolve(true);
+      }, 200);
+    };
+
+    const confirmBtn = overlay.querySelector('.zen-modal-btn-confirm');
+    if (confirmBtn) confirmBtn.onclick = (e) => { e.preventDefault(); closeDialog(); };
+
+    overlay.onclick = (e) => {
+      if (e.target === overlay) closeDialog();
+    };
+  });
+};
+
 /* ════ 2. BREATHING ENGINE (ROBUST & SYNCED) ════ */
 class BreathingController {
   constructor(containerId) {
@@ -415,6 +549,18 @@ class SpaRouter {
         document.title = doc.title;
       }
 
+      // Execute any inline or page-specific scripts from the incoming document (@stack('scripts') and inline)
+      const pageScripts = doc.querySelectorAll('script:not([src])');
+      pageScripts.forEach(oldScript => {
+        const code = oldScript.textContent.trim();
+        if (code) {
+          try {
+            const runner = new Function(code);
+            runner.call(window);
+          } catch (scriptErr) {}
+        }
+      });
+
       // Update active nav & sidebar links
       const currentPath = new URL(url).pathname;
       document.querySelectorAll('.nav-link, .sidebar-item, .user-profile-badge').forEach(el => {
@@ -453,15 +599,12 @@ class SpaRouter {
       // Safely initialize components
       try {
         initAllComponents();
-      } catch (compErr) {
-        console.warn('Component init:', compErr);
-      }
+      } catch (compErr) {}
 
       currentSpaContent.classList.remove('spa-transitioning');
       this.setProgressBar(100);
 
     } catch (err) {
-      console.error('SPA fallback:', err);
       window.location.href = url;
     } finally {
       setTimeout(() => {
@@ -721,8 +864,40 @@ function initAllComponents() {
   });
 }
 
-// Global Document Listener for Dynamic Click Fallbacks (Píldoras, Caritas, Auto-llenar, etc.)
+// Global Document Listener for Dynamic Click Fallbacks (Píldoras, Caritas, Auto-llenar, Popovers, etc.)
 document.addEventListener('click', (e) => {
+  // 0. Verified Badge Popover Close Button
+  const closeBtn = e.target.closest('.verified-popover-close');
+  if (closeBtn) {
+    e.preventDefault();
+    e.stopPropagation();
+    const popover = closeBtn.closest('.verified-popover-card');
+    if (popover) {
+      popover.classList.remove('open');
+    }
+    return;
+  }
+
+  // 0b. Verified Badge Trigger Click
+  const badgeWrap = e.target.closest('.professional-badge-wrap');
+  if (badgeWrap) {
+    const popover = badgeWrap.querySelector('.verified-popover-card');
+    if (popover && !e.target.closest('.verified-popover-card')) {
+      e.preventDefault();
+      e.stopPropagation();
+      const isOpen = popover.classList.contains('open');
+      // Close others first
+      document.querySelectorAll('.verified-popover-card.open').forEach(p => p.classList.remove('open'));
+      if (!isOpen) {
+        popover.classList.add('open');
+      }
+      return;
+    }
+  } else {
+    // Click outside any badge wrap -> close all open popovers
+    document.querySelectorAll('.verified-popover-card.open').forEach(p => p.classList.remove('open'));
+  }
+
   // 1. Emotion Tag Pill Delegated Click
   const emoBtn = e.target.closest('.emotion-tag-btn');
   if (emoBtn) {
@@ -754,6 +929,44 @@ document.addEventListener('click', (e) => {
     e.preventDefault();
     window.fillDemoCredentials();
     return;
+  }
+});
+
+// Delegated Form Confirmation Handling
+document.addEventListener('submit', async (e) => {
+  const form = e.target;
+  if (form && form.matches && (form.matches('.delete-mood-form') || form.hasAttribute('data-confirm'))) {
+    e.preventDefault();
+    const customTitle = form.getAttribute('data-confirm-title') || '¿Eliminar este registro emocional?';
+    const customMessage = form.getAttribute('data-confirm') || 'Esta entrada de tu diario y su estado emocional serán borrados de forma permanente.';
+    const confirmBtnText = form.getAttribute('data-confirm-btn') || 'Sí, eliminar';
+    
+    const confirmed = await window.showZenConfirm({
+      title: customTitle,
+      message: customMessage,
+      confirmText: confirmBtnText,
+      cancelText: 'Conservar',
+      type: 'danger',
+      icon: 'fa-trash-can'
+    });
+
+    if (confirmed) {
+      form.classList.remove('delete-mood-form');
+      form.removeAttribute('data-confirm');
+      form.submit();
+    }
+  }
+});
+
+// Close popovers and modals on Escape key
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.verified-popover-card.open').forEach(p => p.classList.remove('open'));
+    const zenModal = document.getElementById('zenGlobalModalOverlay');
+    if (zenModal && zenModal.classList.contains('active')) {
+      zenModal.classList.remove('active');
+      setTimeout(() => { zenModal.style.display = 'none'; }, 200);
+    }
   }
 });
 

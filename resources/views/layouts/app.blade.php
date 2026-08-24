@@ -17,6 +17,11 @@
   
   <!-- FontAwesome Pro/Free Kit -->
   <script src="https://kit.fontawesome.com/6244811c40.js" crossorigin="anonymous"></script>
+  
+  <!-- RPG Awesome & Game Icons Library -->
+  <link rel="stylesheet" href="{{ asset('vendor/rpg-awesome/css/rpg-awesome.min.css') }}">
+  <script src="{{ asset('vendor/iconify/iconify-icon.min.js') }}"></script>
+  <script src="{{ asset('js/game-icons-pack.js') }}?v={{ file_exists(public_path('js/game-icons-pack.js')) ? filemtime(public_path('js/game-icons-pack.js')) : time() }}"></script>
   @stack('styles')
 </head>
 <body style="background: #F8FAF9; color: #1A2620;">
@@ -65,10 +70,10 @@
 
         <a href="{{ route('favorites.index') }}" class="sidebar-item {{ request()->routeIs('favorites.*') ? 'active' : '' }}">
           <div class="sidebar-item-icon"><i class="fa-solid fa-star"></i></div>
-          <span>Favoritos</span>
+          <span>Mis Favoritos</span>
         </a>
 
-        <div class="sidebar-section-title">Herramientas</div>
+        <div class="sidebar-section-title">Terapia & Herramientas DBT</div>
 
         <a href="{{ route('tools.respiracion') }}" class="sidebar-item {{ request()->routeIs('tools.respiracion') ? 'active' : '' }}">
           <div class="sidebar-item-icon"><i class="fa-solid fa-lungs"></i></div>
@@ -85,26 +90,26 @@
           <span>Técnica STOP (DBT)</span>
         </a>
 
-        <div class="sidebar-section-title">Explorar</div>
-
-        <a href="{{ route('sientes') }}" class="sidebar-item">
+        <a href="{{ route('sientes') }}" class="sidebar-item {{ request()->routeIs('sientes') ? 'active' : '' }}">
           <div class="sidebar-item-icon"><i class="fa-solid fa-heart-pulse"></i></div>
           <span>¿Cómo te sientes?</span>
         </a>
 
-        <a href="{{ route('recursos.index') }}" class="sidebar-item">
+        <div class="sidebar-section-title">Comunidad & Recursos</div>
+
+        <a href="{{ route('recursos.index') }}" class="sidebar-item {{ request()->routeIs('recursos.*') ? 'active' : '' }}">
           <div class="sidebar-item-icon"><i class="fa-solid fa-book-bookmark"></i></div>
-          <span>Recursos</span>
+          <span>Biblioteca de Recursos</span>
         </a>
 
-        <a href="{{ route('revista.index') }}" class="sidebar-item">
+        <a href="{{ route('revista.index') }}" class="sidebar-item {{ request()->routeIs('revista.*') ? 'active' : '' }}">
           <div class="sidebar-item-icon"><i class="fa-solid fa-newspaper"></i></div>
-          <span>Revista</span>
+          <span>Revista Científica</span>
         </a>
 
-        <a href="{{ route('crisis') }}" class="sidebar-item" style="color: #FFA59C;">
+        <a href="{{ route('crisis') }}" class="sidebar-item {{ request()->routeIs('crisis') ? 'active' : '' }}" style="color: #FFA59C;">
           <div class="sidebar-item-icon"><i class="fa-solid fa-phone-volume"></i></div>
-          <span>Líneas de Crisis</span>
+          <span>Líneas de Crisis 24/7</span>
         </a>
       </nav>
 
@@ -112,12 +117,27 @@
       <div class="sidebar-footer">
         <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
           <a href="{{ route('profile.show') }}" class="user-profile-badge">
-            <div class="user-avatar-circle" style="background: #2E5D4B;">
-              {{ strtoupper(substr(auth()->user()?->name ?? 'U', 0, 1)) }}
+            <div class="user-avatar-circle" style="background: #2E5D4B; overflow: hidden; padding: 0;">
+              @if(auth()->user()?->avatar_url)
+                <img src="{{ auth()->user()->avatar_url }}" alt="{{ auth()->user()->name }}" style="width: 100%; height: 100%; object-fit: cover;">
+              @else
+                {{ strtoupper(substr(auth()->user()?->name ?? 'U', 0, 1)) }}
+              @endif
             </div>
             <div class="user-info-text">
-              <div class="user-name-text">{{ auth()->user()?->name ?? 'Usuario' }}</div>
-              <div class="user-role-text">Mi Perfil <i class="fa-solid fa-chevron-right" style="font-size: 0.65rem;"></i></div>
+              <div class="user-name-text" style="display: flex; align-items: center; gap: 4px;">
+                <span>{{ auth()->user()?->name ?? 'Usuario' }}</span>
+                @if(auth()->user()?->isProfessional())
+                  <x-verified-badge size="14" />
+                @endif
+              </div>
+              <div class="user-role-text">
+                @if(auth()->user()?->isProfessional())
+                  <span style="color: #A8E6C0;"><i class="fa-solid fa-certificate"></i> Profesional</span>
+                @else
+                  Mi Perfil <i class="fa-solid fa-chevron-right" style="font-size: 0.65rem;"></i>
+                @endif
+              </div>
             </div>
           </a>
 
@@ -150,27 +170,31 @@
           </div>
         </div>
 
-        <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+          <!-- Interactive Streak / Tree Badge Button -->
+          @php
+            $userStreak = auth()->user()?->calculateStreak() ?? 0;
+            $userTreeLevel = min(5, max(1, intdiv($userStreak, 3) + 1));
+          @endphp
+          <button type="button" onclick="(typeof window.openTreeGame === 'function' && document.getElementById('treeGameModalOverlay')) ? window.openTreeGame() : (window.location.href='{{ route('dashboard') }}?open_game=1')" class="btn btn-sm btn-secondary" style="gap: 6px; background: #FAFDFB; border-color: #A8E6C0; color: #1E4A25; font-weight: 700;" title="Tu racha activa y árbol de bienestar">
+            <i class="fa-solid fa-fire" style="color: #E67E22;"></i>
+            <span>{{ $userStreak }} {{ $userStreak === 1 ? 'día' : 'días' }}</span>
+            <span style="color: #C2D6CA;">|</span>
+            <i class="fa-solid fa-seedling" style="color: #3D8C4F;"></i>
+            <span>Nvl {{ $userTreeLevel }}</span>
+          </button>
+
           <!-- Quick Breath Shortcut -->
           <a href="{{ route('tools.respiracion') }}" class="btn btn-sm btn-secondary" style="gap: 6px;">
             <i class="fa-solid fa-lungs" style="color: #2E5D4B;"></i>
-            <span>Respirar</span>
+            <span>Respira 1 min</span>
           </a>
 
-          <!-- Crisis Button -->
-          <a href="tel:8002900024" class="btn btn-sm btn-crisis" style="gap: 6px;">
+          <!-- Crisis Button SOS -->
+          <a href="tel:8002900024" class="btn btn-sm btn-crisis" style="gap: 6px;" title="Llamar gratis a Línea de la Vida 24/7">
             <i class="fa-solid fa-phone"></i>
-            <span>Línea 24h</span>
+            <span>SOS 24h</span>
           </a>
-
-          <!-- Topbar Direct Logout Button -->
-          <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
-            @csrf
-            <button type="submit" class="btn btn-sm btn-secondary" title="Cerrar sesión" style="color: #C0392B; gap: 6px;">
-              <i class="fa-solid fa-arrow-right-from-bracket"></i>
-              <span>Salir</span>
-            </button>
-          </form>
         </div>
       </header>
 

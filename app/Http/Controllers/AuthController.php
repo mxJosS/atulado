@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules\Password;
 
 class AuthController extends Controller
@@ -101,15 +102,42 @@ class AuthController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email,' . $user->id],
-            'avatar_color' => ['required', 'string', 'in:sage,terra,lav,sky,amber,dark,mint'],
+            'avatar' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:4096'],
+            'remove_avatar' => ['nullable'],
             'bio' => ['nullable', 'string', 'max:300'],
             'crisis_contact_name' => ['nullable', 'string', 'max:100'],
             'crisis_contact_phone' => ['nullable', 'string', 'max:50'],
+        ], [
+            'name.required' => 'El nombre o apodo es obligatorio.',
+            'email.required' => 'El correo electrónico es obligatorio.',
+            'email.email' => 'Ingresa un formato de correo válido.',
+            'email.unique' => 'Este correo electrónico ya pertenece a otro usuario.',
+            'avatar.image' => 'El archivo seleccionado debe ser una imagen válida.',
+            'avatar.mimes' => 'La foto de perfil debe ser formato JPG, PNG o WEBP.',
+            'avatar.max' => 'La foto de perfil no debe superar los 4MB.',
         ]);
 
-        $user->update($validated);
+        if ($request->hasFile('avatar')) {
+            if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
+                Storage::disk('public')->delete($user->avatar);
+            }
+            $path = $request->file('avatar')->store('avatars', 'public');
+            $user->avatar = $path;
+        } elseif ($request->boolean('remove_avatar')) {
+            if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
+                Storage::disk('public')->delete($user->avatar);
+            }
+            $user->avatar = null;
+        }
 
-        return back()->with('success', 'Tu perfil y preferencias han sido actualizados con éxito.');
+        $user->name = $validated['name'];
+        $user->email = $validated['email'];
+        $user->bio = $validated['bio'] ?? null;
+        $user->crisis_contact_name = $validated['crisis_contact_name'] ?? null;
+        $user->crisis_contact_phone = $validated['crisis_contact_phone'] ?? null;
+        $user->save();
+
+        return back()->with('success', 'Tu perfil y foto han sido actualizados con éxito.');
     }
 
     public function updatePassword(Request $request)

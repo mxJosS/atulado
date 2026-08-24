@@ -47,6 +47,9 @@
             <div style="display: flex; gap: 0.6rem; align-items: center;">
               <i class="fa-solid fa-triangle-exclamation" style="color: var(--clinical-red); font-size: 0.9rem;"></i>
               <input type="text" name="warning_signs[]" value="{{ $ws }}" class="form-control" placeholder="Ej. Insomnio severo, dolor en el pecho, rumiación mental...">
+              <button type="button" onclick="this.parentElement.remove()" class="btn-delete-item" title="Eliminar señal">
+                <i class="fa-solid fa-trash"></i>
+              </button>
             </div>
           @endforeach
         </div>
@@ -76,6 +79,9 @@
             <div style="display: flex; gap: 0.6rem; align-items: center;">
               <i class="fa-solid fa-shield" style="color: var(--sage-base); font-size: 0.9rem;"></i>
               <input type="text" name="internal_coping[]" value="{{ $cp }}" class="form-control" placeholder="Ej. Ejercicio de respiración 4-7-8, técnica 5-4-3-2-1, dibujar...">
+              <button type="button" onclick="this.parentElement.remove()" class="btn-delete-item" title="Eliminar estrategia">
+                <i class="fa-solid fa-trash"></i>
+              </button>
             </div>
           @endforeach
         </div>
@@ -99,35 +105,51 @@
 
         <div class="responsive-two-col">
           <div>
-            <label class="form-label" style="font-size: 0.82rem;">Personas que te distraen:</label>
+            <label class="form-label" style="font-size: 0.82rem; font-weight: 600; margin-bottom: 0.5rem; display: block;">Personas que te distraen:</label>
             <div id="socialDistractionsContainer" style="display: flex; flex-direction: column; gap: 0.5rem;">
               @php
                 $distractions = old('social_distractions', $safetyPlan->social_distractions ?? ['Llamar a mi hermano(a)', 'Platicar de series con mi amigo(a)']);
               @endphp
               @foreach($distractions as $ds)
-                <input type="text" name="social_distractions[]" value="{{ $ds }}" class="form-control" placeholder="Nombre de persona...">
+                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                  <input type="text" name="social_distractions[]" value="{{ $ds }}" class="form-control" placeholder="Nombre de persona...">
+                  <button type="button" onclick="this.parentElement.remove()" class="btn-delete-item" title="Eliminar">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </div>
               @endforeach
             </div>
-            <button type="button" onclick="addSocialDistraction()" class="btn btn-sm btn-secondary" style="margin-top: 0.5rem; font-size: 0.75rem;">+ Persona</button>
+            <button type="button" onclick="addSocialDistraction()" class="btn btn-sm btn-secondary" style="margin-top: 0.65rem; font-size: 0.75rem; gap: 4px;">
+              <i class="fa-solid fa-plus"></i>
+              <span>Agregar persona</span>
+            </button>
           </div>
 
           <div>
-            <label class="form-label" style="font-size: 0.82rem;">Lugares seguros:</label>
+            <label class="form-label" style="font-size: 0.82rem; font-weight: 600; margin-bottom: 0.5rem; display: block;">Lugares seguros:</label>
             <div id="safePlacesContainer" style="display: flex; flex-direction: column; gap: 0.5rem;">
               @php
                 $places = old('safe_places', $safetyPlan->safe_places ?? ['El parque cerca de casa', 'La cafetería de la esquina', 'Mi recámara con música']);
               @endphp
               @foreach($places as $pl)
-                <input type="text" name="safe_places[]" value="{{ $pl }}" class="form-control" placeholder="Lugar donde te sientes en paz...">
+                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                  <input type="text" name="safe_places[]" value="{{ $pl }}" class="form-control" placeholder="Lugar donde te sientes en paz...">
+                  <button type="button" onclick="this.parentElement.remove()" class="btn-delete-item" title="Eliminar">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </div>
               @endforeach
             </div>
-            <button type="button" onclick="addSafePlace()" class="btn btn-sm btn-secondary" style="margin-top: 0.5rem; font-size: 0.75rem;">+ Lugar</button>
+            <button type="button" onclick="addSafePlace()" class="btn btn-sm btn-secondary" style="margin-top: 0.65rem; font-size: 0.75rem; gap: 4px;">
+              <i class="fa-solid fa-plus"></i>
+              <span>Agregar lugar</span>
+            </button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- PASO 4: RED DE APOYO DE CONFIANZA -->
+    <!-- PASO 4: RED DE APOYO DE CONFIANZA (ITEM 6: ACCIONES LLAMADA & WHATSAPP) -->
     <div class="card" style="margin-bottom: 1.5rem; border-top: 4px solid #8A7332;">
       <div class="card-body">
         <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
@@ -138,7 +160,7 @@
           Personas a las que puedes decirles explícitamente: <em>"Estoy pasando por un momento muy difícil y necesito que me acompañes"</em>.
         </p>
 
-        <div id="trustedContactsContainer" style="display: flex; flex-direction: column; gap: 0.75rem;">
+        <div id="trustedContactsContainer" style="display: flex; flex-direction: column; gap: 0.85rem;">
           @php
             $contacts = old('trusted_contacts', $safetyPlan->trusted_contacts ?? [
               ['name' => 'Carlos (Amigo)', 'phone' => '55 1234 5678', 'relationship' => 'Amigo de confianza'],
@@ -146,13 +168,57 @@
             ]);
           @endphp
           @foreach($contacts as $idx => $tc)
-            <div class="trusted-contact-grid" style="background: var(--bg-subtle); padding: 0.75rem; border-radius: var(--radius-sm);">
-              <input type="text" name="trusted_contacts[{{ $idx }}][name]" value="{{ $tc['name'] ?? '' }}" class="form-control" placeholder="Nombre completo">
-              <input type="text" name="trusted_contacts[{{ $idx }}][phone]" value="{{ $tc['phone'] ?? '' }}" class="form-control" placeholder="Teléfono de contacto">
-              <input type="text" name="trusted_contacts[{{ $idx }}][relationship]" value="{{ $tc['relationship'] ?? '' }}" class="form-control" placeholder="Vínculo / Relación">
+            @php
+              $phoneClean = preg_replace('/[^0-9]/', '', $tc['phone'] ?? '');
+              $waMessage = urlencode("Necesito ayuda, ¿podemos hablar?");
+            @endphp
+            <div class="trusted-contact-card" data-index="{{ $idx }}">
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.65rem; margin-bottom: 0.75rem;">
+                <div>
+                  <label class="form-label" style="font-size: 0.75rem; margin-bottom: 0.2rem;">Nombre:</label>
+                  <input type="text" name="trusted_contacts[{{ $idx }}][name]" value="{{ $tc['name'] ?? '' }}" class="form-control" placeholder="Nombre completo" style="font-size: 0.86rem;">
+                </div>
+                <div>
+                  <label class="form-label" style="font-size: 0.75rem; margin-bottom: 0.2rem;">Teléfono:</label>
+                  <input type="text" name="trusted_contacts[{{ $idx }}][phone]" value="{{ $tc['phone'] ?? '' }}" class="form-control contact-phone-input" placeholder="Ej. 5512345678" style="font-size: 0.86rem;" oninput="updateContactActions(this)">
+                </div>
+                <div>
+                  <label class="form-label" style="font-size: 0.75rem; margin-bottom: 0.2rem;">Vínculo / Relación:</label>
+                  <input type="text" name="trusted_contacts[{{ $idx }}][relationship]" value="{{ $tc['relationship'] ?? '' }}" class="form-control" placeholder="Amigo, Pareja, Familiar..." style="font-size: 0.86rem;">
+                </div>
+              </div>
+
+              <!-- ════ CAMPO ACCIONES (ITEM 6 ESPECÍFICO) ════ -->
+              <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 0.65rem; border-top: 1px dashed #DCE8E0; flex-wrap: wrap; gap: 0.5rem;">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  <span style="font-family: var(--font-mono); font-size: 0.72rem; color: #556860; font-weight: 700; text-transform: uppercase;">Acciones:</span>
+                  
+                  <!-- 1. LLAMADA DIRECTA -->
+                  <a href="tel:{{ $phoneClean ?: '8002900024' }}" class="btn-call action-call-btn" title="Llamar directamente a este contacto">
+                    <i class="fa-solid fa-phone"></i>
+                    <span>Llamar</span>
+                  </a>
+
+                  <!-- 2. WHATSAPP CON MENSAJE PRELLENADO "Necesito ayuda, ¿podemos hablar?" -->
+                  <a href="https://wa.me/{{ $phoneClean ? (str_starts_with($phoneClean, '52') ? $phoneClean : '52'.$phoneClean) : '' }}?text={{ $waMessage }}" target="_blank" class="btn-whatsapp action-wa-btn" title="Enviar WhatsApp con mensaje de auxilio prellenado">
+                    <i class="fa-brands fa-whatsapp" style="font-size: 1rem;"></i>
+                    <span>WhatsApp ("Necesito ayuda...")</span>
+                  </a>
+                </div>
+
+                <!-- 3. BOTÓN ELIMINAR CONTACTO -->
+                <button type="button" onclick="this.closest('.trusted-contact-card').remove()" class="btn-delete-item" title="Eliminar este contacto">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
             </div>
           @endforeach
         </div>
+
+        <button type="button" onclick="addTrustedContact()" class="btn btn-sm btn-secondary" style="margin-top: 0.85rem; font-size: 0.78rem; gap: 4px;">
+          <i class="fa-solid fa-user-plus"></i>
+          <span>Agregar otro contacto de confianza</span>
+        </button>
       </div>
     </div>
 
@@ -175,6 +241,9 @@
             <div style="display: flex; gap: 0.6rem; align-items: center;">
               <i class="fa-solid fa-heart" style="color: var(--sage-base); font-size: 0.9rem;"></i>
               <input type="text" name="reasons_to_live[]" value="{{ $rs }}" class="form-control" style="background: #ffffff;" placeholder="Ej. Mi perro, el proyecto que estoy construyendo...">
+              <button type="button" onclick="this.parentElement.remove()" class="btn-delete-item" title="Eliminar razón de vida">
+                <i class="fa-solid fa-trash"></i>
+              </button>
             </div>
           @endforeach
         </div>
@@ -185,11 +254,11 @@
       </div>
     </div>
 
-    <!-- SAVE SUBMIT -->
+    <!-- SAVE SUBMIT (ITEM 6: ETIQUETA "Guardar cambios") -->
     <div style="text-align: right; margin-bottom: 3rem;">
-      <button type="submit" class="btn btn-primary btn-lg" style="gap: 8px;">
+      <button type="submit" class="btn btn-primary btn-lg" style="gap: 8px; font-size: 1rem; padding: 0.85rem 1.75rem;">
         <i class="fa-solid fa-floppy-disk"></i>
-        <span>Guardar cambios del Plan de Seguridad</span>
+        <span>Guardar cambios</span>
       </button>
     </div>
   </form>
@@ -199,11 +268,19 @@
 
 @push('scripts')
 <script>
+  let contactCounter = {{ count($contacts ?? []) }};
+
   function addWarningSign() {
     const c = document.getElementById('warningSignsContainer');
     const div = document.createElement('div');
     div.style = 'display: flex; gap: 0.6rem; align-items: center;';
-    div.innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="color: var(--clinical-red); font-size: 0.9rem;"></i><input type="text" name="warning_signs[]" class="form-control" placeholder="Nueva señal de alerta...">';
+    div.innerHTML = `
+      <i class="fa-solid fa-triangle-exclamation" style="color: var(--clinical-red); font-size: 0.9rem;"></i>
+      <input type="text" name="warning_signs[]" class="form-control" placeholder="Nueva señal de alerta...">
+      <button type="button" onclick="this.parentElement.remove()" class="btn-delete-item" title="Eliminar señal">
+        <i class="fa-solid fa-trash"></i>
+      </button>
+    `;
     c.appendChild(div);
   }
 
@@ -211,36 +288,119 @@
     const c = document.getElementById('internalCopingContainer');
     const div = document.createElement('div');
     div.style = 'display: flex; gap: 0.6rem; align-items: center;';
-    div.innerHTML = '<i class="fa-solid fa-shield" style="color: var(--sage-base); font-size: 0.9rem;"></i><input type="text" name="internal_coping[]" class="form-control" placeholder="Nueva estrategia de afrontamiento...">';
+    div.innerHTML = `
+      <i class="fa-solid fa-shield" style="color: var(--sage-base); font-size: 0.9rem;"></i>
+      <input type="text" name="internal_coping[]" class="form-control" placeholder="Nueva estrategia de afrontamiento...">
+      <button type="button" onclick="this.parentElement.remove()" class="btn-delete-item" title="Eliminar estrategia">
+        <i class="fa-solid fa-trash"></i>
+      </button>
+    `;
     c.appendChild(div);
   }
 
   function addSocialDistraction() {
     const c = document.getElementById('socialDistractionsContainer');
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.name = 'social_distractions[]';
-    input.className = 'form-control';
-    input.placeholder = 'Nombre de persona...';
-    c.appendChild(input);
+    const div = document.createElement('div');
+    div.style = 'display: flex; gap: 0.5rem; align-items: center;';
+    div.innerHTML = `
+      <input type="text" name="social_distractions[]" class="form-control" placeholder="Nombre de persona...">
+      <button type="button" onclick="this.parentElement.remove()" class="btn-delete-item" title="Eliminar">
+        <i class="fa-solid fa-trash"></i>
+      </button>
+    `;
+    c.appendChild(div);
   }
 
   function addSafePlace() {
     const c = document.getElementById('safePlacesContainer');
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.name = 'safe_places[]';
-    input.className = 'form-control';
-    input.placeholder = 'Lugar seguro...';
-    c.appendChild(input);
+    const div = document.createElement('div');
+    div.style = 'display: flex; gap: 0.5rem; align-items: center;';
+    div.innerHTML = `
+      <input type="text" name="safe_places[]" class="form-control" placeholder="Lugar seguro...">
+      <button type="button" onclick="this.parentElement.remove()" class="btn-delete-item" title="Eliminar">
+        <i class="fa-solid fa-trash"></i>
+      </button>
+    `;
+    c.appendChild(div);
   }
 
   function addReasonToLive() {
     const c = document.getElementById('reasonsToLiveContainer');
     const div = document.createElement('div');
     div.style = 'display: flex; gap: 0.6rem; align-items: center;';
-    div.innerHTML = '<i class="fa-solid fa-heart" style="color: var(--sage-base); font-size: 0.9rem;"></i><input type="text" name="reasons_to_live[]" class="form-control" style="background: #ffffff;" placeholder="Nueva razón para seguir...">';
+    div.innerHTML = `
+      <i class="fa-solid fa-heart" style="color: var(--sage-base); font-size: 0.9rem;"></i>
+      <input type="text" name="reasons_to_live[]" class="form-control" style="background: #ffffff;" placeholder="Nueva razón para seguir...">
+      <button type="button" onclick="this.parentElement.remove()" class="btn-delete-item" title="Eliminar razón de vida">
+        <i class="fa-solid fa-trash"></i>
+      </button>
+    `;
     c.appendChild(div);
+  }
+
+  function addTrustedContact() {
+    const c = document.getElementById('trustedContactsContainer');
+    const card = document.createElement('div');
+    card.className = 'trusted-contact-card';
+    card.setAttribute('data-index', contactCounter);
+    
+    const waMessage = encodeURIComponent("Necesito ayuda, ¿podemos hablar?");
+
+    card.innerHTML = `
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.65rem; margin-bottom: 0.75rem;">
+        <div>
+          <label class="form-label" style="font-size: 0.75rem; margin-bottom: 0.2rem;">Nombre:</label>
+          <input type="text" name="trusted_contacts[${contactCounter}][name]" class="form-control" placeholder="Nombre completo" style="font-size: 0.86rem;">
+        </div>
+        <div>
+          <label class="form-label" style="font-size: 0.75rem; margin-bottom: 0.2rem;">Teléfono:</label>
+          <input type="text" name="trusted_contacts[${contactCounter}][phone]" class="form-control contact-phone-input" placeholder="Ej. 5512345678" style="font-size: 0.86rem;" oninput="updateContactActions(this)">
+        </div>
+        <div>
+          <label class="form-label" style="font-size: 0.75rem; margin-bottom: 0.2rem;">Vínculo / Relación:</label>
+          <input type="text" name="trusted_contacts[${contactCounter}][relationship]" class="form-control" placeholder="Amigo, Pareja, Familiar..." style="font-size: 0.86rem;">
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 0.65rem; border-top: 1px dashed #DCE8E0; flex-wrap: wrap; gap: 0.5rem;">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <span style="font-family: var(--font-mono); font-size: 0.72rem; color: #556860; font-weight: 700; text-transform: uppercase;">Acciones:</span>
+          <a href="tel:" class="btn-call action-call-btn" title="Llamar directamente">
+            <i class="fa-solid fa-phone"></i>
+            <span>Llamar</span>
+          </a>
+          <a href="https://wa.me/?text=${waMessage}" target="_blank" class="btn-whatsapp action-wa-btn" title="Enviar WhatsApp de auxilio">
+            <i class="fa-brands fa-whatsapp" style="font-size: 1rem;"></i>
+            <span>WhatsApp ("Necesito ayuda...")</span>
+          </a>
+        </div>
+        <button type="button" onclick="this.closest('.trusted-contact-card').remove()" class="btn-delete-item" title="Eliminar este contacto">
+          <i class="fa-solid fa-trash"></i>
+        </button>
+      </div>
+    `;
+
+    c.appendChild(card);
+    contactCounter++;
+  }
+
+  function updateContactActions(phoneInput) {
+    const card = phoneInput.closest('.trusted-contact-card');
+    if (!card) return;
+
+    const rawPhone = phoneInput.value.replace(/[^0-9]/g, '');
+    const callBtn = card.querySelector('.action-call-btn');
+    const waBtn = card.querySelector('.action-wa-btn');
+    const waMessage = encodeURIComponent("Necesito ayuda, ¿podemos hablar?");
+
+    if (callBtn) {
+      callBtn.href = rawPhone ? `tel:${rawPhone}` : 'tel:8002900024';
+    }
+
+    if (waBtn) {
+      const waNumber = rawPhone.startsWith('52') ? rawPhone : (rawPhone ? '52' + rawPhone : '');
+      waBtn.href = waNumber ? `https://wa.me/${waNumber}?text=${waMessage}` : `https://wa.me/?text=${waMessage}`;
+    }
   }
 </script>
 @endpush

@@ -172,7 +172,7 @@
                   </h3>
                 </div>
 
-                <form action="{{ route('mood.destroy', $log) }}" method="POST" onsubmit="return confirm('¿Eliminar este registro?')">
+                <form action="{{ route('mood.destroy', $log) }}" method="POST" class="delete-mood-form">
                   @csrf
                   @method('DELETE')
                   <button type="submit" class="btn btn-sm btn-secondary" title="Eliminar registro" style="color: var(--clinical-red); padding: 0.3rem 0.6rem;">
@@ -198,7 +198,7 @@
         @endforeach
       </div>
 
-      <div style="margin-top: 1.5rem;">
+      <div style="display: flex; justify-content: center; margin-top: 2rem;">
         {{ $logs->links() }}
       </div>
     @endif

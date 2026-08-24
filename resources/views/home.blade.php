@@ -100,28 +100,71 @@
   </div>
 </section>
 
-<!-- ════ TRUST STRIP ════ -->
-<div style="background: #FFFFFF; border-bottom: 1.5px solid #DCE8E0; padding: 1.35rem 1.5rem;">
-  <div style="max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-around; gap: 1.25rem; flex-wrap: wrap;">
-    <div style="display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 0.76rem; font-weight: 600; text-transform: uppercase; color: #2E5D4B;">
-      <i class="fa-solid fa-lock" style="color: #3D7A5F;"></i>
-      <span>100% Confidencial</span>
+<!-- ════ 1. INFINITE TRUST MARQUEE (ITEM 1) ════ -->
+<div class="trust-marquee-wrapper" title="Desliza para pausar">
+  <div class="trust-marquee-track">
+    <!-- First sequence -->
+    <div class="marquee-group">
+      <div class="marquee-item" style="color: #2E5D4B;">
+        <i class="fa-solid fa-lock" style="color: #3D7A5F;"></i>
+        <span>100% CONFIDENCIAL</span>
+      </div>
+      <div class="marquee-item" style="color: #2E5D4B;">
+        <i class="fa-solid fa-hand-holding-heart" style="color: #3D7A5F;"></i>
+        <span>GRATUITO Y SIN COSTO</span>
+      </div>
+      <div class="marquee-item" style="color: #5B4A8A;">
+        <i class="fa-solid fa-spa" style="color: #5B4A8A;"></i>
+        <span>BASADO EN DBT</span>
+      </div>
+      <div class="marquee-item" style="color: #A93226;">
+        <i class="fa-solid fa-clock" style="color: #A93226;"></i>
+        <span>DISPONIBLE 24/7</span>
+      </div>
+      <div class="marquee-item" style="color: #8A7332;">
+        <i class="fa-solid fa-earth-americas" style="color: #8A7332;"></i>
+        <span>MÉXICO Y LATAM</span>
+      </div>
+      <div class="marquee-item" style="color: #2E5D4B;">
+        <i class="fa-solid fa-shield-halved" style="color: #3D7A5F;"></i>
+        <span>ESPACIO SEGURO Y ANÓNIMO</span>
+      </div>
+      <div class="marquee-item" style="color: #5B4A8A;">
+        <i class="fa-solid fa-leaf" style="color: #5B4A8A;"></i>
+        <span>SIN JUICIOS NI ETIQUETAS</span>
+      </div>
     </div>
-    <div style="display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 0.76rem; font-weight: 600; text-transform: uppercase; color: #2E5D4B;">
-      <i class="fa-solid fa-hand-holding-heart" style="color: #3D7A5F;"></i>
-      <span>Gratuito y sin costo</span>
-    </div>
-    <div style="display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 0.76rem; font-weight: 600; text-transform: uppercase; color: #5B4A8A;">
-      <i class="fa-solid fa-spa" style="color: #5B4A8A;"></i>
-      <span>Basado en DBT</span>
-    </div>
-    <div style="display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 0.76rem; font-weight: 600; text-transform: uppercase; color: #A93226;">
-      <i class="fa-solid fa-clock" style="color: #A93226;"></i>
-      <span>Disponible 24/7</span>
-    </div>
-    <div style="display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 0.76rem; font-weight: 600; text-transform: uppercase; color: #8A7332;">
-      <i class="fa-solid fa-earth-americas" style="color: #8A7332;"></i>
-      <span>México y LATAM</span>
+
+    <!-- Duplicated sequence for seamless infinite loop -->
+    <div class="marquee-group" aria-hidden="true">
+      <div class="marquee-item" style="color: #2E5D4B;">
+        <i class="fa-solid fa-lock" style="color: #3D7A5F;"></i>
+        <span>100% CONFIDENCIAL</span>
+      </div>
+      <div class="marquee-item" style="color: #2E5D4B;">
+        <i class="fa-solid fa-hand-holding-heart" style="color: #3D7A5F;"></i>
+        <span>GRATUITO Y SIN COSTO</span>
+      </div>
+      <div class="marquee-item" style="color: #5B4A8A;">
+        <i class="fa-solid fa-spa" style="color: #5B4A8A;"></i>
+        <span>BASADO EN DBT</span>
+      </div>
+      <div class="marquee-item" style="color: #A93226;">
+        <i class="fa-solid fa-clock" style="color: #A93226;"></i>
+        <span>DISPONIBLE 24/7</span>
+      </div>
+      <div class="marquee-item" style="color: #8A7332;">
+        <i class="fa-solid fa-earth-americas" style="color: #8A7332;"></i>
+        <span>MÉXICO Y LATAM</span>
+      </div>
+      <div class="marquee-item" style="color: #2E5D4B;">
+        <i class="fa-solid fa-shield-halved" style="color: #3D7A5F;"></i>
+        <span>ESPACIO SEGURO Y ANÓNIMO</span>
+      </div>
+      <div class="marquee-item" style="color: #5B4A8A;">
+        <i class="fa-solid fa-leaf" style="color: #5B4A8A;"></i>
+        <span>SIN JUICIOS NI ETIQUETAS</span>
+      </div>
     </div>
   </div>
 </div>
@@ -237,6 +280,91 @@
           </a>
         </div>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════ 2. SECCIÓN REVISTA CIENTÍFICA & APORTES PROFESIONALES (ITEM 2) ════ -->
+<section style="padding: 4.5rem 1.5rem; background: #F8FAF9; border-bottom: 1.5px solid #DCE8E0;">
+  <div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2.5rem; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <span class="mono-tag" style="color: #2E5D4B;">— EVIDENCIA & PSICOEDUCACIÓN</span>
+        <h2 style="font-size: clamp(1.6rem, 3vw, 2.3rem); margin-top: 0.25rem; margin-bottom: 0.35rem; color: #1A2620;">
+          Aportes de la Comunidad Profesional
+        </h2>
+        <p style="color: #556860; font-size: 0.94rem; max-width: 600px;">
+          Artículos clínicos, investigaciones y técnicas basadas en evidencia redactadas por terapeutas y especialistas en salud mental.
+        </p>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+        <a href="{{ route('revista.index') }}" class="btn btn-secondary btn-sm" style="gap: 6px;">
+          <i class="fa-solid fa-newspaper"></i>
+          <span>Explorar Revista Completa</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </a>
+        @auth
+          @if(auth()->user()->isProfessional())
+            <a href="{{ route('revista.create') }}" class="btn btn-primary btn-sm" style="gap: 6px;">
+              <i class="fa-solid fa-pen-nib"></i>
+              <span>Publicar Artículo</span>
+            </a>
+          @endif
+        @endauth
+      </div>
+    </div>
+
+    <!-- Article Cards Grid -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+      @forelse($latestArticles as $art)
+        <div class="article-forum-card">
+          <div style="padding: 1.5rem; display: flex; flex-direction: column; flex: 1;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+              <span class="badge-blue-category">{{ $art->category }}</span>
+              <span class="mono-tag" style="color: #556860; display: flex; align-items: center; gap: 4px;">
+                <i class="fa-regular fa-clock"></i> {{ $art->read_time }}
+              </span>
+            </div>
+
+            <h3 style="font-size: 1.2rem; margin-bottom: 0.65rem; line-height: 1.35;">
+              <a href="{{ route('revista.show', $art->slug) }}" style="color: #1A2620; text-decoration: none;">
+                {{ $art->title }}
+              </a>
+            </h3>
+
+            <p style="font-size: 0.88rem; color: #556860; line-height: 1.6; margin-bottom: 1.25rem; flex: 1;">
+              {{ Str::limit($art->excerpt, 120) }}
+            </p>
+
+            <div style="padding-top: 0.85rem; border-top: 1px solid #DCE8E0; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem;">
+              <div style="display: flex; align-items: center; gap: 0.5rem; overflow: hidden;">
+                <div style="width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, #1877F2 0%, #0D6EFD 100%); color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 700; flex-shrink: 0;">
+                  {{ strtoupper(substr($art->author_name, 0, 1)) }}
+                </div>
+                <div style="font-size: 0.78rem; white-space: nowrap; overflow: visible;">
+                  <div style="font-weight: 700; color: #1A2620; display: flex; align-items: center; gap: 5px;">
+                    <span>{{ $art->author_name }}</span>
+                    <x-verified-badge size="16" />
+                  </div>
+                  <div style="color: #556860; font-size: 0.72rem;">{{ Str::limit($art->author_role, 24) }}</div>
+                </div>
+              </div>
+
+              <a href="{{ route('revista.show', $art->slug) }}" class="btn btn-sm btn-secondary" style="font-size: 0.78rem; padding: 0.35rem 0.65rem; white-space: nowrap; gap: 4px; color: #1877F2; border-color: rgba(24, 119, 242, 0.3);">
+                <span>Leer</span>
+                <i class="fa-solid fa-arrow-right"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      @empty
+        <div class="card" style="grid-column: 1 / -1; text-align: center; padding: 3rem 1.5rem;">
+          <i class="fa-solid fa-feather" style="font-size: 2.2rem; color: #8EADA4;"></i>
+          <h3 style="margin-top: 0.75rem; font-size: 1.15rem;">Espacio abierto para profesionales</h3>
+          <p style="color: #556860; font-size: 0.88rem; margin-top: 0.35rem;">Sé el primero en compartir psicoeducación basada en evidencia con la comunidad.</p>
+        </div>
+      @endforelse
     </div>
   </div>
 </section>

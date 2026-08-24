@@ -21,8 +21,10 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/recursos', [ResourceController::class, 'index'])->name('recursos.index');
 Route::get('/recursos/{slug}', [ResourceController::class, 'show'])->name('recursos.show');
 
-// Magazine (Revista)
+// Magazine (Revista & Publicaciones Científicas)
 Route::get('/revista', [ArticleController::class, 'index'])->name('revista.index');
+Route::get('/revista/crear', [ArticleController::class, 'create'])->name('revista.create');
+Route::post('/revista', [ArticleController::class, 'store'])->name('revista.store');
 Route::get('/revista/{slug}', [ArticleController::class, 'show'])->name('revista.show');
 
 // Emotional Self-check & Tools

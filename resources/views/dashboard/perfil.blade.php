@@ -11,9 +11,38 @@
 
   <div style="margin-bottom: 1.75rem;">
     <span class="mono-tag" style="color: var(--sage-base);">— CONFIGURACIÓN DE CUENTA</span>
-    <h1 style="font-size: 1.85rem; margin-top: 0.15rem; color: var(--text-near-black);">Mi Perfil</h1>
+    <h1 style="font-size: 1.85rem; margin-top: 0.15rem; color: var(--text-near-black); display: flex; align-items: center; gap: 8px;">
+      <span>Mi Perfil</span>
+      @if($user->isProfessional())
+        <x-verified-badge size="22" />
+      @endif
+    </h1>
     <p style="color: var(--text-medium-gray); font-size: 0.9rem;">Personaliza tu experiencia, contactos de emergencia y credenciales de acceso.</p>
   </div>
+
+  @if($user->isProfessional())
+    <div class="card" style="margin-bottom: 1.75rem; background: linear-gradient(135deg, #FFFFFF 0%, #F0F7FF 100%); border: 1.5px solid #0095F6; box-shadow: 0 4px 16px rgba(0, 149, 246, 0.08);">
+      <div class="card-body" style="padding: 1.25rem 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+        <div style="display: flex; align-items: center; gap: 0.85rem;">
+          <div style="width: 46px; height: 46px; border-radius: 50%; background: rgba(0, 149, 246, 0.12); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <x-verified-badge size="26" />
+          </div>
+          <div>
+            <div style="font-weight: 700; color: #1A2620; font-size: 0.98rem; display: flex; align-items: center; gap: 6px;">
+              <span>Cuenta Profesional Verificada</span>
+            </div>
+            <p style="font-size: 0.82rem; color: #556860; margin: 0; margin-top: 0.15rem;">
+              Cuentas con la insignia oficial de especialista. Tus artículos y aportes en la Revista Científica contarán con el sello de autenticidad y tu fotografía de autor.
+            </p>
+          </div>
+        </div>
+        <a href="{{ route('revista.create') }}" class="btn btn-sm btn-primary" style="background: #0095F6; border-color: #0095F6; gap: 6px; font-size: 0.82rem; white-space: nowrap;">
+          <i class="fa-solid fa-pen-nib"></i>
+          <span>Publicar Artículo</span>
+        </a>
+      </div>
+    </div>
+  @endif
 
   <!-- PROFILE DETAILS FORM -->
   <div class="card" style="margin-bottom: 1.75rem;">
@@ -23,9 +52,57 @@
         <span>Datos Personales</span>
       </h2>
 
-      <form method="POST" action="{{ route('profile.update') }}">
+      <form method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data">
         @csrf
         @method('PUT')
+
+        <!-- Profile Photo Upload -->
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+          <label class="form-label" style="display: flex; align-items: center; justify-content: space-between;">
+            <span>Foto de Perfil</span>
+            <span style="font-size: 0.76rem; color: #556860; font-weight: normal;">Visible en tu cuenta y artículos publicados</span>
+          </label>
+
+          <div style="display: flex; align-items: center; gap: 1.25rem; flex-wrap: wrap; background: #F8FAF9; padding: 1.15rem; border-radius: 14px; border: 1.5px dashed #C2D6CA;">
+            <!-- Current / Preview Avatar -->
+            <div style="position: relative; width: 72px; height: 72px; flex-shrink: 0;">
+              <div id="avatarPreviewBox" style="width: 72px; height: 72px; border-radius: 50%; overflow: hidden; background: #2E5D4B; display: flex; align-items: center; justify-content: center; color: #FFFFFF; font-size: 1.75rem; font-weight: 700; border: 2.5px solid #FFFFFF; box-shadow: 0 4px 12px rgba(0,0,0,0.12);">
+                @if($user->avatar_url)
+                  <img id="avatarPreviewImg" src="{{ $user->avatar_url }}" alt="{{ $user->name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                  <span id="avatarInitials" style="display: none;">{{ strtoupper(substr($user->name, 0, 1)) }}</span>
+                @else
+                  <span id="avatarInitials">{{ strtoupper(substr($user->name, 0, 1)) }}</span>
+                  <img id="avatarPreviewImg" src="" alt="Vista previa" style="display: none; width: 100%; height: 100%; object-fit: cover;">
+                @endif
+              </div>
+            </div>
+
+            <!-- Upload Controls -->
+            <div style="flex: 1; min-width: 220px;">
+              <input type="file" name="avatar" id="avatarInput" accept="image/png, image/jpeg, image/jpg, image/webp" style="display: none;" onchange="handleAvatarPreview(this)">
+              <input type="hidden" name="remove_avatar" id="removeAvatarFlag" value="0">
+
+              <div style="display: flex; gap: 0.65rem; flex-wrap: wrap; margin-bottom: 0.4rem;">
+                <label for="avatarInput" class="btn btn-secondary btn-sm" style="cursor: pointer; gap: 6px; font-size: 0.82rem; padding: 0.45rem 0.9rem;">
+                  <i class="fa-solid fa-camera"></i>
+                  <span>Subir nueva foto</span>
+                </label>
+
+                @if($user->avatar)
+                  <button type="button" onclick="removeCurrentAvatar()" id="btnRemoveAvatar" class="btn btn-sm" style="background: rgba(192, 57, 43, 0.1); color: #C0392B; border: 1px solid rgba(192, 57, 43, 0.3); font-size: 0.8rem; padding: 0.45rem 0.85rem; gap: 5px;">
+                    <i class="fa-solid fa-trash-can"></i>
+                    <span>Quitar foto</span>
+                  </button>
+                @endif
+              </div>
+
+              <p style="font-size: 0.78rem; color: #556860; margin: 0; line-height: 1.4;">
+                Formatos recomendados: JPG, PNG o WEBP. Tamaño máximo: 4MB. Esta imagen se mostrará como tu autoría oficial en la Revista Científica.
+              </p>
+              @error('avatar') <div class="form-error" style="margin-top: 0.4rem;">{{ $message }}</div> @enderror
+            </div>
+          </div>
+        </div>
 
         <div class="form-group">
           <label for="name" class="form-label">Nombre o apodo</label>
@@ -41,34 +118,8 @@
 
         <div class="form-group">
           <label for="bio" class="form-label">Frase o intención personal (bio)</label>
-          <input type="text" name="bio" id="bio" value="{{ old('bio', $user->bio) }}" class="form-control" placeholder="Ej. Un día a la vez, con paciencia y compasión...">
+          <input type="text" name="bio" id="bio" value="{{ old('bio', $user->bio) }}" class="form-control" placeholder="Ej. Cuidando de mi salud mental día a día. Aprendiendo a escucharme.">
           @error('bio') <div class="form-error">{{ $message }}</div> @enderror
-        </div>
-
-        <!-- Avatar Color Choice -->
-        <div class="form-group" style="margin-top: 1.25rem;">
-          <label class="form-label">Tono de tu avatar:</label>
-          <div style="display: flex; gap: 0.85rem; margin-top: 0.35rem;">
-            @php
-              $colors = [
-                'sage' => ['label' => 'Sage', 'bg' => '#2E5D4B'],
-                'mint' => ['label' => 'Menta', 'bg' => '#5AB56E'],
-                'lav' => ['label' => 'Lavanda', 'bg' => '#5B4A8A'],
-                'amber' => ['label' => 'Dorado', 'bg' => '#C8B87A'],
-                'terra' => ['label' => 'Tierra', 'bg' => '#6B3A1F'],
-              ];
-              $currentColor = old('avatar_color', $user->avatar_color ?? 'sage');
-            @endphp
-            @foreach($colors as $val => $c)
-              <label style="cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 0.25rem;">
-                <input type="radio" name="avatar_color" value="{{ $val }}" {{ $currentColor === $val ? 'checked' : '' }} style="display: none;" class="avatar-radio">
-                <span class="avatar-swatch" style="width: 34px; height: 34px; border-radius: 50%; background: {{ $c['bg'] }}; display: flex; align-items: center; justify-content: center; border: 2px solid {{ $currentColor === $val ? 'var(--sage-base)' : 'transparent' }};">
-                  <i class="fa-solid fa-check check-mark" style="color: #ffffff; font-size: 0.75rem; display: {{ $currentColor === $val ? 'block' : 'none' }};"></i>
-                </span>
-                <span style="font-size: 0.7rem; color: var(--text-medium-gray); font-family: var(--font-mono);">{{ $c['label'] }}</span>
-              </label>
-            @endforeach
-          </div>
         </div>
 
         <!-- Emergency Crisis Contact Quick Fields -->
@@ -145,3 +196,56 @@
 
 </div>
 @endsection
+
+@push('scripts')
+<script>
+  function handleAvatarPreview(input) {
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const previewImg = document.getElementById('avatarPreviewImg');
+        const initials = document.getElementById('avatarInitials');
+        const removeFlag = document.getElementById('removeAvatarFlag');
+        
+        if (removeFlag) removeFlag.value = '0';
+        if (previewImg) {
+          previewImg.src = e.target.result;
+          previewImg.style.display = 'block';
+        }
+        if (initials) {
+          initials.style.display = 'none';
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  async function removeCurrentAvatar() {
+    let confirmed = true;
+    if (typeof window.showZenConfirm === 'function') {
+      confirmed = await window.showZenConfirm({
+        title: '¿Quitar foto de perfil?',
+        message: 'Tu perfil volverá a mostrar tu avatar con iniciales. Recuerda guardar los cambios de perfil para confirmar.',
+        confirmText: 'Quitar foto',
+        cancelText: 'Conservar',
+        type: 'warning',
+        icon: 'fa-user-slash'
+      });
+    }
+    if (!confirmed) return;
+
+    const input = document.getElementById('avatarInput');
+    const previewImg = document.getElementById('avatarPreviewImg');
+    const initials = document.getElementById('avatarInitials');
+    const removeFlag = document.getElementById('removeAvatarFlag');
+    const btnRemove = document.getElementById('btnRemoveAvatar');
+
+    if (input) input.value = '';
+    if (removeFlag) removeFlag.value = '1';
+    if (previewImg) previewImg.style.display = 'none';
+    if (initials) initials.style.display = 'block';
+    if (btnRemove) btnRemove.style.display = 'none';
+  }
+</script>
+@endpush

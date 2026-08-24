@@ -28,12 +28,31 @@ class AppFlowTest extends TestCase
             'is_featured' => true,
         ]);
 
+        $topicArea = \App\Models\TopicArea::create([
+            'name' => 'Ansiedad & Pánico',
+            'slug' => 'ansiedad-panico',
+            'description' => 'Área de ansiedad y pánico',
+            'icon' => 'fa-wind',
+            'color' => 'sky',
+        ]);
+
         Article::create([
+            'topic_area_id' => $topicArea->id,
             'title' => 'Salud Mental Hoy',
             'slug' => 'salud-mental-hoy',
-            'category' => 'Ansiedad',
-            'excerpt' => 'Extracto de prueba',
-            'content' => 'Contenido completo',
+            'author_name' => 'Dr. Carlos Mendoza',
+            'author_credentials' => 'Psiquiatra y Terapeuta DBT',
+            'visual_theme' => 'sky',
+            'publication_type' => 'revision',
+            'target_audience' => 'general',
+            'summary' => 'Extracto de prueba',
+            'content' => 'Contenido completo de prueba con más de cien caracteres para superar las validaciones de publicación.',
+            'references' => 'APA Reference 2026',
+            'discussion_prompt' => '¿Cómo manejas tus momentos de crisis?',
+            'reading_time_min' => 4,
+            'allow_comments' => true,
+            'is_disclaimer_accepted' => true,
+            'status' => 'published',
             'published_at' => Carbon::now(),
         ]);
 
@@ -125,5 +144,104 @@ class AppFlowTest extends TestCase
             'user_id' => $user->id,
             'reasons_for_living' => 'Mi familia y mis proyectos',
         ]);
+
+        // Test Print View
+        $this->actingAs($user)->get('/plan-de-seguridad/imprimir')
+            ->assertStatus(200)
+            ->assertSee('Plan de Seguridad Personal')
+            ->assertSee('LÍNEAS DE CRISIS Y AYUDA INMEDIATA');
+    }
+
+    public function test_home_has_marquee_and_login_has_google_button(): void
+    {
+        $this->get('/')
+            ->assertStatus(200)
+            ->assertSee('100% CONFIDENCIAL')
+            ->assertSee('BASADO EN DBT');
+
+        $this->get('/login')
+            ->assertStatus(200)
+            ->assertSee('Acceder con Google')
+            ->assertSee('demo@atulado.com.mx');
+    }
+
+    public function test_user_can_publish_scientific_article(): void
+    {
+        $user = User::factory()->create([
+            'role' => 'profesional',
+            'professional_title' => 'Dra. en Neurociencias',
+        ]);
+
+        $topicArea = \App\Models\TopicArea::create([
+            'name' => 'Terapia DBT & Conductual',
+            'slug' => 'terapia-dbt-conductual',
+            'icon' => 'fa-brain',
+            'color' => 'lav',
+        ]);
+
+        $this->actingAs($user)->get('/revista/crear')
+            ->assertStatus(200)
+            ->assertSee('Publicar Artículo o Investigación');
+
+        $response = $this->actingAs($user)->post('/revista', [
+            'topic_area_id' => $topicArea->id,
+            'title' => 'Neurobiología del Apego y Regulación DBT',
+            'author_name' => 'Dra. Laura Sánchez',
+            'author_credentials' => 'Especialista en DBT y Neurociencias',
+            'visual_theme' => 'lav',
+            'publication_type' => 'revision',
+            'target_audience' => 'profesionales',
+            'summary' => 'Análisis de los circuitos de regulación en momentos de activación simpática.',
+            'content' => 'La terapia dialéctico conductual combina la aceptación radical con el cambio conductual activo en personas con desregulación emocional severa, permitiendo cultivar una vida que valga la pena ser vivida.',
+            'references' => 'Linehan, M. M. (1993). Cognitive-Behavioral Treatment of Borderline Personality Disorder.',
+            'discussion_prompt' => '¿Cómo influye la relación terapéutica en el apego seguro?',
+            'reading_time_min' => 5,
+            'allow_comments' => 1,
+            'is_disclaimer_accepted' => 1,
+        ]);
+
+        $response->assertRedirect();
+        $this->assertDatabaseHas('articles', [
+            'topic_area_id' => $topicArea->id,
+            'title' => 'Neurobiología del Apego y Regulación DBT',
+            'author_name' => 'Dra. Laura Sánchez',
+            'author_credentials' => 'Especialista en DBT y Neurociencias',
+            'publication_type' => 'revision',
+            'target_audience' => 'profesionales',
+            'is_disclaimer_accepted' => 1,
+        ]);
+    }
+
+    public function test_user_can_publish_article_with_cover_image_file(): void
+    {
+        \Illuminate\Support\Facades\Storage::fake('public');
+
+        $user = User::factory()->create(['role' => 'profesional']);
+        $topicArea = \App\Models\TopicArea::create([
+            'name' => 'Mindfulness',
+            'slug' => 'mindfulness',
+        ]);
+
+        $file = \Illuminate\Http\UploadedFile::fake()->image('portada.jpg', 800, 600);
+
+        $response = $this->actingAs($user)->post('/revista', [
+            'topic_area_id' => $topicArea->id,
+            'title' => 'Mindfulness y Autocompasión',
+            'author_name' => 'Dr. Fernando Rios',
+            'author_credentials' => 'Psicólogo Clínico',
+            'visual_theme' => 'salvia',
+            'publication_type' => 'divulgacion',
+            'target_audience' => 'general',
+            'summary' => 'Resumen sobre mindfulness y bienestar emocional.',
+            'content' => 'Contenido completo para la investigación con más de cien caracteres para superar las validaciones requeridas.',
+            'cover_image' => $file,
+            'is_disclaimer_accepted' => 1,
+        ]);
+
+        $response->assertRedirect();
+        $article = Article::where('title', 'Mindfulness y Autocompasión')->first();
+        $this->assertNotNull($article);
+        $this->assertNotNull($article->cover_image_path);
+        $this->assertStringStartsWith('/storage/articles/', $article->cover_image_path);
     }
 }

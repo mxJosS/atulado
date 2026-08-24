@@ -19,12 +19,25 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'avatar',
         'avatar_color',
         'bio',
         'crisis_contact_name',
         'crisis_contact_phone',
         'is_admin',
+        'role',
+        'professional_title',
+        'license_number',
+        'institution',
     ];
+
+    public function getAvatarUrlAttribute(): ?string
+    {
+        if ($this->avatar) {
+            return str_starts_with($this->avatar, 'http') ? $this->avatar : asset('storage/' . $this->avatar);
+        }
+        return null;
+    }
 
     protected $hidden = [
         'password',
@@ -38,6 +51,16 @@ class User extends Authenticatable
             'password' => 'hashed',
             'is_admin' => 'boolean',
         ];
+    }
+
+    public function isProfessional(): bool
+    {
+        return $this->role === 'profesional' || $this->role === 'admin' || $this->is_admin;
+    }
+
+    public function articles(): HasMany
+    {
+        return $this->hasMany(Article::class)->orderBy('published_at', 'desc');
     }
 
     public function moodLogs(): HasMany

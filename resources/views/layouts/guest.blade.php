@@ -15,6 +15,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Instrument+Serif:ital@0;1&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <!-- FontAwesome Pro/Free Kit -->
   <script src="https://kit.fontawesome.com/6244811c40.js" crossorigin="anonymous"></script>
+  
+  <!-- RPG Awesome & Game Icons Library -->
+  <link rel="stylesheet" href="{{ asset('vendor/rpg-awesome/css/rpg-awesome.min.css') }}">
+  <script src="{{ asset('vendor/iconify/iconify-icon.min.js') }}"></script>
+  <script src="{{ asset('js/game-icons-pack.js') }}?v={{ file_exists(public_path('js/game-icons-pack.js')) ? filemtime(public_path('js/game-icons-pack.js')) : time() }}"></script>
   @stack('styles')
 </head>
 <body style="background-color: #F8FAF9; color: #1A2620;">

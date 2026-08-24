@@ -13,11 +13,11 @@ return new class extends Migration
             $table->string('title');
             $table->string('slug')->unique();
             $table->string('author_name')->default('Equipo A tu lado');
-            $table->string('author_role')->default('Psicología y Bienestar');
-            $table->string('category'); // e.g. Ansiedad, Hábitos, DBT, Duelo, Sueño, Relaciones
-            $table->string('read_time')->default('4 min');
-            $table->string('color_tag')->default('sage'); // sage, terra, lav, sky, amber
-            $table->text('excerpt');
+            $table->string('author_role')->nullable()->default('Psicología y Bienestar');
+            $table->string('category')->nullable(); // e.g. Ansiedad, Hábitos, DBT, Duelo, Sueño, Relaciones
+            $table->string('read_time')->nullable()->default('4 min');
+            $table->string('color_tag')->nullable()->default('sage'); // sage, terra, lav, sky, amber
+            $table->text('excerpt')->nullable();
             $table->longText('content');
             $table->boolean('is_featured')->default(false);
             $table->timestamp('published_at')->nullable();
