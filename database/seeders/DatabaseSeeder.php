@@ -18,7 +18,11 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        if (User::where('email', 'demo@atulado.com.mx')->exists()) {
+        $demoUser = User::where('email', 'demo@atulado.com.mx')->first();
+        if ($demoUser) {
+            $demoUser->update([
+                'password' => Hash::make('demo1234'),
+            ]);
             return;
         }
 
@@ -26,7 +30,7 @@ class DatabaseSeeder extends Seeder
         $demoUser = User::create([
             'name' => 'María López',
             'email' => 'demo@atulado.com.mx',
-            'password' => Hash::make('password123'),
+            'password' => Hash::make('demo1234'),
             'avatar_color' => 'sage',
             'bio' => 'Cuidando de mi salud mental día a día. Aprendiendo a escucharme.',
             'crisis_contact_name' => 'Sofía López (Hermana)',
