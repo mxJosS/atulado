@@ -53,13 +53,26 @@ return new class extends Migration
 
         // Migrate data from existing columns if available
         if (Schema::hasColumn('articles', 'excerpt') && Schema::hasColumn('articles', 'summary')) {
-            DB::statement("UPDATE articles SET summary = excerpt WHERE summary IS NULL OR summary = ''");
+            DB::table('articles')
+                ->where(function ($query) {
+                    $query->whereNull('summary')->orWhere('summary', '');
+                })
+                ->whereNotNull('excerpt')
+                ->update(['summary' => DB::raw('excerpt')]);
         }
         if (Schema::hasColumn('articles', 'author_role') && Schema::hasColumn('articles', 'author_credentials')) {
-            DB::statement("UPDATE articles SET author_credentials = author_role WHERE author_credentials IS NULL OR author_credentials = ''");
+            DB::table('articles')
+                ->where(function ($query) {
+                    $query->whereNull('author_credentials')->orWhere('author_credentials', '');
+                })
+                ->whereNotNull('author_role')
+                ->update(['author_credentials' => DB::raw('author_role')]);
         }
         if (Schema::hasColumn('articles', 'references_list') && Schema::hasColumn('articles', 'references')) {
-            DB::statement("UPDATE articles SET \"references\" = references_list WHERE \"references\" IS NULL");
+            DB::table('articles')
+                ->whereNull('references')
+                ->whereNotNull('references_list')
+                ->update(['references' => DB::raw('references_list')]);
         }
     }
 

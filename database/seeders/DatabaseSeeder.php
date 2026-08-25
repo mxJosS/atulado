@@ -18,6 +18,10 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        if (User::where('email', 'demo@atulado.com.mx')->exists()) {
+            return;
+        }
+
         // 1. Create Demo User
         $demoUser = User::create([
             'name' => 'María López',
