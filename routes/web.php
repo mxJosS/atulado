@@ -8,6 +8,7 @@ use App\Http\Controllers\MoodTrackerController;
 use App\Http\Controllers\ResourceController;
 use App\Http\Controllers\SafetyPlanController;
 use App\Http\Controllers\ToolController;
+use App\Http\Controllers\AssessmentController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -72,6 +73,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/recursos/{resource}/favorito', [ResourceController::class, 'toggleFavorite'])->name('recursos.favorite');
     Route::post('/recursos/{resource}/completar', [ResourceController::class, 'toggleCompleted'])->name('recursos.complete');
     Route::get('/mis-favoritos', [ResourceController::class, 'userFavorites'])->name('favorites.index');
+
+    // Clinical Risk Assessment Engine (v1.0)
+    Route::post('/assessment/who5', [AssessmentController::class, 'submitWho5'])->name('assessment.who5');
+    Route::post('/assessment/mdi', [AssessmentController::class, 'submitMdi'])->name('assessment.mdi');
+    Route::post('/assessment/asq', [AssessmentController::class, 'submitAsq'])->name('assessment.asq');
+    Route::post('/assessment/crisis/accion', [AssessmentController::class, 'registrarAccionCrisis'])->name('assessment.crisis.action');
+    Route::post('/assessment/crisis/{evento}/cerrar', [AssessmentController::class, 'cerrarCasoCrisis'])->name('assessment.crisis.close');
 
     // Profile Settings
     Route::get('/perfil', [AuthController::class, 'showProfile'])->name('profile.show');

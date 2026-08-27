@@ -14,9 +14,12 @@ class MoodLog extends Model
     protected $fillable = [
         'user_id',
         'score',
+        'valor_invertido',
         'primary_emotion',
         'tags',
         'journal_entry',
+        'bandera_lexica',
+        'terminos_detectados',
         'gratitude_note',
         'energy_level',
         'sleep_hours',
@@ -27,6 +30,9 @@ class MoodLog extends Model
     {
         return [
             'score' => 'integer',
+            'valor_invertido' => 'integer',
+            'bandera_lexica' => 'boolean',
+            'terminos_detectados' => 'array',
             'energy_level' => 'integer',
             'sleep_hours' => 'integer',
             'tags' => 'array',

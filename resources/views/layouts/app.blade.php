@@ -160,41 +160,34 @@
 
       <!-- TOPBAR WITH INSTANT SHORTCUTS -->
       <header class="dashboard-topbar">
-        <div style="display: flex; align-items: center; gap: 0.85rem;">
-          <button id="mobileSidebarToggle" class="btn btn-sm btn-secondary" style="display: none; padding: 0.4rem 0.65rem;" aria-label="Abrir menú">
+        <div class="topbar-left-group">
+          <button id="mobileSidebarToggle" class="btn btn-sm btn-secondary mobile-sidebar-toggle" aria-label="Abrir menú de navegación">
             <i class="fa-solid fa-bars"></i>
           </button>
-          <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: #556860; font-family: var(--font-mono);">
+          <div class="topbar-date-display">
             <i class="fa-regular fa-calendar" style="color: #2E5D4B;"></i>
             <span>{{ now()->locale('es')->isoFormat('dddd, D [de] MMMM') }}</span>
           </div>
         </div>
 
-        <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
           <!-- Interactive Streak / Tree Badge Button -->
           @php
             $userStreak = auth()->user()?->calculateStreak() ?? 0;
             $userTreeLevel = min(5, max(1, intdiv($userStreak, 3) + 1));
           @endphp
-          <button type="button" onclick="(typeof window.openTreeGame === 'function' && document.getElementById('treeGameModalOverlay')) ? window.openTreeGame() : (window.location.href='{{ route('dashboard') }}?open_game=1')" class="btn btn-sm btn-secondary" style="gap: 6px; background: #FAFDFB; border-color: #A8E6C0; color: #1E4A25; font-weight: 700;" title="Tu racha activa y árbol de bienestar">
-            <i class="fa-solid fa-fire" style="color: #E67E22;"></i>
-            <span>{{ $userStreak }} {{ $userStreak === 1 ? 'día' : 'días' }}</span>
-            <span style="color: #C2D6CA;">|</span>
-            <i class="fa-solid fa-seedling" style="color: #3D8C4F;"></i>
-            <span>Nvl {{ $userTreeLevel }}</span>
+          <button type="button" onclick="(typeof window.openTreeGame === 'function' && document.getElementById('treeGameModalOverlay')) ? window.openTreeGame() : (window.location.href='{{ route('dashboard') }}?open_game=1')" class="topbar-streak-pill" title="Tu racha activa y árbol de bienestar (Click para abrir)">
+            <div class="streak-flame-segment">
+              <i class="fa-solid fa-fire {{ $userStreak > 0 ? 'flame-active' : '' }}"></i>
+              <span class="streak-number">{{ $userStreak }}</span>
+              <span class="streak-label">{{ $userStreak === 1 ? 'día' : 'días' }}</span>
+            </div>
+            <div class="streak-pill-divider"></div>
+            <div class="streak-tree-segment">
+              <i class="fa-solid fa-seedling"></i>
+              <span class="tree-level-label">Nvl {{ $userTreeLevel }}</span>
+            </div>
           </button>
-
-          <!-- Quick Breath Shortcut -->
-          <a href="{{ route('tools.respiracion') }}" class="btn btn-sm btn-secondary" style="gap: 6px;">
-            <i class="fa-solid fa-lungs" style="color: #2E5D4B;"></i>
-            <span>Respira 1 min</span>
-          </a>
-
-          <!-- Crisis Button SOS -->
-          <a href="tel:8002900024" class="btn btn-sm btn-crisis" style="gap: 6px;" title="Llamar gratis a Línea de la Vida 24/7">
-            <i class="fa-solid fa-phone"></i>
-            <span>SOS 24h</span>
-          </a>
         </div>
       </header>
 
@@ -234,6 +227,7 @@
   </div>
 
   <script src="{{ asset('js/main.js') }}?v={{ file_exists(public_path('js/main.js')) ? filemtime(public_path('js/main.js')) : time() }}"></script>
+  <script src="{{ asset('js/game-engine.js') }}?v={{ file_exists(public_path('js/game-engine.js')) ? filemtime(public_path('js/game-engine.js')) : time() }}"></script>
   @stack('scripts')
 </body>
 </html>

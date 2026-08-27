@@ -37,6 +37,85 @@ window.finishGrounding = function() {
   if (bar) bar.style.width = '100%';
 };
 
+/* ════ MOTOR CLÍNICO V1.0: FUNCIONES GLOBALES DE MODALES Y TRIAJE ════ */
+window.closeClinicalModals = function() {
+  const modals = ['who5ModalOverlay', 'mdiModalOverlay', 'asqModalOverlay', 'containmentModalOverlay'];
+  modals.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+};
+
+window.openWho5Modal = function(origen = 'programada') {
+  window.closeClinicalModals();
+  const modal = document.getElementById('who5ModalOverlay');
+  const inputOrigen = document.getElementById('who5OrigenInput');
+  if (inputOrigen) inputOrigen.value = origen;
+  if (modal) modal.style.display = 'flex';
+};
+
+window.openMdiModal = function() {
+  window.closeClinicalModals();
+  const modal = document.getElementById('mdiModalOverlay');
+  if (modal) modal.style.display = 'flex';
+};
+
+window.openAsqModal = function() {
+  window.closeClinicalModals();
+  const modal = document.getElementById('asqModalOverlay');
+  if (modal) modal.style.display = 'flex';
+};
+
+window.openContainmentModal = function() {
+  window.closeClinicalModals();
+  const modal = document.getElementById('containmentModalOverlay');
+  if (modal) modal.style.display = 'flex';
+};
+
+window.selectClinicalRadio = function(labelEl) {
+  const container = labelEl.closest('.clinical-options-grid');
+  if (container) {
+    container.querySelectorAll('.clinical-radio-btn').forEach(btn => btn.classList.remove('selected'));
+  }
+  labelEl.classList.add('selected');
+  const radio = labelEl.querySelector('input[type="radio"]');
+  if (radio) radio.checked = true;
+};
+
+window.checkAsqP5Visibility = function() {
+  const p1 = document.querySelector('input[name="p1"]:checked')?.value;
+  const p2 = document.querySelector('input[name="p2"]:checked')?.value;
+  const p3 = document.querySelector('input[name="p3"]:checked')?.value;
+  const p4 = document.querySelector('input[name="p4"]:checked')?.value;
+
+  const esPositiva = (v) => v === 'si' || v === 'prefiero_no_contestar';
+  const container5 = document.getElementById('asqP5Container');
+
+  if (container5) {
+    if (esPositiva(p1) || esPositiva(p2) || esPositiva(p3) || esPositiva(p4)) {
+      container5.style.display = 'block';
+    } else {
+      container5.style.display = 'none';
+    }
+  }
+};
+
+window.registrarCrisisAccion = async function(tipoAccion) {
+  try {
+    const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    await fetch('/assessment/crisis/accion', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': token,
+        'X-Requested-With': 'XMLHttpRequest',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({ tipo_accion: tipoAccion })
+    });
+  } catch (err) {}
+};
+
 /* ════ GLOBAL FLOATING ZEN TOAST SYSTEM (5 SEGUNDOS CON BARRA DE LLENADO) ════ */
 window.showZenToast = function(message, type = 'success', duration = 5000) {
   let container = document.getElementById('zenToastContainer');
@@ -461,23 +540,43 @@ class SpaRouter {
           return;
         }
 
-        // Check if layout switch is required (Dashboard vs Public)
-        const isDashboardLink = url.pathname.startsWith('/dashboard') || 
-                                url.pathname.startsWith('/historial') || 
-                                url.pathname.startsWith('/plan-de-seguridad') || 
-                                url.pathname.startsWith('/mis-favoritos') || 
-                                url.pathname.startsWith('/perfil');
-        const currentIsDashboard = !!document.querySelector('.dashboard-layout');
-
-        // If switching between layouts, let standard browser navigation execute directly
-        if (currentIsDashboard !== isDashboardLink) {
-          return;
-        }
-
         e.preventDefault();
         this.navigate(url.href, true);
       } catch (err) {
         // Fallback to default browser navigation
+      }
+    });
+
+    // Intercept form submissions across dashboard and SPA views
+    document.addEventListener('submit', (e) => {
+      const form = e.target.closest('form');
+      if (!form) return;
+
+      // Allow default submission if marked data-no-spa, target=_blank, or logout
+      const action = form.getAttribute('action') || window.location.href;
+      if (
+        form.hasAttribute('data-no-spa') ||
+        form.target === '_blank' ||
+        action.includes('/logout') ||
+        action.includes('/login') ||
+        action.includes('/registro')
+      ) {
+        return;
+      }
+
+      // If form has custom AJAX handler with stopImmediatePropagation or explicit ID, let it handle
+      if (form.id === 'moodCheckinForm' || form.id === 'who5Form' || form.id === 'mdiForm' || form.id === 'asqForm') {
+        return;
+      }
+
+      try {
+        const url = new URL(action, window.location.origin);
+        if (url.origin !== window.location.origin) return;
+
+        e.preventDefault();
+        this.submitForm(form);
+      } catch (err) {
+        // Fallback
       }
     });
 
@@ -512,7 +611,10 @@ class SpaRouter {
     try {
       const res = await fetch(url, { 
         credentials: 'same-origin',
-        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        headers: { 
+          'X-Requested-With': 'XMLHttpRequest',
+          'Accept': 'text/html, application/xhtml+xml, */*'
+        }
       });
 
       if (!res.ok) {
@@ -522,6 +624,7 @@ class SpaRouter {
 
       this.setProgressBar(75);
       const html = await res.text();
+      const targetUrl = res.url || url;
 
       const parser = new DOMParser();
       const doc = parser.parseFromString(html, 'text/html');
@@ -535,7 +638,7 @@ class SpaRouter {
       // If layout mismatch or missing container, fallback to standard redirect
       if (!newSpaContent || !currentSpaContent || (currentIsDashboard !== newIsDashboard)) {
         this.setProgressBar(100);
-        window.location.href = url;
+        window.location.href = targetUrl;
         return;
       }
 
@@ -549,33 +652,14 @@ class SpaRouter {
         document.title = doc.title;
       }
 
-      // Execute any inline or page-specific scripts from the incoming document (@stack('scripts') and inline)
-      const pageScripts = doc.querySelectorAll('script:not([src])');
-      pageScripts.forEach(oldScript => {
-        const code = oldScript.textContent.trim();
-        if (code) {
-          try {
-            const runner = new Function(code);
-            runner.call(window);
-          } catch (scriptErr) {}
-        }
-      });
+      // Transfer any flash toast messages from response
+      this.syncToasts(doc);
+
+      // Execute any inline or page-specific scripts from the incoming document
+      this.executePageScripts(doc);
 
       // Update active nav & sidebar links
-      const currentPath = new URL(url).pathname;
-      document.querySelectorAll('.nav-link, .sidebar-item, .user-profile-badge').forEach(el => {
-        const href = el.getAttribute('href');
-        if (href) {
-          try {
-            const elUrl = new URL(href, window.location.origin);
-            if (elUrl.pathname === currentPath) {
-              el.classList.add('active');
-            } else {
-              el.classList.remove('active');
-            }
-          } catch (e) {}
-        }
-      });
+      this.updateActiveLinks(targetUrl);
 
       // Update topbar header title if present
       const newTopbarTitle = doc.querySelector('.topbar-page-title');
@@ -587,11 +671,16 @@ class SpaRouter {
       // Close mobile sidebar and drawers if open
       const sideBar = document.getElementById('dashboardSidebar');
       const overlay = document.getElementById('sidebarOverlay');
+      const mobileDrawer = document.getElementById('navMobileDrawer');
+      const hamburgerBtn = document.getElementById('navHamburgerBtn');
+
       if (sideBar) sideBar.classList.remove('mobile-open');
       if (overlay) overlay.style.display = 'none';
+      if (mobileDrawer) mobileDrawer.classList.remove('open');
+      if (hamburgerBtn) hamburgerBtn.setAttribute('aria-expanded', 'false');
 
       if (pushState) {
-        history.pushState({ spa: true, url }, '', url);
+        history.pushState({ spa: true, url: targetUrl }, '', targetUrl);
       }
 
       window.scrollTo({ top: 0, behavior: 'instant' });
@@ -613,6 +702,154 @@ class SpaRouter {
       }, 150);
     }
   }
+
+  async submitForm(form) {
+    if (this.isNavigating) return;
+    this.isNavigating = true;
+    this.setProgressBar(40);
+
+    const action = form.getAttribute('action') || window.location.href;
+    const method = (form.getAttribute('method') || 'POST').toUpperCase();
+    const formData = new FormData(form);
+
+    const submitBtns = form.querySelectorAll('button[type="submit"], input[type="submit"]');
+    submitBtns.forEach(btn => {
+      btn.disabled = true;
+      btn.style.opacity = '0.7';
+    });
+
+    try {
+      const res = await fetch(action, {
+        method: method,
+        body: formData,
+        credentials: 'same-origin',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'Accept': 'text/html, application/xhtml+xml, */*'
+        }
+      });
+
+      this.setProgressBar(75);
+      const targetUrl = res.url || action;
+      const html = await res.text();
+
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+
+      const currentSpaContent = document.getElementById('spaContent');
+      const newSpaContent = doc.getElementById('spaContent');
+
+      if (!newSpaContent || !currentSpaContent) {
+        window.location.href = targetUrl;
+        return;
+      }
+
+      // Smooth swap
+      currentSpaContent.classList.add('spa-transitioning');
+      await new Promise(r => setTimeout(r, 60));
+
+      currentSpaContent.innerHTML = newSpaContent.innerHTML;
+
+      if (doc.title) {
+        document.title = doc.title;
+      }
+
+      // Transfer flash toast notifications
+      this.syncToasts(doc);
+
+      // Execute scripts
+      this.executePageScripts(doc);
+
+      // Update active nav & sidebar links
+      this.updateActiveLinks(targetUrl);
+
+      // Update URL if changed
+      if (targetUrl !== window.location.href) {
+        history.pushState({ spa: true, url: targetUrl }, '', targetUrl);
+      }
+
+      // Re-init components
+      try {
+        initAllComponents();
+      } catch (compErr) {}
+
+      currentSpaContent.classList.remove('spa-transitioning');
+      this.setProgressBar(100);
+
+    } catch (err) {
+      form.submit();
+    } finally {
+      submitBtns.forEach(btn => {
+        btn.disabled = false;
+        btn.style.opacity = '1';
+      });
+      setTimeout(() => {
+        this.setProgressBar(0);
+        this.isNavigating = false;
+      }, 150);
+    }
+  }
+
+  syncToasts(doc) {
+    const incomingToasts = doc.querySelectorAll('#zenToastContainer .zen-toast-pill');
+    if (incomingToasts.length > 0) {
+      let activeContainer = document.getElementById('zenToastContainer');
+      if (!activeContainer) {
+        activeContainer = document.createElement('div');
+        activeContainer.id = 'zenToastContainer';
+        document.body.appendChild(activeContainer);
+      }
+      activeContainer.innerHTML = '';
+      incomingToasts.forEach(t => {
+        const cloned = t.cloneNode(true);
+        cloned.onclick = () => {
+          cloned.classList.add('toast-leaving');
+          setTimeout(() => cloned.remove(), 450);
+        };
+        activeContainer.appendChild(cloned);
+      });
+      setTimeout(() => {
+        activeContainer.querySelectorAll('.zen-toast-pill').forEach(tp => {
+          tp.classList.add('toast-leaving');
+          setTimeout(() => tp.remove(), 450);
+        });
+      }, 4500);
+    }
+  }
+
+  executePageScripts(doc) {
+    const pageScripts = doc.querySelectorAll('script:not([src])');
+    pageScripts.forEach(oldScript => {
+      const code = oldScript.textContent.trim();
+      if (code) {
+        try {
+          const scriptElem = document.createElement('script');
+          scriptElem.textContent = code;
+          document.body.appendChild(scriptElem);
+          setTimeout(() => scriptElem.remove(), 150);
+        } catch (scriptErr) {}
+      }
+    });
+  }
+
+  updateActiveLinks(targetUrl) {
+    try {
+      const currentPath = new URL(targetUrl, window.location.origin).pathname;
+      document.querySelectorAll('.nav-link, .sidebar-item, .user-profile-badge').forEach(el => {
+        const href = el.getAttribute('href');
+        if (href) {
+          try {
+            const elUrl = new URL(href, window.location.origin);
+            if (elUrl.pathname === currentPath) {
+              el.classList.add('active');
+            } else {
+              el.classList.remove('active');
+            }
+          } catch (e) {}
+        }
+      });
+    } catch (e) {}
+  }
 }
 
 /* ════ 4. UNIFIED COMPONENT INITIALIZERS ════ */
@@ -623,15 +860,30 @@ function initAllComponents() {
   if (hamburgerBtn && mobileDrawer) {
     hamburgerBtn.onclick = (e) => {
       e.preventDefault();
+      e.stopPropagation();
       const isOpen = mobileDrawer.classList.toggle('open');
-      hamburgerBtn.setAttribute('aria-expanded', isOpen);
+      hamburgerBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
     };
+
+    // Close on any click inside drawer (links, buttons, login, register)
+    mobileDrawer.querySelectorAll('a, button').forEach(el => {
+      el.onclick = () => {
+        mobileDrawer.classList.remove('open');
+        hamburgerBtn.setAttribute('aria-expanded', 'false');
+      };
+    });
   }
 
-  document.querySelectorAll('.nav-mobile-link').forEach(link => {
-    link.onclick = () => {
-      if (mobileDrawer) mobileDrawer.classList.remove('open');
-    };
+  // Close mobile drawer when clicking outside
+  document.addEventListener('click', (e) => {
+    const mobileDrawer = document.getElementById('navMobileDrawer');
+    const hamburgerBtn = document.getElementById('navHamburgerBtn');
+    if (mobileDrawer && mobileDrawer.classList.contains('open')) {
+      if (!mobileDrawer.contains(e.target) && !hamburgerBtn?.contains(e.target)) {
+        mobileDrawer.classList.remove('open');
+        if (hamburgerBtn) hamburgerBtn.setAttribute('aria-expanded', 'false');
+      }
+    }
   });
 
   // B. Dashboard Sidebar Mobile Toggle
@@ -740,7 +992,7 @@ function initAllComponents() {
     };
   });
 
-  // G. AJAX Dashboard Check-in Submission
+  // G. AJAX Dashboard Check-in Submission & Cascade Clinical Engine Flow
   const checkinForm = document.getElementById('moodCheckinForm');
   if (checkinForm) {
     checkinForm.onsubmit = async (e) => {
@@ -764,7 +1016,7 @@ function initAllComponents() {
 
         const data = await res.json();
         if (data.success) {
-          // Mostrar Toast Circular FLOTANTE afuera de la tarjeta durante 5 segundos
+          // Mostrar Toast Circular FLOTANTE afuera de la tarjeta
           window.showZenToast(data.message, 'success', 5000);
 
           if (saveText) saveText.textContent = '¡Guardado con éxito!';
@@ -779,6 +1031,20 @@ function initAllComponents() {
             saveBtn.disabled = false;
             if (saveText) saveText.textContent = 'Actualizar registro de hoy';
           }, 2500);
+
+          // ════ Evaluador del Motor Clínico de 4 Capas ════
+          if (data.evaluacion) {
+            const ev = data.evaluacion;
+            if (ev.ruta === 'B' && ev.abrir_who5) {
+              setTimeout(() => {
+                window.openWho5Modal(ev.origen_who5 || 'programada');
+              }, 600);
+            } else if (ev.ruta === 'C' && ev.abrir_mdi) {
+              setTimeout(() => {
+                window.openMdiModal();
+              }, 600);
+            }
+          }
         } else {
           throw new Error('Error al guardar');
         }
@@ -786,6 +1052,119 @@ function initAllComponents() {
         window.showZenToast('Ocurrió un error al guardar. Revisa los campos e intenta de nuevo.', 'error', 5000);
         saveBtn.disabled = false;
         if (saveText) saveText.textContent = 'Guardar registro emocional';
+      }
+    };
+  }
+
+  // G.1 WHO-5 Form Submission (Capa 1)
+  const who5Form = document.getElementById('who5Form');
+  if (who5Form) {
+    who5Form.onsubmit = async (e) => {
+      e.preventDefault();
+      const submitBtn = document.getElementById('who5SubmitBtn');
+      if (submitBtn) submitBtn.disabled = true;
+
+      try {
+        const formData = new FormData(who5Form);
+        const res = await fetch('/assessment/who5', {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
+          }
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          const resWho5 = data.resultado;
+          if (resWho5.abrir_mdi) {
+            window.openMdiModal();
+          } else {
+            window.closeClinicalModals();
+            window.showZenToast(resWho5.mensaje || 'Evaluación de bienestar completada.', 'success', 5000);
+          }
+        }
+      } catch (err) {
+        window.showZenToast('Por favor responde todas las preguntas del cuestionario.', 'error', 4000);
+      } finally {
+        if (submitBtn) submitBtn.disabled = false;
+      }
+    };
+  }
+
+  // G.2 MDI Form Submission (Capa 2)
+  const mdiForm = document.getElementById('mdiForm');
+  if (mdiForm) {
+    mdiForm.onsubmit = async (e) => {
+      e.preventDefault();
+      const submitBtn = document.getElementById('mdiSubmitBtn');
+      if (submitBtn) submitBtn.disabled = true;
+
+      try {
+        const formData = new FormData(mdiForm);
+        const res = await fetch('/assessment/mdi', {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
+          }
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          const resMdi = data.resultado;
+          if (resMdi.abrir_asq) {
+            window.openAsqModal();
+          } else if (resMdi.nivel === 'ROJO') {
+            window.openContainmentModal();
+          } else {
+            window.closeClinicalModals();
+            window.showZenToast('Respuestas registradas. Hemos adaptado tus sugerencias de bienestar.', 'success', 5000);
+          }
+        }
+      } catch (err) {
+        window.showZenToast('Por favor completa todos los ítems para continuar.', 'error', 4000);
+      } finally {
+        if (submitBtn) submitBtn.disabled = false;
+      }
+    };
+  }
+
+  // G.3 ASQ Form Submission (Capa 3)
+  const asqForm = document.getElementById('asqForm');
+  if (asqForm) {
+    asqForm.onsubmit = async (e) => {
+      e.preventDefault();
+      const submitBtn = document.getElementById('asqSubmitBtn');
+      if (submitBtn) submitBtn.disabled = true;
+
+      try {
+        const formData = new FormData(asqForm);
+        const res = await fetch('/assessment/asq', {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
+          }
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          const resAsq = data.resultado;
+          if (resAsq.nivel === 'ROJO' || resAsq.nivel === 'ROJO_AGUDO') {
+            window.openContainmentModal();
+          } else {
+            window.closeClinicalModals();
+            window.showZenToast('Gracias por tu honestidad. Cuentas con nosotros en todo momento.', 'success', 5000);
+          }
+        }
+      } catch (err) {
+        window.showZenToast('Por favor selecciona una opción en cada pregunta.', 'error', 4000);
+      } finally {
+        if (submitBtn) submitBtn.disabled = false;
       }
     };
   }

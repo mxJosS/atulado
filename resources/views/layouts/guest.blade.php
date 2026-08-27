@@ -25,11 +25,11 @@
 <body style="background-color: #F8FAF9; color: #1A2620;">
 
   <!-- PUBLIC NAVBAR -->
-  <nav class="site-navbar" id="siteNavbar" style="background: #080C0A; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding: 0.85rem 1.5rem; position: sticky; top: 0; z-index: 100;">
-    <div class="nav-container" style="max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem;">
+  <nav class="site-navbar" id="siteNavbar">
+    <div class="nav-container">
       
       <!-- Brand Logo -->
-      <a href="{{ route('home') }}" class="nav-brand" style="display: flex; align-items: center; gap: 0.65rem; font-family: var(--font-display); font-size: 1.35rem; font-weight: 700; color: #FFFFFF; text-decoration: none;" aria-label="Ir a inicio">
+      <a href="{{ route('home') }}" class="nav-brand" aria-label="Ir a inicio">
         <svg class="ptree" viewBox="0 0 16 16" width="28" height="28" xmlns="http://www.w3.org/2000/svg">
           <rect x="5" y="0" width="6" height="2" fill="#2D6B3A"/>
           <rect x="3" y="2" width="10" height="2" fill="#3D8C4F"/>
@@ -45,7 +45,7 @@
       </a>
 
       <!-- Menu Links -->
-      <ul class="nav-menu" style="display: flex; align-items: center; gap: 0.35rem; list-style: none; margin: 0; padding: 0;">
+      <ul class="nav-menu">
         <li><a href="{{ route('home') }}" class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}">Inicio</a></li>
         <li><a href="{{ route('sientes') }}" class="nav-link {{ request()->routeIs('sientes') ? 'active' : '' }}">¿Cómo te sientes?</a></li>
         <li><a href="{{ route('tools.respiracion') }}" class="nav-link {{ request()->routeIs('tools.respiracion') ? 'active' : '' }}">Respira Conmigo</a></li>
@@ -55,10 +55,11 @@
       </ul>
 
       <!-- Action Buttons -->
-      <div class="nav-actions" style="display: flex; align-items: center; gap: 0.75rem;">
-        <a href="tel:8002900024" class="nav-crisis-pill" title="Llamar a Línea de la Vida">
+      <div class="nav-actions">
+        <a href="tel:8002900024" class="nav-crisis-pill" title="Llamar a Línea de la Vida 24/7">
           <i class="fa-solid fa-phone" style="font-size: 0.75rem;"></i>
-          <span>CRISIS: 800 290 0024</span>
+          <span class="crisis-label-desktop">CRISIS: 800 290 0024</span>
+          <span class="crisis-label-mobile">SOS 24h</span>
         </a>
 
         @auth
@@ -73,7 +74,7 @@
           </a>
         @endauth
 
-        <button class="nav-hamburger" id="navHamburgerBtn" aria-label="Abrir menú de navegación">
+        <button class="nav-hamburger" id="navHamburgerBtn" aria-label="Abrir menú de navegación" aria-expanded="false">
           <i class="fa-solid fa-bars" style="font-size: 1.25rem;"></i>
         </button>
       </div>

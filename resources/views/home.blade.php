@@ -320,9 +320,9 @@
       @forelse($latestArticles as $art)
         <div class="article-forum-card">
           <div style="padding: 1.5rem; display: flex; flex-direction: column; flex: 1;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
               <span class="badge-blue-category">{{ $art->category }}</span>
-              <span class="mono-tag" style="color: #556860; display: flex; align-items: center; gap: 4px;">
+              <span class="mono-tag" style="color: #556860; display: flex; align-items: center; gap: 4px; font-size: 0.75rem; white-space: nowrap;">
                 <i class="fa-regular fa-clock"></i> {{ $art->read_time }}
               </span>
             </div>

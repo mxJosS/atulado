@@ -200,9 +200,9 @@
                   </a>
 
                   <!-- 2. WHATSAPP CON MENSAJE PRELLENADO "Necesito ayuda, ¿podemos hablar?" -->
-                  <a href="https://wa.me/{{ $phoneClean ? (str_starts_with($phoneClean, '52') ? $phoneClean : '52'.$phoneClean) : '' }}?text={{ $waMessage }}" target="_blank" class="btn-whatsapp action-wa-btn" title="Enviar WhatsApp con mensaje de auxilio prellenado">
+                  <a href="https://wa.me/{{ $phoneClean ? (str_starts_with($phoneClean, '52') ? $phoneClean : '52'.$phoneClean) : '' }}?text={{ $waMessage }}" target="_blank" class="btn-whatsapp action-wa-btn" title="Enviar WhatsApp de auxilio">
                     <i class="fa-brands fa-whatsapp" style="font-size: 1rem;"></i>
-                    <span>WhatsApp ("Necesito ayuda...")</span>
+                    <span class="wa-btn-label">WhatsApp</span>
                   </a>
                 </div>
 
@@ -371,7 +371,7 @@
           </a>
           <a href="https://wa.me/?text=${waMessage}" target="_blank" class="btn-whatsapp action-wa-btn" title="Enviar WhatsApp de auxilio">
             <i class="fa-brands fa-whatsapp" style="font-size: 1rem;"></i>
-            <span>WhatsApp ("Necesito ayuda...")</span>
+            <span class="wa-btn-label">WhatsApp</span>
           </a>
         </div>
         <button type="button" onclick="this.closest('.trusted-contact-card').remove()" class="btn-delete-item" title="Eliminar este contacto">

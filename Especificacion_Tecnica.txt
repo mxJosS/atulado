@@ -1,0 +1,523 @@
+DOCUMENTACIÓN TÉCNICA DE DESARROLLO
+ESPECIFICACIÓN DEL MOTOR
+A Tu Lado  ·  Termómetro de riesgo en salud mental  ·  v1.0
+Para el equipo de desarrollo
+Este documento define, sin ambigüedad, qué debe programarse: instrumentos, puntuaciones, umbrales, reglas de anulación, estructura de datos y comportamiento esperado en cada ruta. Todo umbral aquí escrito proviene de la documentación oficial del instrumento que lo publica y no debe modificarse sin autorización del asesor clínico.
+Tres reglas que no se negocian en el código
+1. El riesgo suicida nunca se promedia. Las banderas anulan el resultado global; no suman a él.
+2. Ningún umbral se ajusta por intuición. Cada constante tiene una fuente citada en este documento; cambiarla exige actualizar la fuente.
+3. El plano gerencial nunca recibe texto libre ni puntajes individuales identificados. La separación se aplica en la capa de datos, no en la interfaz.
+4. Un caso Rojo no se cierra por puntaje: se cierra únicamente con contacto humano verificado.
+1
+Arquitectura del motor
+El motor es una cascada de cuatro capas. Cada capa se ejecuta solo si la anterior emite la condición de apertura. El objetivo de diseño es que el trayecto mínimo sea de cinco preguntas y el máximo de veintitrés.
+Capa
+Módulo
+Ítems
+Condición de apertura
+0
+Enrutador diario
+1
+Siempre disponible. Registra el estado del día y decide la ruta
+1
+WHO-5
+5
+Ruta B, o calendario de 14 días
+2
+MDI
+12
+WHO-5 crudo ≤ 12, o cualquier ítem en 0-1, o entrada por Ruta C
+3
+ASQ (NIMH)
+4 o 5
+MDI ítem 6 > 0
+4
+Puchol
+60
+Evaluación organizacional periódica, o señal en ítems 3, 8 y 9 del MDI
+Tabla 1. Capas del motor.
+ENRUTAMIENTO DESDE EL REGISTRO DIARIO
+Selección del usuario
+Ruta
+Comportamiento
+Excelente · Bien
+A
+No se abre instrumento. Se muestra pregunta abierta opcional y contenido de consejos. Se registra el valor para la curva
+Regular
+B
+Se abre WHO-5, salvo que exista una aplicación con menos de 14 días de antigüedad: en ese caso se reutiliza el último resultado
+Mal · Terrible
+C
+Se abre MDI directamente. El WHO-5 se omite porque su única función es decidir si aplicar el MDI, y el usuario ya respondió esa pregunta
+Tabla 2. Reglas de enrutamiento de la capa 0.
+Codificación del registro diario
+La escala de las caritas se almacena invertida para que un valor mayor signifique mayor malestar, igual que en el MDI: Excelente = 0, Bien = 1, Regular = 2, Mal = 3, Terrible = 4.
+Esta codificación es la que alimenta la curva longitudinal del usuario. No confundirla con la escala del WHO-5, donde un valor mayor significa mayor bienestar.
+LAS CUATRO REGLAS DE VIGILANCIA DIARIA
+Se ejecutan cada vez que el usuario registra, y también en un proceso programado diario que detecta la ausencia de registro. Cualquiera que se active adelanta la aplicación del WHO-5 sin esperar al día 14.
+const UMBRAL_DESVIACION = 1.0;   // puntos sobre la escala 0-4
+const DIAS_PERSISTENCIA  = 3;
+const SALTO_ABRUPTO      = 2;
+const DIAS_SILENCIO      = 5;
+function señalVigilancia(serie) {
+  const base30  = media(ultimos(serie, 30));
+  const movil7  = media(ultimos(serie, 7));
+  // R1 · desviación de línea base
+  if (serie.length >= 14 && (movil7 - base30) >= UMBRAL_DESVIACION)
+      return 'R1_DESVIACION';
+  // R2 · persistencia
+  if (consecutivos(serie, v => v >= 3) >= DIAS_PERSISTENCIA)
+      return 'R2_PERSISTENCIA';
+  // R3 · caida abrupta sostenida 2 dias
+  if (saltoSostenido(serie, SALTO_ABRUPTO, 2))
+      return 'R3_CAIDA';
+  // R4 · silencio tras patron regular
+  if (teniaPatronRegular(serie) && diasSinRegistro(serie) >= DIAS_SILENCIO)
+      return 'R4_SILENCIO';
+  return null;
+}
+// R1 exige al menos 14 dias de historia para que base30 sea estable.
+// Antes de ese punto solo operan R2, R3 y R4.
+Límite de alcance de estas reglas
+Los umbrales del WHO-5, del MDI y de Puchol provienen de sus instrumentos. Estos cuatro NO: son del equipo.
+Por eso su efecto está acotado por diseño: disparan la aplicación de un instrumento y nunca asignan un nivel. En el código esto significa que señalVigilancia() jamás escribe en la tabla de clasificaciones — solo invoca abrirWHO5().
+Se guardan como constantes de configuración, no incrustadas, porque se recalibrarán con los datos del piloto.
+R4 tiene una regla de producto asociada: el mensaje al usuario debe acercarse, nunca reclamar. Nada de «llevas 5 días sin registrar».
+2
+Capa 1 — WHO-5
+Índice de Bienestar de cinco ítems de la Organización Mundial de la Salud, versión 1998 en español. Propiedad de la OMS desde 2024, publicado como recurso de acceso abierto.
+ÍTEMS Y ESCALA
+Encabezado obligatorio en pantalla: «Durante las últimas dos semanas…». Los cinco ítems se responden en una escala de seis opciones donde un valor mayor indica mayor bienestar.
+#
+Ítem
+Escala
+1
+Me he sentido alegre y de buen humor
+Todo el tiempo = 5
+2
+Me he sentido tranquilo y relajado
+La mayor parte del tiempo = 4
+3
+Me he sentido activo y enérgico
+Más de la mitad del tiempo = 3
+4
+Me he despertado fresco y descansado
+Menos de la mitad del tiempo = 2
+5
+Mi vida cotidiana ha estado llena de cosas que me interesan
+De vez en cuando = 1 · Nunca = 0
+Tabla 3. Ítems del WHO-5 y codificación de respuestas.
+CÁLCULO
+crudo   = suma de los 5 ítems          // rango 0 a 25
+escala  = crudo * 4                    // rango 0 a 100
+// REGLA CRÍTICA: el umbral de 13 se evalúa sobre el CRUDO, no sobre escala.
+// Fuente: instrucciones oficiales WHO-5, "la primera puntuación calculada".
+// Aplicar 13 sobre la escala 0-100 haría el filtro inservible.
+abrirMDI = (crudo < 13) || items.some(v => v <= 1)
+El error que hay que evitar en la implementación
+El corte de 13 vive en la escala cruda de 0 a 25, equivalente a 52 sobre 100. Si se compara contra la escala de 0 a 100, solo se detectaría a quien obtenga 12 de 100 o menos, es decir, prácticamente a nadie.
+La segunda condición es independiente del total: un usuario puede obtener 15 de crudo y aun así abrir el MDI si respondió 0 o 1 en cualquier ítem individual.
+REGLA DE CAMBIO LONGITUDINAL
+Las instrucciones del instrumento establecen que una diferencia de diez puntos en la puntuación porcentual constituye un cambio significativo. La comparación solo es válida entre aplicaciones separadas por catorce días o más, porque la ventana de recuerdo del instrumento es de dos semanas.
+Criterio según el origen de la aplicación
+Aplicación PROGRAMADA (cada 14 días): se evalúan ambos criterios, el absoluto y el de cambio de 10 puntos.
+Aplicación ADELANTADA por señal de vigilancia diaria: se evalúa SOLO el criterio absoluto. La comparación de 10 puntos no es válida entre aplicaciones separadas por menos de 14 días, porque la ventana de recuerdo del instrumento es de dos semanas y los periodos se traslapan.
+El registro debe guardar el origen de cada aplicación: 'programada' o 'adelantada'.
+const DIAS_MIN = 14;
+const CAIDA_SIGNIFICATIVA = 10;   // puntos sobre la escala 0-100
+function cambioSignificativo(actual, anterior) {
+  if (!anterior) return false;
+  const dias = diffDias(actual.fecha, anterior.fecha);
+  if (dias < DIAS_MIN) return false;
+  return (anterior.escala - actual.escala) >= CAIDA_SIGNIFICATIVA;
+}
+// Si devuelve true: elevar a AMARILLO como mínimo y abrir MDI,
+// aunque el crudo siga por encima de 13.
+3
+Capa 2 — Major Depression Inventory
+Doce preguntas que puntúan diez ítems. Los pares 8a/8b y 10a/10b son subítems del mismo constructo. Escala de 0 a 5 por ítem, total de 0 a 50, ventana de dos semanas.
+ÍTEMS
+#
+Contenido
+Dominio
+1
+Se ha sentido triste o con el ánimo bajo
+Afecto
+2
+Ha perdido interés en sus actividades cotidianas
+Anhedonia
+3
+Se ha sentido falto de energía y fuerzas
+Energía
+4
+Se ha sentido con menos confianza en sí mismo
+Autopercepción
+5
+Ha tenido mala conciencia o sentimientos de culpa
+Autopercepción
+6
+Ha sentido que la vida no valía la pena vivirla
+IDEACIÓN — ver capa 3
+7
+Ha tenido dificultad para concentrarse
+Cognitivo
+8a / 8b
+Se ha sentido inquieto / se ha sentido lento o inhibido
+Psicomotor
+9
+Ha tenido dificultades para dormir
+Sueño
+10a / 10b
+Ha tenido menos apetito / ha tenido más apetito
+Apetito
+Tabla 4. Ítems del MDI. El ítem 6 tiene tratamiento especial y se documenta en la capa 3.
+CÁLCULO Y NIVELES
+// Los subítems toman el valor MAYOR del par, no la suma.
+const i8  = Math.max(r.i8a, r.i8b);
+const i10 = Math.max(r.i10a, r.i10b);
+const total = r.i1+r.i2+r.i3+r.i4+r.i5+r.i6+r.i7+i8+r.i9+i10;  // 0 a 50
+let nivel;
+if      (total < 20) nivel = 'AMARILLO';   // sin depresión
+else if (total < 25) nivel = 'NARANJA';    // leve      20-24
+else if (total < 30) nivel = 'NARANJA';    // moderada  25-29
+else                 nivel = 'ROJO';       // grave     30+
+Prohibido implementar el algoritmo diagnóstico
+El MDI admite un segundo uso: aplicar los criterios ICD-10 y DSM-IV para emitir un diagnóstico de episodio depresivo. NO se implementa.
+Razón: emitir un diagnóstico contradice el deslinde del producto y cambiaría su clasificación regulatoria. Solo se usa la escala de severidad.
+Si alguien propone agregarlo, la respuesta es no, y esta línea es la referencia.
+4
+Capa 3 — ASQ y banderas de riesgo
+El ítem 6 del MDI mide ideación pasiva: sentir que la vida no vale la pena. No mide intención. Para distinguirlas se aplica el ASQ del Instituto Nacional de Salud Mental de Estados Unidos, diseñado para tamizaje rápido por personal no especializado.
+Por qué ASQ y no Columbia Protocol
+El Columbia Protocol es gratuito, pero su gratuidad excluye los fines de lucro. Un producto que se vende por suscripción quedaría fuera de esa licencia, y el problema aparecería justo cuando el proyecto empiece a facturar.
+El ASQ se publica sin costo y sin esa restricción, tiene versión oficial en español, se responde en menos de un minuto y sus reglas de interpretación son explícitas. Es la decisión correcta a largo plazo.
+Confirmar por escrito las condiciones de uso con el NIMH antes de la primera factura, igual que con los demás instrumentos.
+LAS CINCO PREGUNTAS
+#
+Pregunta
+Periodo
+1
+¿Ha deseado estar muerto?
+Últimas semanas
+2
+¿Ha sentido que usted o su familia estarían mejor si estuviera muerto?
+Últimas semanas
+3
+¿Ha estado pensando en suicidarse?
+Última semana
+4
+¿Alguna vez ha intentado suicidarse?
+A lo largo de la vida
+5
+¿Está pensando en suicidarse en este momento?
+Ahora — solo si 1 a 4 dio positivo
+Tabla 5. Preguntas del ASQ. Si la 4 es afirmativa se capturan además método y fecha del intento.
+TRES OPCIONES DE RESPUESTA, NO DOS
+El instrumento trata la negativa a responder como prueba positiva. En papel eso ocurre solo; en pantalla hay que darle un lugar explícito, o el usuario se ve forzado a mentir.
+// Cada pregunta admite TRES valores. No dos.
+type Respuesta = 'si' | 'no' | 'prefiero_no_contestar';
+// 'prefiero_no_contestar' se procesa EXACTAMENTE igual que 'si'.
+const esPositiva = r => r === 'si' || r === 'prefiero_no_contestar';
+LÓGICA DE APLICACIÓN Y TRIAGE
+function aplicarASQ(r) {
+  const p1a4 = [r.p1, r.p2, r.p3, r.p4];
+  // Prueba NEGATIVA: no se formula la pregunta 5.
+  if (p1a4.every(x => x === 'no'))
+      return { resultado: 'NEGATIVA', nivel: null };
+  // Positiva: se formula la 5 para evaluar agudeza.
+  const p5 = preguntar(5);
+  // Negarse a contestar la 5 se trata como afirmativa:
+  // ante la duda, criterio conservador.
+  if (esPositiva(p5))
+      return { resultado: 'POSITIVA_AGUDA', nivel: 'ROJO_AGUDO' };
+  return { resultado: 'POSITIVA_NO_AGUDA', nivel: 'ROJO' };
+}
+Resultado
+Nivel
+Acción
+NEGATIVA
+No modifica
+El nivel lo sigue determinando el MDI
+POSITIVA_NO_AGUDA
+ROJO
+Evaluación breve de seguridad. Contacto humano el mismo día. El caso no se cierra sin contacto verificado
+POSITIVA_AGUDA
+ROJO AGUDO
+Riesgo inminente. Protocolo inmediato de la sección siguiente
+Tabla 6. Triage del ASQ, literal del instrumento.
+La nota que el propio instrumento incluye
+El ASQ advierte que el juicio clínico siempre puede anteponerse a una prueba negativa. En el sistema esto se implementa como una vía manual: el profesional del plano clínico puede elevar el nivel de un caso aunque el tamizaje haya salido negativo.
+Esa vía debe existir en el código y quedar registrada en la auditoría. Un sistema que no permite al profesional contradecirlo se está colocando por encima del criterio clínico, que es exactamente lo que este proyecto declara no hacer.
+4b
+Protocolo de Rojo agudo a distancia
+El ASQ fue diseñado para urgencias hospitalarias. Dos de sus instrucciones no son ejecutables a distancia: que la persona no puede retirarse hasta ser evaluada, y que se retiren los objetos peligrosos de la habitación. Forzar cualquiera de las dos sería coercitivo y podría ser contraproducente.
+El cambio de sujeto que resuelve el problema
+En la clínica se retiene a la PERSONA. En la aplicación se retiene el CASO.
+El sistema no puede impedir que alguien cierre la pantalla, y no debe intentarlo. Lo que sí puede hacer es no cerrar el caso, no avanzar a otra cosa, y perseguir activamente el contacto humano hasta que se verifique.
+La carga de reestablecer contacto pasa del usuario al sistema. Esa es la traducción correcta de la instrucción original.
+Momento
+Qué ocurre
+Detalle de implementación
+t = 0 s
+Pantalla de contención
+Sin cierre pasivo: no hay una equis que solo descarta. Nunca se muestra la palabra Rojo, ni un puntaje, ni una etiqueta. Se acompaña, no se etiqueta
+t = 0 s
+Cuatro acciones
+Llamar a línea de crisis 24/7 · Llamar a contacto de emergencia registrado · Ver recursos inmediatos · Ya estoy con alguien. Las cuatro registran evento
+t < 30 s
+Alerta simultánea
+Notificación al profesional de guardia en el instante en que se marca la pregunta 5, no al terminar el cuestionario
+t < 5 min
+Contacto humano
+El profesional llama. Este compromiso va por escrito en el contrato con la empresa: es la promesa de servicio del producto
+Mientras espera
+Plan de seguridad
+La pantalla acompaña: quién está cerca, a dónde puede ir, qué le ha ayudado antes, y la invitación a alejarse de medios de riesgo entregándolos a alguien de confianza
+Si cierra sin ayuda
+Salida sin contacto
+Se registra como evento y escala: llamada del profesional y, sin respuesta, contacto con la persona de emergencia conforme al consentimiento firmado
+Cierre del caso
+Solo con contacto verificado
+Un caso Rojo nunca se cierra porque bajó el puntaje ni porque pasó el tiempo. Se cierra cuando hay contacto humano registrado
+Tabla 7. Protocolo de Rojo agudo. La variante no aguda usa la misma secuencia con contacto el mismo día en lugar de cinco minutos.
+Distinción por contexto de uso
+Colaborador en sitio y en horario laboral: además de lo anterior, la empresa puede movilizar a la persona designada en el protocolo para acompañar físicamente, conforme a lo previsto en el consentimiento.
+Usuario remoto o fuera de horario: la ruta es la línea de crisis de 24 horas más el contacto de emergencia registrado. Por eso los dos contactos son obligatorios al registro y editables en cualquier momento.
+Ninguna de estas rutas se activa automáticamente sin acción del usuario, salvo el supuesto de riesgo inminente, que debe estar descrito de forma expresa en el consentimiento firmado.
+Requisito de liberación
+Este protocolo es el único componente del sistema que no debe liberarse sin aprobación por escrito del asesor clínico: textos de pantalla, redacción del plan de seguridad, y criterios de escalada.
+El ASQ fue validado para aplicación presencial. Su uso a distancia es una adaptación legítima, pero es una adaptación: el equipo debe declararla como tal en la documentación en lugar de presentarla como uso estándar.
+5
+Niveles y acciones del sistema
+Nivel
+Criterio
+Qué ejecuta el sistema
+VERDE
+WHO-5 crudo ≥ 13, sin ítems en 0-1, sin señal de vigilancia y sin banderas
+Contenido de consejos. Vigilancia diaria activa. Programar WHO-5 a 14 días
+AMARILLO
+WHO-5 crudo ≤ 12, o ítem en 0-1, o caída ≥ 10 puntos, o cualquier regla de vigilancia activa
+ABRIR EL MDI. Si el MDI resulta < 20 se mantiene Amarillo con recursos dirigidos y frecuencia de registro elevada
+NARANJA
+MDI 20 a 29, o Puchol > 40 en dos o más dimensiones
+Notificar al plano clínico. Ofrecer agenda de cita. Registrar en la cola priorizada
+ROJO
+MDI ≥ 30, o ítem 6 ≥ 4, o ASQ positivo no agudo, o botón de ayuda
+Pantalla de contención, alerta al plano clínico, contacto humano el mismo día
+ROJO AGUDO
+ASQ positivo agudo: pregunta 5 afirmativa o sin contestar
+Protocolo de la sección 4b. Contacto en menos de cinco minutos
+Tabla 8. Comportamiento del sistema por nivel.
+PANTALLA DE NIVEL ROJO
+Nunca se muestra la palabra «Rojo», ni un puntaje, ni una etiqueta de severidad. Se acompaña, no se etiqueta.
+Tres acciones visibles: llamar a línea de crisis, llamar a contacto de emergencia, ver recursos inmediatos.
+Números que deben estar en configuración del servidor, nunca incrustados en el código: Línea de la Vida 800 911 2000, nacional y 24/7; Línea Amiga Yucatán 800 108 8000, 24/7; emergencias 911.
+El botón de continuar sin ayuda existe, pero es el elemento menos prominente de la pantalla.
+Reverificar la vigencia de los números cada seis meses.
+6
+Ramas específicas y preguntas ancla
+El sistema se extiende a otros dominios sin alargar el trayecto base, mediante preguntas ancla: una sola línea que decide si abrir un instrumento completo. Las preguntas ancla se presentan únicamente dentro de la evaluación profunda, nunca en el registro diario.
+Rama
+Disparador
+Instrumento
+Estado
+Conducta alimentaria
+MDI ítem 10 alto, o pregunta ancla
+SCOFF · 5 ítems
+Prioridad 1
+Estrés
+Evaluación organizacional, o ítems 3, 8 y 9 del MDI
+Puchol · 60 ítems
+Implementada
+Sueño
+MDI ítem 9 alto
+Escala de Atenas · 8 ítems
+Roadmap
+Ansiedad
+MDI ítems 7 y 8 altos
+GAD-7, o GAD-2 breve
+Roadmap
+Consumo de sustancias
+Pregunta ancla
+AUDIT-C · 3 ítems, luego ASSIST
+Roadmap
+Acoso
+Pregunta ancla
+Marcador transversal, no nivel
+Roadmap
+Dismorfia corporal
+Pregunta ancla
+BDDQ · 4 ítems
+Roadmap
+Tabla 9. Arquitectura de ramas. Solo la primera se contempla para la etapa actual.
+Regla de gobernanza de las ramas
+No se programa una rama sin su ruta de canalización correspondiente. Tamizar algo que no se puede atender no es neutral: se le informa a la persona que tiene un problema y se le deja sola con él.
+Cada rama requiere tres cosas antes de escribir código: el instrumento con su licencia verificada, el protocolo de escalada, y el recurso concreto al que se canaliza.
+El acoso es un caso distinto: no es un trastorno sino una exposición. Se registra como marcador transversal que acompaña al nivel — «Naranja · marcador: acoso reportado» — porque la acción correcta no es canalizar a la persona sino intervenir el entorno.
+7
+Modelo de datos y separación de planos
+La separación entre el plano clínico y el plano gerencial se implementa en la capa de datos y en los permisos, nunca ocultando elementos en la interfaz.
+Plano clínico
+Plano gerencial
+Acceso
+Profesional con cédula, bajo secreto profesional y carta de confidencialidad
+Responsable de RH o Bienestar de la empresa contratante
+Contenido
+Texto libre, respuestas ítem por ítem, puntajes, banderas con identidad
+Únicamente agregados: distribución por nivel, tendencia del grupo, participación
+Identidad
+Identificada
+Anonimizada, con umbral mínimo de 15 personas por corte
+Ejemplo
+«Usuario X · bandera activa 02:14 · ASQ positivo agudo»
+«120 colaboradores: 68 % verde, 21 % amarillo, 8 % naranja, 3 % rojo»
+Tabla 10. Separación de planos.
+ESQUEMA MÍNIMO DE TABLAS
+usuarios            id · org_id · rol · consentimiento_version · consentimiento_fecha
+registros_diarios   id · usuario_id · fecha · valor(0-4) · texto_libre · bandera_lexica
+series_vigilancia   usuario_id · base30 · movil7 · dias_silencio · ultima_señal · fecha
+aplicaciones_who5   id · usuario_id · fecha · i1..i5 · crudo · escala · origen
+aplicaciones_mdi    id · usuario_id · fecha · i1..i10 (8a,8b,10a,10b) · total
+aplicaciones_asq    id · usuario_id · fecha · p1..p5 · metodo · fecha_intento · resultado
+aplicaciones_puchol id · usuario_id · fecha · fisio · cogn · motora · emoc · alteradas
+clasificaciones     id · usuario_id · fecha · nivel · origen · banderas[]
+eventos_crisis      id · usuario_id · disparado_en · notificado_en · contactado_en ·
+                    salida_sin_contacto · cierre_verificado_por
+contactos_emergencia  id · usuario_id · nombre · telefono · relacion
+// El plano gerencial NO consulta estas tablas: consulta una vista agregada
+// que aplica el umbral mínimo de 15 personas por corte.
+FILTRO LÉXICO DEL TEXTO LIBRE
+El sistema NO interpreta el texto. Aplica coincidencia contra una lista cerrada y versionada de términos críticos.
+La lista es un componente clínico: la revisa y firma el asesor clínico, y se versiona en el repositorio junto al código.
+Categorías: autolesión y muerte autoinfligida, métodos o medios letales, desesperanza absoluta, violencia sufrida o ejercida.
+Un término detectado levanta bandera para revisión humana en el plano clínico. Nunca clasifica por sí solo, y nunca se expone al plano gerencial.
+8
+Despliegue e infraestructura
+Despliegue en Railway bajo modelo de consumo. La configuración base cubre una empresa piloto de 15 usuarios y escala por incremento de recursos, sin cambio de arquitectura.
+Escenario
+Empresas
+Usuarios
+Recursos
+USD/mes
+MXN/mes
+Piloto
+1
+15
+1 GB RAM · 0.2 vCPU · 1 GB
+$14.21
+$265
+Inicial
+5
+300
+2 GB RAM · 0.5 vCPU · 5 GB
+$31.29
+$579
+Operación
+15
+1,500
+4 GB RAM · 1 vCPU · 20 GB
+$65.14
+$1,205
+Escala
+50
+7,500
+8 GB RAM · 2 vCPU · 100 GB
+$143.11
+$2,648
+Tabla 11. Dimensionamiento por escenario. Tarifas Railway: $10.01 USD por GB de RAM al mes, $20.01 por vCPU, $0.16 por GB de volumen, $0.05 por GB de egreso. Tipo de cambio de referencia 18.50.
+Servicios separados: aplicación web, base de datos PostgreSQL y volumen persistente.
+Cifrado en reposo para las tablas del plano clínico y respaldo automático diario.
+Variables de entorno para líneas de crisis, umbrales y versión del consentimiento: ningún valor clínico incrustado en el código.
+Registro de auditoría de todo acceso al plano clínico, con usuario, fecha y registro consultado.
+9
+Otros módulos de la plataforma
+La plataforma incluye y seguirá incluyendo apartados que no forman parte del motor de clasificación. Se documentan aquí conforme se definan.
+9.1 · Foro de expertos
+Espacio de consulta con profesionales de salud mental.
+Pendiente de definir: moderación, verificación de cédula profesional, política de contenido, anonimato del usuario, tiempos de respuesta y su relación con el protocolo de crisis cuando una publicación contenga señales de riesgo.
+[ Espacio reservado — pendiente de documentar ]
+9.2 · Recursos de ayuda personal
+Biblioteca de contenidos de autocuidado, ejercicios de respiración, técnicas de grounding y material psicoeducativo.
+Pendiente de definir: origen y validación clínica de cada contenido, criterio de asignación según el dominio afectado, y control de versiones del material.
+[ Espacio reservado — pendiente de documentar ]
+9.3 · Mecánica del árbol y sistema de progreso
+El árbol crece con la interacción y entrega un consejo en cada incremento. No se marchita por inactividad: se conserva en su último estado.
+Pendiente de definir: reglas de incremento, catálogo de consejos y su origen, y verificación de que la recompensa premie la constancia en el autocuidado y nunca el resultado clínico del usuario.
+[ Espacio reservado — pendiente de documentar ]
+9.4 · Panel institucional y módulo NOM-035
+Tablero agregado para la empresa contratante y módulo de cumplimiento con la Guía de Referencia III.
+Pendiente de definir: estructura del reporte conservable como evidencia ante la STPS, periodicidad y política de retención de al menos un año.
+[ Espacio reservado — pendiente de documentar ]
+9.5 · Onboarding, consentimiento y contactos de emergencia
+Alta del usuario, consentimiento informado granular y captura obligatoria de dos contactos de emergencia.
+Pendiente de definir: texto legal del consentimiento, mecanismo de revocación desde la propia aplicación y versionado del aviso de privacidad.
+[ Espacio reservado — pendiente de documentar ]
+10
+Lista de verificación antes de liberar
+#
+Verificación
+Responsable
+1
+El umbral de 13 se compara contra el crudo, no contra la escala de 0 a 100
+Desarrollo
+2
+La segunda condición del WHO-5 (ítem en 0-1) está implementada e independiente del total
+Desarrollo
+3
+Los subítems 8a/8b y 10a/10b toman el máximo, no la suma
+Desarrollo
+4
+Las banderas elevan el nivel y nunca lo degradan
+Desarrollo
+5
+El algoritmo diagnóstico ICD-10 del MDI no está implementado
+Desarrollo
+6
+Los números de crisis salen de configuración y están verificados
+Desarrollo · Clínico
+7
+La lista de términos críticos está firmada por el asesor clínico
+Clínico
+8
+El plano gerencial no puede consultar texto libre ni puntajes identificados
+Desarrollo
+9
+El umbral de 15 personas por corte se aplica en la vista agregada
+Desarrollo
+10
+Existe registro de auditoría de todo acceso al plano clínico
+Desarrollo
+11
+La palabra «diagnóstico» no aparece en ningún texto de la interfaz
+Producto
+12
+La pantalla de nivel Rojo no muestra puntaje ni etiqueta de severidad
+Producto · Clínico
+13
+señalVigilancia() no escribe nunca en la tabla de clasificaciones
+Desarrollo
+14
+R1 no se evalúa antes de 14 días de historia
+Desarrollo
+15
+Las aplicaciones adelantadas se evalúan solo con criterio absoluto
+Desarrollo
+16
+El mensaje de la regla de silencio se acerca, no reclama
+Producto
+17
+Cada pregunta del ASQ ofrece tres opciones y «prefiero no contestar» se procesa como Sí
+Desarrollo
+18
+Negarse a contestar la pregunta 5 del ASQ clasifica como positiva aguda
+Desarrollo
+19
+Existe la vía manual para que el profesional eleve un caso con tamizaje negativo
+Desarrollo
+20
+Un caso Rojo solo se cierra con contacto humano verificado
+Desarrollo · Clínico
+21
+El protocolo de Rojo agudo cuenta con aprobación escrita del asesor clínico
+Clínico
+Tabla 12. Verificación obligatoria previa a cualquier liberación.

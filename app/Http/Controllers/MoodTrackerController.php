@@ -3,12 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\MoodLog;
+use App\Services\ClinicalEngineService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class MoodTrackerController extends Controller
 {
+    public function __construct(
+        protected ClinicalEngineService $clinicalEngine
+    ) {}
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -25,6 +30,13 @@ class MoodTrackerController extends Controller
         $today = Carbon::today()->format('Y-m-d');
         $user = Auth::user();
 
+        // Evaluar registro en el Motor Clínico (Capa 0)
+        $evaluacion = $this->clinicalEngine->evaluarRegistroDiario(
+            $user,
+            $validated['score'],
+            $validated['journal_entry'] ?? null
+        );
+
         // Check if log already exists for today -> update or create
         $moodLog = MoodLog::updateOrCreate(
             [
@@ -33,9 +45,12 @@ class MoodTrackerController extends Controller
             ],
             [
                 'score' => $validated['score'],
+                'valor_invertido' => $evaluacion['valor_invertido'],
                 'primary_emotion' => $validated['primary_emotion'],
                 'tags' => $validated['tags'] ?? [],
                 'journal_entry' => $validated['journal_entry'] ?? null,
+                'bandera_lexica' => $evaluacion['filtro_lexico']['bandera_lexica'],
+                'terminos_detectados' => $evaluacion['filtro_lexico']['terminos_detectados'],
                 'gratitude_note' => $validated['gratitude_note'] ?? null,
                 'energy_level' => $validated['energy_level'] ?? 3,
                 'sleep_hours' => $validated['sleep_hours'] ?? null,
@@ -47,6 +62,7 @@ class MoodTrackerController extends Controller
                 'success' => true,
                 'message' => '¡Tu registro emocional ha sido guardado exitosamente!',
                 'log' => $moodLog,
+                'evaluacion' => $evaluacion,
             ]);
         }
 

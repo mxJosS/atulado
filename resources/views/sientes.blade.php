@@ -261,4 +261,6 @@
   </div>
 
 </div>
+
+@include('components.clinical-modals')
 @endsection

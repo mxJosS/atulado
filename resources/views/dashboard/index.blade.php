@@ -7,19 +7,23 @@
 
   <!-- ════ CLEAN MODERN GREETING BANNER ════ -->
   <div style="background: linear-gradient(135deg, #0D1410 0%, #1E2A22 100%) !important; color: #FFFFFF !important; border-radius: 24px; padding: 1.5rem 1.75rem; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 1.75rem; border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: var(--shadow-sm);">
-    <div style="display: flex; align-items: center; gap: 1rem;">
-      <div style="width: 48px; height: 48px; border-radius: 50%; background: rgba(90, 181, 110, 0.2); border: 2px solid #A8E6C0; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; font-weight: 700; color: #FFFFFF;">
-        {{ strtoupper(substr($user->name, 0, 1)) }}
+    <div style="display: flex; align-items: center; gap: 1.15rem; flex: 1; min-width: 260px;">
+      <div style="width: 52px; height: 52px; min-width: 52px; min-height: 52px; max-width: 52px; max-height: 52px; border-radius: 50%; background: linear-gradient(135deg, rgba(90, 181, 110, 0.35), rgba(46, 93, 75, 0.5)); border: 2.5px solid #A8E6C0; display: flex; align-items: center; justify-content: center; font-size: 1.35rem; font-weight: 700; color: #FFFFFF; flex-shrink: 0; aspect-ratio: 1 / 1; overflow: hidden; box-shadow: 0 0 16px rgba(168, 230, 192, 0.25);">
+        @if($user->avatar_url)
+          <img src="{{ $user->avatar_url }}" alt="{{ $user->name }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+        @else
+          <span style="line-height: 1;">{{ strtoupper(substr($user->name, 0, 1)) }}</span>
+        @endif
       </div>
-      <div>
-        <div class="mono-tag" style="color: #A8E6C0; font-size: 0.68rem;">{{ $greeting }}</div>
+      <div style="flex: 1; min-width: 0;">
+        <div class="mono-tag" style="color: #A8E6C0; font-size: 0.68rem; letter-spacing: 0.08em;">{{ $greeting }}</div>
         <h1 style="color: #FFFFFF !important; font-size: clamp(1.35rem, 2.5vw, 1.85rem); margin: 0; line-height: 1.2; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
           <span>Hola, {{ $user->name }}</span>
           @if($user->isProfessional())
             <x-verified-badge size="20" />
           @endif
         </h1>
-        <p style="color: #C8DDD1 !important; font-size: 0.86rem; margin-top: 0.2rem; font-style: italic;">
+        <p style="color: #C8DDD1 !important; font-size: 0.86rem; margin-top: 0.25rem; font-style: italic; margin-bottom: 0;">
           @if($todayLog)
             "Hoy registraste sentirte {{ strtolower($todayLog->primary_emotion) }}. Gracias por escucharte."
           @else
@@ -30,7 +34,7 @@
     </div>
 
     <!-- Quick Tool Button -->
-    <a href="{{ route('tools.respiracion') }}" class="btn btn-sm btn-outline-white" style="gap: 8px;">
+    <a href="{{ route('tools.respiracion') }}" class="btn btn-sm btn-outline-white" style="gap: 8px; border-radius: 12px; padding: 0.5rem 1rem;">
       <i class="fa-solid fa-lungs" style="color: #A8E6C0;"></i>
       <span>Respira 1 min</span>
     </a>
@@ -177,11 +181,26 @@
 
       <!-- ════ WIDGET TU RACHA (ITEM 4 OBLIGATORIO) ════ -->
       <div class="streak-racha-box">
-        <span class="mono-tag" style="color: #8A7332; display: block; margin-bottom: 0.4rem;">— TU RACHA</span>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+          <span class="mono-tag" style="color: #944000; font-weight: 700; background: rgba(230, 126, 34, 0.12); padding: 0.25rem 0.65rem; border-radius: 6px; font-size: 0.72rem; letter-spacing: 0.06em;">
+            <i class="fa-solid fa-fire" style="color: #E67E22; margin-right: 4px;"></i> TU RACHA DIARIA
+          </span>
+          @if($streak > 0)
+            <span class="badge" style="background: rgba(46, 93, 75, 0.12); color: #1E4A25; font-size: 0.72rem; font-weight: 700; border-radius: 9999px; padding: 0.2rem 0.55rem;">
+              <i class="fa-solid fa-bolt" style="color: #E67E22;"></i> Activa
+            </span>
+          @else
+            <span class="badge" style="background: rgba(140, 120, 80, 0.1); color: #7A693D; font-size: 0.72rem; font-weight: 600; border-radius: 9999px; padding: 0.2rem 0.55rem;">
+              Comienza hoy
+            </span>
+          @endif
+        </div>
         
-        <div style="display: flex; align-items: baseline; gap: 0.6rem;">
-          <div class="streak-big-count">{{ $streak }}</div>
-          <div style="font-family: var(--font-mono); font-size: 0.95rem; font-weight: 700; color: #8A7332; text-transform: uppercase; letter-spacing: 0.08em;">
+        <div style="display: flex; align-items: baseline; gap: 0.6rem; margin-top: 0.4rem;">
+          <div class="streak-big-count">
+            <span>{{ $streak }}</span>
+          </div>
+          <div style="font-family: var(--font-mono); font-size: 0.92rem; font-weight: 700; color: #944000; text-transform: uppercase; letter-spacing: 0.06em;">
             {{ $streak === 1 ? 'DÍA SEGUIDO' : 'DÍAS SEGUIDOS' }}
           </div>
         </div>
@@ -193,20 +212,32 @@
           @endphp
           @foreach($weeklyData as $idx => $day)
             <div class="day-circle-bubble {{ $day['has_log'] ? 'completed' : '' }} {{ $day['is_today'] ? 'today-active' : '' }}" title="{{ $day['day_name'] }} ({{ $day['date'] }}): {{ $day['has_log'] ? 'Registrado' : 'Pendiente' }}">
-              {{ $dayLetters[$idx] ?? 'D' }}
+              @if($day['has_log'])
+                <i class="fa-solid fa-check" style="font-size: 0.75rem;"></i>
+              @else
+                {{ $dayLetters[$idx] ?? 'D' }}
+              @endif
             </div>
           @endforeach
         </div>
 
         <!-- MOTIVATIONAL TREE MESSAGE -->
-        <p style="font-size: 0.92rem; color: #556860; line-height: 1.6; margin-bottom: 1rem; font-weight: 500;">
-          ¡Sigue así! Tu árbol crece con cada día que te cuidas.
+        <p style="font-size: 0.88rem; color: #556860; line-height: 1.5; margin-bottom: 1rem; font-weight: 500;">
+          @if($streak >= 7)
+            ¡Increíble consistencia! Tu hábito de autocuidado está en su punto más fuerte.
+          @elseif($streak >= 3)
+            ¡Gran progreso! Cada día de registro fortalece tu bienestar mental y tu árbol.
+          @elseif($streak > 0)
+            ¡Buen inicio! Vuelve mañana para seguir haciendo crecer tu racha y tu árbol.
+          @else
+            Completa tu registro diario para encender tu racha y hacer crecer tu árbol.
+          @endif
         </p>
 
         <!-- Dynamic Pixel Tree Preview with JUGAR BUTTON (ITEM 5) -->
-        <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.85rem; background: rgba(255, 255, 255, 0.7); border-radius: 16px; padding: 0.75rem 1rem; border: 1px solid rgba(200, 184, 122, 0.3); flex-wrap: wrap;">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.85rem; background: rgba(255, 255, 255, 0.85); border-radius: 16px; padding: 0.85rem 1.1rem; border: 1.5px solid rgba(200, 184, 122, 0.35); box-shadow: 0 2px 8px rgba(0,0,0,0.03); flex-wrap: wrap;">
           <div style="display: flex; align-items: center; gap: 0.75rem;">
-            <svg class="ptree" viewBox="0 0 16 16" width="34" height="34" xmlns="http://www.w3.org/2000/svg">
+            <svg class="ptree" viewBox="0 0 16 16" width="34" height="34" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 2px 4px rgba(45, 107, 58, 0.2));">
               <rect x="5" y="0" width="6" height="2" fill="#2D6B3A"/>
               <rect x="3" y="2" width="10" height="2" fill="#3D8C4F"/>
               <rect x="2" y="4" width="12" height="2" fill="#5AB56E"/>
@@ -278,6 +309,9 @@
   </div>
 </div>
 
+<!-- ════ MODALES DEL MOTOR CLÍNICO (WHO-5, MDI, ASQ Y CONTENCIÓN) ════ -->
+@include('components.clinical-modals')
+
 <!-- ══════════════════════════════════════════════════════════════════════
      MODAL DEL MINIJUEGO: ESTILO PLANTS VS ZOMBIES ZEN GARDEN
      ══════════════════════════════════════════════════════════════════════ -->
@@ -325,49 +359,49 @@
           </button>
         </div>
 
-        <!-- 1. Calm Bank Counter (Solo icono de sol y número) -->
+        <!-- 1. Calm Bank Counter -->
         <div class="pvz-calm-bank" id="calmBankDisplay" title="Soles acumulados para la Tienda">
           <i class="fa-solid fa-sun" style="color: #F1C40F; font-size: 1.05rem;"></i>
           <strong id="pvzTotalCalmPoints">125</strong>
         </div>
 
-        <!-- 2. Daily Task Counter (0 / 5) -->
+        <!-- 2. Daily Task Counter -->
         <div class="pvz-daily-task-pill" id="dailyTaskPillDisplay" title="Tareas completadas hoy">
           <i class="fa-solid fa-list-check" style="color: #5AB56E; font-size: 0.92rem;"></i>
-          <span>Tareas: <strong id="pvzDailyTasksCompleted">0</strong> / 5</span>
+          <span><strong id="pvzDailyTasksCompleted">0</strong>/5</span>
         </div>
 
-        <!-- Plant & Level Indicator (Nombre, Nv. y barra de porcentaje para subir de nivel) -->
-        <div style="display: flex; align-items: center; gap: 0.65rem; flex-shrink: 0;">
-          <span id="activePlantNameDisplay" style="font-weight: 700; font-size: 0.95rem; color: #FFFFFF; white-space: nowrap;">Árbol Sabiduría</span>
+        <!-- Plant & Level Indicator -->
+        <div class="pvz-plant-level-hud" style="display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0;">
+          <span id="activePlantNameDisplay" style="font-weight: 700; font-size: 0.88rem; color: #FFFFFF; white-space: nowrap;">Árbol Sabiduría</span>
 
           <span class="pvz-hud-level-tag" id="pvzHudLevelTag" title="Nivel actual del árbol (Nivel máximo: 100)">
             Nv. <strong id="pvzCurrentTreeLevel">1</strong>
           </span>
 
-          <div style="display: flex; align-items: center; gap: 6px;" title="Progreso de experiencia para subir de nivel">
-            <div class="pvz-vitality-meter" style="width: 80px; height: 9px;">
+          <div style="display: flex; align-items: center; gap: 4px;" title="Progreso de experiencia para subir de nivel">
+            <div class="pvz-vitality-meter" style="width: 60px; height: 8px;">
               <div class="pvz-vitality-fill" id="pvzHappinessFill" style="width: 0%;"></div>
             </div>
-            <span id="pvzHappinessText" style="font-size: 0.74rem; color: #A8E6C0; font-family: var(--font-mono); font-weight: 700;">0%</span>
+            <span id="pvzHappinessText" style="font-size: 0.7rem; color: #A8E6C0; font-family: var(--font-mono); font-weight: 700;">0%</span>
           </div>
         </div>
 
-        <!-- Right Controls: Streak with Shield, Sound, Close (Con espaciado seguro) -->
-        <div style="display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; margin-right: 0.2rem;">
-          <div id="pvzStreakWrap" style="background: rgba(230, 126, 34, 0.15); border: 1px solid rgba(230, 126, 34, 0.4); padding: 0.3rem 0.75rem; border-radius: 9999px; font-family: var(--font-mono); font-size: 0.8rem; color: #FFA59C; font-weight: 700; display: flex; align-items: center; gap: 6px;">
+        <!-- Right Controls: Streak with Shield, Sound, Close -->
+        <div class="pvz-right-controls" style="display: flex; align-items: center; gap: 0.35rem; flex-shrink: 0; margin-left: auto;">
+          <div id="pvzStreakWrap" style="background: rgba(230, 126, 34, 0.15); border: 1px solid rgba(230, 126, 34, 0.4); padding: 0.22rem 0.5rem; border-radius: 9999px; font-family: var(--font-mono); font-size: 0.75rem; color: #FFA59C; font-weight: 700; display: flex; align-items: center; gap: 4px; flex-shrink: 0;">
             <i class="fa-solid fa-fire" style="color: #E67E22;"></i>
             <span><strong id="gameStreakCount">{{ $streak }}</strong>d</span>
-            <span id="shieldIndicator" style="display: none; background: #5DADE2; color: #080C0A; padding: 0.1rem 0.45rem; border-radius: 9999px; font-size: 0.7rem; margin-left: 2px;" title="Escudo de Racha Activo">
-              <i class="fa-solid fa-shield-halved"></i> Escudo
+            <span id="shieldIndicator" style="display: none; background: #5DADE2; color: #080C0A; padding: 0.1rem 0.35rem; border-radius: 9999px; font-size: 0.65rem;" title="Escudo de Racha Activo">
+              <i class="fa-solid fa-shield-halved"></i>
             </span>
           </div>
 
-          <button type="button" onclick="toggleZenSound()" id="soundToggleBtn" title="Alternar Sonido Zen" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #A8E6C0; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
-            <i id="soundIcon" class="fa-solid fa-volume-high" style="font-size: 0.88rem;"></i>
+          <button type="button" onclick="toggleZenSound()" id="soundToggleBtn" title="Alternar Sonido Zen" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #A8E6C0; width: 30px; height: 30px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <i id="soundIcon" class="fa-solid fa-volume-high" style="font-size: 0.82rem;"></i>
           </button>
 
-          <button type="button" onclick="promptExitTreeGame()" title="Salir del Invernadero" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #FFFFFF; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+          <button type="button" onclick="promptExitTreeGame()" title="Salir del Invernadero" class="pvz-exit-btn" style="background: rgba(231, 76, 60, 0.4); border: 1.5px solid #E74C3C; color: #FFFFFF; width: 32px; height: 32px; min-width: 32px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; box-shadow: 0 0 10px rgba(231, 76, 60, 0.4);">
             <i class="fa-solid fa-xmark" style="font-size: 1rem;"></i>
           </button>
         </div>
@@ -1035,9 +1069,7 @@
 
 @push('scripts')
 <script>
-  // ══════════════════════════════════════════════════════════════════════
   // SENSITIVE & SUICIDAL TENDENCY WORDS FILTER (ZERO EMOJIS)
-  // ══════════════════════════════════════════════════════════════════════
   const SENSITIVE_KEYWORDS = [
     'armas', 'arma', 'pistola', 'bala', 'morirme', 'quiero morir', 'no quiero vivir',
     'suicidio', 'suicidarme', 'acabar con todo', 'hacerme daño', 'ahorcarme', 'ahorcar',
@@ -1064,1187 +1096,6 @@
 
       crisisAlert.style.display = detected ? 'block' : 'none';
     });
-  }
-
-  // ══════════════════════════════════════════════════════════════════════
-  // ══════════════════════════════════════════════════════════════════════
-  // PLANTS VS ZOMBIES ZEN GARDEN & PROGRESSIVE BOTANICAL LEVELING (1-100)
-  // ══════════════════════════════════════════════════════════════════════
-  let soundEnabled = true;
-  let audioCtx = null;
-  let activeTool = 'water';
-
-  // 1. Soles Totales (Monedero acumulativo persistente para la tienda)
-  let totalCalmPoints = 125;
-  try {
-    const savedTotal = localStorage.getItem('atulado_zen_total_calm');
-    if (savedTotal !== null) {
-      totalCalmPoints = parseInt(savedTotal, 10) || 0;
-    }
-  } catch(e) {}
-
-  // 2. Contador de Tareas Diarias (0 / 5, reiniciado cada nuevo día)
-  let dailyTasksCompleted = 0;
-  const DAILY_TASKS_MAX = 5;
-  try {
-    const todayStr = new Date().toISOString().slice(0, 10);
-    const storedDate = localStorage.getItem('atulado_zen_daily_date');
-    if (storedDate === todayStr) {
-      dailyTasksCompleted = parseInt(localStorage.getItem('atulado_zen_daily_tasks'), 10) || 0;
-    } else {
-      dailyTasksCompleted = 0;
-      localStorage.setItem('atulado_zen_daily_date', todayStr);
-      localStorage.setItem('atulado_zen_daily_tasks', '0');
-    }
-  } catch(e) {}
-
-  let currentThought = 'water';
-  let skySunInterval = null;
-
-  // Species metadata
-  const ALL_SPECIES = [
-    { id: 'Tree', key: 'tree', name: 'Árbol Sabiduría', cost: 0 },
-    { id: 'Lotus', key: 'lotus', name: 'Loto Serena', cost: 150 },
-    { id: 'Bonsai', key: 'bonsai', name: 'Bonsái Resiliencia', cost: 300 },
-    { id: 'Sunflower', key: 'sunflower', name: 'Girasol Gratitud', cost: 450 },
-    { id: 'Cactus', key: 'cactus', name: 'Cactus Fortaleza', cost: 600 },
-    { id: 'Bamboo', key: 'bamboo', name: 'Bambú de Paz', cost: 750 },
-    { id: 'Lavender', key: 'lavender', name: 'Lavanda Calma', cost: 900 },
-    { id: 'Orchid', key: 'orchid', name: 'Orquídea Armonía', cost: 1100 }
-  ];
-
-  const SPECIES_NAMES = {
-    tree: 'Árbol Sabiduría',
-    lotus: 'Loto Serena',
-    bonsai: 'Bonsái Resiliencia',
-    sunflower: 'Girasol Gratitud',
-    cactus: 'Cactus Fortaleza',
-    bamboo: 'Bambú de Paz',
-    lavender: 'Lavanda Calma',
-    orchid: 'Orquídea Armonía'
-  };
-
-  // 3. Multi-plant Individual Leveling System (Nv. 1 to Nv. 100)
-  let plantLevels = {
-    tree: { level: 1, xp: 0 },
-    lotus: { level: 1, xp: 0 },
-    bonsai: { level: 1, xp: 0 },
-    sunflower: { level: 1, xp: 0 },
-    cactus: { level: 1, xp: 0 },
-    bamboo: { level: 1, xp: 0 },
-    lavender: { level: 1, xp: 0 },
-    orchid: { level: 1, xp: 0 }
-  };
-
-  try {
-    const savedLevels = localStorage.getItem('atulado_zen_plant_levels');
-    if (savedLevels) {
-      const parsed = JSON.parse(savedLevels);
-      Object.keys(plantLevels).forEach(k => {
-        if (parsed[k]) {
-          plantLevels[k] = {
-            level: Math.max(1, Math.min(100, parseInt(parsed[k].level, 10) || 1)),
-            xp: Math.max(0, parseInt(parsed[k].xp, 10) || 0)
-          };
-        }
-      });
-    }
-  } catch(e) {}
-
-  function saveZenPlantLevels() {
-    try {
-      localStorage.setItem('atulado_zen_plant_levels', JSON.stringify(plantLevels));
-    } catch(e) {}
-  }
-
-  // Exponential XP required per level: Nv 1 takes ~5 min (~50 XP). Nv 100 requires ~1 month of daily mindful care.
-  function getXpRequired(level) {
-    if (level >= 100) return 0;
-    const base = 40;
-    const growth = Math.pow(1 + (level - 1) * 0.082, 2.25);
-    return Math.round(base * growth + (level * 10));
-  }
-
-  function addPlantXp(plantKey, amount, showPopup = false) {
-    if (!plantLevels[plantKey]) {
-      plantLevels[plantKey] = { level: 1, xp: 0 };
-    }
-
-    const p = plantLevels[plantKey];
-    if (p.level >= 100) {
-      p.level = 100;
-      p.xp = 0;
-      saveZenPlantLevels();
-      updatePlantHudDisplay();
-      updateShopUI();
-      return;
-    }
-
-    p.xp += amount;
-    let req = getXpRequired(p.level);
-    let leveledUp = false;
-
-    while (p.xp >= req && p.level < 100) {
-      p.xp -= req;
-      p.level += 1;
-      leveledUp = true;
-      req = getXpRequired(p.level);
-    }
-
-    if (p.level >= 100) {
-      p.level = 100;
-      p.xp = 0;
-    }
-
-    saveZenPlantLevels();
-    updatePlantHudDisplay();
-    updateShopUI();
-
-    if (showPopup && amount > 0) {
-      spawnScorePopup(`<iconify-icon icon="game-icons:ground-sprout" style="color: #5AB56E; vertical-align: middle;"></iconify-icon> +${amount} XP (${SPECIES_NAMES[plantKey] || 'Planta'})`);
-    }
-
-    if (leveledUp) {
-      triggerLevelUpCelebration(plantKey, p.level);
-    }
-  }
-
-  function triggerLevelUpCelebration(plantKey, newLevel) {
-    playMusicChord();
-    setTimeout(playCollectChime, 250);
-    createSunFx();
-    createFertilizerFx();
-
-    const plantName = SPECIES_NAMES[plantKey] || 'Tu árbol';
-    if (newLevel >= 100) {
-      showZenNotification(
-        "¡Nivel 100 Máximo!",
-        `¡Felicidades! ${plantName} ha alcanzado el nivel 100 máximo tras tu constancia y cuidado diario. Has cultivado la máxima serenidad y armonía.`,
-        "game-icons:laurel-crown",
-        "#F1C40F"
-      );
-    } else {
-      showZenNotification(
-        `¡${plantName} Subió a Nivel ${newLevel}!`,
-        `Tu constancia da frutos. Cada nivel requiere más cuidado y dedicación. Sigue cuidando tu árbol para llevarlo al Nivel 100.`,
-        "game-icons:party-popper",
-        "#5AB56E"
-      );
-    }
-  }
-
-  function updatePlantHudDisplay() {
-    const activeKey = zenInventory.activePlant || 'tree';
-    const pData = plantLevels[activeKey] || { level: 1, xp: 0 };
-
-    const nameElem = document.getElementById('activePlantNameDisplay');
-    const levelElem = document.getElementById('pvzCurrentTreeLevel');
-    const levelTag = document.getElementById('pvzHudLevelTag');
-    const fillElem = document.getElementById('pvzHappinessFill');
-    const textElem = document.getElementById('pvzHappinessText');
-
-    if (nameElem) nameElem.innerText = SPECIES_NAMES[activeKey] || 'Árbol Sabiduría';
-    if (levelElem) levelElem.innerText = pData.level;
-
-    if (levelTag) {
-      if (pData.level >= 100) {
-        levelTag.classList.add('max-level');
-        levelTag.innerHTML = '<i class="fa-solid fa-crown"></i> Nv. <strong>100 MAX</strong>';
-      } else {
-        levelTag.classList.remove('max-level');
-        levelTag.innerHTML = `Nv. <strong id="pvzCurrentTreeLevel">${pData.level}</strong>`;
-      }
-    }
-
-    let percent = 0;
-    if (pData.level >= 100) {
-      percent = 100;
-    } else {
-      const req = getXpRequired(pData.level);
-      percent = req > 0 ? Math.min(99, Math.floor((pData.xp / req) * 100)) : 0;
-    }
-
-    if (fillElem) fillElem.style.width = percent + '%';
-    if (textElem) textElem.innerText = percent + '%';
-  }
-
-  // Persistent User Zen Inventory (Stored in LocalStorage)
-  let zenInventory = {
-    shield: false,
-    unlockedPlants: ['tree'],
-    activePlant: 'tree',
-    unlockedPots: ['terracotta'],
-    activePot: 'terracotta'
-  };
-
-  try {
-    const saved = localStorage.getItem('atulado_zen_inventory');
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      zenInventory = Object.assign(zenInventory, parsed);
-    }
-  } catch(e) {}
-
-  function saveZenInventory() {
-    try {
-      localStorage.setItem('atulado_zen_inventory', JSON.stringify(zenInventory));
-    } catch(e) {}
-  }
-
-  function saveZenEconomy() {
-    try {
-      localStorage.setItem('atulado_zen_total_calm', totalCalmPoints.toString());
-      localStorage.setItem('atulado_zen_daily_tasks', dailyTasksCompleted.toString());
-      localStorage.setItem('atulado_zen_daily_date', new Date().toISOString().slice(0, 10));
-    } catch(e) {}
-  }
-
-  // Tool specifications: Costs, Cooldowns (ms), Calma gains, XP gains
-  const TOOL_SPECS = {
-    water: { cost: 0, cooldown: 1500, calmGain: 15, xpGain: 15, name: 'Regadera' },
-    sun: { cost: 15, cooldown: 3000, calmGain: 25, xpGain: 20, name: 'Luz Solar' },
-    spray: { cost: 20, cooldown: 3500, calmGain: 30, xpGain: 25, name: 'Spray Calma' },
-    phonograph: { cost: 25, cooldown: 4000, calmGain: 35, xpGain: 30, name: 'Fonógrafo' },
-    fertilizer: { cost: 35, cooldown: 5000, calmGain: 45, xpGain: 45, name: 'Fertilizante' }
-  };
-
-  const toolCooldowns = { water: false, sun: false, spray: false, phonograph: false, fertilizer: false };
-
-  const WISDOM_BANK = [
-    "Las emociones son como olas: alcanzan un punto máximo y luego se disipan suavemente.",
-    "La aceptación radical no significa resignarse, sino dejar de gastar energía en luchar contra lo que ya es.",
-    "Inhala en 4 tiempos, sostén en 7 y exhala en 8. Tu sistema nervioso siempre sabe cómo regresar al centro.",
-    "Tu mente es un jardín. No puedes evitar que lleguen malas hierbas, pero sí decides cuáles pensamientos regar.",
-    "Cuando sientas una tormenta, ancla tus pies en el suelo: 5 cosas que ves, 4 que tocas, 3 que escuchas.",
-    "La autocompasión es tratarte con la misma amabilidad con la que cuidarías a un buen amigo en apuros.",
-    "No tienes que resolver toda tu vida hoy; solo necesitas dar el siguiente paso amable hacia ti.",
-    "Sentir dolor es parte de la condición humana, pero sufrir en soledad no tiene por qué serlo."
-  ];
-
-  const THOUGHT_CONFIG = {
-    water: { icon: 'game-icons:watering-can', color: '#5DADE2', text: '¡Tengo sed! Ríegame con la regadera' },
-    fertilizer: { icon: 'game-icons:fertilizer-bag', color: '#58D68D', text: '¡Necesito nutrientes! Aplica fertilizante' },
-    phonograph: { icon: 'game-icons:music-spell', color: '#AF7AC5', text: '¡Toca música relajante en el fonógrafo!' },
-    spray: { icon: 'game-icons:delicate-perfume', color: '#48C9B0', text: '¡Disipa la tensión con spray de calma!' },
-    sun: { icon: 'game-icons:sunbeams', color: '#F39C12', text: '¡Dame un baño de luz solar dorada!' }
-  };
-
-  // Web Audio Tone Synthesizer
-  function playPvzTone(freq, type = 'sine', duration = 0.35) {
-    if (!soundEnabled) return;
-    try {
-      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      if (audioCtx.state === 'suspended') audioCtx.resume();
-
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-
-      osc.type = type;
-      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-
-      gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.18, audioCtx.currentTime + 0.04);
-      gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
-
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-
-      osc.start();
-      osc.stop(audioCtx.currentTime + duration);
-    } catch(e) {}
-  }
-
-  function playCollectChime() {
-    playPvzTone(1046.50, 'sine', 0.15); // C6
-    setTimeout(() => playPvzTone(1318.51, 'sine', 0.2), 70); // E6
-    setTimeout(() => playPvzTone(1567.98, 'sine', 0.25), 140); // G6
-  }
-
-  function playMusicChord() {
-    playPvzTone(523.25, 'triangle', 0.7); // C5
-    setTimeout(() => playPvzTone(659.25, 'triangle', 0.7), 100); // E5
-    setTimeout(() => playPvzTone(783.99, 'triangle', 0.7), 200); // G5
-    setTimeout(() => playPvzTone(1046.50, 'sine', 1.0), 300); // C6
-  }
-
-  function playBuySuccessTone() {
-    playPvzTone(784, 'triangle', 0.2);
-    setTimeout(() => playPvzTone(1046.5, 'triangle', 0.3), 100);
-    setTimeout(() => playPvzTone(1568, 'sine', 0.5), 220);
-  }
-
-  window.toggleZenSound = function() {
-    soundEnabled = !soundEnabled;
-    const icon = document.getElementById('soundIcon');
-    if (soundEnabled) {
-      if (icon) icon.className = 'fa-solid fa-volume-high';
-      playPvzTone(660, 'sine', 0.3);
-    } else {
-      if (icon) icon.className = 'fa-solid fa-volume-xmark';
-    }
-  };
-
-  // Carousel Smooth Scrolling Function
-  window.scrollPvzCarousel = function(trackId, direction) {
-    const track = document.getElementById(trackId);
-    if (track) {
-      track.scrollBy({ left: direction * 230, behavior: 'smooth' });
-      playPvzTone(520, 'sine', 0.08);
-    }
-  };
-
-  // Navigation Screen Switcher (Jardín vs Tienda)
-  window.switchPvzScreen = function(screenName) {
-    const gardenScreen = document.getElementById('pvzGardenScreen');
-    const shopScreen = document.getElementById('pvzShopScreen');
-    const tabGardenBtn = document.getElementById('tabGardenBtn');
-    const tabShopBtn = document.getElementById('tabShopBtn');
-
-    if (screenName === 'garden') {
-      if (gardenScreen) gardenScreen.style.display = 'flex';
-      if (shopScreen) shopScreen.style.display = 'none';
-      if (tabGardenBtn) tabGardenBtn.classList.add('active');
-      if (tabShopBtn) tabShopBtn.classList.remove('active');
-      updatePlantHudDisplay();
-      playPvzTone(600, 'sine', 0.15);
-    } else {
-      if (gardenScreen) gardenScreen.style.display = 'none';
-      if (shopScreen) shopScreen.style.display = 'block';
-      if (tabGardenBtn) tabGardenBtn.classList.remove('active');
-      if (tabShopBtn) tabShopBtn.classList.add('active');
-      updateShopUI();
-      playPvzTone(750, 'sine', 0.15);
-    }
-  };
-
-  // Modal Open / Close & Exit Confirmation
-  window.openTreeGame = function() {
-    const modal = document.getElementById('treeGameModalOverlay');
-    const loader = document.getElementById('gameLoaderScreen');
-    const gameplay = document.getElementById('gameplayScreen');
-    const fill = document.getElementById('loaderProgressFill');
-    const exitOverlay = document.getElementById('pvzExitConfirmOverlay');
-
-    if (!modal) {
-      return;
-    }
-
-    if (exitOverlay) exitOverlay.style.display = 'none';
-
-    document.body.style.overflow = 'hidden';
-    modal.classList.add('active');
-    if (loader) loader.style.display = 'flex';
-    if (gameplay) gameplay.style.display = 'none';
-    if (fill) fill.style.width = '0%';
-
-    playPvzTone(432, 'sine', 0.5);
-
-    setTimeout(() => { if (fill) fill.style.width = '50%'; }, 200);
-    setTimeout(() => { if (fill) fill.style.width = '85%'; }, 500);
-    setTimeout(() => {
-      if (fill) fill.style.width = '100%';
-      playPvzTone(528, 'sine', 0.7);
-    }, 750);
-
-    setTimeout(() => {
-      if (loader) loader.style.display = 'none';
-      if (gameplay) {
-        gameplay.style.display = 'flex';
-        gameplay.style.flexDirection = 'column';
-      }
-      renderActivePlant();
-      renderActivePot();
-      updateCalmDisplays();
-      updatePlantHudDisplay();
-      updateShieldDisplay();
-      pickNewThought();
-      spawnInitialSuns();
-      startSkySuns();
-    }, 950);
-  };
-
-  window.promptExitTreeGame = function() {
-    const exitOverlay = document.getElementById('pvzExitConfirmOverlay');
-    if (exitOverlay) {
-      exitOverlay.style.display = 'flex';
-      playPvzTone(520, 'triangle', 0.2);
-    } else {
-      window.confirmExitTreeGame();
-    }
-  };
-
-  window.cancelExitTreeGame = function() {
-    const exitOverlay = document.getElementById('pvzExitConfirmOverlay');
-    if (exitOverlay) {
-      exitOverlay.style.display = 'none';
-      playPvzTone(660, 'sine', 0.15);
-    }
-  };
-
-  window.confirmExitTreeGame = function() {
-    const exitOverlay = document.getElementById('pvzExitConfirmOverlay');
-    if (exitOverlay) exitOverlay.style.display = 'none';
-
-    document.body.style.overflow = '';
-    const modal = document.getElementById('treeGameModalOverlay');
-    if (modal) modal.classList.remove('active');
-    if (skySunInterval) clearInterval(skySunInterval);
-    playPvzTone(380, 'sine', 0.25);
-  };
-
-  window.closeTreeGame = function() {
-    window.promptExitTreeGame();
-  };
-
-  // Tool Selection
-  window.selectPvzTool = function(toolName) {
-    if (toolCooldowns[toolName]) return;
-
-    activeTool = toolName;
-    document.querySelectorAll('.pvz-tool-slot').forEach(slot => slot.classList.remove('active'));
-
-    const slotId = 'tool' + toolName.charAt(0).toUpperCase() + toolName.slice(1);
-    const slot = document.getElementById(slotId);
-    if (slot) slot.classList.add('active');
-
-    playPvzTone(700, 'sine', 0.1);
-  };
-
-  // Thought Bubble Mechanics
-  window.pickNewThought = function() {
-    const tools = ['water', 'sun', 'spray', 'phonograph', 'fertilizer'];
-    currentThought = tools[Math.floor(Math.random() * tools.length)];
-    const cfg = THOUGHT_CONFIG[currentThought];
-
-    const bubble = document.getElementById('pvzThoughtBubble');
-    const iconWrap = document.getElementById('thoughtIconWrap');
-    const text = document.getElementById('thoughtText');
-
-    if (bubble && text) {
-      if (iconWrap) {
-        iconWrap.innerHTML = `<iconify-icon icon="${cfg.icon}" style="color: ${cfg.color}; font-size: 1.4rem; vertical-align: middle;"></iconify-icon>`;
-      }
-      text.innerText = cfg.text;
-      bubble.style.display = 'inline-flex';
-    }
-  };
-
-  window.satisfyThoughtBubble = function(e) {
-    if (e) e.stopPropagation();
-    window.selectPvzTool(currentThought);
-    window.applyActiveToolToTree();
-  };
-
-  window.handleStageClick = function(e) {
-    if (e.target.closest('.pvz-collectible-item') || e.target.closest('.pvz-sky-sun') || e.target.closest('.pvz-thought-bubble')) return;
-    window.applyActiveToolToTree();
-  };
-
-  function spawnScorePopup(text, left = '50%', top = '45%') {
-    const canvas = document.getElementById('pvzStageCanvas');
-    if (!canvas) return;
-
-    const popup = document.createElement('div');
-    popup.className = 'pvz-score-popup';
-    popup.innerHTML = text;
-    popup.style.left = left;
-    popup.style.top = top;
-    canvas.appendChild(popup);
-
-    setTimeout(() => popup.remove(), 900);
-  }
-
-  // Care Application with Calm Costs, XP, and Cooldowns
-  window.applyActiveToolToTree = function(e) {
-    if (e) e.stopPropagation();
-
-    const spec = TOOL_SPECS[activeTool];
-    if (!spec) return;
-
-    if (toolCooldowns[activeTool]) return;
-
-    startToolCooldown(activeTool, spec.cooldown);
-
-    const treeSvg = document.getElementById('interactiveTreeSvg');
-    const dialogue = document.getElementById('pvzWisdomDialogue');
-
-    if (treeSvg) {
-      treeSvg.classList.remove('pvz-plant-joy');
-      void treeSvg.offsetWidth;
-      treeSvg.classList.add('pvz-plant-joy');
-    }
-
-    const randQuote = WISDOM_BANK[Math.floor(Math.random() * WISDOM_BANK.length)];
-    if (dialogue) dialogue.innerText = `"${randQuote}"`;
-
-    // Tool audio-visual actions
-    if (activeTool === 'water') {
-      playPvzTone(587.33, 'sine', 0.6);
-      createWaterFx();
-    } else if (activeTool === 'sun') {
-      playPvzTone(784, 'sine', 0.8);
-      createSunFx();
-    } else if (activeTool === 'spray') {
-      playPvzTone(440, 'sine', 0.6);
-      createSprayFx();
-    } else if (activeTool === 'phonograph') {
-      playMusicChord();
-      createMusicFx();
-    } else if (activeTool === 'fertilizer') {
-      playPvzTone(659.25, 'triangle', 0.7);
-      createFertilizerFx();
-    }
-
-    const activeKey = zenInventory.activePlant || 'tree';
-    let earnedXp = spec.xpGain || 15;
-
-    // Task fulfillment logic (0/5 up to 5/5)
-    if (activeTool === currentThought) {
-      if (dailyTasksCompleted < DAILY_TASKS_MAX) {
-        dailyTasksCompleted += 1;
-        totalCalmPoints += 20;
-        earnedXp += 40; // Bonus XP for matching plant's desire
-        saveZenEconomy();
-        updateCalmDisplays();
-        spawnScorePopup(`<iconify-icon icon="game-icons:sunbeams" style="color: #F1C40F; vertical-align: middle;"></iconify-icon> +20 Soles (${dailyTasksCompleted}/${DAILY_TASKS_MAX})`);
-      } else {
-        earnedXp += 25;
-        spawnScorePopup(`<iconify-icon icon="game-icons:sparkles" style="color: #F1C40F; vertical-align: middle;"></iconify-icon> ¡Deseo cumplido! (+${earnedXp} XP)`);
-      }
-
-      spawnDroppingSun(true);
-      setTimeout(pickNewThought, 2800);
-    } else {
-      spawnDroppingSun(false);
-    }
-
-    // Award XP to active plant
-    addPlantXp(activeKey, earnedXp, true);
-  }
-
-  function startToolCooldown(toolName, durationMs) {
-    toolCooldowns[toolName] = true;
-    const slotId = 'tool' + toolName.charAt(0).toUpperCase() + toolName.slice(1);
-    const slot = document.getElementById(slotId);
-    if (slot) slot.classList.add('cooling');
-
-    setTimeout(() => {
-      toolCooldowns[toolName] = false;
-      if (slot) slot.classList.remove('cooling');
-    }, durationMs);
-  }
-
-  // ══════════════════════════════════════════════════════════════════════
-  // IN-GAME MODAL NOTIFICATIONS (NO BROWSER ALERTS / NO LOGS)
-  // ══════════════════════════════════════════════════════════════════════
-  window.showZenNotification = function(title, message, icon = 'game-icons:sunbeams', color = '#F1C40F') {
-    const modal = document.getElementById('pvzNotificationModal');
-    const titleElem = document.getElementById('pvzNotifTitle');
-    const msgElem = document.getElementById('pvzNotifMessage');
-    const iconContainer = document.getElementById('pvzNotifIconContainer');
-    const iconWrap = document.getElementById('pvzNotifIconWrap');
-
-    if (titleElem) titleElem.innerText = title;
-    if (msgElem) msgElem.innerText = message;
-
-    if (iconContainer) {
-      if (icon.startsWith('game-icons:') || icon.startsWith('ra ') || icon.startsWith('fa-')) {
-        if (icon.startsWith('game-icons:')) {
-          iconContainer.innerHTML = `<iconify-icon icon="${icon}" style="font-size: 2.1rem; color: ${color}; line-height: 1;"></iconify-icon>`;
-        } else if (icon.startsWith('ra ')) {
-          iconContainer.innerHTML = `<i class="${icon}" style="font-size: 1.9rem; color: ${color};"></i>`;
-        } else {
-          iconContainer.innerHTML = `<i class="${icon}" style="font-size: 1.7rem; color: ${color};"></i>`;
-        }
-      } else {
-        iconContainer.innerHTML = `<iconify-icon icon="game-icons:${icon}" style="font-size: 2.1rem; color: ${color}; line-height: 1;"></iconify-icon>`;
-      }
-    }
-
-    if (iconWrap) {
-      iconWrap.style.color = color;
-      iconWrap.style.borderColor = color;
-      iconWrap.style.background = color + '22';
-      iconWrap.style.boxShadow = `0 0 24px ${color}55`;
-    }
-
-    if (modal) modal.style.display = 'flex';
-    playPvzTone(350, 'triangle', 0.2);
-  };
-
-  window.closeZenNotification = function() {
-    const modal = document.getElementById('pvzNotificationModal');
-    if (modal) modal.style.display = 'none';
-    playPvzTone(600, 'sine', 0.15);
-  };
-
-  // ══════════════════════════════════════════════════════════════════════
-  // ZEN REWARDS & SHOP LOGIC
-  // ══════════════════════════════════════════════════════════════════════
-  window.buyStreakShield = function() {
-    if (zenInventory.shield) {
-      showZenNotification("Escudo Ya Activo", "Ya cuentas con un Escudo Zen activo que protege tu racha diaria.", "game-icons:shield-reflect", "#5DADE2");
-      return;
-    }
-
-    if (totalCalmPoints < 100) {
-      playPvzTone(260, 'sawtooth', 0.25);
-      showZenNotification("Soles Insuficientes", "Necesitas 100 Soles para canjear el Escudo Protector de Racha. ¡Completa tareas o recolecta soles en el jardín!", "game-icons:sunbeams", "#F1C40F");
-      return;
-    }
-
-    totalCalmPoints -= 100;
-    zenInventory.shield = true;
-    saveZenInventory();
-    saveZenEconomy();
-
-    playBuySuccessTone();
-    updateCalmDisplays();
-    updateShieldDisplay();
-    updateShopUI();
-
-    showZenNotification("¡Escudo Activado!", "Tu racha diaria ahora está blindada contra ausencias. Se ha añadido la insignia de protección en tu barra superior.", "game-icons:shield-reflect", "#5DADE2");
-  };
-
-  window.unlockOrSelectPlant = function(plantKey, cost) {
-    if (zenInventory.unlockedPlants.includes(plantKey)) {
-      selectPlant(plantKey);
-      return;
-    }
-
-    if (totalCalmPoints < cost) {
-      playPvzTone(260, 'sawtooth', 0.25);
-      showZenNotification("Soles Insuficientes", `Necesitas ${cost} Soles para desbloquear esta especie. Sigue completando tareas para acumular más soles.`, "game-icons:sunbeams", "#F1C40F");
-      return;
-    }
-
-    totalCalmPoints -= cost;
-    zenInventory.unlockedPlants.push(plantKey);
-    zenInventory.activePlant = plantKey;
-    saveZenInventory();
-    saveZenEconomy();
-
-    playBuySuccessTone();
-    updateCalmDisplays();
-    renderActivePlant();
-    updatePlantHudDisplay();
-    updateShopUI();
-
-    showZenNotification("¡Nueva Especie Desbloqueada!", `Has desbloqueado ${SPECIES_NAMES[plantKey] || 'esta planta'} y ahora se encuentra en tu Invernadero Zen lista para subir de nivel.`, "game-icons:ground-sprout", "#5AB56E");
-  };
-
-  window.selectPlant = function(plantKey) {
-    zenInventory.activePlant = plantKey;
-    saveZenInventory();
-    playPvzTone(660, 'sine', 0.2);
-    renderActivePlant();
-    updatePlantHudDisplay();
-    updateShopUI();
-  };
-
-  window.unlockOrSelectPot = function(potKey, cost) {
-    if (zenInventory.unlockedPots.includes(potKey)) {
-      selectPot(potKey);
-      return;
-    }
-
-    if (totalCalmPoints < cost) {
-      playPvzTone(260, 'sawtooth', 0.25);
-      showZenNotification("Soles Insuficientes", `Necesitas ${cost} Soles para desbloquear esta maceta artesanal.`, "game-icons:sunbeams", "#F1C40F");
-      return;
-    }
-
-    totalCalmPoints -= cost;
-    zenInventory.unlockedPots.push(potKey);
-    zenInventory.activePot = potKey;
-    saveZenInventory();
-    saveZenEconomy();
-
-    playBuySuccessTone();
-    updateCalmDisplays();
-    renderActivePot();
-    updateShopUI();
-
-    showZenNotification("¡Maceta Equipada!", "Has desbloqueado y equipado tu nueva maceta artesanal.", "game-icons:flower-pot", "#C8B87A");
-  };
-
-  window.selectPot = function(potKey) {
-    zenInventory.activePot = potKey;
-    saveZenInventory();
-    playPvzTone(600, 'sine', 0.2);
-    renderActivePot();
-    updateShopUI();
-  };
-
-  function updateShieldDisplay() {
-    const shieldInd = document.getElementById('shieldIndicator');
-    if (shieldInd) {
-      shieldInd.style.display = zenInventory.shield ? 'inline-flex' : 'none';
-    }
-  }
-
-  function renderActivePot() {
-    const potWrapper = document.getElementById('pvzTreePot');
-    if (!potWrapper) return;
-
-    potWrapper.className = 'pvz-pot-wrapper pot-' + zenInventory.activePot;
-  }
-
-  function renderActivePlant() {
-    const container = document.getElementById('pvzPlantSvgContainer');
-    const plantNameDisplay = document.getElementById('activePlantNameDisplay');
-    if (!container) return;
-
-    const p = zenInventory.activePlant;
-    let svgHtml = '';
-
-    if (p === 'lotus') {
-      if (plantNameDisplay) plantNameDisplay.innerText = 'Loto Serena';
-      svgHtml = `
-        <svg id="interactiveTreeSvg" class="ptree" viewBox="0 0 32 32" width="130" height="130" xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); filter: drop-shadow(0 12px 24px rgba(0,0,0,0.65)); margin-bottom: -5px;">
-          <ellipse cx="16" cy="27" rx="14" ry="4" fill="#145A32"/>
-          <ellipse cx="16" cy="26" rx="12" ry="3" fill="#1E8449"/>
-          <path d="M16 8 C11 15 8 22 16 26 C24 22 21 15 16 8 Z" fill="#FADBD8"/>
-          <path d="M16 11 C12 16 10 21 16 25 C22 21 20 16 16 11 Z" fill="#F1948A"/>
-          <path d="M9 16 C6 20 8 24 16 26 C12 24 10 20 9 16 Z" fill="#E8DAEF"/>
-          <path d="M23 16 C26 20 24 24 16 26 C20 24 22 20 23 16 Z" fill="#E8DAEF"/>
-          <circle cx="16" cy="22" r="3" fill="#F1C40F"/>
-        </svg>
-      `;
-    } else if (p === 'bonsai') {
-      if (plantNameDisplay) plantNameDisplay.innerText = 'Bonsái Resiliencia';
-      svgHtml = `
-        <svg id="interactiveTreeSvg" class="ptree" viewBox="0 0 32 32" width="130" height="130" xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); filter: drop-shadow(0 12px 24px rgba(0,0,0,0.65)); margin-bottom: -5px;">
-          <path d="M15 28 Q18 22 13 18 Q8 14 16 10 Q14 14 17 18 Q19 23 17 28 Z" fill="#5D4037"/>
-          <ellipse cx="11" cy="14" rx="7" ry="4" fill="#1E4A25"/>
-          <ellipse cx="11" cy="13" rx="5" ry="3" fill="#2E7D32"/>
-          <ellipse cx="21" cy="10" rx="8" ry="4" fill="#1E4A25"/>
-          <ellipse cx="21" cy="9" rx="6" ry="3" fill="#388E3C"/>
-          <ellipse cx="16" cy="7" rx="6" ry="3" fill="#4CAF50"/>
-        </svg>
-      `;
-    } else if (p === 'sunflower') {
-      if (plantNameDisplay) plantNameDisplay.innerText = 'Girasol Gratitud';
-      svgHtml = `
-        <svg id="interactiveTreeSvg" class="ptree" viewBox="0 0 32 32" width="130" height="130" xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); filter: drop-shadow(0 12px 24px rgba(0,0,0,0.65)); margin-bottom: -5px;">
-          <rect x="15" y="16" width="2" height="12" fill="#2E7D32"/>
-          <path d="M15 22 Q10 20 8 23 Q12 25 15 23 Z" fill="#4CAF50"/>
-          <path d="M17 20 Q22 18 24 21 Q20 23 17 21 Z" fill="#4CAF50"/>
-          <circle cx="16" cy="12" r="10" fill="#F39C12"/>
-          <circle cx="16" cy="12" r="8.5" fill="#F1C40F"/>
-          <circle cx="16" cy="12" r="5" fill="#5D4037"/>
-          <circle cx="16" cy="12" r="4" fill="#3E2723"/>
-        </svg>
-      `;
-    } else if (p === 'cactus') {
-      if (plantNameDisplay) plantNameDisplay.innerText = 'Cactus Fortaleza';
-      svgHtml = `
-        <svg id="interactiveTreeSvg" class="ptree" viewBox="0 0 32 32" width="130" height="130" xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); filter: drop-shadow(0 12px 24px rgba(0,0,0,0.65)); margin-bottom: -5px;">
-          <rect x="13" y="8" width="6" height="21" rx="3" fill="#27AE60"/>
-          <rect x="14" y="9" width="4" height="19" rx="2" fill="#2ECC71"/>
-          <path d="M13 18 H8 V12 H10 V16 H13 Z" fill="#27AE60"/>
-          <path d="M19 16 H24 V10 H22 V14 H19 Z" fill="#27AE60"/>
-          <circle cx="16" cy="6" r="3.5" fill="#E91E63"/>
-          <circle cx="16" cy="6" r="1.8" fill="#F1C40F"/>
-          <circle cx="16" cy="12" r="0.9" fill="#FFF59D"/>
-          <circle cx="16" cy="18" r="0.9" fill="#FFF59D"/>
-          <circle cx="16" cy="24" r="0.9" fill="#FFF59D"/>
-          <circle cx="9" cy="13" r="0.7" fill="#FFF59D"/>
-          <circle cx="23" cy="11" r="0.7" fill="#FFF59D"/>
-        </svg>
-      `;
-    } else if (p === 'bamboo') {
-      if (plantNameDisplay) plantNameDisplay.innerText = 'Bambú de Paz';
-      svgHtml = `
-        <svg id="interactiveTreeSvg" class="ptree" viewBox="0 0 32 32" width="130" height="130" xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); filter: drop-shadow(0 12px 24px rgba(0,0,0,0.65)); margin-bottom: -5px;">
-          <rect x="8" y="8" width="3.5" height="21" rx="1.5" fill="#2E7D32"/>
-          <rect x="7" y="14" width="5.5" height="1.2" fill="#1B5E20"/>
-          <rect x="7" y="21" width="5.5" height="1.2" fill="#1B5E20"/>
-          <rect x="14.5" y="4" width="4" height="25" rx="2" fill="#43A047"/>
-          <rect x="13.5" y="10" width="6" height="1.2" fill="#2E7D32"/>
-          <rect x="13.5" y="17" width="6" height="1.2" fill="#2E7D32"/>
-          <rect x="13.5" y="24" width="6" height="1.2" fill="#2E7D32"/>
-          <rect x="21" y="9" width="3.5" height="20" rx="1.5" fill="#388E3C"/>
-          <rect x="20" y="16" width="5.5" height="1.2" fill="#1B5E20"/>
-          <path d="M18.5 10 Q25 8 28 11 Q23 12.5 18.5 11.5 Z" fill="#81C784"/>
-          <path d="M11.5 14 Q5 12 4 15 Q8.5 16.5 11.5 15.5 Z" fill="#81C784"/>
-          <path d="M18.5 5 Q24 3 26 6 Q22 7.5 18.5 6.5 Z" fill="#A5D6A7"/>
-        </svg>
-      `;
-    } else if (p === 'lavender') {
-      if (plantNameDisplay) plantNameDisplay.innerText = 'Lavanda Calma';
-      svgHtml = `
-        <svg id="interactiveTreeSvg" class="ptree" viewBox="0 0 32 32" width="130" height="130" xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); filter: drop-shadow(0 12px 24px rgba(0,0,0,0.65)); margin-bottom: -5px;">
-          <line x1="16" y1="12" x2="16" y2="28" stroke="#388E3C" stroke-width="2"/>
-          <line x1="10" y1="14" x2="15" y2="28" stroke="#2E7D32" stroke-width="1.8"/>
-          <line x1="22" y1="14" x2="17" y2="28" stroke="#2E7D32" stroke-width="1.8"/>
-          <ellipse cx="16" cy="6" rx="3.5" ry="4.5" fill="#8E24AA"/>
-          <ellipse cx="16" cy="10" rx="4" ry="3.5" fill="#BA68C8"/>
-          <ellipse cx="16" cy="14" rx="3.5" ry="3" fill="#CE93D8"/>
-          <ellipse cx="10" cy="10" rx="3" ry="4" fill="#7B1FA2"/>
-          <ellipse cx="11" cy="14" rx="3.2" ry="3" fill="#AB47BC"/>
-          <ellipse cx="22" cy="10" rx="3" ry="4" fill="#7B1FA2"/>
-          <ellipse cx="21" cy="14" rx="3.2" ry="3" fill="#AB47BC"/>
-        </svg>
-      `;
-    } else if (p === 'orchid') {
-      if (plantNameDisplay) plantNameDisplay.innerText = 'Orquídea Armonía';
-      svgHtml = `
-        <svg id="interactiveTreeSvg" class="ptree" viewBox="0 0 32 32" width="130" height="130" xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); filter: drop-shadow(0 12px 24px rgba(0,0,0,0.65)); margin-bottom: -5px;">
-          <path d="M12 28 Q15 16 22 6" stroke="#2E7D32" stroke-width="2.5" fill="none"/>
-          <ellipse cx="9" cy="27" rx="7" ry="2.5" fill="#388E3C" transform="rotate(-20 9 27)"/>
-          <ellipse cx="17" cy="27" rx="7" ry="2.5" fill="#388E3C" transform="rotate(20 17 27)"/>
-          <circle cx="16" cy="14" r="5" fill="#F3E5F5"/>
-          <ellipse cx="12.5" cy="13" rx="3.5" ry="2.5" fill="#CE93D8"/>
-          <ellipse cx="19.5" cy="13" rx="3.5" ry="2.5" fill="#CE93D8"/>
-          <circle cx="16" cy="15.5" r="2.5" fill="#E91E63"/>
-          <circle cx="16" cy="15.5" r="1" fill="#FDD835"/>
-          <circle cx="21" cy="6.5" r="3.8" fill="#F8BBD0"/>
-          <ellipse cx="18.5" cy="6" rx="2.5" ry="1.8" fill="#EC407A"/>
-          <ellipse cx="23.5" cy="6" rx="2.5" ry="1.8" fill="#EC407A"/>
-          <circle cx="21" cy="7.5" r="1.8" fill="#C2185B"/>
-        </svg>
-      `;
-    } else {
-      if (plantNameDisplay) plantNameDisplay.innerText = 'Árbol Sabiduría';
-      svgHtml = `
-        <svg id="interactiveTreeSvg" class="ptree" viewBox="0 0 32 32" width="130" height="130" xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); filter: drop-shadow(0 12px 24px rgba(0,0,0,0.65)); margin-bottom: -5px; z-index: 5;">
-          <rect id="treeTrunk" x="14" y="18" width="4" height="10" fill="#6B3A1F"/>
-          <rect x="13" y="21" width="1" height="6" fill="#4A2710"/>
-          <rect x="17" y="22" width="1" height="5" fill="#4A2710"/>
-          <rect id="foliage1" x="7" y="6" width="18" height="14" fill="#2D6B3A"/>
-          <rect id="foliage2" x="5" y="8" width="22" height="12" fill="#2D6B3A"/>
-          <rect id="foliage3" x="8" y="7" width="16" height="12" fill="#3D8C4F"/>
-          <rect id="foliage4" x="10" y="5" width="12" height="14" fill="#5AB56E"/>
-          <rect id="foliage5" x="12" y="4" width="8" height="3" fill="#3D8C4F"/>
-          <rect id="foliage6" x="11" y="7" width="5" height="3" fill="#7FD68A"/>
-          <rect id="apple1" x="9" y="12" width="2" height="2" fill="#C0392B"/>
-          <rect id="apple2" x="20" y="11" width="2" height="2" fill="#C0392B"/>
-          <rect id="apple3" x="15" y="15" width="2" height="2" fill="#C0392B"/>
-        </svg>
-      `;
-    }
-
-    container.innerHTML = svgHtml;
-  }
-
-  function updateShopUI() {
-    const shopBal = document.getElementById('shopCalmBalance');
-    if (shopBal) shopBal.innerText = totalCalmPoints;
-
-    // Shield
-    const btnShield = document.getElementById('btnShopShield');
-    const cardShield = document.getElementById('shopCardShield');
-    const priceBadgeShield = document.getElementById('priceBadgeShield');
-    if (btnShield && cardShield) {
-      if (zenInventory.shield) {
-        btnShield.className = 'pvz-shop-action-btn active-equipped';
-        btnShield.innerHTML = '<i class="fa-solid fa-check"></i> <span>Escudo Activo</span>';
-        btnShield.disabled = true;
-        cardShield.classList.add('owned');
-        if (priceBadgeShield) priceBadgeShield.style.display = 'none';
-      } else {
-        btnShield.className = 'pvz-shop-action-btn';
-        btnShield.innerHTML = '<i class="fa-solid fa-hand-holding-heart"></i> <span>Canjear Escudo</span>';
-        btnShield.disabled = false;
-        cardShield.classList.remove('owned');
-        if (priceBadgeShield) priceBadgeShield.style.display = 'inline-flex';
-      }
-    }
-
-    // 8 Plants - Progress & Level display
-    ALL_SPECIES.forEach(p => {
-      const btn = document.getElementById('btnPlant' + p.id);
-      const card = document.getElementById('cardPlant' + p.id);
-      const priceBadge = document.getElementById('priceBadge' + p.id);
-      const levelLabel = document.getElementById('shopLevel' + p.id);
-      const percentLabel = document.getElementById('shopPercent' + p.id);
-      const levelFill = document.getElementById('shopLevelFill' + p.id);
-
-      const pData = plantLevels[p.key] || { level: 1, xp: 0 };
-      const req = getXpRequired(pData.level);
-      const pct = pData.level >= 100 ? 100 : (req > 0 ? Math.min(99, Math.floor((pData.xp / req) * 100)) : 0);
-
-      if (levelLabel) {
-        levelLabel.innerText = pData.level >= 100 ? 'Nv. 100 MAX' : `Nv. ${pData.level}`;
-      }
-      if (percentLabel) {
-        percentLabel.innerText = `${pct}%`;
-      }
-      if (levelFill) {
-        levelFill.style.width = `${pct}%`;
-      }
-
-      if (!btn || !card) return;
-
-      const isUnlocked = zenInventory.unlockedPlants.includes(p.key);
-      const isActive = zenInventory.activePlant === p.key;
-
-      if (isActive) {
-        btn.className = 'pvz-shop-action-btn active-equipped';
-        btn.innerHTML = '<i class="fa-solid fa-check"></i> <span>En el Invernadero</span>';
-        card.classList.add('owned');
-        if (priceBadge) priceBadge.style.display = 'none';
-      } else if (isUnlocked) {
-        btn.className = 'pvz-shop-action-btn';
-        btn.innerHTML = '<i class="fa-solid fa-seedling"></i> <span>Colocar en Jardín</span>';
-        card.classList.add('owned');
-        if (priceBadge) priceBadge.style.display = 'none';
-      } else {
-        btn.className = 'pvz-shop-action-btn';
-        btn.innerHTML = `<i class="fa-solid fa-lock"></i> <span>Desbloquear</span>`;
-        card.classList.remove('owned');
-        if (priceBadge) priceBadge.style.display = 'inline-flex';
-      }
-    });
-
-    // 6 Pots
-    const pots = [
-      { id: 'Terracotta', key: 'terracotta', cost: 0 },
-      { id: 'Jade', key: 'jade', cost: 80 },
-      { id: 'Kintsugi', key: 'kintsugi', cost: 160 },
-      { id: 'Marble', key: 'marble', cost: 240 },
-      { id: 'Obsidian', key: 'obsidian', cost: 360 },
-      { id: 'Wood', key: 'wood', cost: 480 }
-    ];
-
-    pots.forEach(pot => {
-      const btn = document.getElementById('btnPot' + pot.id);
-      const card = document.getElementById('cardPot' + pot.id);
-      const priceBadge = document.getElementById('priceBadge' + pot.id);
-      if (!btn || !card) return;
-
-      const isUnlocked = zenInventory.unlockedPots.includes(pot.key);
-      const isActive = zenInventory.activePot === pot.key;
-
-      if (isActive) {
-        btn.className = 'pvz-shop-action-btn active-equipped';
-        btn.innerHTML = '<i class="fa-solid fa-check"></i> <span>Equipada</span>';
-        card.classList.add('owned');
-        if (priceBadge) priceBadge.style.display = 'none';
-      } else if (isUnlocked) {
-        btn.className = 'pvz-shop-action-btn';
-        btn.innerHTML = '<i class="fa-solid fa-palette"></i> <span>Equipar</span>';
-        card.classList.add('owned');
-        if (priceBadge) priceBadge.style.display = 'none';
-      } else {
-        btn.className = 'pvz-shop-action-btn';
-        btn.innerHTML = `<i class="fa-solid fa-lock"></i> <span>Desbloquear</span>`;
-        card.classList.remove('owned');
-        if (priceBadge) priceBadge.style.display = 'inline-flex';
-      }
-    });
-  }
-
-  function updateCalmDisplays() {
-    const totalElem = document.getElementById('pvzTotalCalmPoints');
-    const shopBal = document.getElementById('shopCalmBalance');
-    const dailyCompletedElem = document.getElementById('pvzDailyTasksCompleted');
-
-    if (totalElem) totalElem.innerText = totalCalmPoints;
-    if (shopBal) shopBal.innerText = totalCalmPoints;
-    if (dailyCompletedElem) dailyCompletedElem.innerText = dailyTasksCompleted;
-  }
-
-  // FX CREATORS
-  function createWaterFx() {
-    const fxLayer = document.getElementById('pvzFxLayer');
-    if (!fxLayer) return;
-
-    for (let i = 0; i < 10; i++) {
-      const drop = document.createElement('div');
-      drop.style.position = 'absolute';
-      drop.style.left = (42 + Math.random() * 16) + '%';
-      drop.style.top = (25 + Math.random() * 15) + '%';
-      drop.style.color = '#5DADE2';
-      drop.style.fontSize = '0.95rem';
-      drop.style.pointerEvents = 'none';
-      drop.style.transition = 'all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1)';
-      drop.innerHTML = '<i class="fa-solid fa-droplet"></i>';
-
-      fxLayer.appendChild(drop);
-
-      setTimeout(() => {
-        drop.style.transform = `translateY(${90 + Math.random() * 30}px) scale(0.6)`;
-        drop.style.opacity = '0';
-      }, 25);
-
-      setTimeout(() => drop.remove(), 650);
-    }
-  }
-
-  function createFertilizerFx() {
-    const fxLayer = document.getElementById('pvzFxLayer');
-    if (!fxLayer) return;
-
-    for (let i = 0; i < 8; i++) {
-      const sparkle = document.createElement('div');
-      sparkle.style.position = 'absolute';
-      sparkle.style.left = (38 + Math.random() * 24) + '%';
-      sparkle.style.top = (30 + Math.random() * 30) + '%';
-      sparkle.style.color = '#58D68D';
-      sparkle.style.fontSize = '1.05rem';
-      sparkle.style.pointerEvents = 'none';
-      sparkle.style.transition = 'all 0.8s ease-out';
-      sparkle.innerHTML = '<i class="fa-solid fa-star"></i>';
-
-      fxLayer.appendChild(sparkle);
-
-      setTimeout(() => {
-        sparkle.style.transform = `translateY(-25px) rotate(${Math.random() * 180}deg) scale(1.3)`;
-        sparkle.style.opacity = '0';
-      }, 35);
-
-      setTimeout(() => sparkle.remove(), 850);
-    }
-  }
-
-  function createMusicFx() {
-    const fxLayer = document.getElementById('pvzFxLayer');
-    if (!fxLayer) return;
-
-    const notes = ['fa-music', 'fa-compact-disc', 'fa-music'];
-    for (let i = 0; i < 5; i++) {
-      const note = document.createElement('div');
-      note.style.position = 'absolute';
-      note.style.left = (38 + Math.random() * 24) + '%';
-      note.style.top = (40 + Math.random() * 20) + '%';
-      note.style.color = '#AF7AC5';
-      note.style.fontSize = '1.15rem';
-      note.style.pointerEvents = 'none';
-      note.style.transition = 'all 1.1s ease-out';
-      note.innerHTML = `<i class="fa-solid ${notes[i % notes.length]}"></i>`;
-
-      fxLayer.appendChild(note);
-
-      setTimeout(() => {
-        note.style.transform = `translate(${Math.random() * 50 - 25}px, -75px) scale(1.2)`;
-        note.style.opacity = '0';
-      }, 40);
-
-      setTimeout(() => note.remove(), 1200);
-    }
-  }
-
-  function createSprayFx() {
-    const fxLayer = document.getElementById('pvzFxLayer');
-    if (!fxLayer) return;
-
-    for (let i = 0; i < 7; i++) {
-      const mist = document.createElement('div');
-      mist.style.position = 'absolute';
-      mist.style.left = (40 + Math.random() * 20) + '%';
-      mist.style.top = (35 + Math.random() * 25) + '%';
-      mist.style.color = '#48C9B0';
-      mist.style.fontSize = '1.25rem';
-      mist.style.pointerEvents = 'none';
-      mist.style.transition = 'all 0.85s ease-out';
-      mist.innerHTML = '<i class="fa-solid fa-wind"></i>';
-
-      fxLayer.appendChild(mist);
-
-      setTimeout(() => {
-        mist.style.transform = `scale(1.6) translateY(-35px)`;
-        mist.style.opacity = '0';
-      }, 35);
-
-      setTimeout(() => mist.remove(), 950);
-    }
-  }
-
-  function createSunFx() {
-    const glow = document.getElementById('sunGlow');
-    if (!glow) return;
-    glow.style.transform = 'translateX(-50%) scale(1.6)';
-    setTimeout(() => { glow.style.transform = 'translateX(-50%) scale(1)'; }, 750);
-  }
-
-  // Dropping Collectibles (Tree-spawned Suns / Gems)
-  function spawnInitialSuns() {
-    setTimeout(() => spawnDroppingSun(true), 400);
-  }
-
-  function spawnDroppingSun(isBonus = false) {
-    const container = document.getElementById('pvzCollectiblesLayer');
-    if (!container) return;
-
-    const count = isBonus ? 2 : 1;
-    for (let c = 0; c < count; c++) {
-      setTimeout(() => {
-        const item = document.createElement('div');
-        item.className = 'pvz-collectible-item';
-
-        const isGem = Math.random() > 0.6;
-        item.innerHTML = `<i class="fa-solid ${isGem ? 'fa-gem' : 'fa-sun'}"></i>`;
-
-        const posX = 28 + Math.random() * 44;
-        const posY = 52 + Math.random() * 22;
-        item.style.left = posX + '%';
-        item.style.top = posY + '%';
-
-        item.onclick = function(e) {
-          e.stopPropagation();
-          collectSunItem(this, isGem ? 3 : 2);
-        };
-
-        container.appendChild(item);
-      }, c * 250);
-    }
-  }
-
-  // Sky Falling Suns (PvZ Daytime Mechanic)
-  function startSkySuns() {
-    if (skySunInterval) clearInterval(skySunInterval);
-    skySunInterval = setInterval(() => {
-      spawnSkySun();
-    }, 6500);
-  }
-
-  function spawnSkySun() {
-    const container = document.getElementById('pvzCollectiblesLayer');
-    if (!container) return;
-
-    const skySun = document.createElement('div');
-    skySun.className = 'pvz-sky-sun';
-    skySun.innerHTML = '<i class="fa-solid fa-sun"></i>';
-    skySun.style.left = (15 + Math.random() * 70) + '%';
-
-    skySun.onclick = function(e) {
-      e.stopPropagation();
-      collectSunItem(this, 2);
-    };
-
-    container.appendChild(skySun);
-
-    setTimeout(() => {
-      if (skySun.parentElement) skySun.remove();
-    }, 9000);
-  }
-
-  function collectSunItem(elem, points = 2) {
-    playCollectChime();
-
-    spawnScorePopup(`<i class="fa-solid fa-plus"></i>${points} Soles (Jardín)`, elem.style.left, elem.style.top);
-
-    totalCalmPoints += points;
-    saveZenEconomy();
-    updateCalmDisplays();
-
-    // Award XP on collection
-    const activeKey = zenInventory.activePlant || 'tree';
-    addPlantXp(activeKey, 8, false);
-
-    const bankWrap = document.getElementById('calmBankDisplay');
-    if (bankWrap) {
-      bankWrap.style.transform = 'scale(1.15)';
-      setTimeout(() => { bankWrap.style.transform = 'scale(1)'; }, 200);
-    }
-
-    elem.style.transition = 'all 0.45s cubic-bezier(0.2, 0.8, 0.2, 1)';
-    elem.style.transform = 'scale(1.3) translateY(-120px)';
-    elem.style.opacity = '0';
-
-    setTimeout(() => elem.remove(), 500);
   }
 
   // Smilies selector & Emotion tag buttons

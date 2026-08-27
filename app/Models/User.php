@@ -85,6 +85,56 @@ class User extends Authenticatable
             ->withTimestamps();
     }
 
+    public function seriesVigilancia(): HasMany
+    {
+        return $this->hasMany(SerieVigilancia::class)->orderBy('fecha', 'desc');
+    }
+
+    public function aplicacionesWho5(): HasMany
+    {
+        return $this->hasMany(AplicacionWho5::class)->orderBy('fecha', 'desc');
+    }
+
+    public function aplicacionesMdi(): HasMany
+    {
+        return $this->hasMany(AplicacionMdi::class)->orderBy('fecha', 'desc');
+    }
+
+    public function aplicacionesAsq(): HasMany
+    {
+        return $this->hasMany(AplicacionAsq::class)->orderBy('fecha', 'desc');
+    }
+
+    public function aplicacionesPuchol(): HasMany
+    {
+        return $this->hasMany(AplicacionPuchol::class)->orderBy('fecha', 'desc');
+    }
+
+    public function clasificaciones(): HasMany
+    {
+        return $this->hasMany(Clasificacion::class)->orderBy('fecha', 'desc');
+    }
+
+    public function eventosCrisis(): HasMany
+    {
+        return $this->hasMany(EventoCrisis::class)->orderBy('disparado_en', 'desc');
+    }
+
+    public function contactosEmergencia(): HasMany
+    {
+        return $this->hasMany(ContactoEmergencia::class);
+    }
+
+    public function getLatestClasificacionAttribute(): ?Clasificacion
+    {
+        return $this->clasificaciones()->first();
+    }
+
+    public function getActiveCrisisEventAttribute(): ?EventoCrisis
+    {
+        return $this->eventosCrisis()->where('estado', '!=', 'cerrado')->first();
+    }
+
     public function getTodayMoodLogAttribute()
     {
         return $this->moodLogs()->whereDate('logged_date', Carbon::today())->first();
