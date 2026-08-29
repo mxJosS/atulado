@@ -1,58 +1,74 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+<div align="center">
+  <table border="0" style="width: 100%; border: none; background: transparent;">
+    <tr style="border: none; background: transparent;">
+      <td align="left" style="border: none; vertical-align: middle; width: 50%;">
+        <img height="95" alt="Logo TecNM" src="https://github.com/user-attachments/assets/b46ab6a2-996e-441b-a7bf-ac9e3ec28141" />
+      </td>
+      <td align="right" style="border: none; vertical-align: middle; width: 50%;">
+        <img height="95" alt="Logo ITM" src="https://github.com/user-attachments/assets/38470846-eeca-4f90-8b03-9bb2fbc45c45" />
+      </td>
+    </tr>
+  </table>
+
+  <h2>TECNOLÓGICO NACIONAL DE MÉXICO</h2>
+  <h3>INSTITUTO TECNOLÓGICO DE MÉRIDA</h3>
+  <h4>DEPARTAMENTO DE SISTEMAS Y COMPUTACIÓN</h4>
+
+  <p>
+    <b>Proyecto:</b> Tecnologías para la Salud Humana<br>
+    <b>Equipo:</b> "A tu lado"<br>
+    <b>Integrantes:</b><br>
+    Manuel Fernando García Pérez<br>
+    Said Abdiel Canul Mirlos<br>
+    Jose Angel Espinosa García<br>
+    Karime Jacqueline Espinosa Góngora
+  </p>
+
+  <br/>
+
+  # A tu lado
+
+  **Plataforma web de divulgación, foro comunitario y recursos sobre psicología y comportamiento humano**
+
+  <br/>
+
+  ![PHP](https://img.shields.io/badge/PHP-777BB4?style=flat-square&logo=php&logoColor=white)
+  ![Laravel](https://img.shields.io/badge/Laravel-FF2D20?style=flat-square&logo=laravel&logoColor=white)
+  ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat-square&logo=tailwind-css&logoColor=white)
+  ![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=flat-square&logo=mysql&logoColor=white)
+  ![License](https://img.shields.io/badge/license-MIT-333333?style=flat-square)
+
+</div>
+
+---
+
+### Descripción del Proyecto
+
+**A tu lado** es un espacio digital desarrollado para la difusión de temas relacionados con la salud mental, el bienestar emocional y el comportamiento humano. La plataforma integra un sistema de divulgación editorial con un foro interactivo, proporcionando un canal accesible y estructurado para la consulta de información especializada y el intercambio de experiencias.
+
+---
+
+### Módulos y Funcionalidades
+
+* **Divulgación de Artículos:** Módulo para la redacción, categorización y lectura de contenido especializado en salud mental y desarrollo personal.
+* **Foro Comunitario:** Espacio estructurado por temáticas para la interacción de la comunidad mediante hilos de debate y comentarios.
+* **Gestión y Control de Accesos:** Sistema de autenticación con control de roles y permisos (usuarios, moderadores y administradores).
+* **Panel de Moderación:** Herramientas administrativas para la supervisión de contenido, revisión de envíos y métricas del sistema.
+* **Diseño Responsivo:** Interfaz optimizada para una navegación fluida en dispositivos móviles, tablets y escritorio.
+
+---
+
+### Stack Tecnológico
+
+| Capa / Área | Tecnologías |
+| :--- | :--- |
+| **Backend & Framework** | ![PHP](https://img.shields.io/badge/PHP-777BB4?style=flat-square&logo=php&logoColor=white) ![Laravel](https://img.shields.io/badge/Laravel-FF2D20?style=flat-square&logo=laravel&logoColor=white) |
+| **Frontend & UI** | ![Blade](https://img.shields.io/badge/Blade-F05340?style=flat-square&logo=laravel&logoColor=white) ![Tailwind CSS](https://img.shields.io/badge/Tailwind-06B6D4?style=flat-square&logo=tailwind-css&logoColor=white) ![Alpine.js](https://img.shields.io/badge/Alpine.js-8BC0D0?style=flat-square&logo=alpinedotjs&logoColor=white) |
+| **Base de Datos** | ![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=flat-square&logo=mysql&logoColor=white) |
+| **Control de Versiones** | ![Git](https://img.shields.io/badge/Git-F05032?style=flat-square&logo=git&logoColor=white) ![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white) |
+
+---
 
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+  <sub>Mérida, Yucatán, México</sub>
 </p>
-
-## About Laravel
-
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
-
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
-
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
-
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
-
-```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
-```
-
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
