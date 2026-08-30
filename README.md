@@ -15,8 +15,8 @@
   <h4>DEPARTAMENTO DE SISTEMAS Y COMPUTACIÓN</h4>
 
   <p>
-    <b>Proyecto:</b> Tecnologías para la Salud Humana<br>
-    <b>Equipo:</b> "A tu lado"<br>
+    <b>Categoría:</b> Tecnologías para la Salud Humana<br>
+    <b>Proyecto</b> "A tu lado"<br>
     <b>Integrantes:</b><br>
     Manuel Fernando García Pérez<br>
     Said Abdiel Canul Mirlos<br>
