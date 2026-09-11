@@ -117,12 +117,18 @@ class ClinicalEngineService
             return ['bandera_lexica' => false, 'terminos_detectados' => []];
         }
 
-        $textoNormalizado = mb_strtolower($texto, 'UTF-8');
+        $normalize = function(string $str): string {
+            $ascii = \Illuminate\Support\Str::ascii(mb_strtolower($str, 'UTF-8'));
+            return (string) preg_replace('/[^a-z0-9 ]/i', ' ', $ascii);
+        };
+
+        $textoNormalizado = $normalize($texto);
         $terminosCriticos = config('clinical.terminos_criticos', []);
         $detectados = [];
 
         foreach ($terminosCriticos as $termino) {
-            if (str_contains($textoNormalizado, mb_strtolower($termino, 'UTF-8'))) {
+            $terminoNormalizado = trim($normalize($termino));
+            if (!empty($terminoNormalizado) && str_contains($textoNormalizado, $terminoNormalizado)) {
                 $detectados[] = $termino;
             }
         }

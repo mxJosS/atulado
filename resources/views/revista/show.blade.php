@@ -17,7 +17,7 @@
   <!-- COVER IMAGE IF PRESENT -->
   @if($article->cover_image_path)
     <div style="width: 100%; max-height: 380px; border-radius: 16px; overflow: hidden; margin-bottom: 2rem; box-shadow: var(--shadow-sm);">
-      <img src="{{ $article->cover_image_path }}" alt="{{ $article->title }}" style="width: 100%; height: 100%; object-fit: cover;">
+      <img src="{{ $article->cover_image_path }}" alt="{{ $article->title }}" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy" decoding="async">
     </div>
   @endif
 
@@ -63,7 +63,7 @@
     <div style="display: flex; align-items: center; gap: 0.85rem; padding-top: 1rem; border-top: 1px solid #DCE8E0;">
       <div style="width: 50px; height: 50px; border-radius: 50%; overflow: hidden; background: linear-gradient(135deg, #0064E0 0%, #0095F6 100%); color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.2rem; box-shadow: 0 4px 12px rgba(0, 149, 246, 0.25); flex-shrink: 0;">
         @if($article->author_avatar_url)
-          <img src="{{ $article->author_avatar_url }}" alt="{{ $article->author_name }}" style="width: 100%; height: 100%; object-fit: cover;">
+          <img src="{{ $article->author_avatar_url }}" alt="{{ $article->author_name }}" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy" decoding="async">
         @else
           {{ strtoupper(substr($article->author_name, 0, 1)) }}
         @endif

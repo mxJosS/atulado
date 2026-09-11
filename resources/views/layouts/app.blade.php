@@ -13,15 +13,15 @@
   <link rel="stylesheet" href="{{ asset('css/style.css') }}?v={{ file_exists(public_path('css/style.css')) ? filemtime(public_path('css/style.css')) : time() }}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Instrument+Serif:ital@0;1&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600..700;1,9..144,400&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Instrument+Serif:ital@0;1&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   
-  <!-- FontAwesome Pro/Free Kit -->
-  <script src="https://kit.fontawesome.com/6244811c40.js" crossorigin="anonymous"></script>
+  <!-- FontAwesome Pro/Free Kit (Non-blocking deferred) -->
+  <script src="https://kit.fontawesome.com/6244811c40.js" crossorigin="anonymous" defer></script>
   
-  <!-- RPG Awesome & Game Icons Library -->
+  <!-- RPG Awesome & Game Icons Library (Deferred) -->
   <link rel="stylesheet" href="{{ asset('vendor/rpg-awesome/css/rpg-awesome.min.css') }}">
-  <script src="{{ asset('vendor/iconify/iconify-icon.min.js') }}"></script>
-  <script src="{{ asset('js/game-icons-pack.js') }}?v={{ file_exists(public_path('js/game-icons-pack.js')) ? filemtime(public_path('js/game-icons-pack.js')) : time() }}"></script>
+  <script src="{{ asset('vendor/iconify/iconify-icon.min.js') }}" defer></script>
+  <script src="{{ asset('js/game-icons-pack.js') }}?v={{ file_exists(public_path('js/game-icons-pack.js')) ? filemtime(public_path('js/game-icons-pack.js')) : time() }}" defer></script>
   @stack('styles')
 </head>
 <body style="background: #F8FAF9; color: #1A2620;">
@@ -115,11 +115,11 @@
 
       <!-- PINNED USER PROFILE & LOGOUT AT BOTTOM -->
       <div class="sidebar-footer">
-        <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
-          <a href="{{ route('profile.show') }}" class="user-profile-badge">
+        <div class="sidebar-footer-content">
+          <a href="{{ route('profile.show') }}" class="user-profile-badge" title="Ir a mi perfil">
             <div class="user-avatar-circle" style="background: #2E5D4B; overflow: hidden; padding: 0;">
               @if(auth()->user()?->avatar_url)
-                <img src="{{ auth()->user()->avatar_url }}" alt="{{ auth()->user()->name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                <img src="{{ auth()->user()->avatar_url }}" alt="{{ auth()->user()->name }}" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy" decoding="async">
               @else
                 {{ strtoupper(substr(auth()->user()?->name ?? 'U', 0, 1)) }}
               @endif
@@ -128,7 +128,7 @@
               <div class="user-name-text" style="display: flex; align-items: center; gap: 4px;">
                 <span>{{ auth()->user()?->name ?? 'Usuario' }}</span>
                 @if(auth()->user()?->isProfessional())
-                  <x-verified-badge size="14" />
+                  <x-verified-badge size="14" :popover="false" />
                 @endif
               </div>
               <div class="user-role-text">
@@ -142,10 +142,10 @@
           </a>
 
           <!-- Instant 1-Click Logout -->
-          <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
+          <form action="{{ route('logout') }}" method="POST" class="sidebar-logout-form">
             @csrf
-            <button type="submit" title="Cerrar Sesión" style="background: rgba(192, 57, 43, 0.18); border: 1px solid rgba(192, 57, 43, 0.35); color: #FFA59C; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s;">
-              <i class="fa-solid fa-arrow-right-from-bracket" style="font-size: 0.82rem;"></i>
+            <button type="submit" class="btn-sidebar-logout" title="Cerrar Sesión" aria-label="Cerrar Sesión">
+              <i class="fa-solid fa-arrow-right-from-bracket"></i>
             </button>
           </form>
         </div>

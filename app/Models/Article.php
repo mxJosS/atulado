@@ -60,7 +60,10 @@ class Article extends Model
 
     public function getAuthorAvatarUrlAttribute(): ?string
     {
-        return $this->user?->avatar_url;
+        if ($this->user_id && $this->user) {
+            return $this->user->avatar_url;
+        }
+        return null;
     }
 
     public function topicArea(): BelongsTo

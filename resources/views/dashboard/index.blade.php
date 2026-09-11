@@ -10,7 +10,7 @@
     <div style="display: flex; align-items: center; gap: 1.15rem; flex: 1; min-width: 260px;">
       <div style="width: 52px; height: 52px; min-width: 52px; min-height: 52px; max-width: 52px; max-height: 52px; border-radius: 50%; background: linear-gradient(135deg, rgba(90, 181, 110, 0.35), rgba(46, 93, 75, 0.5)); border: 2.5px solid #A8E6C0; display: flex; align-items: center; justify-content: center; font-size: 1.35rem; font-weight: 700; color: #FFFFFF; flex-shrink: 0; aspect-ratio: 1 / 1; overflow: hidden; box-shadow: 0 0 16px rgba(168, 230, 192, 0.25);">
         @if($user->avatar_url)
-          <img src="{{ $user->avatar_url }}" alt="{{ $user->name }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+          <img src="{{ $user->avatar_url }}" alt="{{ $user->name }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;" loading="lazy" decoding="async">
         @else
           <span style="line-height: 1;">{{ strtoupper(substr($user->name, 0, 1)) }}</span>
         @endif
@@ -1069,33 +1069,63 @@
 
 @push('scripts')
 <script>
-  // SENSITIVE & SUICIDAL TENDENCY WORDS FILTER (ZERO EMOJIS)
+  // SENSITIVE & SUICIDAL TENDENCY WORDS / STEMS FILTER (ACCENT & CASE AGNOSTIC)
   const SENSITIVE_KEYWORDS = [
-    'armas', 'arma', 'pistola', 'bala', 'morirme', 'quiero morir', 'no quiero vivir',
-    'suicidio', 'suicidarme', 'acabar con todo', 'hacerme daño', 'ahorcarme', 'ahorcar',
-    'cortarme', 'pastillas para dormir', 'desaparecer', 'no vale la pena vivir',
-    'matarme', 'me voy a morir', 'terminar con mi vida', 'quitarme la vida', 'ya no puedo más',
-    'autolesion', 'autolesionarme'
+    'suicid', 'suicida', 'suicidio', 'suicidios', 'suicidarme', 'suicidarse', 'suicidarte', 'suicidar',
+    'morir', 'morirme', 'morirse', 'morirte', 'quiero morir', 'deseo morir', 'desearia morir', 'muerto', 'muerta', 'no quiero vivir', 'dejar de vivir',
+    'matar', 'matarme', 'matarse', 'matarte', 'mataria', 'quitarme la vida', 'quitarse la vida', 'quitarte la vida',
+    'acabar con todo', 'acabar con mi vida', 'terminar con mi vida', 'hacerme dano', 'hacerse dano', 'hacerme dolor',
+    'ahorc', 'ahorcar', 'ahorcarme', 'ahorcarse', 'ahorcarte', 'asfixia', 'asfixiarme',
+    'cortar', 'cortarme', 'cortarse', 'cortarte', 'cortarme las venas', 'cortarme las munecas', 'desangrar', 'desangrarme',
+    'autolesi', 'autolesion', 'autolesionarme', 'autolesionarse', 'autolesiones',
+    'pastillas para dormir', 'pastillas todas', 'tomar pastillas', 'sobredosis', 'envenenar', 'envenenarme',
+    'armas', 'arma', 'pistola', 'bala', 'disparar', 'dispararme', 'pegarme un tiro', 'darme un tiro',
+    'no vale la pena vivir', 'ya no puedo mas', 'no puedo mas', 'ya no aguanto', 'no aguanto mas',
+    'desaparecer', 'no encuentro salida', 'sin salida', 'sin esperanza', 'nadie me va a extranar', 'seria mejor si no existiera', 'no debi nacer'
   ];
 
   const journalInput = document.getElementById('journal_entry');
   const crisisAlert = document.getElementById('crisisEmpathicAlert');
 
-  if (journalInput && crisisAlert) {
-    journalInput.addEventListener('input', function() {
-      const text = this.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-      let detected = false;
+  function checkSensitiveKeywords() {
+    if (!journalInput || !crisisAlert) return;
+    const rawText = journalInput.value || '';
+    const text = rawText
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?"'¡!¿]/g, " ")
+      .replace(/\s+/g, " ");
 
+    let detected = false;
+
+    if (text.trim().length > 0) {
       for (const kw of SENSITIVE_KEYWORDS) {
-        const normalizedKw = kw.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-        if (text.includes(normalizedKw)) {
+        const normalizedKw = kw
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .trim();
+
+        if (normalizedKw && text.includes(normalizedKw)) {
           detected = true;
           break;
         }
       }
+    }
 
-      crisisAlert.style.display = detected ? 'block' : 'none';
+    crisisAlert.style.display = detected ? 'block' : 'none';
+  }
+
+  if (journalInput && crisisAlert) {
+    ['input', 'keyup', 'change', 'paste', 'blur'].forEach(evt => {
+      journalInput.addEventListener(evt, () => {
+        setTimeout(checkSensitiveKeywords, 10);
+      });
     });
+    // Run on initial page load if text was already filled
+    document.addEventListener('DOMContentLoaded', checkSensitiveKeywords);
+    setTimeout(checkSensitiveKeywords, 100);
   }
 
   // Smilies selector & Emotion tag buttons

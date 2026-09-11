@@ -179,4 +179,79 @@ class ClinicalEngineTest extends TestCase
         ]);
         $resAsq->assertStatus(200)->assertJson(['success' => true]);
     }
+
+    /**
+     * Verificación del filtro léxico de palabras sensibles y raíces de crisis
+     */
+    public function test_lexical_filter_detects_suicidal_stems_and_variations(): void
+    {
+        // Caso A: 'suicidar' (caso del usuario en captura)
+        $res1 = $this->engine->analizarTextoLibre('hoy he pensado en suicidar');
+        $this->assertTrue($res1['bandera_lexica']);
+        $this->assertNotEmpty($res1['terminos_detectados']);
+
+        // Caso B: 'suicidio' con mayúsculas y acentos
+        $res2 = $this->engine->analizarTextoLibre('Tengo pensamientos de SUICÍDIO');
+        $this->assertTrue($res2['bandera_lexica']);
+
+        // Caso C: 'matarme' o 'quitarme la vida'
+        $res3 = $this->engine->analizarTextoLibre('quiero matarme porque no aguanto');
+        $this->assertTrue($res3['bandera_lexica']);
+
+        // Caso D: Texto neutro / positivo -> sin bandera
+        $res4 = $this->engine->analizarTextoLibre('Hoy fue un buen día, fui a caminar al parque');
+        $this->assertFalse($res4['bandera_lexica']);
+        $this->assertEmpty($res4['terminos_detectados']);
+    }
+
+    /**
+     * Verificación de aislamiento de foto de perfil: sólo el usuario autor real muestra su avatar
+     */
+    public function test_article_author_avatar_separation(): void
+    {
+        $userA = User::factory()->create([
+            'name' => 'Usuario A',
+            'avatar' => 'avatars/usuario_a.jpg',
+        ]);
+
+        $userB = User::factory()->create([
+            'name' => 'Usuario B',
+            'avatar' => null,
+        ]);
+
+        // Artículo del Usuario A
+        $articleA = \App\Models\Article::create([
+            'user_id' => $userA->id,
+            'title' => 'Artículo de Usuario A',
+            'slug' => 'articulo-usuario-a',
+            'author_name' => 'Usuario A',
+            'author_credentials' => 'Psicólogo',
+            'content' => 'Contenido de prueba con más de cien caracteres para cumplir con la longitud mínima requerida por el modelo de datos.',
+            'summary' => 'Resumen de prueba',
+            'publication_type' => 'divulgacion',
+            'target_audience' => 'general',
+            'is_disclaimer_accepted' => true,
+        ]);
+
+        // Artículo editorial sin user_id
+        $articleEditorial = \App\Models\Article::create([
+            'user_id' => null,
+            'title' => 'Artículo Editorial Dra. Elena',
+            'slug' => 'articulo-dra-elena',
+            'author_name' => 'Dra. Elena Vázquez',
+            'author_credentials' => 'Terapeuta Certificada',
+            'content' => 'Contenido científico editorial con más de cien caracteres para cumplir con la longitud mínima requerida por el modelo de datos.',
+            'summary' => 'Resumen editorial',
+            'publication_type' => 'revision',
+            'target_audience' => 'general',
+            'is_disclaimer_accepted' => true,
+        ]);
+
+        // El artículo de A muestra su foto
+        $this->assertNotNull($articleA->author_avatar_url);
+        $this->assertStringContainsString('usuario_a.jpg', $articleA->author_avatar_url);
+
+        // El artículo editorial NO hereda ninguna foto
+        $this->assertNull($articleEditorial->author_avatar_url);
+    }
 }

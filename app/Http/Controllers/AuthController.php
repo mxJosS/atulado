@@ -7,7 +7,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
+use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
 {
@@ -17,6 +19,69 @@ class AuthController extends Controller
             return redirect()->route('dashboard');
         }
         return view('auth.login');
+    }
+
+    public function redirectToGoogle()
+    {
+        if (empty(config('services.google.client_id')) || empty(config('services.google.client_secret'))) {
+            return redirect()->route('login')->with('error', 'El inicio de sesión con Google requiere configurar GOOGLE_CLIENT_ID y GOOGLE_CLIENT_SECRET en el archivo .env.');
+        }
+
+        try {
+            return Socialite::driver('google')->redirect();
+        } catch (\Exception $e) {
+            return redirect()->route('login')->with('error', 'No se pudo iniciar la conexión con Google: ' . $e->getMessage());
+        }
+    }
+
+    public function handleGoogleCallback(Request $request)
+    {
+        try {
+            $googleUser = Socialite::driver('google')->user();
+        } catch (\Exception $e) {
+            return redirect()->route('login')->with('error', 'Ocurrió un error o se canceló la autenticación con Google. Por favor, intenta de nuevo.');
+        }
+
+        if (!$googleUser || empty($googleUser->getEmail())) {
+            return redirect()->route('login')->with('error', 'No se pudo obtener la información de tu cuenta de Google.');
+        }
+
+        // Buscar si existe usuario por google_id o por correo electrónico
+        $user = User::where('google_id', $googleUser->getId())
+            ->orWhere('email', $googleUser->getEmail())
+            ->first();
+
+        if ($user) {
+            $user->google_id = $googleUser->getId();
+            if (empty($user->avatar) && $googleUser->getAvatar()) {
+                $user->avatar = $googleUser->getAvatar();
+            }
+            if (!$user->email_verified_at) {
+                $user->email_verified_at = now();
+            }
+            $user->save();
+        } else {
+            $user = User::create([
+                'name' => $googleUser->getName() ?: ($googleUser->getNickname() ?: 'Usuario Google'),
+                'email' => $googleUser->getEmail(),
+                'google_id' => $googleUser->getId(),
+                'avatar' => $googleUser->getAvatar(),
+                'avatar_color' => 'sage',
+                'email_verified_at' => now(),
+                'password' => Hash::make(Str::random(32)),
+            ]);
+        }
+
+        Auth::login($user, true);
+        $request->session()->regenerate();
+
+        if ($user->is_admin) {
+            return redirect()->intended(route('admin.dashboard'))
+                ->with('success', '¡Bienvenido(a) al Panel de Administración, ' . $user->name . '!');
+        }
+
+        return redirect()->intended(route('dashboard'))
+            ->with('success', '¡Bienvenido(a) a tu espacio seguro, ' . $user->name . '!');
     }
 
     public function login(Request $request)
@@ -34,8 +99,13 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
+            $user = Auth::user();
+            if ($user->is_admin) {
+                return redirect()->intended(route('admin.dashboard'))
+                    ->with('success', '¡Bienvenido al Panel de Administración, ' . $user->name . '!');
+            }
             return redirect()->intended(route('dashboard'))
-                ->with('success', '¡Bienvenido de vuelta, ' . Auth::user()->name . '!');
+                ->with('success', '¡Bienvenido de vuelta, ' . $user->name . '!');
         }
 
         return back()->withErrors([
@@ -92,7 +162,9 @@ class AuthController extends Controller
 
     public function showProfile()
     {
-        return view('dashboard.perfil', ['user' => Auth::user()]);
+        $user = Auth::user();
+        $latestVerification = $user->latestProfessionalVerification;
+        return view('dashboard.perfil', compact('user', 'latestVerification'));
     }
 
     public function updateProfile(Request $request)

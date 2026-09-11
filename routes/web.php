@@ -9,6 +9,7 @@ use App\Http\Controllers\ResourceController;
 use App\Http\Controllers\SafetyPlanController;
 use App\Http\Controllers\ToolController;
 use App\Http\Controllers\AssessmentController;
+use App\Http\Controllers\ProfessionalVerificationController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -22,10 +23,14 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/recursos', [ResourceController::class, 'index'])->name('recursos.index');
 Route::get('/recursos/{slug}', [ResourceController::class, 'show'])->name('recursos.show');
 
+// Magazine Authoring (Requires Authentication and Verified Healthcare Professional Role)
+Route::middleware(['auth', 'professional'])->group(function () {
+    Route::get('/revista/crear', [ArticleController::class, 'create'])->name('revista.create');
+    Route::post('/revista', [ArticleController::class, 'store'])->name('revista.store');
+});
+
 // Magazine (Revista & Publicaciones Científicas)
 Route::get('/revista', [ArticleController::class, 'index'])->name('revista.index');
-Route::get('/revista/crear', [ArticleController::class, 'create'])->name('revista.create');
-Route::post('/revista', [ArticleController::class, 'store'])->name('revista.store');
 Route::get('/revista/{slug}', [ArticleController::class, 'show'])->name('revista.show');
 
 // Emotional Self-check & Tools
@@ -46,6 +51,10 @@ Route::middleware('guest')->group(function () {
 
     Route::get('/registro', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/registro', [AuthController::class, 'register'])->middleware('throttle:6,1');
+
+    // Google OAuth Authentication
+    Route::get('/auth/google', [AuthController::class, 'redirectToGoogle'])->name('auth.google');
+    Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
 });
 
 /*
@@ -85,4 +94,29 @@ Route::middleware('auth')->group(function () {
     Route::get('/perfil', [AuthController::class, 'showProfile'])->name('profile.show');
     Route::put('/perfil', [AuthController::class, 'updateProfile'])->name('profile.update');
     Route::put('/perfil/password', [AuthController::class, 'updatePassword'])->name('profile.password');
+
+    // Professional Healthcare Accreditation (Client Submission)
+    Route::post('/perfil/solicitud-profesional', [ProfessionalVerificationController::class, 'store'])->name('profile.verification.store');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Admin Portal Routes (Restricted to is_admin = true)
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'index'])->name('dashboard');
+    
+    // Acreditaciones
+    Route::get('/solicitudes-profesionales', [ProfessionalVerificationController::class, 'index'])->name('verifications.index');
+    Route::get('/solicitudes-profesionales/{verification}/documento', [ProfessionalVerificationController::class, 'document'])->name('verifications.document');
+    Route::post('/solicitud-profesional/{verification}/aprobar', [ProfessionalVerificationController::class, 'approve'])->name('verification.approve');
+    Route::post('/solicitud-profesional/{verification}/rechazar', [ProfessionalVerificationController::class, 'reject'])->name('verification.reject');
+
+    // Usuarios
+    Route::get('/usuarios', [\App\Http\Controllers\Admin\AdminUserController::class, 'index'])->name('users.index');
+    Route::post('/usuarios', [\App\Http\Controllers\Admin\AdminUserController::class, 'store'])->name('users.store');
+
+    // Foros & Revista
+    Route::get('/foros', [\App\Http\Controllers\Admin\AdminForumController::class, 'index'])->name('forums.index');
 });

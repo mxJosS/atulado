@@ -18,6 +18,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'google_id',
         'password',
         'avatar',
         'avatar_color',
@@ -61,6 +62,16 @@ class User extends Authenticatable
     public function articles(): HasMany
     {
         return $this->hasMany(Article::class)->orderBy('published_at', 'desc');
+    }
+
+    public function professionalVerifications(): HasMany
+    {
+        return $this->hasMany(ProfessionalVerification::class)->orderBy('created_at', 'desc');
+    }
+
+    public function latestProfessionalVerification(): HasOne
+    {
+        return $this->hasOne(ProfessionalVerification::class)->latestOfMany();
     }
 
     public function moodLogs(): HasMany

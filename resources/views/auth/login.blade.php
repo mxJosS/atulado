@@ -46,11 +46,10 @@
       </div>
 
       <!-- GOOGLE SIGN IN BUTTON (CON LOGO OFICIAL A COLOR) -->
-      <button 
-        type="button" 
+      <a 
+        href="{{ route('auth.google') }}" 
         id="googleLoginBtn"
-        onclick="loginWithGoogleDemo()" 
-        style="width: 100%; justify-content: center; background: #FFFFFF; color: #374151; border: 1.5px solid #D1D5DB; border-radius: 12px; padding: 0.75rem 1rem; font-weight: 600; font-size: 0.92rem; display: flex; align-items: center; gap: 10px; margin-bottom: 1.25rem; transition: all 0.2s ease; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.06);"
+        style="width: 100%; justify-content: center; background: #FFFFFF; color: #374151; border: 1.5px solid #D1D5DB; border-radius: 12px; padding: 0.75rem 1rem; font-weight: 600; font-size: 0.92rem; display: flex; align-items: center; gap: 10px; margin-bottom: 1.25rem; transition: all 0.2s ease; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.06); text-decoration: none;"
         onmouseover="this.style.background='#F9FAFB'; this.style.borderColor='#9CA3AF';"
         onmouseout="this.style.background='#FFFFFF'; this.style.borderColor='#D1D5DB';"
       >
@@ -62,28 +61,13 @@
           <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
         </svg>
         <span>Acceder con Google</span>
-      </button>
+      </a>
 
       <!-- Divider -->
       <div style="display: flex; align-items: center; margin-bottom: 1.25rem; color: #8EADA4; font-size: 0.75rem; text-transform: uppercase; font-family: var(--font-mono); letter-spacing: 0.08em;">
         <div style="flex: 1; height: 1px; background: #DCE8E0;"></div>
         <span style="padding: 0 0.75rem;">o con tu correo</span>
         <div style="flex: 1; height: 1px; background: #DCE8E0;"></div>
-      </div>
-
-      <!-- Demo Account Quick-Fill Pill -->
-      <div style="background: #D4EDE2; border: 1px solid #5AB56E; border-radius: 12px; padding: 0.75rem 0.95rem; margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;">
-        <div style="font-size: 0.8rem; color: #2E5D4B;">
-          <div style="font-weight: 700; display: flex; align-items: center; gap: 6px;">
-            <i class="fa-solid fa-seedling" style="color: #3D7A5F;"></i>
-            <span>Cuenta Demo:</span>
-          </div>
-          <div style="font-family: var(--font-mono); font-size: 0.74rem; color: #2E5D4B;">demo@atulado.com.mx</div>
-        </div>
-        <button type="button" onclick="fillDemoCredentials()" class="btn btn-sm btn-primary demo-autofill-btn" style="padding: 0.35rem 0.75rem; font-size: 0.75rem; border-radius: 8px; white-space: nowrap; gap: 6px; background: #2E5D4B !important; color: #FFFFFF !important;">
-          <i class="fa-solid fa-wand-magic-sparkles"></i>
-          <span>Auto-llenar</span>
-        </button>
       </div>
 
       <!-- Login Form -->
@@ -187,18 +171,6 @@
       eyeIcon.classList.remove('fa-eye-slash');
       eyeIcon.classList.add('fa-eye');
     }
-  }
-
-  function fillDemoCredentials() {
-    document.getElementById('email').value = 'demo@atulado.com.mx';
-    document.getElementById('password').value = 'demo1234';
-  }
-
-  function loginWithGoogleDemo() {
-    // Autofill demo and submit for frictionless Google one-click access demo
-    document.getElementById('email').value = 'demo@atulado.com.mx';
-    document.getElementById('password').value = 'demo1234';
-    document.getElementById('mainLoginForm').submit();
   }
 </script>
 @endpush

@@ -162,7 +162,27 @@ class AppFlowTest extends TestCase
         $this->get('/login')
             ->assertStatus(200)
             ->assertSee('Acceder con Google')
-            ->assertSee('demo@atulado.com.mx');
+            ->assertDontSee('Cuenta Demo:')
+            ->assertDontSee('demo@atulado.com.mx');
+    }
+
+    public function test_guest_cannot_access_article_creation_or_post(): void
+    {
+        $this->get('/revista/crear')->assertRedirect('/login');
+        $this->post('/revista', ['title' => 'Intento Invalido'])->assertRedirect('/login');
+    }
+
+    public function test_unverified_regular_user_cannot_access_article_creation_or_post(): void
+    {
+        $patient = User::factory()->create(['role' => 'paciente', 'is_admin' => false]);
+
+        $this->actingAs($patient)->get('/revista/crear')
+            ->assertRedirect(route('profile.show'))
+            ->assertSessionHas('error');
+
+        $this->actingAs($patient)->post('/revista', ['title' => 'Intento no verificado'])
+            ->assertRedirect(route('profile.show'))
+            ->assertSessionHas('error');
     }
 
     public function test_user_can_publish_scientific_article(): void
@@ -243,5 +263,49 @@ class AppFlowTest extends TestCase
         $this->assertNotNull($article);
         $this->assertNotNull($article->cover_image_path);
         $this->assertStringStartsWith('/storage/articles/', $article->cover_image_path);
+    }
+
+    public function test_user_can_update_profile(): void
+    {
+        $user = User::factory()->create([
+            'name' => 'Usuario Original',
+            'email' => 'original@atulado.com.mx',
+        ]);
+
+        $response = $this->actingAs($user)->put('/perfil', [
+            'name' => 'Usuario Actualizado',
+            'email' => 'actualizado@atulado.com.mx',
+            'bio' => 'Mi nueva biografía de bienestar.',
+            'crisis_contact_name' => 'Hermana Mayor',
+            'crisis_contact_phone' => '55 9988 7766',
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'name' => 'Usuario Actualizado',
+            'email' => 'actualizado@atulado.com.mx',
+            'bio' => 'Mi nueva biografía de bienestar.',
+        ]);
+    }
+
+    public function test_user_can_update_password(): void
+    {
+        $user = User::factory()->create([
+            'password' => \Illuminate\Support\Facades\Hash::make('password123'),
+        ]);
+
+        $response = $this->actingAs($user)->put('/perfil/password', [
+            'current_password' => 'password123',
+            'password' => 'nueva_password456',
+            'password_confirmation' => 'nueva_password456',
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+
+        $user->refresh();
+        $this->assertTrue(\Illuminate\Support\Facades\Hash::check('nueva_password456', $user->password));
     }
 }

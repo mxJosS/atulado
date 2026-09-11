@@ -14,6 +14,10 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
 
+        if ($user->is_admin) {
+            return redirect()->route('admin.dashboard');
+        }
+
         // Calculate time greeting
         $hour = Carbon::now()->hour;
         if ($hour >= 5 && $hour < 12) {

@@ -21,10 +21,24 @@
 
     <!-- ACTION BUTTONS: SEARCH & PUBLISH -->
     <div style="display: flex; gap: 0.85rem; justify-content: center; align-items: center; flex-wrap: wrap;">
-      <a href="{{ route('revista.create') }}" class="btn btn-primary btn-lg" style="gap: 8px;">
-        <i class="fa-solid fa-pen-nib"></i>
-        <span>Publicar Artículo Científico</span>
-      </a>
+      @auth
+        @if(auth()->user()->isProfessional())
+          <a href="{{ route('revista.create') }}" class="btn btn-primary btn-lg" style="gap: 8px;">
+            <i class="fa-solid fa-pen-nib"></i>
+            <span>Publicar Artículo Científico</span>
+          </a>
+        @else
+          <a href="{{ route('profile.show') }}#solicitud-profesional" class="btn btn-primary btn-lg" style="gap: 8px; background: #2E5D4B;" title="Verifícate como profesional para publicar">
+            <i class="fa-solid fa-id-card-clip"></i>
+            <span>Verificarme como Profesional</span>
+          </a>
+        @endif
+      @else
+        <a href="{{ route('login') }}" class="btn btn-primary btn-lg" style="gap: 8px;" title="Inicia sesión para publicar">
+          <i class="fa-solid fa-right-to-bracket"></i>
+          <span>Acceder para Publicar</span>
+        </a>
+      @endauth
       <a href="#articulosGrid" class="btn btn-outline-white btn-lg" style="gap: 8px;">
         <i class="fa-solid fa-book-open-reader"></i>
         <span>Explorar Artículos</span>
@@ -62,10 +76,24 @@
     </form>
 
     <!-- PUBLISH BUTTON SHORTCUT -->
-    <a href="{{ route('revista.create') }}" class="btn btn-secondary btn-sm" style="gap: 6px; border-color: #5AB56E; color: #2E5D4B; font-weight: 700; border-radius: 10px;">
-      <i class="fa-solid fa-feather-pointed" style="color: #3D7A5F;"></i>
-      <span>Aporte Profesional</span>
-    </a>
+    @auth
+      @if(auth()->user()->isProfessional())
+        <a href="{{ route('revista.create') }}" class="btn btn-secondary btn-sm" style="gap: 6px; border-color: #5AB56E; color: #2E5D4B; font-weight: 700; border-radius: 10px;">
+          <i class="fa-solid fa-feather-pointed" style="color: #3D7A5F;"></i>
+          <span>Aporte Profesional</span>
+        </a>
+      @else
+        <a href="{{ route('profile.show') }}#solicitud-profesional" class="btn btn-secondary btn-sm" style="gap: 6px; border-color: #5AB56E; color: #2E5D4B; font-weight: 700; border-radius: 10px;" title="Verifícate para publicar">
+          <i class="fa-solid fa-id-card-clip" style="color: #3D7A5F;"></i>
+          <span>Acreditarme</span>
+        </a>
+      @endif
+    @else
+      <a href="{{ route('login') }}" class="btn btn-secondary btn-sm" style="gap: 6px; border-color: #5AB56E; color: #2E5D4B; font-weight: 700; border-radius: 10px;" title="Inicia sesión para publicar">
+        <i class="fa-solid fa-right-to-bracket" style="color: #3D7A5F;"></i>
+        <span>Acceder para Publicar</span>
+      </a>
+    @endauth
   </div>
 
   <!-- FEATURED ARTICLE HERO CARD -->
@@ -102,7 +130,7 @@
             <div style="display: flex; align-items: center; gap: 0.65rem;">
               <div style="width: 44px; height: 44px; border-radius: 50%; overflow: hidden; background: linear-gradient(135deg, #0064E0 0%, #0095F6 100%); color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1rem; box-shadow: 0 4px 10px rgba(0, 149, 246, 0.25); flex-shrink: 0;">
                 @if($featuredArticle->author_avatar_url)
-                  <img src="{{ $featuredArticle->author_avatar_url }}" alt="{{ $featuredArticle->author_name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                  <img src="{{ $featuredArticle->author_avatar_url }}" alt="{{ $featuredArticle->author_name }}" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy" decoding="async">
                 @else
                   {{ strtoupper(substr($featuredArticle->author_name, 0, 1)) }}
                 @endif
@@ -147,9 +175,17 @@
       <i class="fa-solid fa-newspaper" style="font-size: 2.5rem; color: #8EADA4;"></i>
       <h3 style="margin-top: 1rem; margin-bottom: 0.5rem; font-size: 1.25rem;">No se encontraron artículos</h3>
       <p style="color: #556860; font-size: 0.9rem;">Prueba con otros términos de búsqueda o publica un nuevo artículo.</p>
-      <div style="margin-top: 1.25rem; display: flex; gap: 0.75rem; justify-content: center;">
+      <div style="margin-top: 1.25rem; display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
         <a href="{{ route('revista.index') }}" class="btn btn-secondary btn-sm" style="border-radius: 10px;">Ver todos los artículos</a>
-        <a href="{{ route('revista.create') }}" class="btn btn-primary btn-sm" style="background: #1877F2; border-color: #1877F2; border-radius: 10px;">Publicar aporte profesional</a>
+        @auth
+          @if(auth()->user()->isProfessional())
+            <a href="{{ route('revista.create') }}" class="btn btn-primary btn-sm" style="border-radius: 10px;">Publicar aporte profesional</a>
+          @else
+            <a href="{{ route('profile.show') }}#solicitud-profesional" class="btn btn-primary btn-sm" style="border-radius: 10px;">Acreditarme como Profesional</a>
+          @endif
+        @else
+          <a href="{{ route('login') }}" class="btn btn-primary btn-sm" style="border-radius: 10px;">Acceder para Publicar</a>
+        @endauth
       </div>
     </div>
   @else
@@ -158,7 +194,7 @@
         <div class="article-forum-card" style="border-radius: 16px; overflow: hidden; display: flex; flex-direction: column;">
           @if($art->cover_image_path)
             <div style="height: 160px; overflow: hidden; background: #2E5D4B;">
-              <img src="{{ $art->cover_image_path }}" alt="{{ $art->title }}" style="width: 100%; height: 100%; object-fit: cover;">
+              <img src="{{ $art->cover_image_path }}" alt="{{ $art->title }}" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy" decoding="async">
             </div>
           @endif
 
@@ -191,7 +227,7 @@
               <div style="display: flex; align-items: center; gap: 0.5rem; overflow: hidden;">
                 <div style="width: 36px; height: 36px; border-radius: 50%; overflow: hidden; background: linear-gradient(135deg, #0064E0 0%, #0095F6 100%); color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 700; flex-shrink: 0;">
                   @if($art->author_avatar_url)
-                    <img src="{{ $art->author_avatar_url }}" alt="{{ $art->author_name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                    <img src="{{ $art->author_avatar_url }}" alt="{{ $art->author_name }}" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy" decoding="async">
                   @else
                     {{ strtoupper(substr($art->author_name, 0, 1)) }}
                   @endif
