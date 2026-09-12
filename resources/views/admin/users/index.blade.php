@@ -84,6 +84,10 @@
          style="padding: 0.4rem 0.85rem; border-radius: 7px; font-size: 0.82rem; font-weight: 600; text-decoration: none; {{ request('rol') === 'profesional' ? 'background: white; color: #1A2620; box-shadow: var(--shadow-xs);' : 'color: #556860;' }}">
         Profesionales ({{ $counts['profesionales'] }})
       </a>
+      <a href="{{ route('admin.users.index', array_merge(request()->except('rol', 'page'), ['rol' => 'usuario'])) }}" 
+         style="padding: 0.4rem 0.85rem; border-radius: 7px; font-size: 0.82rem; font-weight: 600; text-decoration: none; {{ request('rol') === 'usuario' ? 'background: white; color: #1A2620; box-shadow: var(--shadow-xs);' : 'color: #556860;' }}">
+        Usuarios ({{ $counts['usuarios'] }})
+      </a>
     </div>
 
     <!-- Buscador -->
@@ -152,13 +156,17 @@
 
               <!-- Rol Badge -->
               <td style="padding: 1rem 1.25rem;">
-                @if($user->is_admin)
+                @if($user->is_admin || $user->role === 'admin')
                   <span style="display: inline-flex; align-items: center; gap: 5px; padding: 0.25rem 0.65rem; border-radius: 6px; background: #1A2620; color: #A8E6C0; font-size: 0.72rem; font-weight: 700; font-family: 'IBM Plex Mono', monospace;">
                     <i class="fa-solid fa-shield"></i> Administrador
                   </span>
-                @else
+                @elseif($user->role === 'profesional')
                   <span style="display: inline-flex; align-items: center; gap: 5px; padding: 0.25rem 0.65rem; border-radius: 6px; background: #E0F2FE; color: #0369A1; font-size: 0.72rem; font-weight: 700;">
                     <i class="fa-solid fa-user-doctor"></i> Profesional
+                  </span>
+                @else
+                  <span style="display: inline-flex; align-items: center; gap: 5px; padding: 0.25rem 0.65rem; border-radius: 6px; background: #F1F5F9; color: #475569; font-size: 0.72rem; font-weight: 600;">
+                    <i class="fa-solid fa-user"></i> Usuario
                   </span>
                 @endif
               </td>
@@ -441,28 +449,42 @@
           <input type="email" name="email" id="editUserEmail" required class="form-control" style="border-radius: 9px;">
         </div>
 
-        <!-- Selector de Rol (Exclusivamente Administrador y Profesional) -->
+        <!-- Selector de Rol (Usuario | Profesional | Administrador) -->
         <div style="margin-bottom: 1.25rem;">
           <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: #2D3748; margin-bottom: 0.45rem; display: block;">
             Rol del Sistema <span style="color: #DC2626;">*</span>
           </label>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem;">
-            <label style="display: flex; align-items: flex-start; gap: 10px; padding: 0.85rem; border-radius: 10px; border: 2px solid #E2E8F0; background: white; cursor: pointer; transition: all 0.2s ease;" id="editLabelRoleAdmin">
-              <input type="radio" name="role" value="admin" id="editRoleAdmin" onchange="toggleEditRoleFields()" style="margin-top: 3px;">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.65rem;">
+            <!-- Usuario -->
+            <label style="display: flex; align-items: flex-start; gap: 8px; padding: 0.75rem; border-radius: 10px; border: 2px solid #E2E8F0; background: white; cursor: pointer; transition: all 0.2s ease;" id="editLabelRoleUser">
+              <input type="radio" name="role" value="usuario" id="editRoleUser" onchange="toggleEditRoleFields()" style="margin-top: 3px;">
               <div>
-                <div style="font-weight: 700; font-size: 0.88rem; color: #1A2620; display: flex; align-items: center; gap: 5px;">
-                  <i class="fa-solid fa-shield-halved" style="color: #2E5D4B;"></i> Administrador
+                <div style="font-weight: 700; font-size: 0.85rem; color: #1A2620; display: flex; align-items: center; gap: 4px;">
+                  <i class="fa-solid fa-user" style="color: #475569;"></i> Usuario
                 </div>
-                <div style="font-size: 0.74rem; color: #6E887E; margin-top: 2px;">Control total del sistema.</div>
+                <div style="font-size: 0.72rem; color: #6E887E; margin-top: 2px;">Cuenta estándar.</div>
               </div>
             </label>
-            <label style="display: flex; align-items: flex-start; gap: 10px; padding: 0.85rem; border-radius: 10px; border: 2px solid #E2E8F0; background: white; cursor: pointer; transition: all 0.2s ease;" id="editLabelRolePro">
+
+            <!-- Profesional -->
+            <label style="display: flex; align-items: flex-start; gap: 8px; padding: 0.75rem; border-radius: 10px; border: 2px solid #E2E8F0; background: white; cursor: pointer; transition: all 0.2s ease;" id="editLabelRolePro">
               <input type="radio" name="role" value="profesional" id="editRolePro" onchange="toggleEditRoleFields()" style="margin-top: 3px;">
               <div>
-                <div style="font-weight: 700; font-size: 0.88rem; color: #1A2620; display: flex; align-items: center; gap: 5px;">
+                <div style="font-weight: 700; font-size: 0.85rem; color: #1A2620; display: flex; align-items: center; gap: 4px;">
                   <i class="fa-solid fa-user-doctor" style="color: #0E7490;"></i> Profesional
                 </div>
-                <div style="font-size: 0.74rem; color: #6E887E; margin-top: 2px;">Especialista acreditado.</div>
+                <div style="font-size: 0.72rem; color: #6E887E; margin-top: 2px;">Acreditado.</div>
+              </div>
+            </label>
+
+            <!-- Administrador -->
+            <label style="display: flex; align-items: flex-start; gap: 8px; padding: 0.75rem; border-radius: 10px; border: 2px solid #E2E8F0; background: white; cursor: pointer; transition: all 0.2s ease;" id="editLabelRoleAdmin">
+              <input type="radio" name="role" value="admin" id="editRoleAdmin" onchange="toggleEditRoleFields()" style="margin-top: 3px;">
+              <div>
+                <div style="font-weight: 700; font-size: 0.85rem; color: #1A2620; display: flex; align-items: center; gap: 4px;">
+                  <i class="fa-solid fa-shield-halved" style="color: #2E5D4B;"></i> Admin
+                </div>
+                <div style="font-size: 0.72rem; color: #6E887E; margin-top: 2px;">Control total.</div>
               </div>
             </label>
           </div>
@@ -582,11 +604,13 @@
     document.getElementById('editUserName').value = user.name || '';
     document.getElementById('editUserEmail').value = user.email || '';
 
-    // Rol (Exclusivamente Administrador o Profesional)
+    // Rol (Administrador, Profesional o Usuario)
     if (user.is_admin || user.role === 'admin') {
       document.getElementById('editRoleAdmin').checked = true;
-    } else {
+    } else if (user.role === 'profesional') {
       document.getElementById('editRolePro').checked = true;
+    } else {
+      document.getElementById('editRoleUser').checked = true;
     }
 
     // Estado (Activo vs Pendiente)
@@ -610,19 +634,34 @@
 
   function toggleEditRoleFields() {
     const isPro = document.getElementById('editRolePro').checked;
+    const isAdmin = document.getElementById('editRoleAdmin').checked;
+    const isUser = document.getElementById('editRoleUser').checked;
     const proContainer = document.getElementById('editProFieldsContainer');
     const labelAdmin = document.getElementById('editLabelRoleAdmin');
     const labelPro = document.getElementById('editLabelRolePro');
+    const labelUser = document.getElementById('editLabelRoleUser');
 
     proContainer.style.display = isPro ? 'block' : 'none';
+
     if (isPro) {
-      labelPro.style.borderColor = '#2E5D4B';
-      labelPro.style.background = '#F0FDF4';
+      labelPro.style.borderColor = '#0E7490';
+      labelPro.style.background = '#F0FDFA';
       labelAdmin.style.borderColor = '#E2E8F0';
       labelAdmin.style.background = 'white';
-    } else {
+      labelUser.style.borderColor = '#E2E8F0';
+      labelUser.style.background = 'white';
+    } else if (isAdmin) {
       labelAdmin.style.borderColor = '#2E5D4B';
       labelAdmin.style.background = '#F8FAF9';
+      labelPro.style.borderColor = '#E2E8F0';
+      labelPro.style.background = 'white';
+      labelUser.style.borderColor = '#E2E8F0';
+      labelUser.style.background = 'white';
+    } else {
+      labelUser.style.borderColor = '#475569';
+      labelUser.style.background = '#F8FAFC';
+      labelAdmin.style.borderColor = '#E2E8F0';
+      labelAdmin.style.background = 'white';
       labelPro.style.borderColor = '#E2E8F0';
       labelPro.style.background = 'white';
     }

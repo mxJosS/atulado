@@ -14,8 +14,11 @@ class AdminDashboardController extends Controller
     public function index()
     {
         $totalUsers = User::count();
-        $totalAdmins = User::where('is_admin', true)->count();
-        $totalProfessionals = User::where('is_admin', false)->count();
+        $totalAdmins = User::where('is_admin', true)->orWhere('role', 'admin')->count();
+        $totalProfessionals = User::where('role', 'profesional')->where('is_admin', false)->count();
+        $totalRegularUsers = User::where(function ($q) {
+            $q->where('role', 'usuario')->orWhereNull('role');
+        })->where('is_admin', false)->count();
 
         $pendingVerifications = ProfessionalVerification::where('status', 'pendiente')->count();
         $approvedVerifications = ProfessionalVerification::where('status', 'aprobada')->count();
@@ -36,6 +39,7 @@ class AdminDashboardController extends Controller
             'totalUsers',
             'totalAdmins',
             'totalProfessionals',
+            'totalRegularUsers',
             'pendingVerifications',
             'approvedVerifications',
             'totalArticles',

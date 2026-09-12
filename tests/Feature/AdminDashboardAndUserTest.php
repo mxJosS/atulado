@@ -185,4 +185,75 @@ class AdminDashboardAndUserTest extends TestCase
         $response->assertRedirect(route('admin.users.index'));
         $this->assertDatabaseMissing('users', ['id' => $targetUser->id]);
     }
+
+    public function test_admin_dashboard_and_users_correctly_differentiate_regular_users_from_professionals(): void
+    {
+        $admin = User::factory()->create(['is_admin' => true, 'role' => 'admin']);
+        $regularUser = User::factory()->create([
+            'name' => 'Jose Angel Google',
+            'email' => 'iscjoseangel@gmail.com',
+            'role' => 'usuario',
+            'is_admin' => false,
+        ]);
+        $proUser = User::factory()->create([
+            'name' => 'Dra Sandra Psicologa',
+            'email' => 'sandra@atulado.com.mx',
+            'role' => 'profesional',
+            'is_admin' => false,
+            'license_number' => 'CED-123456',
+        ]);
+
+        // Dashboard test
+        $response = $this->actingAs($admin)->get('/admin/dashboard');
+        $response->assertStatus(200);
+        $response->assertViewHas('totalAdmins', 1);
+        $response->assertViewHas('totalProfessionals', 1);
+        $response->assertViewHas('totalRegularUsers', 1);
+
+        // Regular user should have "Usuario" badge in dashboard
+        $response->assertSee('iscjoseangel@gmail.com');
+        $response->assertSee('Usuario');
+
+        // Users index test
+        $indexResponse = $this->actingAs($admin)->get('/admin/usuarios');
+        $indexResponse->assertStatus(200);
+        $indexResponse->assertSee('Usuarios (1)');
+        $indexResponse->assertSee('Profesionales (1)');
+        $indexResponse->assertSee('Admins (1)');
+
+        // Filter by usuario
+        $usuarioFilterResponse = $this->actingAs($admin)->get('/admin/usuarios?rol=usuario');
+        $usuarioFilterResponse->assertSee('iscjoseangel@gmail.com');
+        $usuarioFilterResponse->assertDontSee('sandra@atulado.com.mx');
+
+        // Filter by profesional
+        $proFilterResponse = $this->actingAs($admin)->get('/admin/usuarios?rol=profesional');
+        $proFilterResponse->assertSee('sandra@atulado.com.mx');
+        $proFilterResponse->assertDontSee('iscjoseangel@gmail.com');
+    }
+
+    public function test_admin_can_update_user_to_regular_usuario_role(): void
+    {
+        $admin = User::factory()->create(['is_admin' => true]);
+        $user = User::factory()->create([
+            'name' => 'Ex Profesional',
+            'email' => 'expro@atulado.com.mx',
+            'role' => 'profesional',
+            'license_number' => 'CED-998877',
+            'institution' => 'Clinica Central',
+        ]);
+
+        $response = $this->actingAs($admin)->put("/admin/usuarios/{$user->id}", [
+            'name' => 'Usuario Estandar',
+            'email' => 'expro@atulado.com.mx',
+            'role' => 'usuario',
+            'status' => 'activo',
+        ]);
+
+        $response->assertRedirect(route('admin.users.index'));
+        $user->refresh();
+        $this->assertEquals('usuario', $user->role);
+        $this->assertNull($user->license_number);
+        $this->assertNull($user->institution);
+    }
 }

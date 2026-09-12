@@ -20,9 +20,15 @@ class AdminUserController extends Controller
 
         if ($request->filled('rol')) {
             if ($request->rol === 'admin') {
-                $query->where('is_admin', true);
+                $query->where(function ($q) {
+                    $q->where('is_admin', true)->orWhere('role', 'admin');
+                });
             } elseif ($request->rol === 'profesional') {
-                $query->where('is_admin', false);
+                $query->where('role', 'profesional')->where('is_admin', false);
+            } elseif ($request->rol === 'usuario') {
+                $query->where(function ($q) {
+                    $q->where('role', 'usuario')->orWhereNull('role');
+                })->where('is_admin', false);
             }
         }
 
@@ -39,8 +45,11 @@ class AdminUserController extends Controller
 
         $counts = [
             'todos' => User::count(),
-            'admins' => User::where('is_admin', true)->count(),
-            'profesionales' => User::where('is_admin', false)->count(),
+            'admins' => User::where('is_admin', true)->orWhere('role', 'admin')->count(),
+            'profesionales' => User::where('role', 'profesional')->where('is_admin', false)->count(),
+            'usuarios' => User::where(function ($q) {
+                $q->where('role', 'usuario')->orWhereNull('role');
+            })->where('is_admin', false)->count(),
         ];
 
         return view('admin.users.index', compact('users', 'counts'));
@@ -119,7 +128,7 @@ class AdminUserController extends Controller
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
-            'role' => ['required', 'in:admin,profesional'],
+            'role' => ['required', 'in:admin,profesional,usuario'],
             'status' => ['required', 'in:activo,pendiente'],
             'password' => ['nullable', 'string', 'min:6'],
             'license_number' => ['nullable', 'string', 'max:50'],
@@ -175,6 +184,10 @@ class AdminUserController extends Controller
             if (empty($user->professional_title)) {
                 $user->professional_title = 'Especialista en Salud Mental';
             }
+        } elseif ($role === 'usuario') {
+            $user->license_number = null;
+            $user->institution = null;
+            $user->professional_title = null;
         }
 
         $user->save();

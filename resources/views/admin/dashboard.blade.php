@@ -45,10 +45,12 @@
       <div style="font-size: 2.3rem; font-weight: 800; color: #1A2620; font-family: 'IBM Plex Mono', monospace; line-height: 1;">
         {{ $totalUsers }}
       </div>
-      <div style="margin-top: 0.85rem; font-size: 0.82rem; color: #556860; display: flex; gap: 12px;">
-        <span><strong style="color: #2E5D4B;">{{ $totalAdmins }}</strong> Administradores</span>
+      <div style="margin-top: 0.85rem; font-size: 0.82rem; color: #556860; display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+        <span><strong style="color: #2E5D4B;">{{ $totalAdmins }}</strong> Admins</span>
         <span>•</span>
         <span><strong style="color: #0E7490;">{{ $totalProfessionals }}</strong> Profesionales</span>
+        <span>•</span>
+        <span><strong style="color: #475569;">{{ $totalRegularUsers }}</strong> Usuarios</span>
       </div>
     </div>
 
@@ -190,13 +192,17 @@
             </div>
 
             <div style="flex-shrink: 0;">
-              @if($usr->is_admin)
+              @if($usr->is_admin || $usr->role === 'admin')
                 <span style="padding: 0.2rem 0.55rem; border-radius: 6px; background: #1A2620; color: #A8E6C0; font-size: 0.7rem; font-weight: 700;">
                   Admin
                 </span>
-              @else
+              @elseif($usr->role === 'profesional')
                 <span style="padding: 0.2rem 0.55rem; border-radius: 6px; background: #E0F2FE; color: #0369A1; font-size: 0.7rem; font-weight: 700;">
                   Profesional
+                </span>
+              @else
+                <span style="padding: 0.2rem 0.55rem; border-radius: 6px; background: #F1F5F9; color: #475569; font-size: 0.7rem; font-weight: 700;">
+                  Usuario
                 </span>
               @endif
             </div>
