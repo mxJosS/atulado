@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
@@ -36,52 +37,92 @@ class AuthController extends Controller
 
     public function handleGoogleCallback(Request $request)
     {
+        // 1. Manejo de errores devueltos directamente por Google en la URL
+        if ($request->has('error')) {
+            $errorCode = $request->get('error');
+            Log::warning('Google OAuth devolvió error en callback', [
+                'error' => $errorCode,
+                'error_description' => $request->get('error_description'),
+            ]);
+
+            if ($errorCode === 'access_denied') {
+                return redirect()->route('login')->with('error', 'Google denegó el acceso. Si el proyecto en Google Cloud está en "Modo de prueba", la cuenta debe registrarse en "Usuarios de prueba" o publicar la app.');
+            }
+
+            return redirect()->route('login')->with('error', 'La autenticación con Google fue cancelada o rechazada.');
+        }
+
+        // 2. Obtención de usuario desde Google con tolerancia a navegadores móviles/in-app (stateless)
         try {
-            $googleUser = Socialite::driver('google')->user();
-        } catch (\Exception $e) {
-            return redirect()->route('login')->with('error', 'Ocurrió un error o se canceló la autenticación con Google. Por favor, intenta de nuevo.');
+            $googleUser = Socialite::driver('google')->stateless()->user();
+        } catch (\Throwable $e) {
+            Log::warning('Socialite stateless falló, intentando stateful: ' . $e->getMessage());
+            try {
+                $googleUser = Socialite::driver('google')->user();
+            } catch (\Throwable $e2) {
+                Log::error('Fallo definitivo al autenticar con Google: ' . $e2->getMessage(), [
+                    'exception' => $e2,
+                ]);
+                return redirect()->route('login')->with('error', 'Ocurrió un error o se canceló la autenticación con Google. Por favor, intenta de nuevo.');
+            }
         }
 
         if (!$googleUser || empty($googleUser->getEmail())) {
             return redirect()->route('login')->with('error', 'No se pudo obtener la información de tu cuenta de Google.');
         }
 
-        // Buscar si existe usuario por google_id o por correo electrónico
-        $user = User::where('google_id', $googleUser->getId())
-            ->orWhere('email', $googleUser->getEmail())
-            ->first();
+        // 3. Procesamiento y persistencia en base de datos con captura integral de excepciones
+        try {
+            $email = strtolower(trim($googleUser->getEmail()));
+            $googleId = (string) $googleUser->getId();
+            $avatarUrl = $googleUser->getAvatar();
 
-        if ($user) {
-            $user->google_id = $googleUser->getId();
-            if (empty($user->avatar) && $googleUser->getAvatar()) {
-                $user->avatar = $googleUser->getAvatar();
+            // Buscar si existe usuario por google_id o por correo electrónico
+            $user = User::where('google_id', $googleId)
+                ->orWhere('email', $email)
+                ->first();
+
+            if ($user) {
+                $user->google_id = $googleId;
+                if (empty($user->avatar) && $avatarUrl) {
+                    $user->avatar = $avatarUrl;
+                }
+                if (!$user->email_verified_at) {
+                    $user->email_verified_at = now();
+                }
+                $user->save();
+            } else {
+                $user = User::create([
+                    'name' => $googleUser->getName() ?: ($googleUser->getNickname() ?: 'Usuario Google'),
+                    'email' => $email,
+                    'google_id' => $googleId,
+                    'avatar' => $avatarUrl,
+                    'avatar_color' => 'sage',
+                    'role' => 'usuario',
+                    'email_verified_at' => now(),
+                    'password' => Hash::make(Str::random(32)),
+                ]);
             }
-            if (!$user->email_verified_at) {
-                $user->email_verified_at = now();
+
+            Auth::login($user, true);
+            $request->session()->regenerate();
+
+            if ($user->is_admin) {
+                return redirect()->intended(route('admin.dashboard'))
+                    ->with('success', '¡Bienvenido(a) al Panel de Administración, ' . $user->name . '!');
             }
-            $user->save();
-        } else {
-            $user = User::create([
-                'name' => $googleUser->getName() ?: ($googleUser->getNickname() ?: 'Usuario Google'),
-                'email' => $googleUser->getEmail(),
-                'google_id' => $googleUser->getId(),
-                'avatar' => $googleUser->getAvatar(),
-                'avatar_color' => 'sage',
-                'email_verified_at' => now(),
-                'password' => Hash::make(Str::random(32)),
+
+            return redirect()->intended(route('dashboard'))
+                ->with('success', '¡Bienvenido(a) a tu espacio seguro, ' . $user->name . '!');
+
+        } catch (\Throwable $e) {
+            Log::error('Error crítico al procesar usuario de Google: ' . $e->getMessage(), [
+                'exception' => $e,
+                'email' => $googleUser->getEmail() ?? null,
             ]);
+
+            return redirect()->route('login')->with('error', 'Ocurrió un error al procesar tu cuenta de usuario. Por favor, intenta de nuevo o inicia con correo.');
         }
-
-        Auth::login($user, true);
-        $request->session()->regenerate();
-
-        if ($user->is_admin) {
-            return redirect()->intended(route('admin.dashboard'))
-                ->with('success', '¡Bienvenido(a) al Panel de Administración, ' . $user->name . '!');
-        }
-
-        return redirect()->intended(route('dashboard'))
-            ->with('success', '¡Bienvenido(a) a tu espacio seguro, ' . $user->name . '!');
     }
 
     public function login(Request $request)

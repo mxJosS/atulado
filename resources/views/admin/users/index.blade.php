@@ -187,7 +187,7 @@
 
               <!-- Fecha Registro -->
               <td style="padding: 1rem 1.25rem; font-size: 0.82rem; color: #556860;">
-                {{ $user->created_at ? $user->created_at->format('d/m/Y H:i') : '—' }}
+                {{ $user->created_at ? $user->created_at->format('d/m/Y') : '—' }}
               </td>
 
               <!-- Estado -->

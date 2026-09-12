@@ -256,4 +256,25 @@ class AdminDashboardAndUserTest extends TestCase
         $this->assertNull($user->license_number);
         $this->assertNull($user->institution);
     }
+
+    public function test_admin_users_index_displays_registration_date_without_time(): void
+    {
+        $admin = User::factory()->create(['is_admin' => true]);
+        $user = User::factory()->create([
+            'created_at' => now()->setDate(2026, 9, 12)->setTime(2, 16, 0),
+        ]);
+
+        $response = $this->actingAs($admin)->get('/admin/usuarios');
+        $response->assertStatus(200);
+        $response->assertSee('12/09/2026');
+        $response->assertDontSee('12/09/2026 02:16');
+    }
+
+    public function test_google_callback_handles_access_denied_gracefully(): void
+    {
+        $response = $this->get('/auth/google/callback?error=access_denied');
+
+        $response->assertRedirect(route('login'));
+        $response->assertSessionHas('error');
+    }
 }
