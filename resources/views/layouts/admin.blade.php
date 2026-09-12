@@ -162,23 +162,32 @@
 
     <!-- ════ MAIN ADMIN CONTENT CANVAS ════ -->
     <div class="dashboard-main">
-      <main class="dashboard-content" style="padding: clamp(1.2rem, 3vw, 2.5rem);">
-        
-        <!-- Top Flash Notification (Zen Toast / Banner Style) -->
-        @if (session('success'))
-          <div style="margin-bottom: 1.5rem; background: #EBF7EE; border: 1px solid #A8E6C0; border-radius: 12px; padding: 0.85rem 1.25rem; display: flex; align-items: center; gap: 10px; color: #1E4A25; font-size: 0.9rem; font-weight: 500; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
-            <i class="fa-solid fa-circle-check" style="color: #2E5D4B; font-size: 1.1rem;"></i>
+      <!-- GLOBAL FLOATING TOAST CONTAINER (Consistente con todo el sistema A tu lado) -->
+      <div id="zenToastContainer">
+        @if(session('success'))
+          <div class="zen-toast-pill success" onclick="this.remove()">
+            <i class="fa-solid fa-circle-check" style="font-size: 1.15rem; color: #1E4A25;"></i>
             <span>{{ session('success') }}</span>
+            <div class="toast-fill-bar"></div>
           </div>
         @endif
-
-        @if (session('error'))
-          <div style="margin-bottom: 1.5rem; background: #FDE8E8; border: 1px solid #F8B4B4; border-radius: 12px; padding: 0.85rem 1.25rem; display: flex; align-items: center; gap: 10px; color: #9B1C1C; font-size: 0.9rem; font-weight: 500;">
-            <i class="fa-solid fa-triangle-exclamation" style="font-size: 1.1rem;"></i>
+        @if(session('error'))
+          <div class="zen-toast-pill error" onclick="this.remove()">
+            <i class="fa-solid fa-triangle-exclamation" style="font-size: 1.15rem; color: #922B21;"></i>
             <span>{{ session('error') }}</span>
+            <div class="toast-fill-bar"></div>
           </div>
         @endif
+        @if(session('info'))
+          <div class="zen-toast-pill info" onclick="this.remove()">
+            <i class="fa-solid fa-circle-info" style="font-size: 1.15rem; color: #4A3575;"></i>
+            <span>{{ session('info') }}</span>
+            <div class="toast-fill-bar"></div>
+          </div>
+        @endif
+      </div>
 
+      <main class="dashboard-content" style="padding: clamp(1.2rem, 3vw, 2.5rem);">
         @if ($errors->any())
           <div style="margin-bottom: 1.5rem; background: #FDE8E8; border: 1px solid #F8B4B4; border-radius: 12px; padding: 1rem 1.25rem; color: #9B1C1C;">
             <div style="font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
@@ -197,6 +206,146 @@
     </div>
 
   </div>
+
+  <!-- ════ MODAL GLOBAL DE CONFIRMACIÓN Y AVISO ADMINISTRATIVO ════ -->
+  <div id="adminNoticeModal" style="display: none; position: fixed; inset: 0; background: rgba(10,20,15,0.6); z-index: 999999; backdrop-filter: blur(4px); align-items: center; justify-content: center; padding: 1.5rem;">
+    <div style="background: white; width: 100%; max-width: 440px; border-radius: 20px; box-shadow: 0 20px 45px rgba(0,0,0,0.25); overflow: hidden; border: 1px solid rgba(0,0,0,0.08); animation: zenToastDrop 0.3s cubic-bezier(0.16, 1, 0.3, 1);">
+      <div style="padding: 1.85rem 1.65rem; text-align: center;">
+        <div id="adminNoticeIconContainer" style="width: 56px; height: 56px; margin: 0 auto 1rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.45rem; background: #EBF7EE; color: #1E4A25;">
+          <i id="adminNoticeIcon" class="fa-solid fa-circle-info"></i>
+        </div>
+        <h3 id="adminNoticeTitle" style="margin: 0 0 0.5rem; font-size: 1.22rem; font-weight: 700; color: #1A2620; font-family: 'Fraunces', serif;">
+          Aviso Administrativo
+        </h3>
+        <p id="adminNoticeMessage" style="margin: 0 0 1.5rem; font-size: 0.88rem; color: #556860; line-height: 1.55;">
+          Contenido del aviso
+        </p>
+        <div style="display: flex; gap: 10px; justify-content: center;">
+          <button type="button" id="adminNoticeCancelBtn" onclick="closeAdminNoticeModal()" class="btn btn-secondary" style="border-radius: 9px; padding: 0.55rem 1.25rem; font-size: 0.85rem; font-weight: 600;">
+            Cancelar
+          </button>
+          <button type="button" id="adminNoticeConfirmBtn" class="btn btn-primary" style="border-radius: 9px; padding: 0.55rem 1.4rem; font-size: 0.85rem; font-weight: 700;">
+            Entendido
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 1. Auto-dismiss de alertas Toast tras 5 segundos con animación suave de desvanecimiento
+    function initToastAutoDismiss() {
+      document.querySelectorAll('.zen-toast-pill').forEach(function(toast) {
+        if (toast.dataset.dismissInitialized) return;
+        toast.dataset.dismissInitialized = 'true';
+
+        setTimeout(function() {
+          if (toast.isConnected) {
+            toast.classList.add('toast-leaving');
+          }
+        }, 4500);
+
+        setTimeout(function() {
+          if (toast.isConnected) {
+            toast.remove();
+          }
+        }, 5000);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', initToastAutoDismiss);
+
+    // 2. Helper Global para disparar Toast de forma programática
+    window.showZenToast = function(message, type) {
+      type = type || 'success';
+      const container = document.getElementById('zenToastContainer');
+      if (!container) return;
+
+      const toast = document.createElement('div');
+      toast.className = 'zen-toast-pill ' + type;
+      toast.onclick = function() { toast.remove(); };
+
+      let iconClass = 'fa-circle-check';
+      let iconColor = '#1E4A25';
+      if (type === 'error') {
+        iconClass = 'fa-triangle-exclamation';
+        iconColor = '#922B21';
+      } else if (type === 'info') {
+        iconClass = 'fa-circle-info';
+        iconColor = '#4A3575';
+      }
+
+      toast.innerHTML = '<i class="fa-solid ' + iconClass + '" style="font-size: 1.15rem; color: ' + iconColor + ';"></i>' +
+                        '<span>' + message + '</span>' +
+                        '<div class="toast-fill-bar"></div>';
+
+      container.appendChild(toast);
+      initToastAutoDismiss();
+    };
+
+    // 3. Helper Global para Modales de Confirmación (Reemplaza a console.log y confirm)
+    window.showAdminNoticeModal = function(options) {
+      options = options || {};
+      const modal = document.getElementById('adminNoticeModal');
+      if (!modal) return;
+
+      document.getElementById('adminNoticeTitle').textContent = options.title || 'Panel de Administración';
+      document.getElementById('adminNoticeMessage').innerHTML = options.message || '';
+
+      const iconEl = document.getElementById('adminNoticeIcon');
+      const iconCont = document.getElementById('adminNoticeIconContainer');
+      const confirmBtn = document.getElementById('adminNoticeConfirmBtn');
+      const cancelBtn = document.getElementById('adminNoticeCancelBtn');
+
+      if (options.type === 'danger') {
+        iconEl.className = 'fa-solid fa-trash-can';
+        iconCont.style.background = '#FEF2F2';
+        iconCont.style.color = '#DC2626';
+        confirmBtn.style.background = '#DC2626';
+        confirmBtn.style.borderColor = '#DC2626';
+      } else if (options.type === 'edit') {
+        iconEl.className = 'fa-solid fa-pen-to-square';
+        iconCont.style.background = '#EBF7EE';
+        iconCont.style.color = '#1E4A25';
+        confirmBtn.style.background = '#2E5D4B';
+        confirmBtn.style.borderColor = '#2E5D4B';
+      } else {
+        iconEl.className = 'fa-solid fa-circle-info';
+        iconCont.style.background = '#F0F9FF';
+        iconCont.style.color = '#0284C7';
+        confirmBtn.style.background = '#2E5D4B';
+        confirmBtn.style.borderColor = '#2E5D4B';
+      }
+
+      if (options.showCancel) {
+        cancelBtn.style.display = 'inline-flex';
+        cancelBtn.textContent = options.cancelText || 'Cancelar';
+      } else {
+        cancelBtn.style.display = 'none';
+      }
+
+      confirmBtn.textContent = options.confirmText || 'Entendido';
+      confirmBtn.onclick = function() {
+        closeAdminNoticeModal();
+        if (typeof options.onConfirm === 'function') {
+          options.onConfirm();
+        }
+      };
+
+      modal.style.display = 'flex';
+    };
+
+    window.closeAdminNoticeModal = function() {
+      const modal = document.getElementById('adminNoticeModal');
+      if (modal) modal.style.display = 'none';
+    };
+
+    document.getElementById('adminNoticeModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeAdminNoticeModal();
+      }
+    });
+  </script>
 
   @stack('scripts')
 </body>

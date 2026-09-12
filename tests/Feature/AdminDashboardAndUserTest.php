@@ -136,4 +136,53 @@ class AdminDashboardAndUserTest extends TestCase
             'reviewed_by' => $admin->id,
         ]);
     }
+
+    public function test_admin_can_update_user_and_activate_status(): void
+    {
+        $admin = User::factory()->create(['is_admin' => true]);
+        $user = User::factory()->create([
+            'name' => 'Usuario Pendiente',
+            'email' => 'pendiente@atulado.com.mx',
+            'email_verified_at' => null,
+            'role' => 'paciente',
+        ]);
+
+        $response = $this->actingAs($admin)->put("/admin/usuarios/{$user->id}", [
+            'name' => 'Usuario Activado',
+            'email' => 'activado@atulado.com.mx',
+            'role' => 'profesional',
+            'status' => 'activo',
+            'license_number' => 'CED-998877',
+            'institution' => 'Hospital Psiquiátrico Fray Bernardino',
+        ]);
+
+        $response->assertRedirect(route('admin.users.index'));
+        $user->refresh();
+        $this->assertEquals('Usuario Activado', $user->name);
+        $this->assertEquals('activado@atulado.com.mx', $user->email);
+        $this->assertEquals('profesional', $user->role);
+        $this->assertNotNull($user->email_verified_at);
+        $this->assertEquals('CED-998877', $user->license_number);
+    }
+
+    public function test_admin_cannot_delete_themselves(): void
+    {
+        $admin = User::factory()->create(['is_admin' => true]);
+
+        $response = $this->actingAs($admin)->delete("/admin/usuarios/{$admin->id}");
+
+        $response->assertRedirect();
+        $this->assertDatabaseHas('users', ['id' => $admin->id]);
+    }
+
+    public function test_admin_can_delete_another_user(): void
+    {
+        $admin = User::factory()->create(['is_admin' => true]);
+        $targetUser = User::factory()->create(['is_admin' => false]);
+
+        $response = $this->actingAs($admin)->delete("/admin/usuarios/{$targetUser->id}");
+
+        $response->assertRedirect(route('admin.users.index'));
+        $this->assertDatabaseMissing('users', ['id' => $targetUser->id]);
+    }
 }

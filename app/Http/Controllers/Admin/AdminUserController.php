@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 
 class AdminUserController extends Controller
@@ -21,9 +22,7 @@ class AdminUserController extends Controller
             if ($request->rol === 'admin') {
                 $query->where('is_admin', true);
             } elseif ($request->rol === 'profesional') {
-                $query->where('role', 'profesional')->where('is_admin', false);
-            } elseif ($request->rol === 'paciente') {
-                $query->where('role', '!=', 'profesional')->where('is_admin', false);
+                $query->where('is_admin', false);
             }
         }
 
@@ -41,8 +40,7 @@ class AdminUserController extends Controller
         $counts = [
             'todos' => User::count(),
             'admins' => User::where('is_admin', true)->count(),
-            'profesionales' => User::where('role', 'profesional')->where('is_admin', false)->count(),
-            'pacientes' => User::where('role', '!=', 'profesional')->where('is_admin', false)->count(),
+            'profesionales' => User::where('is_admin', false)->count(),
         ];
 
         return view('admin.users.index', compact('users', 'counts'));
@@ -113,6 +111,99 @@ class AdminUserController extends Controller
         });
 
         return redirect()->route('admin.users.index')
-            ->with('success', 'Usuario dado de alta exitosamente' . ($role === 'profesional' ? ' y validado como Profesional de la Salud.' : '.'));
+            ->with('success', 'Usuario creado Exitosamente');
+    }
+
+    public function update(Request $request, User $user)
+    {
+        $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
+            'role' => ['required', 'in:admin,profesional'],
+            'status' => ['required', 'in:activo,pendiente'],
+            'password' => ['nullable', 'string', 'min:6'],
+            'license_number' => ['nullable', 'string', 'max:50'],
+            'institution' => ['nullable', 'string', 'max:150'],
+        ], [
+            'name.required' => 'El nombre es obligatorio.',
+            'email.required' => 'El correo electrónico es obligatorio.',
+            'email.unique' => 'Este correo electrónico ya está registrado por otro usuario.',
+            'password.min' => 'La nueva contraseña debe tener al menos 6 caracteres.',
+            'role.required' => 'El rol del usuario es obligatorio.',
+            'status.required' => 'El estado de la cuenta es obligatorio.',
+        ]);
+
+        // 1. Prohibir degradarse a sí mismo si es el admin actual
+        if ($user->id === Auth::id() && $request->role !== 'admin') {
+            return back()->with('error', 'No puedes quitarte los permisos de administrador a ti mismo.');
+        }
+
+        // 2. Prohibir degradar al único administrador del sistema
+        if ($user->is_admin && $request->role !== 'admin' && User::where('is_admin', true)->where('id', '!=', $user->id)->count() === 0) {
+            return back()->with('error', 'No es posible cambiar el rol al único administrador del sistema.');
+        }
+
+        $isAdmin = $request->role === 'admin';
+        $role = $request->role;
+
+        $user->name = trim($request->name);
+        $user->email = trim($request->email);
+        $user->is_admin = $isAdmin;
+        $user->role = $role;
+
+        // Gestión del Estado (Activo vs Pendiente)
+        if ($request->status === 'activo') {
+            if (!$user->email_verified_at) {
+                $user->email_verified_at = now();
+            }
+        } elseif ($request->status === 'pendiente') {
+            // No permitir suspenderse al admin actual
+            if ($user->id !== Auth::id()) {
+                $user->email_verified_at = null;
+            }
+        }
+
+        // Cambio de contraseña opcional
+        if (!empty($request->password)) {
+            $user->password = Hash::make($request->password);
+        }
+
+        // Campos específicos de profesional
+        if ($role === 'profesional') {
+            $user->license_number = trim($request->license_number ?? '');
+            $user->institution = trim($request->institution ?? '');
+            if (empty($user->professional_title)) {
+                $user->professional_title = 'Especialista en Salud Mental';
+            }
+        }
+
+        $user->save();
+
+        return redirect()->route('admin.users.index')
+            ->with('success', 'Usuario "' . $user->name . '" actualizado exitosamente.');
+    }
+
+    public function destroy(User $user)
+    {
+        // 1. Prohibir auto-eliminación
+        if ($user->id === Auth::id()) {
+            return back()->with('error', 'No puedes eliminar tu propia cuenta de administrador.');
+        }
+
+        // 2. Prohibir eliminar al único administrador del sistema
+        if ($user->is_admin && User::where('is_admin', true)->where('id', '!=', $user->id)->count() === 0) {
+            return back()->with('error', 'No es posible eliminar al único administrador del sistema.');
+        }
+
+        $userName = $user->name;
+
+        DB::transaction(function () use ($user) {
+            // Purgar sesiones activas del usuario
+            DB::table('sessions')->where('user_id', $user->id)->delete();
+            $user->delete();
+        });
+
+        return redirect()->route('admin.users.index')
+            ->with('success', 'Usuario "' . $userName . '" eliminado exitosamente.');
     }
 }

@@ -227,9 +227,13 @@
                 @if($v->status === 'pendiente')
                   <div style="display: flex; align-items: center; gap: 8px;">
                     <!-- APROBAR (Icon-only) -->
-                    <form method="POST" action="{{ route('admin.verification.approve', $v) }}" style="margin: 0;" onsubmit="return confirm('¿Confirmas que la cédula y credenciales de {{ $v->full_name }} han sido validadas oficialmente? El usuario recibirá la insignia y el rol de Profesional.');">
+                    <form id="approveForm-{{ $v->id }}" method="POST" action="{{ route('admin.verification.approve', $v) }}" style="margin: 0;">
                       @csrf
-                      <button type="submit" class="btn btn-primary" title="Aprobar y Acreditar Oficialmente" style="width: 40px; height: 40px; padding: 0; border-radius: 10px; background: #2E5D4B; border-color: #2E5D4B; display: flex; align-items: center; justify-content: center; font-size: 1.05rem; box-shadow: 0 4px 12px rgba(46,93,75,0.25); transition: all 0.2s ease;">
+                      <button type="button" 
+                              onclick="confirmAcreditation('approveForm-{{ $v->id }}', '{{ addslashes($v->full_name) }}')" 
+                              class="btn btn-primary" 
+                              title="Aprobar y Acreditar Oficialmente" 
+                              style="width: 40px; height: 40px; padding: 0; border-radius: 10px; background: #2E5D4B; border-color: #2E5D4B; display: flex; align-items: center; justify-content: center; font-size: 1.05rem; box-shadow: 0 4px 12px rgba(46,93,75,0.25); transition: all 0.2s ease;">
                         <i class="fa-solid fa-check"></i>
                       </button>
                     </form>
@@ -283,6 +287,20 @@
     if (box) {
       box.style.display = box.style.display === 'none' ? 'block' : 'none';
     }
+  }
+
+  function confirmAcreditation(formId, fullName) {
+    showAdminNoticeModal({
+      title: 'Acreditar Profesional de la Salud',
+      message: '¿Confirmas que la cédula y credenciales de <strong>' + fullName + '</strong> han sido validadas oficialmente?<br><br>El usuario recibirá la insignia verificada y el rol de <strong>Profesional</strong>.',
+      type: 'edit',
+      showCancel: true,
+      cancelText: 'Cancelar',
+      confirmText: 'Aprobar Cédula',
+      onConfirm: function() {
+        document.getElementById(formId).submit();
+      }
+    });
   }
 </script>
 @endpush

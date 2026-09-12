@@ -1,6 +1,49 @@
-﻿@extends('layouts.admin')
+@extends('layouts.admin')
 
 @section('title', 'Gestión y Alta de Usuarios — Consola Administrador')
+
+@push('styles')
+<style>
+  .btn-user-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 0.35rem 0.65rem;
+    border-radius: 8px;
+    font-size: 0.76rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    border: 1px solid transparent;
+    text-decoration: none;
+    line-height: 1.2;
+  }
+  .btn-user-edit {
+    background: #F0FDF4;
+    color: #166534;
+    border-color: #BBF7D0;
+  }
+  .btn-user-edit:hover {
+    background: #DCFCE7;
+    color: #14532D;
+    border-color: #86EFAC;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(22, 101, 52, 0.12);
+  }
+  .btn-user-delete {
+    background: #FEF2F2;
+    color: #991B1B;
+    border-color: #FECACA;
+  }
+  .btn-user-delete:hover {
+    background: #FEE2E2;
+    color: #7F1D1D;
+    border-color: #FCA5A5;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(153, 27, 27, 0.12);
+  }
+</style>
+@endpush
 
 @section('content')
 <div style="max-width: 1140px; margin: 0 auto;">
@@ -41,10 +84,6 @@
          style="padding: 0.4rem 0.85rem; border-radius: 7px; font-size: 0.82rem; font-weight: 600; text-decoration: none; {{ request('rol') === 'profesional' ? 'background: white; color: #1A2620; box-shadow: var(--shadow-xs);' : 'color: #556860;' }}">
         Profesionales ({{ $counts['profesionales'] }})
       </a>
-      <a href="{{ route('admin.users.index', array_merge(request()->except('rol', 'page'), ['rol' => 'paciente'])) }}" 
-         style="padding: 0.4rem 0.85rem; border-radius: 7px; font-size: 0.82rem; font-weight: 600; text-decoration: none; {{ request('rol') === 'paciente' ? 'background: white; color: #1A2620; box-shadow: var(--shadow-xs);' : 'color: #556860;' }}">
-        Pacientes ({{ $counts['pacientes'] }})
-      </a>
     </div>
 
     <!-- Buscador -->
@@ -78,7 +117,8 @@
             <th style="padding: 1rem 1.25rem;">Rol</th>
             <th style="padding: 1rem 1.25rem;">Cédula / Especialidad</th>
             <th style="padding: 1rem 1.25rem;">Fecha Registro</th>
-            <th style="padding: 1rem 1.25rem; text-align: right;">Estado</th>
+            <th style="padding: 1rem 1.25rem; text-align: center;">Estado</th>
+            <th style="padding: 1rem 1.25rem; text-align: right;">Acciones</th>
           </tr>
         </thead>
         <tbody style="divide-y: 1px solid rgba(0,0,0,0.04);">
@@ -116,13 +156,9 @@
                   <span style="display: inline-flex; align-items: center; gap: 5px; padding: 0.25rem 0.65rem; border-radius: 6px; background: #1A2620; color: #A8E6C0; font-size: 0.72rem; font-weight: 700; font-family: 'IBM Plex Mono', monospace;">
                     <i class="fa-solid fa-shield"></i> Administrador
                   </span>
-                @elseif($user->role === 'profesional')
+                @else
                   <span style="display: inline-flex; align-items: center; gap: 5px; padding: 0.25rem 0.65rem; border-radius: 6px; background: #E0F2FE; color: #0369A1; font-size: 0.72rem; font-weight: 700;">
                     <i class="fa-solid fa-user-doctor"></i> Profesional
-                  </span>
-                @else
-                  <span style="display: inline-flex; align-items: center; gap: 5px; padding: 0.25rem 0.65rem; border-radius: 6px; background: #F3F4F6; color: #4B5563; font-size: 0.72rem; font-weight: 600;">
-                    Paciente / General
                   </span>
                 @endif
               </td>
@@ -147,7 +183,7 @@
               </td>
 
               <!-- Estado -->
-              <td style="padding: 1rem 1.25rem; text-align: right;">
+              <td style="padding: 1rem 1.25rem; text-align: center;">
                 @if($user->email_verified_at)
                   <span style="color: #059669; font-size: 0.78rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
                     <i class="fa-solid fa-circle" style="font-size: 0.45rem;"></i> Activo
@@ -158,10 +194,42 @@
                   </span>
                 @endif
               </td>
+
+              <!-- Acciones (Editar, Eliminar) -->
+              <td style="padding: 1rem 1.25rem; text-align: right;">
+                <div style="display: inline-flex; align-items: center; gap: 6px; justify-content: flex-end;">
+                  <button type="button" 
+                          onclick="openEditUserModal({{ json_encode([
+                              'id' => $user->id,
+                              'name' => $user->name,
+                              'email' => $user->email,
+                              'role' => $user->role,
+                              'is_admin' => $user->is_admin,
+                              'status' => $user->email_verified_at ? 'activo' : 'pendiente',
+                              'license_number' => $user->license_number ?? '',
+                              'institution' => $user->institution ?? '',
+                              'is_self' => $user->id === auth()->id(),
+                          ]) }})"
+                          class="btn-user-action btn-user-edit"
+                          title="Editar usuario"
+                          aria-label="Editar usuario">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                    <span>Editar</span>
+                  </button>
+                  <button type="button" 
+                          onclick="confirmDeleteUser({{ $user->id }}, '{{ addslashes($user->name) }}', '{{ addslashes($user->email) }}', {{ $user->id === auth()->id() ? 'true' : 'false' }})"
+                          class="btn-user-action btn-user-delete"
+                          title="Eliminar usuario"
+                          aria-label="Eliminar usuario">
+                    <i class="fa-solid fa-trash-can"></i>
+                    <span>Eliminar</span>
+                  </button>
+                </div>
+              </td>
             </tr>
           @empty
             <tr>
-              <td colspan="5" style="text-align: center; padding: 3rem; color: #6E887E;">
+              <td colspan="6" style="text-align: center; padding: 3rem; color: #6E887E;">
                 <i class="fa-solid fa-magnifying-glass" style="font-size: 2rem; color: #CBD5E1; margin-bottom: 0.75rem; display: block;"></i>
                 No se encontraron usuarios con los criterios de búsqueda especificados.
               </td>
@@ -332,8 +400,144 @@
   </div>
 </div>
 
+<!-- ════ MODAL: EDITAR USUARIO ════ -->
+<div id="editUserModal" style="display: none; position: fixed; inset: 0; background: rgba(10,20,15,0.6); z-index: 9999; backdrop-filter: blur(4px); align-items: center; justify-content: center; padding: 1.5rem;">
+  <div style="background: white; width: 100%; max-width: 580px; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.25); overflow: hidden; border: 1px solid rgba(0,0,0,0.08); max-height: 90vh; display: flex; flex-direction: column;">
+    
+    <!-- Modal Header -->
+    <div style="padding: 1.35rem 1.75rem; background: #F8FAF9; border-bottom: 1px solid rgba(0,0,0,0.06); display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <h3 style="margin: 0; font-size: 1.25rem; font-weight: 700; color: #1A2620; font-family: 'Fraunces', serif;">
+          Editar Usuario
+        </h3>
+        <p style="margin: 3px 0 0; font-size: 0.82rem; color: #6E887E;">
+          Modifica los accesos, rol y estado de la cuenta en el sistema.
+        </p>
+      </div>
+      <button type="button" onclick="closeEditUserModal()" style="background: transparent; border: none; font-size: 1.2rem; color: #8CA399; cursor: pointer; padding: 4px;">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <!-- Modal Body -->
+    <div style="padding: 1.75rem; overflow-y: auto;">
+      <form id="editUserForm" method="POST" action="">
+        @csrf
+        @method('PUT')
+
+        <!-- Nombre Completo -->
+        <div style="margin-bottom: 1.15rem;">
+          <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: #2D3748; margin-bottom: 0.4rem; display: block;">
+            Nombre Completo <span style="color: #DC2626;">*</span>
+          </label>
+          <input type="text" name="name" id="editUserName" required class="form-control" style="border-radius: 9px;">
+        </div>
+
+        <!-- Correo Electrónico -->
+        <div style="margin-bottom: 1.15rem;">
+          <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: #2D3748; margin-bottom: 0.4rem; display: block;">
+            Correo Electrónico <span style="color: #DC2626;">*</span>
+          </label>
+          <input type="email" name="email" id="editUserEmail" required class="form-control" style="border-radius: 9px;">
+        </div>
+
+        <!-- Selector de Rol (Exclusivamente Administrador y Profesional) -->
+        <div style="margin-bottom: 1.25rem;">
+          <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: #2D3748; margin-bottom: 0.45rem; display: block;">
+            Rol del Sistema <span style="color: #DC2626;">*</span>
+          </label>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem;">
+            <label style="display: flex; align-items: flex-start; gap: 10px; padding: 0.85rem; border-radius: 10px; border: 2px solid #E2E8F0; background: white; cursor: pointer; transition: all 0.2s ease;" id="editLabelRoleAdmin">
+              <input type="radio" name="role" value="admin" id="editRoleAdmin" onchange="toggleEditRoleFields()" style="margin-top: 3px;">
+              <div>
+                <div style="font-weight: 700; font-size: 0.88rem; color: #1A2620; display: flex; align-items: center; gap: 5px;">
+                  <i class="fa-solid fa-shield-halved" style="color: #2E5D4B;"></i> Administrador
+                </div>
+                <div style="font-size: 0.74rem; color: #6E887E; margin-top: 2px;">Control total del sistema.</div>
+              </div>
+            </label>
+            <label style="display: flex; align-items: flex-start; gap: 10px; padding: 0.85rem; border-radius: 10px; border: 2px solid #E2E8F0; background: white; cursor: pointer; transition: all 0.2s ease;" id="editLabelRolePro">
+              <input type="radio" name="role" value="profesional" id="editRolePro" onchange="toggleEditRoleFields()" style="margin-top: 3px;">
+              <div>
+                <div style="font-weight: 700; font-size: 0.88rem; color: #1A2620; display: flex; align-items: center; gap: 5px;">
+                  <i class="fa-solid fa-user-doctor" style="color: #0E7490;"></i> Profesional
+                </div>
+                <div style="font-size: 0.74rem; color: #6E887E; margin-top: 2px;">Especialista acreditado.</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Estado de la Cuenta (Activo vs Pendiente) -->
+        <div style="margin-bottom: 1.25rem;">
+          <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: #2D3748; margin-bottom: 0.45rem; display: block;">
+            Estado de Verificación de la Cuenta <span style="color: #DC2626;">*</span>
+          </label>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+            <label style="display: flex; align-items: center; gap: 8px; padding: 0.65rem 0.85rem; border-radius: 9px; border: 1.5px solid #A7F3D0; background: #ECFDF5; cursor: pointer; font-size: 0.82rem; font-weight: 700; color: #065F46;">
+              <input type="radio" name="status" value="activo" id="editStatusActivo">
+              <i class="fa-solid fa-circle-check" style="color: #059669;"></i>
+              <span>Activo (Verificado)</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px; padding: 0.65rem 0.85rem; border-radius: 9px; border: 1.5px solid #FDE68A; background: #FFFBEB; cursor: pointer; font-size: 0.82rem; font-weight: 700; color: #92400E;">
+              <input type="radio" name="status" value="pendiente" id="editStatusPendiente">
+              <i class="fa-solid fa-hourglass-half" style="color: #D97706;"></i>
+              <span>Pendiente</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Campos de Profesional (Cédula / Institución) -->
+        <div id="editProFieldsContainer" style="display: none; margin-bottom: 1.25rem; background: #F0FDF4; padding: 1rem; border-radius: 10px; border: 1px solid #BBF7D0;">
+          <div style="margin-bottom: 0.85rem;">
+            <label class="form-label" style="font-size: 0.8rem; font-weight: 700; color: #166534; margin-bottom: 0.35rem; display: block;">
+              Número de Cédula Profesional
+            </label>
+            <input type="text" name="license_number" id="editUserLicense" class="form-control" placeholder="Ej. 12345678" style="border-radius: 9px; background: white;">
+          </div>
+          <div>
+            <label class="form-label" style="font-size: 0.8rem; font-weight: 700; color: #166534; margin-bottom: 0.35rem; display: block;">
+              Institución Universitaria / Hospital (Opcional)
+            </label>
+            <input type="text" name="institution" id="editUserInstitution" class="form-control" placeholder="Ej. UNAM" style="border-radius: 9px; background: white;">
+          </div>
+        </div>
+
+        <!-- Nueva Contraseña (Opcional) -->
+        <div style="margin-bottom: 1.5rem;">
+          <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: #2D3748; margin-bottom: 0.4rem; display: block;">
+            Restablecer Contraseña (Opcional)
+          </label>
+          <input type="password" name="password" placeholder="Dejar en blanco para conservar la actual" class="form-control" style="border-radius: 9px;">
+          <span style="font-size: 0.74rem; color: #6E887E; margin-top: 3px; display: block;">Si escribes una nueva contraseña, debe tener al menos 6 caracteres.</span>
+        </div>
+
+        <!-- Botones de Acción -->
+        <div style="display: flex; justify-content: flex-end; gap: 10px; padding-top: 1.25rem; border-top: 1px solid rgba(0,0,0,0.06);">
+          <button type="button" onclick="closeEditUserModal()" class="btn btn-secondary" style="border-radius: 9px; padding: 0.65rem 1.25rem;">
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn-primary" style="border-radius: 9px; padding: 0.65rem 1.45rem; font-weight: 700;">
+            <i class="fa-solid fa-floppy-disk"></i>
+            <span>Guardar Cambios</span>
+          </button>
+        </div>
+
+      </form>
+    </div>
+
+  </div>
+</div>
+
+<!-- Formulario Oculto para Eliminar Usuarios -->
+<form id="globalDeleteUserForm" method="POST" action="" style="display: none;">
+  @csrf
+  @method('DELETE')
+</form>
+
 @push('scripts')
 <script>
+  // ── Modal Crear Usuario ──────────────────────────────
   function openUserModal() {
     document.getElementById('userModal').style.display = 'flex';
     toggleRoleFields();
@@ -370,6 +574,87 @@
     }
   }
 
+  // ── Modal Editar Usuario ──────────────────────────────
+  function openEditUserModal(user) {
+    const form = document.getElementById('editUserForm');
+    form.action = '/admin/usuarios/' + user.id;
+
+    document.getElementById('editUserName').value = user.name || '';
+    document.getElementById('editUserEmail').value = user.email || '';
+
+    // Rol (Exclusivamente Administrador o Profesional)
+    if (user.is_admin || user.role === 'admin') {
+      document.getElementById('editRoleAdmin').checked = true;
+    } else {
+      document.getElementById('editRolePro').checked = true;
+    }
+
+    // Estado (Activo vs Pendiente)
+    if (user.status === 'activo') {
+      document.getElementById('editStatusActivo').checked = true;
+    } else {
+      document.getElementById('editStatusPendiente').checked = true;
+    }
+
+    // Profesional
+    document.getElementById('editUserLicense').value = user.license_number || '';
+    document.getElementById('editUserInstitution').value = user.institution || '';
+
+    toggleEditRoleFields();
+    document.getElementById('editUserModal').style.display = 'flex';
+  }
+
+  function closeEditUserModal() {
+    document.getElementById('editUserModal').style.display = 'none';
+  }
+
+  function toggleEditRoleFields() {
+    const isPro = document.getElementById('editRolePro').checked;
+    const proContainer = document.getElementById('editProFieldsContainer');
+    const labelAdmin = document.getElementById('editLabelRoleAdmin');
+    const labelPro = document.getElementById('editLabelRolePro');
+
+    proContainer.style.display = isPro ? 'block' : 'none';
+    if (isPro) {
+      labelPro.style.borderColor = '#2E5D4B';
+      labelPro.style.background = '#F0FDF4';
+      labelAdmin.style.borderColor = '#E2E8F0';
+      labelAdmin.style.background = 'white';
+    } else {
+      labelAdmin.style.borderColor = '#2E5D4B';
+      labelAdmin.style.background = '#F8FAF9';
+      labelPro.style.borderColor = '#E2E8F0';
+      labelPro.style.background = 'white';
+    }
+  }
+
+  // ── Eliminar Usuario con Modal de Confirmación ────────
+  function confirmDeleteUser(userId, userName, userEmail, isSelf) {
+    if (isSelf) {
+      showAdminNoticeModal({
+        title: 'Acción No Permitida',
+        message: 'No puedes eliminar tu propia cuenta de administrador en sesión.',
+        type: 'danger',
+        confirmText: 'Entendido'
+      });
+      return;
+    }
+
+    showAdminNoticeModal({
+      title: 'Confirmar Eliminación',
+      message: '¿Estás seguro de que deseas eliminar permanentemente al usuario <strong>' + userName + '</strong> (' + userEmail + ')?<br><br><span style="color: #DC2626; font-size: 0.82rem; font-weight: 600;"><i class="fa-solid fa-triangle-exclamation"></i> Se eliminarán sus accesos y registros asociados. Esta acción es irreversible.</span>',
+      type: 'danger',
+      showCancel: true,
+      cancelText: 'Cancelar',
+      confirmText: 'Sí, Eliminar Usuario',
+      onConfirm: function() {
+        const form = document.getElementById('globalDeleteUserForm');
+        form.action = '/admin/usuarios/' + userId;
+        form.submit();
+      }
+    });
+  }
+
   // Si hay error en validación previa abrir modal automáticamente
   @if($errors->any() && (old('first_name') || old('email')))
     document.addEventListener('DOMContentLoaded', function() {
@@ -379,9 +664,10 @@
 
   // Cerrar al dar click fuera
   document.getElementById('userModal').addEventListener('click', function(e) {
-    if (e.target === this) {
-      closeUserModal();
-    }
+    if (e.target === this) closeUserModal();
+  });
+  document.getElementById('editUserModal').addEventListener('click', function(e) {
+    if (e.target === this) closeEditUserModal();
   });
 </script>
 @endpush

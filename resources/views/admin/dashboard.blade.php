@@ -46,7 +46,7 @@
         {{ $totalUsers }}
       </div>
       <div style="margin-top: 0.85rem; font-size: 0.82rem; color: #556860; display: flex; gap: 12px;">
-        <span><strong style="color: #2E5D4B;">{{ $totalPatients }}</strong> Pacientes</span>
+        <span><strong style="color: #2E5D4B;">{{ $totalAdmins }}</strong> Administradores</span>
         <span>•</span>
         <span><strong style="color: #0E7490;">{{ $totalProfessionals }}</strong> Profesionales</span>
       </div>
@@ -194,13 +194,9 @@
                 <span style="padding: 0.2rem 0.55rem; border-radius: 6px; background: #1A2620; color: #A8E6C0; font-size: 0.7rem; font-weight: 700;">
                   Admin
                 </span>
-              @elseif($usr->role === 'profesional')
+              @else
                 <span style="padding: 0.2rem 0.55rem; border-radius: 6px; background: #E0F2FE; color: #0369A1; font-size: 0.7rem; font-weight: 700;">
                   Profesional
-                </span>
-              @else
-                <span style="padding: 0.2rem 0.55rem; border-radius: 6px; background: #F3F4F6; color: #4B5563; font-size: 0.7rem; font-weight: 600;">
-                  Paciente
                 </span>
               @endif
             </div>
