@@ -230,7 +230,10 @@
                 @endif
               </td>
               <td style="padding: 1rem; text-align: right;">
-                <div style="display: flex; gap: 6px; justify-content: flex-end;">
+                <div style="display: flex; gap: 6px; justify-content: flex-end; align-items: center;">
+                  <a href="{{ route('admin.structure.index') }}?inst={{ $inst['id'] }}&action=new_user" class="btn btn-sm" style="padding: 5px 10px; font-size: 0.8rem; background: #E8F5E9; color: #1B5E20; border-radius: 6px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;" title="Dar de alta nuevo colaborador">
+                    <i class="fa-solid fa-user-plus"></i> + Colaborador
+                  </a>
                   <a href="{{ route('admin.institutions.show', $inst['id']) }}" class="btn btn-sm" style="padding: 5px 10px; font-size: 0.8rem; background: #EEF4F0; color: #2E5D4B; border-radius: 6px; text-decoration: none; font-weight: 600;" title="Ver semáforo y detalle">
                     <i class="fa-solid fa-chart-pie"></i> Detalle
                   </a>

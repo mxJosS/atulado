@@ -152,6 +152,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/altas-estructura/importar-csv', [\App\Http\Controllers\Admin\AdminInstitutionController::class, 'importCsv'])->name('structure.import');
     Route::post('/altas-estructura/areas', [\App\Http\Controllers\Admin\AdminInstitutionController::class, 'storeArea'])->name('structure.area.store');
     Route::post('/altas-estructura/areas/eliminar', [\App\Http\Controllers\Admin\AdminInstitutionController::class, 'destroyArea'])->name('structure.area.destroy');
+    Route::post('/altas-estructura/colaboradores', [\App\Http\Controllers\Admin\AdminInstitutionController::class, 'storeCollaborator'])->name('structure.collaborator.store');
+    Route::post('/altas-estructura/colaboradores/eliminar', [\App\Http\Controllers\Admin\AdminInstitutionController::class, 'destroyCollaborator'])->name('structure.collaborator.destroy');
     Route::get('/vista-cliente', [\App\Http\Controllers\Admin\AdminInstitutionController::class, 'clientView'])->name('client-view.index');
 
     // Centro de Reportes & Visor PDF

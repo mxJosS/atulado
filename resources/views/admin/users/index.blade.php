@@ -150,6 +150,17 @@
                     <div style="font-size: 0.78rem; color: #6E887E;">
                       {{ $user->email }}
                     </div>
+                    @if($user->institution)
+                      <div style="margin-top: 4px;">
+                        <a href="{{ route('admin.structure.index', ['inst' => $user->institution->slug, 'tab' => 'colaboradores']) }}" style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 7px; border-radius: 5px; background: #E8F5E9; color: #1B5E20; font-size: 0.72rem; font-weight: 600; text-decoration: none;" title="Ver en Padrón de {{ $user->institution->name }}">
+                          <i class="fa-solid fa-building" style="font-size: 0.68rem;"></i>
+                          <span>{{ $user->institution->short_name ?: $user->institution->name }}</span>
+                          @if($user->department)
+                            <span style="color: #6E887E; font-weight: 400;">• {{ $user->department }}</span>
+                          @endif
+                        </a>
+                      </div>
+                    @endif
                   </div>
                 </div>
               </td>
@@ -237,7 +248,8 @@
                                 'is_admin' => $user->is_admin,
                                 'status' => $user->email_verified_at ? 'activo' : 'pendiente',
                                 'license_number' => $user->license_number ?? '',
-                                'institution' => $user->institution ?? '',
+                                'institution_id' => $user->institution_id,
+                                'institution_text' => (string) ($user->getRawOriginal('institution') ?? ''),
                                 'is_self' => $isSelf,
                                 'is_super_admin' => $isTargetSuperAdmin,
                             ]) }})"
@@ -431,13 +443,31 @@
             <input type="text" name="license_number" id="licenseNumberInput" value="{{ old('license_number') }}" class="form-control" placeholder="Ej. 12345678" style="border-radius: 9px; background: white;">
           </div>
 
-          <!-- Institución (Opcional) -->
+          <!-- Institución Universitaria (Profesionales) -->
           <div>
             <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: #166534; margin-bottom: 0.4rem; display: block;">
               Institución Universitaria / Hospital (Opcional)
             </label>
             <input type="text" name="institution" value="{{ old('institution') }}" class="form-control" placeholder="Ej. UNAM / Instituto Nacional de Psiquiatría" style="border-radius: 9px; background: white;">
           </div>
+        </div>
+
+        <!-- Institución Corporativa Vinculada (Opcional) -->
+        <div style="margin-bottom: 1.25rem;">
+          <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: #2D3748; margin-bottom: 0.4rem; display: block;">
+            Vincular a Empresa / Institución del Sistema (Opcional)
+          </label>
+          <select name="institution_id" class="form-control" style="border-radius: 9px; background: white;">
+            <option value="">-- Ninguna (Usuario Particular / Independiente) --</option>
+            @foreach($institutions as $instOption)
+              <option value="{{ $instOption->id }}" {{ old('institution_id') == $instOption->id ? 'selected' : '' }}>
+                {{ $instOption->name }}
+              </option>
+            @endforeach
+          </select>
+          <span style="font-size: 0.74rem; color: #6E887E; margin-top: 4px; display: block;">
+            Si se asigna una empresa, el usuario se integrará a su padrón y semáforo institucional.
+          </span>
         </div>
 
         <!-- Botones de Acción -->
@@ -574,6 +604,21 @@
           </div>
         </div>
 
+        <!-- Institución Corporativa Vinculada (Opcional) -->
+        <div style="margin-bottom: 1.25rem;">
+          <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: #2D3748; margin-bottom: 0.45rem; display: block;">
+            Vincular a Empresa / Institución del Sistema (Opcional)
+          </label>
+          <select name="institution_id" id="editUserInstitutionId" class="form-control" style="border-radius: 9px; background: white;">
+            <option value="">-- Ninguna (Usuario Particular / Independiente) --</option>
+            @foreach($institutions as $instOption)
+              <option value="{{ $instOption->id }}">
+                {{ $instOption->name }}
+              </option>
+            @endforeach
+          </select>
+        </div>
+
         <!-- Nueva Contraseña (Opcional) -->
         <div style="margin-bottom: 1.5rem;">
           <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: #2D3748; margin-bottom: 0.4rem; display: block;">
@@ -699,9 +744,13 @@
       document.getElementById('editStatusPendiente').checked = true;
     }
 
-    // Profesional
+    // Profesional / Institución
     document.getElementById('editUserLicense').value = user.license_number || '';
-    document.getElementById('editUserInstitution').value = user.institution || '';
+    document.getElementById('editUserInstitution').value = user.institution_text || user.institution || '';
+    const instSelect = document.getElementById('editUserInstitutionId');
+    if (instSelect) {
+      instSelect.value = user.institution_id || '';
+    }
 
     toggleEditRoleFields();
     document.getElementById('editUserModal').style.display = 'flex';

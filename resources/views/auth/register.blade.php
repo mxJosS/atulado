@@ -69,6 +69,28 @@
         <div style="flex: 1; height: 1px; background: #DCE8E0;"></div>
       </div>
 
+      <!-- Feedback Alerts -->
+      @if (session('error'))
+        <div style="background: #FFEBEE; border-left: 4px solid #D32F2F; border-radius: 10px; padding: 0.85rem 1rem; margin-bottom: 1.25rem; font-size: 0.86rem; color: #C62828; line-height: 1.4;">
+          <i class="fa-solid fa-triangle-exclamation" style="margin-right: 6px;"></i>
+          {{ session('error') }}
+        </div>
+      @endif
+
+      @if ($errors->any())
+        <div style="background: #FDF2F2; border-left: 4px solid #EF4444; border-radius: 10px; padding: 0.85rem 1rem; margin-bottom: 1.25rem; color: #991B1B; font-size: 0.85rem; line-height: 1.4;">
+          <div style="font-weight: 700; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-circle-exclamation" style="color: #DC2626;"></i>
+            <span>Por favor corrige los siguientes inconvenientes:</span>
+          </div>
+          <ul style="margin: 0; padding-left: 1.25rem;">
+            @foreach ($errors->all() as $error)
+              <li>{{ $error }}</li>
+            @endforeach
+          </ul>
+        </div>
+      @endif
+
       <form method="POST" action="{{ route('register') }}" novalidate>
         @csrf
 
@@ -134,12 +156,13 @@
             type="password" 
             name="password_confirmation" 
             id="password_confirmation" 
-            class="form-control" 
+            class="form-control @error('password_confirmation') is-invalid @enderror" 
             placeholder="••••••••" 
             required 
             autocomplete="new-password"
             style="background: #FFFFFF; border: 1.5px solid #DCE8E0; border-radius: 12px; padding: 0.75rem 1rem; font-size: 0.92rem; color: #1A2620;"
           >
+          @error('password_confirmation') <div class="form-error" style="color: #C0392B; font-size: 0.8rem; margin-top: 0.3rem;">{{ $message }}</div> @enderror
         </div>
 
         <!-- Avatar Color Selector -->
@@ -167,6 +190,7 @@
               </label>
             @endforeach
           </div>
+          @error('avatar_color') <div class="form-error" style="color: #C0392B; font-size: 0.8rem; margin-top: 0.3rem;">{{ $message }}</div> @enderror
         </div>
 
         <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 0.85rem; font-size: 0.95rem; border-radius: 12px; background: #2E5D4B !important; color: #FFFFFF !important; box-shadow: 0 4px 14px rgba(46, 93, 75, 0.35); gap: 8px;">

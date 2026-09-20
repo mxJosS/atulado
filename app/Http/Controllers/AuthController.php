@@ -151,11 +151,17 @@ class AuthController extends Controller
             $request->session()->regenerate();
             $user = Auth::user();
 
+            // Si es administrador, acceso directo sin interrupciones
+            if ($user->is_admin) {
+                return redirect()->intended(route('admin.dashboard'))
+                    ->with('success', '¡Bienvenido al Panel de Administración, ' . $user->name . '!');
+            }
+
             // Si el usuario no ha verificado su correo, reenviar código si venció y dirigir a verificación
             if (!$user->hasVerifiedEmail()) {
                 if (!$user->verification_code || now()->gt($user->verification_code_expires_at)) {
-                    $code = $user->generateVerificationCode();
                     try {
+                        $code = $user->generateVerificationCode();
                         Mail::to($user->email)->send(new EmailVerificationCodeMail($code, $user->name));
                     } catch (\Throwable $e) {
                         Log::error('Error al enviar código de verificación en login: ' . $e->getMessage());
@@ -164,11 +170,6 @@ class AuthController extends Controller
 
                 return redirect()->route('verification.code.notice')
                     ->with('info', 'Por favor confirma el código de 6 dígitos enviado a tu correo para activar tu cuenta.');
-            }
-
-            if ($user->is_admin) {
-                return redirect()->intended(route('admin.dashboard'))
-                    ->with('success', '¡Bienvenido al Panel de Administración, ' . $user->name . '!');
             }
 
             $intended = session()->get('url.intended');
@@ -201,37 +202,52 @@ class AuthController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'confirmed', Password::min(6)],
-            'avatar_color' => ['nullable', 'string', 'in:sage,terra,lav,sky,amber,dark'],
+            'avatar_color' => ['nullable', 'string', 'in:sage,mint,terra,lav,sky,amber,dark'],
         ], [
             'name.required' => 'Por favor escribe tu nombre.',
             'email.required' => 'El correo electrónico es obligatorio.',
+            'email.email' => 'Por favor ingresa un correo electrónico válido.',
             'email.unique' => 'Este correo electrónico ya está registrado.',
             'password.required' => 'La contraseña es obligatoria.',
             'password.confirmed' => 'Las contraseñas no coinciden.',
             'password.min' => 'La contraseña debe tener al menos 6 caracteres.',
+            'avatar_color.in' => 'El tono de avatar seleccionado no es válido.',
         ]);
-
-        $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
-            'avatar_color' => $validated['avatar_color'] ?? 'sage',
-            'email_verified_at' => null,
-        ]);
-
-        $code = $user->generateVerificationCode();
 
         try {
-            Mail::to($user->email)->send(new EmailVerificationCodeMail($code, $user->name));
+            $user = User::create([
+                'name' => $validated['name'],
+                'email' => strtolower(trim($validated['email'])),
+                'password' => Hash::make($validated['password']),
+                'avatar_color' => $validated['avatar_color'] ?? 'sage',
+                'email_verified_at' => null,
+            ]);
+
+            $code = $user->generateVerificationCode();
+
+            $mailSent = false;
+            try {
+                Mail::to($user->email)->send(new EmailVerificationCodeMail($code, $user->name));
+                $mailSent = true;
+            } catch (\Throwable $e) {
+                Log::error('Error al enviar código de verificación al registrarse: ' . $e->getMessage());
+            }
+
+            Auth::login($user);
+            $request->session()->regenerate();
+
+            $msg = $mailSent
+                ? '¡Tu cuenta ha sido creada! Hemos enviado un código de 6 dígitos a tu correo (' . $user->email . ') para activarla.'
+                : '¡Tu cuenta ha sido creada! Si no recibiste el código de inmediato, haz clic en "Reenviar código" para solicitar uno nuevo.';
+
+            return redirect()->route('verification.code.notice')->with('status', $msg);
+
         } catch (\Throwable $e) {
-            Log::error('Error al enviar código de verificación al registrarse: ' . $e->getMessage());
+            Log::error('Error crítico al registrar usuario: ' . $e->getMessage(), ['exception' => $e]);
+            return back()->withInput()->withErrors([
+                'email' => 'Ocurrió un inconveniente al registrar la cuenta. Por favor verifica tus datos e inténtalo de nuevo.',
+            ]);
         }
-
-        Auth::login($user);
-        $request->session()->regenerate();
-
-        return redirect()->route('verification.code.notice')
-            ->with('status', '¡Tu cuenta ha sido creada! Hemos enviado un código de 6 dígitos a tu correo electrónico para verificarla.');
     }
 
     public function showVerifyCode()

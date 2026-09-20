@@ -113,6 +113,11 @@
         @endforeach
       </select>
 
+      <a href="{{ route('admin.structure.index') }}?inst={{ $slug }}&action=new_user" class="btn" style="background: #E8F5E9; color: #1B5E20; border: 1.5px solid #C8E6C9; border-radius: 9px; padding: 0.55rem 1.15rem; font-size: 0.84rem; display: flex; align-items: center; gap: 6px; text-decoration: none; font-weight: 600;" title="Dar de alta nuevo colaborador para esta institución">
+        <i class="fa-solid fa-user-plus"></i>
+        <span>+ Agregar Colaboradores</span>
+      </a>
+
       <a href="{{ route('admin.reports.index') }}?inst={{ $slug }}" class="btn btn-primary" style="background: #2E5D4B; color: #FFFFFF; border-radius: 9px; padding: 0.55rem 1.15rem; font-size: 0.84rem; display: flex; align-items: center; gap: 6px; text-decoration: none;">
         <i class="fa-solid fa-file-pdf"></i>
         <span>Emitir Reporte</span>

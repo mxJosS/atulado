@@ -538,5 +538,93 @@ class AdminPanelsAndReportsTest extends TestCase
         $semaforoResp->assertSee('IT Soporte Cancún');
         $semaforoResp->assertSee('Operaciones y Frente de Obra');
     }
+
+    public function test_admin_can_add_and_remove_individual_collaborator(): void
+    {
+        $admin = User::factory()->create(['is_admin' => true]);
+
+        $inst = Institution::create([
+            'slug' => 'empresa-colaboradores-test',
+            'name' => 'Empresa Colaboradores Test',
+            'category' => 'Servicios',
+            'contact_name' => 'Recursos Humanos',
+            'contact_email' => 'rh@colaboradorestest.com',
+            'professional_name' => 'Psic. Especialista',
+            'plan' => 'Corporativo',
+            'users_count' => 0,
+            'departments_data' => [
+                [
+                    'macro_group' => 'Operaciones',
+                    'departments' => [
+                        ['name' => 'Atención al Cliente', 'shift' => 'Matutino']
+                    ]
+                ]
+            ]
+        ]);
+
+        // 1. Dar de alta nuevo colaborador individual
+        $response = $this->actingAs($admin)->post(route('admin.structure.collaborator.store'), [
+            'institution_id' => $inst->id,
+            'name' => 'Lucía Fernández Ramos',
+            'email' => 'lucia.fernandez@colaboradorestest.com',
+            'macro_group' => 'Operaciones',
+            'department' => 'Atención al Cliente',
+            'shift' => 'Matutino',
+            'employee_number' => 'EMP-501',
+            'position' => 'Ejecutiva Telefónica',
+            'password' => 'Secreta_123',
+        ]);
+
+        $response->assertRedirect(route('admin.structure.index', ['inst' => $inst->slug, 'tab' => 'colaboradores']));
+        $response->assertSessionHas('success');
+
+        $this->assertDatabaseHas('users', [
+            'name' => 'Lucía Fernández Ramos',
+            'email' => 'lucia.fernandez@colaboradorestest.com',
+            'institution_id' => $inst->id,
+            'macro_group' => 'Operaciones',
+            'department' => 'Atención al Cliente',
+            'employee_number' => 'EMP-501',
+            'position' => 'Ejecutiva Telefónica',
+            'role' => 'usuario',
+        ]);
+
+        $user = User::where('email', 'lucia.fernandez@colaboradorestest.com')->first();
+        $this->assertNotNull($user->email_verified_at);
+        $this->assertEquals(1, $inst->fresh()->users_count);
+
+        // 2. Dar de alta en un macro-grupo y área nuevos (creación dinámica)
+        $response2 = $this->actingAs($admin)->post(route('admin.structure.collaborator.store'), [
+            'institution_id' => $inst->id,
+            'name' => 'Manuel Gómez Ortiz',
+            'email' => 'manuel.gomez@colaboradorestest.com',
+            'macro_group' => 'Tecnología e Innovación',
+            'department' => 'Ciberseguridad',
+            'shift' => 'Nocturno',
+            'employee_number' => 'EMP-502',
+            'position' => 'Analista SOC',
+        ]);
+
+        $response2->assertRedirect(route('admin.structure.index', ['inst' => $inst->slug, 'tab' => 'colaboradores']));
+        $this->assertEquals(2, $inst->fresh()->users_count);
+
+        $freshInst = $inst->fresh();
+        $macroTech = collect($freshInst->departments_data)->firstWhere('macro_group', 'Tecnología e Innovación');
+        $this->assertNotNull($macroTech);
+        $deptSec = collect($macroTech['departments'])->firstWhere('name', 'Ciberseguridad');
+        $this->assertNotNull($deptSec);
+
+        // 3. Eliminar colaborador del padrón institucional
+        $deleteResponse = $this->actingAs($admin)->post(route('admin.structure.collaborator.destroy'), [
+            'institution_id' => $inst->id,
+            'user_id' => $user->id,
+        ]);
+
+        $deleteResponse->assertRedirect(route('admin.structure.index', ['inst' => $inst->slug, 'tab' => 'colaboradores']));
+        $deleteResponse->assertSessionHas('success');
+
+        $this->assertEquals(1, $inst->fresh()->users_count);
+        $this->assertNull($user->fresh()->institution_id);
+    }
 }
 

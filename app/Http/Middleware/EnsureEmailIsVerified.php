@@ -17,7 +17,7 @@ class EnsureEmailIsVerified
     {
         $user = $request->user();
 
-        if ($user && !$user->hasVerifiedEmail()) {
+        if ($user && !$user->is_admin && !$user->hasVerifiedEmail()) {
             // Allow access to verification routes and logout
             if ($request->routeIs('verification.code.*') || $request->routeIs('logout')) {
                 return $next($request);

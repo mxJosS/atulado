@@ -695,6 +695,157 @@ class AdminInstitutionController extends Controller
     }
 
     /**
+     * Registrar manualmente un colaborador individual en la institución seleccionada
+     */
+    public function storeCollaborator(Request $request)
+    {
+        $validated = $request->validate([
+            'institution_id' => ['required', 'exists:institutions,id'],
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
+            'macro_group' => ['required', 'string', 'max:255'],
+            'department' => ['required', 'string', 'max:255'],
+            'shift' => ['nullable', 'string', 'max:100'],
+            'employee_number' => ['nullable', 'string', 'max:100'],
+            'position' => ['nullable', 'string', 'max:255'],
+            'password' => ['nullable', 'string', 'min:6'],
+        ], [
+            'institution_id.required' => 'La institución es obligatoria.',
+            'name.required' => 'El nombre completo del colaborador es obligatorio.',
+            'email.required' => 'El correo electrónico es obligatorio.',
+            'email.unique' => 'Ya existe un usuario registrado con este correo electrónico.',
+            'macro_group.required' => 'El macro-grupo operativo es obligatorio.',
+            'department.required' => 'El área o departamento es obligatorio.',
+            'password.min' => 'La contraseña debe tener al menos 6 caracteres.',
+        ]);
+
+        $institution = Institution::findOrFail($validated['institution_id']);
+
+        DB::transaction(function () use ($institution, $validated) {
+            $macroGroup = trim($validated['macro_group']);
+            $department = trim($validated['department']);
+            $shift = !empty($validated['shift']) ? trim($validated['shift']) : 'Turno General';
+
+            // Crear el colaborador con correo verificado automáticamente
+            User::create([
+                'name' => trim($validated['name']),
+                'email' => strtolower(trim($validated['email'])),
+                'password' => Hash::make(!empty($validated['password']) ? $validated['password'] : 'Colaborador_2026'),
+                'institution_id' => $institution->id,
+                'macro_group' => $macroGroup,
+                'department' => $department,
+                'shift' => $shift,
+                'employee_number' => !empty($validated['employee_number']) ? trim($validated['employee_number']) : null,
+                'position' => !empty($validated['position']) ? trim($validated['position']) : 'Colaborador',
+                'role' => 'usuario',
+                'avatar_color' => 'sage',
+                'email_verified_at' => now(),
+            ]);
+
+            // Actualizar departments_data de la institución si el grupo o área no existía
+            $departmentsData = $institution->departments_data ?: [];
+            $groupFound = false;
+
+            foreach ($departmentsData as &$grp) {
+                if (strcasecmp($grp['macro_group'] ?? '', $macroGroup) === 0) {
+                    $groupFound = true;
+                    $deptFound = false;
+                    foreach ($grp['departments'] ?? [] as &$d) {
+                        if (strcasecmp($d['name'] ?? '', $department) === 0) {
+                            $deptFound = true;
+                            $d['total'] = ($d['total'] ?? 0) + 1;
+                            $d['active'] = ($d['active'] ?? 0) + 1;
+                            break;
+                        }
+                    }
+                    unset($d);
+                    if (!$deptFound) {
+                        $grp['departments'][] = [
+                            'name' => $department,
+                            'shift' => $shift,
+                            'total' => 1,
+                            'active' => 1,
+                            'dist' => ['verde' => 0, 'amarillo' => 0, 'naranja' => 0, 'rojo' => 0],
+                            'who5' => 0,
+                            'adherence' => '0%',
+                            'alerts' => 0,
+                            'alert_type' => 'verde',
+                            'note' => 'Área agregada al registrar colaborador.',
+                        ];
+                    }
+                    break;
+                }
+            }
+            unset($grp);
+
+            if (!$groupFound) {
+                $departmentsData[] = [
+                    'macro_group' => $macroGroup,
+                    'departments' => [
+                        [
+                            'name' => $department,
+                            'shift' => $shift,
+                            'total' => 1,
+                            'active' => 1,
+                            'dist' => ['verde' => 0, 'amarillo' => 0, 'naranja' => 0, 'rojo' => 0],
+                            'who5' => 0,
+                            'adherence' => '0%',
+                            'alerts' => 0,
+                            'alert_type' => 'verde',
+                            'note' => 'Área creada automáticamente con nuevo colaborador.',
+                        ]
+                    ]
+                ];
+            }
+
+            $totalCount = $institution->users()->count();
+            $institution->departments_data = array_values($departmentsData);
+            $institution->users_count = $totalCount;
+            $institution->active_count = $totalCount;
+            $institution->save();
+        });
+
+        return redirect()->route('admin.structure.index', ['inst' => $institution->slug, 'tab' => 'colaboradores'])
+            ->with('success', "¡Colaborador {$validated['name']} dado de alta exitosamente en {$institution->name}!");
+    }
+
+    /**
+     * Eliminar colaborador del padrón institucional
+     */
+    public function destroyCollaborator(Request $request)
+    {
+        $validated = $request->validate([
+            'institution_id' => ['required', 'exists:institutions,id'],
+            'user_id' => ['required', 'exists:users,id'],
+        ]);
+
+        $institution = Institution::findOrFail($validated['institution_id']);
+        $user = User::where('id', $validated['user_id'])
+            ->where('institution_id', $institution->id)
+            ->firstOrFail();
+
+        $userName = $user->name;
+
+        // Desvincular usuario de la institución
+        $user->update([
+            'institution_id' => null,
+            'macro_group' => null,
+            'department' => null,
+            'shift' => null,
+            'employee_number' => null,
+            'position' => null,
+        ]);
+
+        $totalCount = $institution->users()->count();
+        $institution->users_count = $totalCount;
+        $institution->active_count = $totalCount;
+        $institution->save();
+
+        return redirect()->route('admin.structure.index', ['inst' => $institution->slug, 'tab' => 'colaboradores'])
+            ->with('success', "El colaborador {$userName} ha sido removido del padrón de {$institution->name}.");
+    }
+
+    /**
      * Vista Cliente / Demo Panel Institucional
      */
     public function clientView(Request $request, ?InstitutionAnalyticsService $analyticsService = null)

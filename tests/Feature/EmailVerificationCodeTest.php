@@ -43,6 +43,27 @@ class EmailVerificationCodeTest extends TestCase
         });
     }
 
+    public function test_registration_with_mint_avatar_color_succeeds(): void
+    {
+        Mail::fake();
+
+        $response = $this->post('/registro', [
+            'name' => 'Angel Espinosa',
+            'email' => 'jangel2003.kimba4@gmail.com',
+            'password' => 'secreto123',
+            'password_confirmation' => 'secreto123',
+            'avatar_color' => 'mint',
+        ]);
+
+        $response->assertRedirect('/verificar-codigo');
+        $this->assertAuthenticated();
+
+        $user = User::where('email', 'jangel2003.kimba4@gmail.com')->first();
+        $this->assertNotNull($user);
+        $this->assertEquals('mint', $user->avatar_color);
+        $this->assertNotNull($user->verification_code);
+    }
+
     public function test_unverified_user_is_redirected_to_verify_screen_from_dashboard(): void
     {
         $user = User::factory()->unverified()->create([

@@ -68,8 +68,8 @@
       </p>
     </div>
 
-    <!-- Actions (Descargar CSV y Cargar Padrón) -->
-    <div style="display: flex; gap: 0.75rem; align-items: center;">
+    <!-- Actions (Descargar CSV, Nuevo Colaborador y Cargar Padrón) -->
+    <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
       <a 
         href="{{ route('admin.structure.template') }}" 
         class="btn btn-secondary" 
@@ -82,6 +82,18 @@
       </a>
 
       @if(!empty($selectedInst))
+        <button 
+          type="button" 
+          onclick="openModal('newCollaboratorModal')" 
+          class="btn btn-primary" 
+          style="background: #1B5E20; color: #FFFFFF; padding: 0.55rem 1.15rem; font-size: 0.84rem; display: flex; align-items: center; gap: 6px; border-radius: 9px; border: none; cursor: pointer; font-weight: 600; box-shadow: 0 3px 8px rgba(27,94,32,0.25); transition: all 0.2s;"
+          onmouseover="this.style.background='#144718';"
+          onmouseout="this.style.background='#1B5E20';"
+        >
+          <i class="fa-solid fa-user-plus"></i>
+          <span>+ Nuevo Colaborador</span>
+        </button>
+
         <button 
           type="button" 
           onclick="openModal('uploadCsvModal')" 
@@ -301,15 +313,27 @@
               </p>
             </div>
 
-            <button 
-              type="button" 
-              onclick="openModal('uploadCsvModal')" 
-              class="btn btn-sm" 
-              style="background: #EEF4F0; color: #2E5D4B; border-radius: 8px; font-weight: 600; padding: 6px 12px; border: 1px solid #DCE8E0; cursor: pointer; display: flex; align-items: center; gap: 6px;"
-            >
-              <i class="fa-solid fa-file-arrow-up"></i>
-              <span>Cargar Más por CSV</span>
-            </button>
+            <div style="display: flex; gap: 8px;">
+              <button 
+                type="button" 
+                onclick="openModal('newCollaboratorModal')" 
+                class="btn btn-sm" 
+                style="background: #1B5E20; color: #FFFFFF; border-radius: 8px; font-weight: 600; padding: 6px 14px; border: none; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 2px 6px rgba(27,94,32,0.25);"
+              >
+                <i class="fa-solid fa-user-plus"></i>
+                <span>+ Agregar Colaborador</span>
+              </button>
+
+              <button 
+                type="button" 
+                onclick="openModal('uploadCsvModal')" 
+                class="btn btn-sm" 
+                style="background: #EEF4F0; color: #2E5D4B; border-radius: 8px; font-weight: 600; padding: 6px 12px; border: 1px solid #DCE8E0; cursor: pointer; display: flex; align-items: center; gap: 6px;"
+              >
+                <i class="fa-solid fa-file-arrow-up"></i>
+                <span>Cargar Más por CSV</span>
+              </button>
+            </div>
           </div>
 
           <div style="overflow-x: auto;">
@@ -322,6 +346,7 @@
                   <th style="padding: 0.65rem 0.5rem; text-align: left;">Turno</th>
                   <th style="padding: 0.65rem 0.5rem; text-align: left;">Puesto</th>
                   <th style="padding: 0.65rem 0.5rem; text-align: center;">Estado</th>
+                  <th style="padding: 0.65rem 0.5rem; text-align: center;">Acciones</th>
                 </tr>
               </thead>
               <tbody>
@@ -353,15 +378,41 @@
                         <i class="fa-solid fa-check" style="font-size: 0.65rem;"></i> Activo
                       </span>
                     </td>
+                    <td style="padding: 0.75rem 0.5rem; text-align: center;">
+                      <form 
+                        method="POST" 
+                        action="{{ route('admin.structure.collaborator.destroy') }}" 
+                        onsubmit="return confirm('¿Confirmas que deseas desvincular al colaborador {{ $colab->name }} del padrón de {{ $selectedInst->name }}?');" 
+                        style="display: inline-block; margin: 0;"
+                      >
+                        @csrf
+                        <input type="hidden" name="institution_id" value="{{ $selectedInst->id }}">
+                        <input type="hidden" name="user_id" value="{{ $colab->id }}">
+                        <button 
+                          type="submit" 
+                          title="Remover de la institución" 
+                          style="background: transparent; border: 1px solid #FFCDD2; color: #D32F2F; border-radius: 6px; padding: 4px 8px; font-size: 0.78rem; cursor: pointer; transition: all 0.2s;"
+                          onmouseover="this.style.background='#FFEBEE'; this.style.borderColor='#EF5350';"
+                          onmouseout="this.style.background='transparent'; this.style.borderColor='#FFCDD2';"
+                        >
+                          <i class="fa-solid fa-user-minus"></i>
+                        </button>
+                      </form>
+                    </td>
                   </tr>
                 @empty
                   <tr>
-                    <td colspan="6" style="text-align: center; padding: 2.5rem 1rem; color: #6E887E; font-size: 0.88rem;">
+                    <td colspan="7" style="text-align: center; padding: 2.5rem 1rem; color: #6E887E; font-size: 0.88rem;">
                       <i class="fa-solid fa-users-slash" style="font-size: 1.5rem; color: #A8C2B5; display: block; margin-bottom: 0.5rem;"></i>
                       No hay colaboradores registrados en el padrón de <b>{{ $selectedInst->name }}</b> aún.<br>
-                      <button onclick="openModal('uploadCsvModal')" class="btn btn-sm" style="margin-top: 0.75rem; background: #2E5D4B; color: #FFFFFF; border-radius: 6px; padding: 4px 10px;">
-                        <i class="fa-solid fa-file-arrow-up"></i> Cargar Padrón CSV
-                      </button>
+                      <div style="display: flex; gap: 8px; justify-content: center; margin-top: 0.75rem;">
+                        <button onclick="openModal('newCollaboratorModal')" class="btn btn-sm" style="background: #1B5E20; color: #FFFFFF; border-radius: 6px; padding: 5px 12px; font-weight: 600; border: none; cursor: pointer;">
+                          <i class="fa-solid fa-user-plus"></i> + Agregar Colaborador
+                        </button>
+                        <button onclick="openModal('uploadCsvModal')" class="btn btn-sm" style="background: #EEF4F0; color: #2E5D4B; border-radius: 6px; padding: 5px 12px; font-weight: 600; border: 1px solid #DCE8E0; cursor: pointer;">
+                          <i class="fa-solid fa-file-arrow-up"></i> Cargar Padrón CSV
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 @endforelse
@@ -594,6 +645,194 @@
 
   </div>
 </div>
+
+<!-- ══════════ MODAL: NUEVO COLABORADOR INDIVIDUAL ══════════ -->
+<div 
+  id="newCollaboratorModal" 
+  style="display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(10, 20, 15, 0.65); backdrop-filter: blur(4px); align-items: center; justify-content: center; padding: 1rem;"
+>
+  <div style="background: #FFFFFF; border-radius: 18px; width: 100%; max-width: 600px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); border: 1.5px solid #DCE8E0; padding: 2rem; position: relative; max-height: 90vh; overflow-y: auto;">
+    
+    <!-- Header -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem;">
+      <div>
+        <div style="display: inline-flex; align-items: center; gap: 6px; background: #E8F5E9; color: #1B5E20; padding: 3px 10px; border-radius: 6px; font-size: 0.72rem; font-family: 'IBM Plex Mono', monospace; font-weight: 700; text-transform: uppercase; margin-bottom: 0.5rem;">
+          <i class="fa-solid fa-user-plus"></i> Alta Individual
+        </div>
+        <h3 style="font-family: 'Fraunces', serif; font-size: 1.35rem; font-weight: 700; color: #1A2620; margin: 0;">
+          Nuevo Colaborador
+        </h3>
+        <p style="font-size: 0.84rem; color: #556860; margin: 0.25rem 0 0;">
+          Padrón de <b>{{ $selectedInst->name }}</b>
+        </p>
+      </div>
+      <button 
+        type="button" 
+        onclick="closeModal('newCollaboratorModal')" 
+        style="background: #F0F4F2; border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #556860; cursor: pointer;"
+      >
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <form method="POST" action="{{ route('admin.structure.collaborator.store') }}">
+      @csrf
+      <input type="hidden" name="institution_id" value="{{ $selectedInst->id }}">
+
+      <!-- Grid 2 Columnas -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; margin-bottom: 1rem;">
+        <!-- Nombre -->
+        <div style="grid-column: span 2;">
+          <label style="display: block; font-size: 0.82rem; font-weight: 600; color: #1A2620; margin-bottom: 0.35rem;">
+            Nombre Completo <span style="color: #C0392B;">*</span>:
+          </label>
+          <input 
+            type="text" 
+            name="name" 
+            required 
+            placeholder="Ej. Ing. Roberto Morales Mendoza" 
+            style="width: 100%; padding: 0.6rem 0.85rem; border: 1.5px solid #DCE8E0; border-radius: 9px; font-size: 0.88rem; box-sizing: border-box;"
+          />
+        </div>
+
+        <!-- Correo Electrónico -->
+        <div style="grid-column: span 2;">
+          <label style="display: block; font-size: 0.82rem; font-weight: 600; color: #1A2620; margin-bottom: 0.35rem;">
+            Correo Electrónico Institucional <span style="color: #C0392B;">*</span>:
+          </label>
+          <input 
+            type="email" 
+            name="email" 
+            required 
+            placeholder="ejemplo@itsoportecancun.com" 
+            style="width: 100%; padding: 0.6rem 0.85rem; border: 1.5px solid #DCE8E0; border-radius: 9px; font-size: 0.88rem; box-sizing: border-box;"
+          />
+        </div>
+
+        <!-- Macro-Grupo -->
+        <div>
+          <label style="display: block; font-size: 0.82rem; font-weight: 600; color: #1A2620; margin-bottom: 0.35rem;">
+            Macro-Grupo <span style="color: #C0392B;">*</span>:
+          </label>
+          <input 
+            type="text" 
+            name="macro_group" 
+            list="collaboratorMacroList" 
+            required 
+            placeholder="Ej. Operaciones y Frente de Obra" 
+            style="width: 100%; padding: 0.6rem 0.85rem; border: 1.5px solid #DCE8E0; border-radius: 9px; font-size: 0.88rem; box-sizing: border-box;"
+          />
+          <datalist id="collaboratorMacroList">
+            @foreach($rawGroups as $grp)
+              <option value="{{ $grp['macro_group'] ?? ($grp['name'] ?? '') }}">
+            @endforeach
+          </datalist>
+        </div>
+
+        <!-- Área / Departamento -->
+        <div>
+          <label style="display: block; font-size: 0.82rem; font-weight: 600; color: #1A2620; margin-bottom: 0.35rem;">
+            Área / Departamento <span style="color: #C0392B;">*</span>:
+          </label>
+          <input 
+            type="text" 
+            name="department" 
+            list="collaboratorDeptList" 
+            required 
+            placeholder="Ej. Soporte Técnico en Sitio" 
+            style="width: 100%; padding: 0.6rem 0.85rem; border: 1.5px solid #DCE8E0; border-radius: 9px; font-size: 0.88rem; box-sizing: border-box;"
+          />
+          <datalist id="collaboratorDeptList">
+            @foreach($rawGroups as $grp)
+              @foreach($grp['departments'] ?? [] as $d)
+                <option value="{{ $d['name'] ?? '' }}">
+              @endforeach
+            @endforeach
+          </datalist>
+        </div>
+
+        <!-- Turno -->
+        <div>
+          <label style="display: block; font-size: 0.82rem; font-weight: 600; color: #1A2620; margin-bottom: 0.35rem;">
+            Turno:
+          </label>
+          <select name="shift" style="width: 100%; padding: 0.6rem 0.85rem; border: 1.5px solid #DCE8E0; border-radius: 9px; font-size: 0.88rem; box-sizing: border-box; background: #FFFFFF;">
+            <option value="Turno General">Turno General</option>
+            <option value="Matutino">Matutino</option>
+            <option value="Vespertino">Vespertino</option>
+            <option value="Nocturno">Nocturno</option>
+            <option value="Mixto / Rotativo">Mixto / Rotativo</option>
+            <option value="Completo">Tiempo Completo</option>
+          </select>
+        </div>
+
+        <!-- Puesto / Cargo -->
+        <div>
+          <label style="display: block; font-size: 0.82rem; font-weight: 600; color: #1A2620; margin-bottom: 0.35rem;">
+            Puesto / Cargo:
+          </label>
+          <input 
+            type="text" 
+            name="position" 
+            placeholder="Ej. Auxiliar de Sistemas" 
+            style="width: 100%; padding: 0.6rem 0.85rem; border: 1.5px solid #DCE8E0; border-radius: 9px; font-size: 0.88rem; box-sizing: border-box;"
+          />
+        </div>
+
+        <!-- Nº Empleado -->
+        <div>
+          <label style="display: block; font-size: 0.82rem; font-weight: 600; color: #1A2620; margin-bottom: 0.35rem;">
+            Nº Empleado / Nómina:
+          </label>
+          <input 
+            type="text" 
+            name="employee_number" 
+            placeholder="Ej. EMP-088" 
+            style="width: 100%; padding: 0.6rem 0.85rem; border: 1.5px solid #DCE8E0; border-radius: 9px; font-size: 0.88rem; box-sizing: border-box;"
+          />
+        </div>
+
+        <!-- Contraseña Inicial -->
+        <div>
+          <label style="display: block; font-size: 0.82rem; font-weight: 600; color: #1A2620; margin-bottom: 0.35rem;">
+            Contraseña Inicial:
+          </label>
+          <input 
+            type="text" 
+            name="password" 
+            placeholder="Colaborador_2026 (por defecto)" 
+            style="width: 100%; padding: 0.6rem 0.85rem; border: 1.5px solid #DCE8E0; border-radius: 9px; font-size: 0.88rem; box-sizing: border-box;"
+          />
+        </div>
+      </div>
+
+      <!-- Notice -->
+      <div style="background: #F4F8F5; border-radius: 8px; padding: 0.75rem 0.95rem; font-size: 0.8rem; color: #40574D; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 8px;">
+        <i class="fa-solid fa-circle-info" style="color: #2E5D4B; font-size: 0.95rem;"></i>
+        <span>El colaborador quedará verificado automáticamente para ingresar de inmediato con su correo y contraseña.</span>
+      </div>
+
+      <!-- Action Buttons -->
+      <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+        <button 
+          type="button" 
+          onclick="closeModal('newCollaboratorModal')" 
+          style="background: #F3F7F5; border: 1px solid #DCE8E0; color: #556860; border-radius: 10px; padding: 0.6rem 1.15rem; font-size: 0.86rem; font-weight: 600; cursor: pointer;"
+        >
+          Cancelar
+        </button>
+        <button 
+          type="submit" 
+          style="background: #1B5E20; border: none; color: #FFFFFF; border-radius: 10px; padding: 0.6rem 1.35rem; font-size: 0.86rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 6px rgba(27,94,32,0.25);"
+        >
+          <i class="fa-solid fa-user-check"></i>
+          <span>Guardar Colaborador</span>
+        </button>
+      </div>
+    </form>
+
+  </div>
+</div>
 @endif
 
 <script>
@@ -635,6 +874,18 @@ document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') {
     closeModal('uploadCsvModal');
     closeModal('newAreaModal');
+    closeModal('newCollaboratorModal');
+  }
+});
+
+// Auto abrir modal o tab por query params
+document.addEventListener('DOMContentLoaded', function() {
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('tab') === 'colaboradores') {
+    switchStructureTab('colaboradores');
+  }
+  if (urlParams.get('action') === 'new_user') {
+    openModal('newCollaboratorModal');
   }
 });
 </script>

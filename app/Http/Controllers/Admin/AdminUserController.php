@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Institution;
 use App\Models\ProfessionalVerification;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -16,7 +17,7 @@ class AdminUserController extends Controller
 {
     public function index(Request $request)
     {
-        $query = User::query();
+        $query = User::query()->with('institution');
 
         if ($request->filled('rol')) {
             if ($request->rol === 'admin') {
@@ -42,6 +43,7 @@ class AdminUserController extends Controller
         }
 
         $users = $query->latest()->paginate(15)->withQueryString();
+        $institutions = Institution::orderBy('name')->get();
 
         $counts = [
             'todos' => User::count(),
@@ -52,7 +54,7 @@ class AdminUserController extends Controller
             })->where('is_admin', false)->count(),
         ];
 
-        return view('admin.users.index', compact('users', 'counts'));
+        return view('admin.users.index', compact('users', 'counts', 'institutions'));
     }
 
     public function store(Request $request)
@@ -67,6 +69,7 @@ class AdminUserController extends Controller
             'license_number' => ['required_if:role,profesional', 'nullable', 'string', 'max:50'],
             'specialty' => ['nullable', 'string', 'max:150'],
             'institution' => ['nullable', 'string', 'max:150'],
+            'institution_id' => ['nullable', 'exists:institutions,id'],
         ], [
             'first_name.required' => 'El o los nombres son obligatorios.',
             'last_name.required' => 'Los apellidos son obligatorios.',
@@ -82,8 +85,9 @@ class AdminUserController extends Controller
         $fullName = trim($request->first_name . ' ' . $request->last_name);
         $isAdmin = $request->role === 'admin';
         $role = $request->role;
+        $institutionId = $request->filled('institution_id') ? (int) $request->institution_id : null;
 
-        DB::transaction(function () use ($request, $fullName, $isAdmin, $role) {
+        DB::transaction(function () use ($request, $fullName, $isAdmin, $role, $institutionId) {
             $user = User::create([
                 'name' => $fullName,
                 'email' => $request->email,
@@ -92,9 +96,20 @@ class AdminUserController extends Controller
                 'role' => $role,
                 'avatar_color' => $isAdmin ? 'dark' : ($role === 'profesional' ? 'lav' : 'sage'),
                 'email_verified_at' => now(),
+                'institution_id' => $institutionId,
                 'license_number' => $role === 'profesional' ? trim($request->license_number) : null,
                 'institution' => $role === 'profesional' ? trim($request->institution) : null,
             ]);
+
+            if ($user->institution_id) {
+                $inst = Institution::find($user->institution_id);
+                if ($inst) {
+                    $cnt = $inst->users()->count();
+                    $inst->users_count = $cnt;
+                    $inst->active_count = $cnt;
+                    $inst->save();
+                }
+            }
 
             if ($role === 'profesional') {
                 $degrees = [
@@ -137,6 +152,7 @@ class AdminUserController extends Controller
             'password' => ['nullable', 'string', 'min:6'],
             'license_number' => ['nullable', 'string', 'max:50'],
             'institution' => ['nullable', 'string', 'max:150'],
+            'institution_id' => ['nullable', 'exists:institutions,id'],
         ], [
             'name.required' => 'El nombre es obligatorio.',
             'email.required' => 'El correo electrónico es obligatorio.',
@@ -214,7 +230,32 @@ class AdminUserController extends Controller
             $user->professional_title = null;
         }
 
+        $oldInstId = $user->institution_id;
+        $newInstId = $request->filled('institution_id') ? (int) $request->institution_id : null;
+        $user->institution_id = $newInstId;
+
         $user->save();
+
+        if ($oldInstId !== $newInstId) {
+            if ($oldInstId) {
+                $oldInst = Institution::find($oldInstId);
+                if ($oldInst) {
+                    $cnt = $oldInst->users()->count();
+                    $oldInst->users_count = $cnt;
+                    $oldInst->active_count = $cnt;
+                    $oldInst->save();
+                }
+            }
+            if ($newInstId) {
+                $newInst = Institution::find($newInstId);
+                if ($newInst) {
+                    $cnt = $newInst->users()->count();
+                    $newInst->users_count = $cnt;
+                    $newInst->active_count = $cnt;
+                    $newInst->save();
+                }
+            }
+        }
 
         return redirect()->route('admin.users.index')
             ->with('success', 'Usuario "' . $user->name . '" actualizado exitosamente.');
