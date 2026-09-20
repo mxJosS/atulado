@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Condiciones del Servicio — A tu lado</title>
+<meta name="description" content="Condiciones del servicio de A tu lado: qué es y qué no es la plataforma, tu cuenta, uso aceptable, protocolo de crisis y uso institucional.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://atulado.com.mx/terminos">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="A tu lado">
+<meta property="og:title" content="Condiciones del Servicio — A tu lado">
+<meta property="og:description" content="Condiciones del servicio de A tu lado: qué es y qué no es la plataforma, tu cuenta, uso aceptable, protocolo de crisis y uso institucional.">
+<meta property="og:url" content="https://atulado.com.mx/terminos">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600..700;1,9..144,400&family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg-primary:#080C0A; --bg-canvas:#F8FAF9; --bg-surface:#FFFFFF; --bg-subtle:#EEF4F0;
+  --border-light:#DCE8E0; --border-subtle:#C2D6CA;
+  --sage-base:#2E5D4B; --sage-medium:#3D7A5F; --mint-accent:#A8E6C0; --sage-pale:#D4EDE2;
+  --text-pale-mint:#C8DDD1; --text-light-gray:#8EADA4; --text-medium-gray:#556860; --text-near-black:#1A2620;
+  --font-display:'Fraunces',Georgia,serif; --font-editorial:'Instrument Serif',Georgia,serif;
+  --font-body:'Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  --font-mono:'IBM Plex Mono',ui-monospace,monospace;
+  --radius-sm:10px; --radius-md:16px; --radius-full:9999px;
+  --transition-fast:.18s cubic-bezier(.2,.8,.2,1);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; min-height:100vh; display:flex; flex-direction:column;
+  background:var(--bg-canvas); color:var(--text-near-black);
+  font-family:var(--font-body); font-size:16px; line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:inherit}
+em,.editorial-italic{font-family:var(--font-editorial);font-style:italic;font-weight:400;letter-spacing:0}
+
+/* ── Navbar ── */
+.site-navbar{
+  position:sticky; top:0; z-index:100; background:#080C0A;
+  border-bottom:1px solid rgba(255,255,255,.08); padding:.85rem 1.5rem;
+}
+.nav-container{
+  max-width:1200px; margin:0 auto; display:flex; align-items:center;
+  justify-content:space-between; gap:1.5rem;
+}
+.nav-brand{
+  display:flex; align-items:center; gap:.65rem; font-family:var(--font-display);
+  font-size:1.35rem; font-weight:700; color:#fff; white-space:nowrap;
+  flex-shrink:0; text-decoration:none;
+}
+.nav-menu{display:flex; align-items:center; gap:.15rem; list-style:none; margin:0; padding:0; flex-wrap:wrap}
+.nav-link{
+  font-size:.86rem; font-weight:500; color:#C8DDD1; padding:.45rem .85rem;
+  border-radius:var(--radius-sm); transition:all var(--transition-fast);
+  white-space:nowrap; text-decoration:none; display:inline-block;
+}
+.nav-link:hover{color:#fff; background:rgba(255,255,255,.08)}
+.nav-actions{display:flex; align-items:center; gap:.75rem; flex-shrink:0}
+.nav-crisis-pill{
+  display:inline-flex; align-items:center; gap:7px; padding:.42rem .9rem;
+  border-radius:var(--radius-full); background:rgba(169,50,38,.18); color:#FFA59C;
+  font-family:var(--font-mono); font-size:.7rem; font-weight:600; letter-spacing:.05em;
+  text-decoration:none; white-space:nowrap; transition:all var(--transition-fast);
+}
+.nav-crisis-pill:hover{background:rgba(169,50,38,.32); color:#fff}
+.nav-btn-access{
+  display:inline-flex; align-items:center; padding:.45rem 1rem; border-radius:var(--radius-sm);
+  background:var(--mint-accent); color:#14382A; font-size:.84rem; font-weight:700;
+  text-decoration:none; white-space:nowrap; transition:all var(--transition-fast);
+}
+.nav-btn-access:hover{background:#8FD8AC}
+@media(max-width:1080px){.nav-menu{display:none}}
+@media(max-width:560px){
+  .site-navbar{padding:.75rem 1rem}
+  .nav-brand{font-size:1.15rem}
+  .nav-crisis-pill span{display:none}
+}
+
+/* ── Contenido ── */
+main{flex:1}
+.container-narrow{width:100%; max-width:860px; margin:0 auto; padding:0 clamp(1.25rem,3.5vw,2.5rem)}
+.pagina{padding-top:3.2rem; padding-bottom:5rem}
+.volver{
+  display:inline-block; font-family:var(--font-mono); font-size:.78rem;
+  color:var(--sage-base); text-decoration:underline; margin-bottom:1.2rem;
+}
+h1.titulo{
+  font-family:var(--font-display); font-size:clamp(1.7rem,4.5vw,2.1rem); font-weight:600;
+  letter-spacing:-.03em; margin:0 0 .5rem; line-height:1.15;
+}
+p.entrada{color:var(--text-medium-gray); font-size:1rem; margin:0}
+.meta{
+  font-family:var(--font-mono); font-size:.78rem; color:var(--text-medium-gray);
+  border-top:1px solid var(--border-light); border-bottom:1px solid var(--border-light);
+  padding:.8rem 0; margin:1.6rem 0 0; display:flex; gap:.5rem 1.2rem; flex-wrap:wrap;
+}
+.legal{max-width:78ch}
+.legal h2{
+  font-family:var(--font-display); font-size:1.28rem; font-weight:600;
+  letter-spacing:-.02em; margin:2.6rem 0 .8rem; scroll-margin-top:90px; line-height:1.3;
+}
+.legal h3{font-size:1rem; font-weight:700; margin:1.6rem 0 .5rem; color:var(--text-near-black)}
+.legal p,.legal li{font-size:.95rem; line-height:1.75; color:#33413B}
+.legal ul,.legal ol{padding-left:1.3rem; margin:.6rem 0 1rem}
+.legal li{margin-bottom:.45rem}
+.legal a{color:var(--sage-base)}
+.legal table{
+  width:100%; border-collapse:collapse; font-size:.88rem; border:1px solid var(--border-light);
+  border-radius:var(--radius-sm); overflow:hidden; margin:1rem 0 1.4rem;
+}
+.legal th{
+  text-align:left; padding:.6rem .8rem; background:var(--bg-subtle);
+  border-bottom:1px solid var(--border-subtle); font-family:var(--font-mono);
+  font-size:.7rem; text-transform:uppercase; letter-spacing:.06em; color:var(--text-medium-gray);
+}
+.legal td{padding:.6rem .8rem; border-bottom:1px solid var(--bg-subtle); vertical-align:top}
+.legal tr:last-child td{border-bottom:none}
+.legal td .rol{display:block; color:var(--text-medium-gray); font-size:.86em; font-weight:400}
+.destacado{
+  border-left:3px solid var(--sage-base); background:#F3F8F5;
+  padding:.9rem 1.1rem; border-radius:0 var(--radius-sm) var(--radius-sm) 0; margin:1.2rem 0;
+}
+.destacado.alerta{border-left-color:#C0392B; background:#FCEEEC}
+.destacado p{margin:0 0 .6rem}
+.destacado p:last-child{margin-bottom:0}
+.pend{
+  background:#FBF2D4; border:1px dashed #D4AC0D; color:#6B5400;
+  padding:0 .35rem; border-radius:4px; font-family:var(--font-mono); font-size:.84em;
+}
+.indice{
+  background:var(--bg-subtle); border:1px solid var(--border-light);
+  border-radius:var(--radius-md); padding:1.1rem 1.3rem; margin:2rem 0;
+}
+.indice ol{columns:2; column-gap:2rem; margin:0; padding-left:1.1rem}
+.indice li{font-size:.86rem; margin-bottom:.3rem; break-inside:avoid}
+.indice a{color:var(--sage-base); text-decoration:none}
+.indice a:hover{text-decoration:underline}
+.cruzado{margin-top:2.5rem; font-size:.86rem; color:var(--text-medium-gray)}
+@media(max-width:640px){
+  .indice ol{columns:1}
+  .legal table{font-size:.82rem}
+  .legal th,.legal td{padding:.5rem .55rem}
+}
+
+/* ── Pie ── */
+.site-footer{
+  background:#080C0A; color:#fff; border-top:1px solid rgba(255,255,255,.08);
+  padding:4.5rem clamp(1rem,3vw,2rem) 2.5rem; margin-top:auto;
+}
+.footer-grid{
+  max-width:1200px; margin:0 auto 3.5rem; display:grid;
+  grid-template-columns:2fr repeat(3,1fr); gap:3rem;
+}
+.footer-brand{
+  display:flex; align-items:center; gap:.65rem; font-family:var(--font-display);
+  font-size:1.35rem; font-weight:700; color:#fff; margin-bottom:.85rem;
+}
+.footer-desc{color:#8EADA4; font-size:.88rem; max-width:320px; line-height:1.7; margin-bottom:1.25rem}
+.footer-crisis{
+  display:inline-flex; align-items:center; gap:8px; padding:.5rem 1rem;
+  border-radius:var(--radius-full); background:rgba(169,50,38,.12); color:#FFA59C;
+  font-family:var(--font-mono); font-size:.72rem; font-weight:600; letter-spacing:.06em;
+  text-decoration:none;
+}
+.footer-col-title{
+  font-family:var(--font-mono); font-size:.74rem; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--mint-accent); margin:0 0 1.25rem; font-weight:600;
+}
+.footer-links{list-style:none; display:flex; flex-direction:column; gap:.75rem; margin:0; padding:0}
+.footer-links a{
+  color:#8EADA4; font-size:.88rem; transition:all var(--transition-fast);
+  display:inline-flex; align-items:center; gap:.4rem; text-decoration:none;
+}
+.footer-links a:hover{color:#fff; transform:translateX(3px)}
+.footer-links .ch{color:var(--mint-accent); font-size:.9rem; line-height:1}
+.footer-bottom{
+  max-width:1200px; margin:0 auto; padding-top:2rem;
+  border-top:1px solid rgba(255,255,255,.08); color:#8EADA4; font-size:.82rem;
+  display:flex; flex-direction:column; align-items:center; gap:.75rem; text-align:center;
+}
+.footer-bottom p{margin:0}
+.footer-legales{display:flex; gap:1.1rem; flex-wrap:wrap; justify-content:center}
+.footer-legales a{color:var(--mint-accent); text-decoration:none; font-size:.82rem}
+.footer-legales a:hover{text-decoration:underline}
+.footer-legales .sep{opacity:.35}
+.footer-nota{font-size:.76rem; opacity:.75; max-width:620px}
+@media(max-width:900px){.footer-grid{grid-template-columns:1fr 1fr; gap:2.5rem}}
+@media(max-width:560px){.footer-grid{grid-template-columns:1fr; gap:2rem}.site-footer{padding-top:3rem}}
+
+@media print{
+  .site-navbar,.site-footer,.volver{display:none}
+  body{background:#fff}
+  .pagina{padding-top:0}
+  .legal table,.destacado{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+
+<nav class="site-navbar">
+  <div class="nav-container">
+    <a href="https://atulado.com.mx" class="nav-brand"><svg viewBox="0 0 16 16" width="28" height="28" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="5" y="0" width="6" height="2" fill="#2D6B3A"/><rect x="3" y="2" width="10" height="2" fill="#3D8C4F"/><rect x="2" y="4" width="12" height="2" fill="#5AB56E"/><rect x="3" y="6" width="10" height="2" fill="#3D8C4F"/><rect x="5" y="8" width="6" height="2" fill="#2D6B3A"/><rect x="7" y="10" width="2" height="4" fill="#6B3A1F"/><rect x="4" y="1" width="1" height="1" fill="#C0392B"/><rect x="11" y="3" width="1" height="1" fill="#C0392B"/><rect x="9" y="7" width="1" height="1" fill="#C0392B"/></svg><span>a tu <em class="editorial-italic" style="color:#A8E6C0">lado</em></span></a>
+    <ul class="nav-menu">
+      <li><a href="https://atulado.com.mx" class="nav-link">Inicio</a></li>
+      <li><a href="https://atulado.com.mx/sientes" class="nav-link">&iquest;C&oacute;mo te sientes?</a></li>
+      <li><a href="https://atulado.com.mx/herramientas/respiracion" class="nav-link">Respira Conmigo</a></li>
+      <li><a href="https://atulado.com.mx/recursos" class="nav-link">Recursos</a></li>
+      <li><a href="https://atulado.com.mx/revista" class="nav-link">Revista</a></li>
+      <li><a href="https://atulado.com.mx/crisis" class="nav-link">L&iacute;neas de Ayuda</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="tel:8002900024" class="nav-crisis-pill" title="Llamar a la l&iacute;nea de crisis 24/7"><svg viewBox="0 0 16 16" width="11" height="11" fill="currentColor" aria-hidden="true"><path d="M3.1 1.4a1.2 1.2 0 0 1 1.7.2l1.3 1.7a1.2 1.2 0 0 1-.1 1.6l-.8.8c.6 1.3 1.8 2.5 3.1 3.1l.8-.8a1.2 1.2 0 0 1 1.6-.1l1.7 1.3a1.2 1.2 0 0 1 .2 1.7l-.8 1c-.5.6-1.3.8-2 .6C6.5 11.3 4.7 9.5 3.4 6.2c-.3-.8 0-1.6.6-2.1l-.9-2.7z"/></svg><span>CRISIS: 800 290 0024</span></a>
+      <a href="https://atulado.com.mx/login" class="nav-btn-access">Acceder</a>
+    </div>
+  </div>
+</nav>
+
+<main>
+  <div class="container-narrow pagina">
+    <a href="https://atulado.com.mx" class="volver">&larr; Inicio</a>
+    <h1 class="titulo">Condiciones del Servicio</h1>
+    <p class="entrada">Términos bajo los cuales puedes usar <strong>A tu lado</strong>. Léelos antes de crear tu cuenta.</p>
+    <div class="meta">
+      <span>Última actualización: 15 de septiembre de 2026</span>
+      <span>·</span><span>Versión 1.0</span>
+      <span>·</span><span>Vigente desde su publicación</span>
+    </div>
+    <div class="legal">
+
+      <div class="indice">
+        <ol>
+          <li><a href="#que-es">Qué es A tu lado</a></li>
+          <li><a href="#que-no-es">Qué no es, y qué hacer en una emergencia</a></li>
+          <li><a href="#aceptacion">Aceptación de estas condiciones</a></li>
+          <li><a href="#elegibilidad">Quién puede usar el servicio</a></li>
+          <li><a href="#cuenta">Tu cuenta</a></li>
+          <li><a href="#google">Inicio de sesión con Google</a></li>
+          <li><a href="#uso">Uso aceptable</a></li>
+          <li><a href="#contenido">Lo que tú escribes es tuyo</a></li>
+          <li><a href="#institucional">Uso a través de una empresa o escuela</a></li>
+          <li><a href="#crisis">Protocolo de crisis</a></li>
+          <li><a href="#profesionales">Profesionales de la salud en la plataforma</a></li>
+          <li><a href="#propiedad">Propiedad intelectual</a></li>
+          <li><a href="#disponibilidad">Disponibilidad y cambios</a></li>
+          <li><a href="#responsabilidad">Límite de responsabilidad</a></li>
+          <li><a href="#terminacion">Terminación de la cuenta</a></li>
+          <li><a href="#ley">Ley aplicable</a></li>
+          <li><a href="#contacto">Contacto</a></li>
+        </ol>
+      </div>
+
+      <h2 id="que-es">1 · Qué es A tu lado</h2>
+      <p>A tu lado es una plataforma web de <strong>acompañamiento emocional</strong>. Te permite
+      registrar cómo te sientes, darle seguimiento en el tiempo, acceder a contenido y herramientas de
+      regulación emocional, construir un plan de seguridad personal y encontrar líneas de ayuda. Las
+      organizaciones pueden contratarla para ponerla a disposición de las personas que las integran.</p>
+
+      <h2 id="que-no-es">2 · Qué no es, y qué hacer en una emergencia</h2>
+      <div class="destacado alerta">
+        <p><strong>A tu lado no es un servicio médico ni de urgencias.</strong> No emite diagnósticos, no
+        prescribe ni administra tratamientos, no ofrece psicoterapia y <strong>no sustituye la atención
+        de un profesional de la salud</strong>. Lo que hace es entregarte información, recursos y
+        acompañamiento, y cuando hace falta, ponerte en contacto con una persona.</p>
+        <p><strong>Si estás en peligro inmediato</strong>, no uses la aplicación: llama a la
+        <strong>Línea de la Vida al 800 911 2000</strong>, a <strong>SAPTEL al 55 5259 8121</strong> o al
+        <strong>911</strong>, o acude al servicio de urgencias más cercano.</p>
+      </div>
+      <p>La plataforma puede tardar en detectar una situación, puede no detectarla, o puede no estar
+      disponible por una falla técnica. <strong>No dependas de ella como único recurso de
+      seguridad.</strong></p>
+
+      <h2 id="aceptacion">3 · Aceptación de estas condiciones</h2>
+      <p>Al crear una cuenta o usar A tu lado aceptas estas condiciones y el
+      <a href="https://atulado.com.mx/privacidad">Aviso de Privacidad</a>, que forma parte integral de
+      este documento. Si no estás de acuerdo con alguna parte, no uses el servicio.</p>
+
+      <h2 id="elegibilidad">4 · Quién puede usar el servicio</h2>
+      <p>Debes ser mayor de edad conforme a la legislación mexicana. Si eres menor de edad y accedes a
+      través de una institución educativa, tu participación requiere el consentimiento previo de tu
+      padre, madre o tutor, que la institución debe recabar y acreditar ante A tu lado.</p>
+
+      <h2 id="cuenta">5 · Tu cuenta</h2>
+      <ul>
+        <li>Debes proporcionar información veraz al registrarte.</li>
+        <li>Tu cuenta es personal e intransferible: no la compartas ni la prestes.</li>
+        <li>Eres responsable de resguardar tu contraseña y de la actividad que ocurra en tu cuenta.</li>
+        <li>Si sospechas un acceso no autorizado, avísanos de inmediato a
+        <a href="mailto:privacidad@atulado.com.mx">privacidad@atulado.com.mx</a>.</li>
+      </ul>
+
+      <h2 id="google">6 · Inicio de sesión con Google</h2>
+      <p>Puedes crear tu cuenta e iniciar sesión con tu cuenta de Google. Si lo haces, A tu lado recibe
+      únicamente tu <strong>nombre, correo electrónico, fotografía de perfil e identificador de
+      Google</strong>, y los usa sólo para identificarte dentro de la aplicación.</p>
+      <p>A tu lado <strong>no accede</strong> a tu correo, tu agenda, tus contactos ni tus archivos de
+      Google, y nunca conoce tu contraseña. Puedes revocar el acceso cuando quieras desde
+      <a href="https://myaccount.google.com/permissions" target="_blank" rel="noopener">los permisos de
+      tu cuenta de Google</a>; eso no elimina tu cuenta de A tu lado. El detalle completo está en el
+      <a href="https://atulado.com.mx/privacidad#google">Aviso de Privacidad</a>.</p>
+
+      <h2 id="uso">7 · Uso aceptable</h2>
+      <p>Al usar A tu lado te comprometes a <strong>no</strong>:</p>
+      <ul>
+        <li>Suplantar la identidad de otra persona o crear cuentas con datos falsos.</li>
+        <li>Intentar acceder a información de otras personas usuarias, a cuentas ajenas o a áreas restringidas.</li>
+        <li>Publicar en los espacios comunitarios contenido que promueva el daño a uno mismo o a
+        terceros, que describa métodos de autolesión, o que acose, discrimine o amenace a alguien.</li>
+        <li>Usar la plataforma para difundir publicidad, spam o contenido ilícito.</li>
+        <li>Extraer información de forma automatizada, someter el sistema a ingeniería inversa, o
+        interferir con su funcionamiento.</li>
+        <li>Presentarte como profesional de la salud sin acreditar una cédula profesional vigente.</li>
+      </ul>
+      <p>Podemos suspender o cancelar cuentas que incumplan estas reglas, en especial cuando exista un
+      riesgo para otras personas usuarias.</p>
+
+      <h2 id="contenido">8 · Lo que tú escribes es tuyo</h2>
+      <p>Tu registro diario, el texto que escribas, tus respuestas y tu plan de seguridad <strong>son de
+      tu propiedad</strong>. Nos concedes únicamente la licencia limitada, no exclusiva y revocable que
+      necesitamos para almacenarlos, mostrártelos y operar el servicio conforme al Aviso de Privacidad.
+      Esa licencia termina cuando eliminas el contenido o tu cuenta.</p>
+      <p>Si publicas contenido en los espacios comunitarios de la plataforma, eres responsable de él y
+      nos autorizas a mostrarlo ahí. Podemos retirar contenido que incumpla estas condiciones.</p>
+
+      <h2 id="institucional">9 · Uso a través de una empresa o escuela</h2>
+      <p>Si llegaste a A tu lado porque tu organización lo contrató, esto es lo que aplica:</p>
+      <table>
+        <thead><tr><th>Quién</th><th>Qué puede ver</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Tu organización</strong></td><td>Sólo porcentajes del total. Sin nombres, sin conteos de personas, sin desglose por área y sin nada de lo que escribas.</td></tr>
+          <tr><td><strong>El profesional designado</strong></td><td>Tu información individual, únicamente con un protocolo de crisis activo y bajo contrato de confidencialidad.</td></tr>
+          <tr><td><strong>El equipo acreditado de A tu lado</strong></td><td>Tu información individual, con motivo declarado y registro en bitácora inmutable.</td></tr>
+        </tbody>
+      </table>
+      <div class="destacado alerta">
+        <p><strong>Tu organización tiene prohibido</strong>, por contrato, usar cualquier información
+        proveniente de A tu lado para evaluarte, promoverte, sancionarte, terminar tu relación laboral o
+        escolar, o discriminarte de cualquier forma.</p>
+      </div>
+      <p>Si dejas la organización, tu cuenta se desvincula pero no se cancela: conservas tu historial y
+      puedes seguir usando la plataforma por tu cuenta.</p>
+
+      <h2 id="crisis">10 · Protocolo de crisis</h2>
+      <p>Si el seguimiento de la plataforma indica que podrías estar en riesgo, A tu lado activa un
+      protocolo de contacto humano. Al aceptar estas condiciones <strong>consientes
+      expresamente</strong> que:</p>
+      <ul>
+        <li>Se muestre en pantalla información de líneas de ayuda y contención inmediata.</li>
+        <li>Se notifique al profesional designado, quien podrá comunicarse contigo.</li>
+        <li>Se comparta con ese profesional el resumen de tu información necesario para acompañarte,
+        dentro de ese protocolo y sólo mientras esté activo.</li>
+        <li>En una situación de riesgo inminente para tu vida, se contacte a la persona que registraste
+        como contacto de emergencia o a los servicios de emergencia.</li>
+      </ul>
+      <p>Un protocolo <strong>no se cierra por vencimiento de tiempo</strong>: requiere que un
+      profesional registre que hubo contacto humano verificado.</p>
+
+      <h2 id="profesionales">11 · Profesionales de la salud en la plataforma</h2>
+      <p>Quienes participan como profesionales deben acreditar cédula profesional vigente, que A tu lado
+      verifica antes de otorgar cualquier acceso, y firmar un contrato de confidencialidad. Cada consulta
+      que realizan a información individual queda registrada con motivo declarado. Al vencer su contrato,
+      su acceso se revoca de forma automática.</p>
+      <p>La relación profesional-paciente, en caso de establecerse, es entre esa persona profesional y
+      tú. A tu lado facilita el contacto; no presta el servicio clínico ni interviene en él.</p>
+
+      <h2 id="propiedad">12 · Propiedad intelectual</h2>
+      <p>La plataforma, su código, su diseño, su marca, su logotipo y los contenidos elaborados por
+      A tu lado son propiedad de A tu lado o de sus licenciantes, y están protegidos por la legislación
+      aplicable. No puedes copiarlos, distribuirlos ni crear obras derivadas sin autorización escrita.</p>
+
+      <h2 id="disponibilidad">13 · Disponibilidad y cambios</h2>
+      <p>Procuramos que el servicio esté disponible de forma continua, pero no garantizamos
+      disponibilidad ininterrumpida: puede haber mantenimientos, fallas o interrupciones ajenas a
+      nosotros. Podemos modificar, suspender o descontinuar funciones; si un cambio es sustancial, te
+      avisaremos con anticipación razonable por correo y dentro de la aplicación.</p>
+      <p>También podemos actualizar estas condiciones. La versión vigente estará siempre en
+      <a href="https://atulado.com.mx/terminos">atulado.com.mx/terminos</a> con su fecha. Si sigues
+      usando el servicio después de una actualización, se entiende que la aceptas.</p>
+
+      <h2 id="responsabilidad">14 · Límite de responsabilidad</h2>
+      <p>El servicio se ofrece «tal como está». Dentro de lo permitido por la ley, A tu lado no será
+      responsable por daños indirectos o consecuenciales derivados del uso o de la imposibilidad de uso
+      de la plataforma, ni por decisiones que tomes basándote en el contenido informativo que ofrece.</p>
+      <div class="destacado">
+        <p>Nada en esta cláusula limita la responsabilidad que no pueda excluirse conforme a la
+        legislación mexicana, ni tus derechos como consumidor.</p>
+      </div>
+
+      <h2 id="terminacion">15 · Terminación de la cuenta</h2>
+      <p>Puedes eliminar tu cuenta cuando quieras desde tu perfil o escribiéndonos. Al hacerlo se elimina
+      tu información conforme a los plazos del
+      <a href="https://atulado.com.mx/privacidad#conservacion">Aviso de Privacidad</a>; sólo se conserva,
+      de forma seudonimizada, lo que una obligación legal nos exija.</p>
+      <p>Podemos suspender o cancelar tu cuenta si incumples estas condiciones, si tu conducta pone en
+      riesgo a otras personas, o si lo exige una autoridad. Salvo cuando no sea posible, te lo
+      notificaremos.</p>
+
+      <h2 id="ley">16 · Ley aplicable</h2>
+      <p>Estas condiciones se rigen por las leyes de los Estados Unidos Mexicanos. Para cualquier
+      controversia, las partes se someten a la jurisdicción de los tribunales competentes de la ciudad de
+      <strong>Mérida, Yucatán</strong>, renunciando a cualquier otro fuero.</p>
+
+      <h2 id="contacto">17 · Contacto</h2>
+      <p><strong>Titular:</strong> <span class="pend">A TU LADO</span><br>
+      <strong>Domicilio:</strong> <span class="pend">v. Tecnológico km. 4.5 S/N, Colonia Plan de Ayala, C.P. 97118, Mérida, Yucatán.</span>, Mérida, Yucatán, México<br>
+      <strong>Correo:</strong> <a href="mailto:hola@atulado.com.mx">hola@atulado.com.mx</a><br>
+      <strong>Privacidad:</strong> <a href="mailto:privacidad@atulado.com.mx">privacidad@atulado.com.mx</a></p>
+
+      <div class="destacado alerta" style="margin-top:2.5rem">
+        <p><strong>Recordatorio.</strong> A tu lado no diagnostica, no da tratamiento y no sustituye la
+        atención de un profesional de la salud. Si estás en riesgo, llama a la
+        <strong>Línea de la Vida: 800 911 2000</strong> (24 horas) o al <strong>911</strong>.</p>
+      </div>
+
+      <p class="cruzado"><a href="https://atulado.com.mx/privacidad">Consulta también el Aviso de Privacidad →</a></p>
+
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-grid">
+    <div>
+      <div class="footer-brand"><svg viewBox="0 0 16 16" width="26" height="26" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="5" y="0" width="6" height="2" fill="#2D6B3A"/><rect x="3" y="2" width="10" height="2" fill="#3D8C4F"/><rect x="2" y="4" width="12" height="2" fill="#5AB56E"/><rect x="3" y="6" width="10" height="2" fill="#3D8C4F"/><rect x="5" y="8" width="6" height="2" fill="#2D6B3A"/><rect x="7" y="10" width="2" height="4" fill="#6B3A1F"/><rect x="4" y="1" width="1" height="1" fill="#C0392B"/><rect x="11" y="3" width="1" height="1" fill="#C0392B"/><rect x="9" y="7" width="1" height="1" fill="#C0392B"/></svg><span>a tu <em class="editorial-italic" style="color:#A8E6C0">lado</em></span></div>
+      <p class="footer-desc">Un espacio seguro y confidencial de acompa&ntilde;amiento emocional, herramientas de regulaci&oacute;n y prevenci&oacute;n en crisis para M&eacute;xico y Latinoam&eacute;rica.</p>
+      <a href="tel:8002900024" class="footer-crisis"><svg viewBox="0 0 16 16" width="11" height="11" fill="currentColor" aria-hidden="true"><path d="M3.1 1.4a1.2 1.2 0 0 1 1.7.2l1.3 1.7a1.2 1.2 0 0 1-.1 1.6l-.8.8c.6 1.3 1.8 2.5 3.1 3.1l.8-.8a1.2 1.2 0 0 1 1.6-.1l1.7 1.3a1.2 1.2 0 0 1 .2 1.7l-.8 1c-.5.6-1.3.8-2 .6C6.5 11.3 4.7 9.5 3.4 6.2c-.3-.8 0-1.6.6-2.1l-.9-2.7z"/></svg><span>L&iacute;nea 24h: 800 290 0024</span></a>
+    </div>
+    <div>
+      <h4 class="footer-col-title">Explorar</h4>
+      <ul class="footer-links">
+        <li><a href="https://atulado.com.mx"><span class="ch">&rsaquo;</span> Inicio</a></li>
+        <li><a href="https://atulado.com.mx/sientes"><span class="ch">&rsaquo;</span> &iquest;C&oacute;mo te sientes hoy?</a></li>
+        <li><a href="https://atulado.com.mx/recursos"><span class="ch">&rsaquo;</span> Biblioteca de Recursos</a></li>
+        <li><a href="https://atulado.com.mx/revista"><span class="ch">&rsaquo;</span> Revista de Salud Mental</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 class="footer-col-title">Herramientas</h4>
+      <ul class="footer-links">
+        <li><a href="https://atulado.com.mx/herramientas/respiracion"><span class="ch">&rsaquo;</span> Respira Conmigo (4-7-8)</a></li>
+        <li><a href="https://atulado.com.mx/herramientas/grounding"><span class="ch">&rsaquo;</span> Grounding 5-4-3-2-1</a></li>
+        <li><a href="https://atulado.com.mx/herramientas/stop"><span class="ch">&rsaquo;</span> T&eacute;cnica STOP</a></li>
+        <li><a href="https://atulado.com.mx/crisis"><span class="ch">&rsaquo;</span> L&iacute;neas de Crisis 24h</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 class="footer-col-title">Legal</h4>
+      <ul class="footer-links">
+        <li><a href="https://atulado.com.mx/privacidad"><span class="ch">&rsaquo;</span> Aviso de Privacidad</a></li>
+        <li><a href="https://atulado.com.mx/terminos"><span class="ch">&rsaquo;</span> Condiciones del Servicio</a></li>
+        <li><a href="mailto:privacidad@atulado.com.mx"><span class="ch">&rsaquo;</span> Contacto de privacidad</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; 2026 A tu lado &middot; Plataforma de Bienestar y Salud Mental</p>
+    <p class="footer-legales">
+      <a href="https://atulado.com.mx/privacidad">Aviso de Privacidad</a><span class="sep">&middot;</span>
+      <a href="https://atulado.com.mx/terminos">Condiciones del Servicio</a><span class="sep">&middot;</span>
+      <a href="mailto:privacidad@atulado.com.mx">privacidad@atulado.com.mx</a>
+    </p>
+    <p class="footer-nota">*Este servicio es de acompa&ntilde;amiento emocional: no diagnostica, no da tratamiento y no sustituye la atenci&oacute;n de un profesional de la salud. En una emergencia, comun&iacute;cate de inmediato a la L&iacute;nea de la Vida: 800 911 2000.</p>
+  </div>
+</footer>
+
+</body>
+</html>

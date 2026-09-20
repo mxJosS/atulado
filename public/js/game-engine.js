@@ -15,9 +15,14 @@
   let currentThought = 'water';
   let skySunInterval = null;
 
+  function getZenStorageKey(key) {
+    const uid = (typeof window !== 'undefined' && window.ATULADO_USER_ID !== undefined && window.ATULADO_USER_ID !== null) ? window.ATULADO_USER_ID : 'guest';
+    return `atulado_zen_u${uid}_${key}`;
+  }
+
   // Load Economy from LocalStorage
   try {
-    const savedTotal = localStorage.getItem('atulado_zen_total_calm');
+    const savedTotal = localStorage.getItem(getZenStorageKey('total_calm'));
     if (savedTotal !== null) {
       totalCalmPoints = parseInt(savedTotal, 10) || 0;
     }
@@ -25,13 +30,13 @@
 
   try {
     const todayStr = new Date().toISOString().slice(0, 10);
-    const storedDate = localStorage.getItem('atulado_zen_daily_date');
+    const storedDate = localStorage.getItem(getZenStorageKey('daily_date'));
     if (storedDate === todayStr) {
-      dailyTasksCompleted = parseInt(localStorage.getItem('atulado_zen_daily_tasks'), 10) || 0;
+      dailyTasksCompleted = parseInt(localStorage.getItem(getZenStorageKey('daily_tasks')), 10) || 0;
     } else {
       dailyTasksCompleted = 0;
-      localStorage.setItem('atulado_zen_daily_date', todayStr);
-      localStorage.setItem('atulado_zen_daily_tasks', '0');
+      localStorage.setItem(getZenStorageKey('daily_date'), todayStr);
+      localStorage.setItem(getZenStorageKey('daily_tasks'), '0');
     }
   } catch(e) {}
 
@@ -71,7 +76,7 @@
   };
 
   try {
-    const savedLevels = localStorage.getItem('atulado_zen_plant_levels');
+    const savedLevels = localStorage.getItem(getZenStorageKey('plant_levels'));
     if (savedLevels) {
       const parsed = JSON.parse(savedLevels);
       Object.keys(plantLevels).forEach(k => {
@@ -87,7 +92,7 @@
 
   function saveZenPlantLevels() {
     try {
-      localStorage.setItem('atulado_zen_plant_levels', JSON.stringify(plantLevels));
+      localStorage.setItem(getZenStorageKey('plant_levels'), JSON.stringify(plantLevels));
     } catch(e) {}
   }
 
@@ -211,7 +216,7 @@
   };
 
   try {
-    const saved = localStorage.getItem('atulado_zen_inventory');
+    const saved = localStorage.getItem(getZenStorageKey('inventory'));
     if (saved) {
       const parsed = JSON.parse(saved);
       zenInventory = Object.assign(zenInventory, parsed);
@@ -220,15 +225,15 @@
 
   function saveZenInventory() {
     try {
-      localStorage.setItem('atulado_zen_inventory', JSON.stringify(zenInventory));
+      localStorage.setItem(getZenStorageKey('inventory'), JSON.stringify(zenInventory));
     } catch(e) {}
   }
 
   function saveZenEconomy() {
     try {
-      localStorage.setItem('atulado_zen_total_calm', totalCalmPoints.toString());
-      localStorage.setItem('atulado_zen_daily_tasks', dailyTasksCompleted.toString());
-      localStorage.setItem('atulado_zen_daily_date', new Date().toISOString().slice(0, 10));
+      localStorage.setItem(getZenStorageKey('total_calm'), totalCalmPoints.toString());
+      localStorage.setItem(getZenStorageKey('daily_tasks'), dailyTasksCompleted.toString());
+      localStorage.setItem(getZenStorageKey('daily_date'), new Date().toISOString().slice(0, 10));
     } catch(e) {}
   }
 

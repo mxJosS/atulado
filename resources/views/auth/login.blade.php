@@ -100,6 +100,9 @@
             <label for="password" style="font-size: 0.86rem; font-weight: 600; color: #1A2620;">
               Contraseña
             </label>
+            <a href="{{ route('password.request') }}" style="font-size: 0.82rem; color: #2E5D4B; text-decoration: underline; font-weight: 500;">
+              ¿Olvidaste tu contraseña?
+            </a>
           </div>
           <div style="position: relative;">
             <input 
@@ -151,7 +154,7 @@
 
     <!-- Crisis Hotline Footer -->
     <div style="text-align: center; margin-top: 1.5rem; font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: #8EADA4;">
-      SI ESTÁS EN CRISIS: <a href="tel:8002900024" style="color: #FFA59C; text-decoration: none; font-weight: 700;"><i class="fa-solid fa-phone"></i> 800 290 0024</a>
+      SI ESTÁS EN CRISIS: <a href="tel:8009112000" style="color: #FFA59C; text-decoration: none; font-weight: 700;"><i class="fa-solid fa-phone"></i> 800 911 2000</a>
     </div>
 
   </div>

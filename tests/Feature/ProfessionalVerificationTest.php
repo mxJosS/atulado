@@ -133,7 +133,10 @@ class ProfessionalVerificationTest extends TestCase
         $this->actingAs($this->user);
 
         $response = $this->post(route('admin.verification.approve', $verification));
-        $response->assertStatus(403);
+        $response->assertRedirect(route('dashboard'));
+
+        $jsonResponse = $this->postJson(route('admin.verification.approve', $verification));
+        $jsonResponse->assertStatus(403);
     }
 
     /**
@@ -165,7 +168,10 @@ class ProfessionalVerificationTest extends TestCase
         $this->actingAs($this->user);
 
         $response = $this->get(route('admin.verifications.index'));
-        $response->assertStatus(403);
+        $response->assertRedirect(route('dashboard'));
+
+        $jsonResponse = $this->getJson(route('admin.verifications.index'));
+        $jsonResponse->assertStatus(403);
     }
 
     /**

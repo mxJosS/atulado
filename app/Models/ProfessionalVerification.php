@@ -15,6 +15,7 @@ class ProfessionalVerification extends Model
         'full_name',
         'license_number',
         'education_level',
+        'specialty',
         'document_path',
         'status',
         'admin_notes',
@@ -43,7 +44,7 @@ class ProfessionalVerification extends Model
     {
         return match($this->education_level) {
             'licenciatura' => 'Licenciatura / Pregrado',
-            'especialidad' => 'Especialidad Clínica',
+            'especialidad' => 'Especialidad',
             'maestria'     => 'Maestría',
             'doctorado'    => 'Doctorado',
             default        => ucfirst($this->education_level ?? ''),
@@ -51,15 +52,26 @@ class ProfessionalVerification extends Model
     }
 
     /**
-     * Retorna el título profesional predeterminado para el perfil
+     * Retorna el título profesional predeterminado o basado en la especialidad
      */
     public function getComputedProfessionalTitleAttribute(): string
     {
+        if (!empty($this->specialty)) {
+            $prefix = match($this->education_level) {
+                'licenciatura' => 'Lic. en',
+                'especialidad' => 'Esp. en',
+                'maestria'     => 'Mtr. en',
+                'doctorado'    => 'Dr(a). en',
+                default        => '',
+            };
+            return trim("{$prefix} {$this->specialty}");
+        }
+
         return match($this->education_level) {
-            'licenciatura' => 'Licenciado(a) en Salud Mental',
+            'licenciatura' => 'Licenciado(a) en Salud / Psicología',
             'especialidad' => 'Especialista Clínico(a)',
-            'maestria'     => 'Maestro(a) en Salud Mental',
-            'doctorado'    => 'Doctor(a) en Psicología / Salud',
+            'maestria'     => 'Maestro(a) en Salud / Psicología',
+            'doctorado'    => 'Doctor(a) en Salud / Psicología',
             default        => 'Profesional de la Salud',
         };
     }

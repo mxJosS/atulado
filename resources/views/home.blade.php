@@ -58,9 +58,9 @@
 
     <!-- CRISIS ROUND PANIC BUTTON (OBLIGATORIO) -->
     <div style="margin-bottom: 1.75rem; display: flex; justify-content: center;">
-      <a href="tel:8002900024" class="panic-button-circle" title="Llamar inmediatamente a Línea de la Vida">
+      <a href="tel:8009112000" class="panic-button-circle" title="Llamar inmediatamente a Línea de la Vida">
         <span class="plus-icon">+</span>
-        <span class="phone-num">800 290 0024</span>
+        <span class="phone-num">800 911 2000</span>
         <span class="sub-tag-1">LÍNEA DE LA VIDA</span>
         <span class="sub-tag-2">GRATUITA · 24H</span>
       </a>

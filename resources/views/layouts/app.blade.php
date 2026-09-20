@@ -53,6 +53,13 @@
       <nav class="sidebar-nav-group">
         <div class="sidebar-section-title">Mi Espacio</div>
         
+        @if(auth()->user()?->is_admin)
+          <a href="{{ route('admin.dashboard') }}" class="sidebar-item" style="background: rgba(168,230,192,0.12); color: #A8E6C0; border: 1px solid rgba(168,230,192,0.25); margin-bottom: 0.5rem;" title="Ir al Panel de Administración">
+            <div class="sidebar-item-icon"><i class="fa-solid fa-shield-halved" style="color: #A8E6C0;"></i></div>
+            <span style="font-weight: 700;">Torre de Control</span>
+          </a>
+        @endif
+
         <a href="{{ route('dashboard') }}" class="sidebar-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
           <div class="sidebar-item-icon"><i class="fa-solid fa-table-cells-large"></i></div>
           <span>Dashboard</span>
@@ -171,6 +178,13 @@
         </div>
 
         <div style="display: flex; align-items: center; gap: 0.75rem;">
+          @if(auth()->user()?->is_admin)
+            <a href="{{ route('admin.dashboard') }}" class="btn btn-sm" style="background: #111A14; color: #A8E6C0; border: 1px solid rgba(168,230,192,0.3); font-weight: 700; font-size: 0.78rem; padding: 0.45rem 0.85rem; border-radius: 9999px; gap: 6px; text-decoration: none; display: inline-flex; align-items: center;" title="Volver a la consola de administración">
+              <i class="fa-solid fa-shield-halved" style="color: #A8E6C0;"></i>
+              <span>Torre de Control</span>
+            </a>
+          @endif
+
           <!-- Interactive Streak / Tree Badge Button -->
           @php
             $userStreak = auth()->user()?->calculateStreak() ?? 0;
@@ -227,6 +241,9 @@
   </div>
 
   <script src="{{ asset('js/main.js') }}?v={{ file_exists(public_path('js/main.js')) ? filemtime(public_path('js/main.js')) : time() }}"></script>
+  <script>
+    window.ATULADO_USER_ID = {{ auth()->id() ? auth()->id() : "'guest'" }};
+  </script>
   <script src="{{ asset('js/game-engine.js') }}?v={{ file_exists(public_path('js/game-engine.js')) ? filemtime(public_path('js/game-engine.js')) : time() }}"></script>
   @stack('scripts')
 </body>

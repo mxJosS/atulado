@@ -77,14 +77,20 @@ class ProfessionalVerificationController extends Controller
             $documentPath = $request->file('document')->store('verifications/' . $user->id, 'public');
         }
 
-        ProfessionalVerification::create([
+        $data = [
             'user_id'         => $user->id,
             'full_name'       => trim($request->validated('full_name')),
             'license_number'  => strtoupper(trim($request->validated('license_number'))),
             'education_level' => $request->validated('education_level'),
             'document_path'   => $documentPath,
             'status'          => 'pendiente',
-        ]);
+        ];
+
+        if ($request->filled('specialty')) {
+            $data['specialty'] = trim($request->input('specialty'));
+        }
+
+        ProfessionalVerification::create($data);
 
         return redirect()->route('profile.show')
             ->with('success', '¡Solicitud enviada con éxito! Tu información y cédula profesional están en proceso de verificación por nuestro equipo.');

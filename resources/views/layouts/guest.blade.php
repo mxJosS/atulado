@@ -56,9 +56,9 @@
 
       <!-- Action Buttons -->
       <div class="nav-actions">
-        <a href="tel:8002900024" class="nav-crisis-pill" title="Llamar a Línea de la Vida 24/7">
+        <a href="tel:8009112000" class="nav-crisis-pill" title="Llamar a Línea de la Vida 24/7">
           <i class="fa-solid fa-phone" style="font-size: 0.75rem;"></i>
-          <span class="crisis-label-desktop">CRISIS: 800 290 0024</span>
+          <span class="crisis-label-desktop">CRISIS: 800 911 2000</span>
           <span class="crisis-label-mobile">SOS 24h</span>
         </a>
 
@@ -152,9 +152,9 @@
         <p class="footer-desc">
           Un espacio seguro y confidencial de acompañamiento psicológico, herramientas DBT y prevención en crisis para México y Latinoamérica.
         </p>
-        <a href="tel:8002900024" class="badge badge-crisis" style="padding: 0.5rem 1rem; gap: 8px; text-decoration: none;">
+        <a href="tel:8009112000" class="badge badge-crisis" style="padding: 0.5rem 1rem; gap: 8px; text-decoration: none;">
           <i class="fa-solid fa-phone"></i>
-          <span>Línea 24h: 800 290 0024</span>
+          <span>Línea 24h: 800 911 2000</span>
         </a>
       </div>
 
@@ -197,6 +197,11 @@
 
     <div class="footer-bottom">
       <p>© {{ date('Y') }} A tu lado · Plataforma de Bienestar y Salud Mental</p>
+      <p style="font-size: 0.82rem; margin: 0.4rem 0;">
+        <a href="{{ route('privacidad') }}" style="color: #A8E6C0; text-decoration: none; margin: 0 0.5rem;">Aviso de Privacidad</a> ·
+        <a href="{{ route('terminos') }}" style="color: #A8E6C0; text-decoration: none; margin: 0 0.5rem;">Condiciones del Servicio</a> ·
+        <a href="mailto:privacidad@atulado.com.mx" style="color: #A8E6C0; text-decoration: none; margin: 0 0.5rem;">Contacto Legal</a>
+      </p>
       <p style="font-size: 0.76rem; opacity: 0.75; max-width: 600px;">
         *Este servicio es complementario y no sustituye la psicoterapia profesional individualizada. En emergencias severas, comunícate de inmediato a la Línea de la Vida.
       </p>

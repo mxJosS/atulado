@@ -112,6 +112,13 @@ class AuthController extends Controller
                     ->with('success', '¡Bienvenido(a) al Panel de Administración, ' . $user->name . '!');
             }
 
+            $intended = session()->get('url.intended');
+            if ($intended && (str_contains($intended, '/admin') || str_contains($intended, 'solicitudes-profesionales'))) {
+                session()->forget('url.intended');
+                return redirect()->route('dashboard')
+                    ->with('success', '¡Bienvenido(a) a tu espacio seguro, ' . $user->name . '!');
+            }
+
             return redirect()->intended(route('dashboard'))
                 ->with('success', '¡Bienvenido(a) a tu espacio seguro, ' . $user->name . '!');
 
@@ -145,6 +152,14 @@ class AuthController extends Controller
                 return redirect()->intended(route('admin.dashboard'))
                     ->with('success', '¡Bienvenido al Panel de Administración, ' . $user->name . '!');
             }
+
+            $intended = session()->get('url.intended');
+            if ($intended && (str_contains($intended, '/admin') || str_contains($intended, 'solicitudes-profesionales'))) {
+                session()->forget('url.intended');
+                return redirect()->route('dashboard')
+                    ->with('success', '¡Bienvenido de vuelta, ' . $user->name . '!');
+            }
+
             return redirect()->intended(route('dashboard'))
                 ->with('success', '¡Bienvenido de vuelta, ' . $user->name . '!');
         }
@@ -269,5 +284,90 @@ class AuthController extends Controller
         ]);
 
         return back()->with('success', 'Tu contraseña ha sido modificada con éxito.');
+    }
+
+    public function showForgotPassword()
+    {
+        if (Auth::check()) {
+            return redirect()->route('dashboard');
+        }
+        return view('auth.forgot-password');
+    }
+
+    public function sendResetLinkEmail(Request $request)
+    {
+        $request->validate([
+            'email' => ['required', 'email'],
+        ], [
+            'email.required' => 'El correo electrónico es obligatorio.',
+            'email.email' => 'Ingresa un correo electrónico válido.',
+        ]);
+
+        $status = \Illuminate\Support\Facades\Password::sendResetLink(
+            $request->only('email')
+        );
+
+        if ($status === \Illuminate\Support\Facades\Password::RESET_LINK_SENT) {
+            return back()->with('status', 'Te hemos enviado por correo el enlace para restablecer tu contraseña. Revisa tu bandeja de entrada o spam.');
+        }
+
+        $errorMsg = match ($status) {
+            \Illuminate\Support\Facades\Password::INVALID_USER => 'No encontramos ninguna cuenta registrada con este correo electrónico.',
+            \Illuminate\Support\Facades\Password::RESET_THROTTLED => 'Has realizado demasiados intentos. Por favor, espera unos minutos.',
+            default => 'No se pudo enviar el enlace de recuperación en este momento.',
+        };
+
+        return back()->withErrors(['email' => $errorMsg])->withInput();
+    }
+
+    public function showResetPassword(Request $request, string $token)
+    {
+        if (Auth::check()) {
+            return redirect()->route('dashboard');
+        }
+        return view('auth.reset-password', [
+            'token' => $token,
+            'email' => $request->query('email'),
+        ]);
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'token' => 'required',
+            'email' => ['required', 'email'],
+            'password' => ['required', 'confirmed', Password::min(6)],
+        ], [
+            'email.required' => 'El correo electrónico es obligatorio.',
+            'email.email' => 'Ingresa un correo válido.',
+            'password.required' => 'La contraseña es obligatoria.',
+            'password.confirmed' => 'La confirmación de la contraseña no coincide.',
+            'password.min' => 'La contraseña debe tener al menos 6 caracteres.',
+        ]);
+
+        $status = \Illuminate\Support\Facades\Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user, string $password) {
+                $user->forceFill([
+                    'password' => Hash::make($password),
+                ])->setRememberToken(Str::random(60));
+
+                $user->save();
+
+                event(new \Illuminate\Auth\Events\PasswordReset($user));
+            }
+        );
+
+        if ($status === \Illuminate\Support\Facades\Password::PASSWORD_RESET) {
+            return redirect()->route('login')->with('success', 'Tu contraseña ha sido restablecida con éxito. Ya puedes iniciar sesión con tu nueva clave.');
+        }
+
+        $errorMsg = match ($status) {
+            \Illuminate\Support\Facades\Password::INVALID_USER => 'No encontramos ningún usuario con ese correo electrónico.',
+            \Illuminate\Support\Facades\Password::INVALID_TOKEN => 'El enlace de recuperación es inválido o ya ha expirado.',
+            default => 'Ocurrió un error al restablecer la contraseña.',
+        };
+
+        return back()->withErrors(['email' => $errorMsg]);
     }
 }

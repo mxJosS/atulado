@@ -59,6 +59,14 @@ class User extends Authenticatable
         return $this->role === 'profesional' || $this->role === 'admin' || $this->is_admin;
     }
 
+    /**
+     * Determina si el usuario es la cuenta administradora principal protegida
+     */
+    public function isSuperAdmin(): bool
+    {
+        return strtolower(trim($this->email ?? '')) === 'admin@atulado.com.mx';
+    }
+
     public function articles(): HasMany
     {
         return $this->hasMany(Article::class)->orderBy('published_at', 'desc');

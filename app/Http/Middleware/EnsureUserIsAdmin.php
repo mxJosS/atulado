@@ -16,7 +16,11 @@ class EnsureUserIsAdmin
     public function handle(Request $request, Closure $next): Response
     {
         if (!$request->user() || !$request->user()->is_admin) {
-            abort(403, 'Acceso denegado. No tienes permisos para ingresar al ?rea administrativa.');
+            if ($request->expectsJson()) {
+                abort(403, 'Acceso denegado. No tienes permisos para ingresar al área administrativa.');
+            }
+            return redirect()->route('dashboard')
+                ->with('error', 'Acceso restringido: Esta sección requiere permisos administrativos.');
         }
 
         return $next($request);

@@ -23,7 +23,7 @@
         Publicar Artículo o Investigación
       </h1>
       <p style="color: #C8DDD1 !important; font-size: 0.92rem; line-height: 1.5; margin: 0;">
-        Comparte evidencia clínica, protocolos de regulación emocional, revisiones científicas o reflexiones para la comunidad.
+        Comparte evidencia clínica, protocolos de regulación emocional, nutrición, medicina, revisiones científicas o reflexiones para la comunidad y el bienestar integral.
       </p>
     </div>
 
@@ -133,10 +133,13 @@
                   id="author_credentials" 
                   class="form-control @error('author_credentials') is-invalid @enderror" 
                   value="{{ old('author_credentials', auth()->user()?->professional_title ?? 'Psicólogo Clínico · Terapeuta DBT') }}" 
-                  placeholder="Ej. Psicóloga Clínica · Terapeuta DBT Certificada" 
+                  placeholder="Ej. Psicóloga Clínica · Terapeuta DBT / Nutrióloga Clínica / Médico Psiquiatra" 
                   required
                   style="border-radius: 10px;"
                 >
+                <small style="color: #6E887E; font-size: 0.74rem; display: block; margin-top: 0.35rem;">
+                  Abierto a especialistas de psicología, psiquiatría, nutrición, medicina y disciplinas de bienestar integral.
+                </small>
                 @error('author_credentials')
                   <div style="color: #C0392B; font-size: 0.8rem; margin-top: 0.3rem;">{{ $message }}</div>
                 @enderror

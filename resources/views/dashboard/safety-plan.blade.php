@@ -17,9 +17,9 @@
         <i class="fa-solid fa-print"></i>
         <span>Imprimir / PDF</span>
       </a>
-      <a href="tel:8002900024" class="btn btn-crisis btn-sm" style="gap: 6px;">
+      <a href="tel:8009112000" class="btn btn-crisis btn-sm" style="gap: 6px;">
         <i class="fa-solid fa-phone"></i>
-        <span>SOS 800 290 0024</span>
+        <span>SOS 800 911 2000</span>
       </a>
     </div>
   </div>
@@ -41,7 +41,7 @@
 
         <div id="warningSignsContainer" style="display: flex; flex-direction: column; gap: 0.6rem;">
           @php
-            $warningSigns = old('warning_signs', $safetyPlan->warning_signs ?? ['Pensamientos de no ser suficiente', 'Aislamiento y no responder mensajes', 'Tensión constante en el cuerpo']);
+            $warningSigns = old('warning_signs', $safetyPlan->warning_signs ?? ($safetyPlan->exists ? [] : ['Pensamientos de no ser suficiente', 'Aislamiento y no responder mensajes', 'Tensión constante en el cuerpo']));
           @endphp
           @foreach($warningSigns as $ws)
             <div style="display: flex; gap: 0.6rem; align-items: center;">
@@ -73,7 +73,7 @@
 
         <div id="internalCopingContainer" style="display: flex; flex-direction: column; gap: 0.6rem;">
           @php
-            $coping = old('internal_coping', $safetyPlan->internal_coping ?? ['Respiración 4-7-8 por 4 minutos', 'Ducha de agua fría/tibia consciente', 'Salir a caminar sin celular']);
+            $coping = old('internal_coping', $safetyPlan->internal_coping ?? ($safetyPlan->exists ? [] : ['Respiración 4-7-8 por 4 minutos', 'Ducha de agua fría/tibia consciente', 'Salir a caminar sin celular']));
           @endphp
           @foreach($coping as $cp)
             <div style="display: flex; gap: 0.6rem; align-items: center;">
@@ -108,7 +108,7 @@
             <label class="form-label" style="font-size: 0.82rem; font-weight: 600; margin-bottom: 0.5rem; display: block;">Personas que te distraen:</label>
             <div id="socialDistractionsContainer" style="display: flex; flex-direction: column; gap: 0.5rem;">
               @php
-                $distractions = old('social_distractions', $safetyPlan->social_distractions ?? ['Llamar a mi hermano(a)', 'Platicar de series con mi amigo(a)']);
+                $distractions = old('social_distractions', $safetyPlan->social_distractions ?? ($safetyPlan->exists ? [] : ['Llamar a mi hermano(a)', 'Platicar de series con mi amigo(a)']));
               @endphp
               @foreach($distractions as $ds)
                 <div style="display: flex; gap: 0.5rem; align-items: center;">
@@ -129,7 +129,7 @@
             <label class="form-label" style="font-size: 0.82rem; font-weight: 600; margin-bottom: 0.5rem; display: block;">Lugares seguros:</label>
             <div id="safePlacesContainer" style="display: flex; flex-direction: column; gap: 0.5rem;">
               @php
-                $places = old('safe_places', $safetyPlan->safe_places ?? ['El parque cerca de casa', 'La cafetería de la esquina', 'Mi recámara con música']);
+                $places = old('safe_places', $safetyPlan->safe_places ?? ($safetyPlan->exists ? [] : ['El parque cerca de casa', 'La cafetería de la esquina', 'Mi recámara con música']));
               @endphp
               @foreach($places as $pl)
                 <div style="display: flex; gap: 0.5rem; align-items: center;">
@@ -162,10 +162,10 @@
 
         <div id="trustedContactsContainer" style="display: flex; flex-direction: column; gap: 0.85rem;">
           @php
-            $contacts = old('trusted_contacts', $safetyPlan->trusted_contacts ?? [
+            $contacts = old('trusted_contacts', $safetyPlan->trusted_contacts ?? ($safetyPlan->exists ? [] : [
               ['name' => 'Carlos (Amigo)', 'phone' => '55 1234 5678', 'relationship' => 'Amigo de confianza'],
               ['name' => 'Mamá', 'phone' => '55 9876 5432', 'relationship' => 'Familia directa']
-            ]);
+            ]));
           @endphp
           @foreach($contacts as $idx => $tc)
             @php
@@ -194,7 +194,7 @@
                   <span style="font-family: var(--font-mono); font-size: 0.72rem; color: #556860; font-weight: 700; text-transform: uppercase;">Acciones:</span>
                   
                   <!-- 1. LLAMADA DIRECTA -->
-                  <a href="tel:{{ $phoneClean ?: '8002900024' }}" class="btn-call action-call-btn" title="Llamar directamente a este contacto">
+                  <a href="tel:{{ $phoneClean ?: '8009112000' }}" class="btn-call action-call-btn" title="Llamar directamente a este contacto">
                     <i class="fa-solid fa-phone"></i>
                     <span>Llamar</span>
                   </a>
@@ -235,7 +235,7 @@
 
         <div id="reasonsToLiveContainer" style="display: flex; flex-direction: column; gap: 0.6rem;">
           @php
-            $reasons = old('reasons_to_live', $safetyPlan->reasons_to_live ?? ['Mi mascota que depende de mí con amor incondicional', 'Terminar mi carrera y ver mundo', 'Estar presente para las personas que me quieren']);
+            $reasons = old('reasons_to_live', $safetyPlan->reasons_to_live ?? ($safetyPlan->exists ? [] : ['Mi mascota que depende de mí con amor incondicional', 'Terminar mi carrera y ver mundo', 'Estar presente para las personas que me quieren']));
           @endphp
           @foreach($reasons as $rs)
             <div style="display: flex; gap: 0.6rem; align-items: center;">
@@ -394,7 +394,7 @@
     const waMessage = encodeURIComponent("Necesito ayuda, ¿podemos hablar?");
 
     if (callBtn) {
-      callBtn.href = rawPhone ? `tel:${rawPhone}` : 'tel:8002900024';
+      callBtn.href = rawPhone ? `tel:${rawPhone}` : 'tel:8009112000';
     }
 
     if (waBtn) {

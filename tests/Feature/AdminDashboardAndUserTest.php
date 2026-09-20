@@ -18,16 +18,20 @@ class AdminDashboardAndUserTest extends TestCase
 
         $response = $this->actingAs($user)->get('/admin/dashboard');
 
-        $response->assertStatus(403);
+        $response->assertRedirect(route('dashboard'));
+        $response->assertSessionHas('error');
+
+        $jsonResponse = $this->actingAs($user)->getJson('/admin/dashboard');
+        $jsonResponse->assertStatus(403);
     }
 
-    public function test_admin_accessing_user_dashboard_redirects_to_admin_dashboard(): void
+    public function test_admin_can_access_user_dashboard_naturally(): void
     {
         $admin = User::factory()->create(['is_admin' => true]);
 
         $response = $this->actingAs($admin)->get('/dashboard');
 
-        $response->assertRedirect(route('admin.dashboard'));
+        $response->assertStatus(200);
     }
 
     public function test_admin_user_can_access_admin_dashboard_and_modules(): void
@@ -126,7 +130,7 @@ class AdminDashboardAndUserTest extends TestCase
         $this->assertNotNull($proUser);
         $this->assertEquals('profesional', $proUser->role);
         $this->assertEquals('CED-88776655', $proUser->license_number);
-        $this->assertStringContainsString('Mtro.', $proUser->professional_title);
+        $this->assertStringContainsString('Maestría', $proUser->professional_title);
 
         $this->assertDatabaseHas('professional_verifications', [
             'user_id' => $proUser->id,
@@ -276,5 +280,101 @@ class AdminDashboardAndUserTest extends TestCase
 
         $response->assertRedirect(route('login'));
         $response->assertSessionHas('error');
+    }
+
+    public function test_super_admin_account_cannot_be_deleted(): void
+    {
+        $superAdmin = User::factory()->create([
+            'email' => 'admin@atulado.com.mx',
+            'is_admin' => true,
+            'role' => 'admin',
+        ]);
+
+        $otherAdmin = User::factory()->create([
+            'email' => 'otro.admin@atulado.com.mx',
+            'is_admin' => true,
+            'role' => 'admin',
+        ]);
+
+        // Intentar eliminar como otro admin
+        $response = $this->actingAs($otherAdmin)->delete("/admin/usuarios/{$superAdmin->id}");
+        $response->assertSessionHas('error');
+        $this->assertDatabaseHas('users', ['email' => 'admin@atulado.com.mx']);
+
+        // Intentar auto-eliminación
+        $selfResponse = $this->actingAs($superAdmin)->delete("/admin/usuarios/{$superAdmin->id}");
+        $selfResponse->assertSessionHas('error');
+        $this->assertDatabaseHas('users', ['email' => 'admin@atulado.com.mx']);
+    }
+
+    public function test_super_admin_can_delete_other_admins_and_users(): void
+    {
+        $superAdmin = User::factory()->create([
+            'email' => 'admin@atulado.com.mx',
+            'is_admin' => true,
+            'role' => 'admin',
+        ]);
+
+        $otherAdmin = User::factory()->create([
+            'email' => 'admin2@atulado.com.mx',
+            'is_admin' => true,
+            'role' => 'admin',
+        ]);
+
+        $regularUser = User::factory()->create([
+            'email' => 'paciente@atulado.com.mx',
+            'role' => 'usuario',
+            'is_admin' => false,
+        ]);
+
+        // Super admin puede eliminar a otro admin
+        $response1 = $this->actingAs($superAdmin)->delete("/admin/usuarios/{$otherAdmin->id}");
+        $response1->assertRedirect(route('admin.users.index'));
+        $this->assertDatabaseMissing('users', ['id' => $otherAdmin->id]);
+
+        // Super admin puede eliminar a un usuario regular
+        $response2 = $this->actingAs($superAdmin)->delete("/admin/usuarios/{$regularUser->id}");
+        $response2->assertRedirect(route('admin.users.index'));
+        $this->assertDatabaseMissing('users', ['id' => $regularUser->id]);
+    }
+
+    public function test_other_admin_cannot_delete_another_admin(): void
+    {
+        User::factory()->create([
+            'email' => 'admin@atulado.com.mx',
+            'is_admin' => true,
+            'role' => 'admin',
+        ]);
+
+        $admin1 = User::factory()->create([
+            'email' => 'admin1@atulado.com.mx',
+            'is_admin' => true,
+            'role' => 'admin',
+        ]);
+
+        $admin2 = User::factory()->create([
+            'email' => 'admin2@atulado.com.mx',
+            'is_admin' => true,
+            'role' => 'admin',
+        ]);
+
+        $response = $this->actingAs($admin1)->delete("/admin/usuarios/{$admin2->id}");
+        $response->assertSessionHas('error');
+        $this->assertDatabaseHas('users', ['id' => $admin2->id]);
+    }
+
+    public function test_ui_does_not_display_super_admin_text(): void
+    {
+        $superAdmin = User::factory()->create([
+            'email' => 'admin@atulado.com.mx',
+            'is_admin' => true,
+            'role' => 'admin',
+        ]);
+
+        $response = $this->actingAs($superAdmin)->get('/admin/usuarios');
+        $response->assertStatus(200);
+        $response->assertDontSee('Super Admin');
+        $response->assertDontSee('super admin');
+        $response->assertDontSee('SuperAdmin');
     }
 }

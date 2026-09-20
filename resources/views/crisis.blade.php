@@ -19,9 +19,9 @@
     </p>
 
     <div style="margin-top: 2rem;">
-      <a href="tel:8002900024" class="btn btn-crisis btn-lg" style="font-size: 1.05rem; padding: 1rem 2.25rem; border-radius: 9999px; gap: 8px;">
+      <a href="tel:8009112000" class="btn btn-crisis btn-lg" style="font-size: 1.05rem; padding: 1rem 2.25rem; border-radius: 9999px; gap: 8px;">
         <i class="fa-solid fa-phone"></i>
-        <span>México: 800 290 0024 (Línea de la Vida)</span>
+        <span>México: 800 911 2000 (Línea de la Vida)</span>
       </a>
     </div>
   </div>

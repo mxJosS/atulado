@@ -53,6 +53,62 @@
     .admin-nav-item.active .nav-icon {
       color: #A8E6C0;
     }
+    .admin-switch-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 0.55rem 0.85rem;
+      border-radius: 9px;
+      background: rgba(255, 255, 255, 0.08);
+      color: #FFFFFF;
+      text-decoration: none;
+      font-size: 0.82rem;
+      font-weight: 600;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      transition: all 0.2s ease;
+      margin-bottom: 0.75rem;
+    }
+    .admin-switch-btn:hover {
+      background: rgba(255, 255, 255, 0.16);
+      color: #A8E6C0;
+      border-color: rgba(168, 230, 192, 0.4);
+    }
+    .admin-mobile-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 1.25rem;
+      background: #FFFFFF;
+      border-bottom: 1px solid #E2ECE6;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+    }
+    .mobile-sidebar-toggle-admin {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      padding: 0;
+      border-radius: 8px;
+      border: 1px solid #DCE8E0;
+      background: #FFFFFF;
+      color: #1A2620;
+      cursor: pointer;
+      font-size: 1.1rem;
+    }
+    @media (max-width: 960px) {
+      .mobile-sidebar-toggle-admin {
+        display: inline-flex !important;
+      }
+    }
+    @media (max-width: 520px) {
+      .admin-topbar-text {
+        display: none;
+      }
+    }
   </style>
 </head>
 <body style="background: #F8FAF9; color: #1A2620;">
@@ -81,10 +137,18 @@
       </div>
 
       <!-- Admin Tag -->
-      <div style="padding: 0 1.25rem 0.85rem;">
+      <div style="padding: 0 1.25rem 0.65rem;">
         <span style="display: inline-flex; align-items: center; gap: 6px; padding: 0.22rem 0.65rem; border-radius: 6px; background: rgba(168,230,192,0.12); color: #A8E6C0; font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.04em;">
           <i class="fa-solid fa-shield-halved" style="font-size: 0.72rem;"></i> CONSOLA ADMINISTRADOR
         </span>
+      </div>
+
+      <!-- Quick Switch to User App -->
+      <div style="padding: 0 0.85rem 0.65rem;">
+        <a href="{{ route('dashboard') }}" class="admin-switch-btn" title="Ir a la aplicación como usuario">
+          <i class="fa-solid fa-house-user" style="color: #A8E6C0;"></i>
+          <span>Ir a la App (Mi Espacio)</span>
+        </a>
       </div>
 
       <!-- Navigation Menu: ONLY 4 SPECIFIED MODULES -->
@@ -160,8 +224,41 @@
 
     </aside>
 
+    <!-- Overlay for Mobile Sidebar in Admin -->
+    <div id="adminSidebarOverlay" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 85;"></div>
+
     <!-- ════ MAIN ADMIN CONTENT CANVAS ════ -->
     <div class="dashboard-main">
+
+      <!-- Admin Topbar with Mobile Hamburger, Brand & Quick Actions -->
+      <header class="admin-mobile-topbar">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <button id="adminMobileSidebarToggle" type="button" class="mobile-sidebar-toggle-admin" aria-label="Abrir menú de navegación">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-family: 'Fraunces', serif; font-weight: 700; font-size: 1.05rem; color: #1A2620;">
+              Consola Admin
+            </span>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <a href="{{ route('dashboard') }}" class="btn btn-sm" style="display: inline-flex; align-items: center; gap: 6px; background: #EBF7EE; color: #1E4A25; border: 1px solid #B8E2C8; border-radius: 9999px; font-size: 0.78rem; font-weight: 600; padding: 0.4rem 0.8rem; text-decoration: none;" title="Abrir mi espacio de usuario">
+            <i class="fa-solid fa-house-user"></i>
+            <span class="admin-topbar-text">Mi Espacio</span>
+          </a>
+
+          <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
+            @csrf
+            <button type="submit" class="btn btn-sm" style="display: inline-flex; align-items: center; gap: 6px; background: #FFF1F2; color: #9F1239; border: 1px solid #FECDD3; border-radius: 9999px; font-size: 0.78rem; font-weight: 600; padding: 0.4rem 0.8rem; cursor: pointer;" title="Cerrar Sesión">
+              <i class="fa-solid fa-arrow-right-from-bracket"></i>
+              <span class="admin-topbar-text">Salir</span>
+            </button>
+          </form>
+        </div>
+      </header>
+
       <!-- GLOBAL FLOATING TOAST CONTAINER (Consistente con todo el sistema A tu lado) -->
       <div id="zenToastContainer">
         @if(session('success'))
@@ -345,6 +442,35 @@
         closeAdminNoticeModal();
       }
     });
+
+    // 4. Admin Sidebar Mobile Toggle
+    (function() {
+      const toggleBtn = document.getElementById('adminMobileSidebarToggle');
+      const sidebar = document.getElementById('dashboardSidebar');
+      const overlay = document.getElementById('adminSidebarOverlay');
+
+      if (toggleBtn && sidebar && overlay) {
+        toggleBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          sidebar.classList.toggle('mobile-open');
+          overlay.style.display = sidebar.classList.contains('mobile-open') ? 'block' : 'none';
+        });
+
+        overlay.addEventListener('click', function() {
+          sidebar.classList.remove('mobile-open');
+          overlay.style.display = 'none';
+        });
+
+        sidebar.querySelectorAll('.admin-nav-item, .admin-switch-btn').forEach(function(item) {
+          item.addEventListener('click', function() {
+            if (window.innerWidth <= 960) {
+              sidebar.classList.remove('mobile-open');
+              overlay.style.display = 'none';
+            }
+          });
+        });
+      }
+    })();
   </script>
 
   @stack('scripts')

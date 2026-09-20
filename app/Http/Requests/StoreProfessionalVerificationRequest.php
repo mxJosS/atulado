@@ -25,6 +25,7 @@ class StoreProfessionalVerificationRequest extends FormRequest
             'full_name'       => ['required', 'string', 'min:3', 'max:255'],
             'license_number'  => ['required', 'string', 'max:50', 'regex:/^[a-zA-Z0-9\-]+$/'],
             'education_level' => ['required', 'in:licenciatura,especialidad,maestria,doctorado'],
+            'specialty'       => ['nullable', 'string', 'max:120'],
             'document'        => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png,webp', 'max:5120'], // Máximo 5MB
         ];
     }

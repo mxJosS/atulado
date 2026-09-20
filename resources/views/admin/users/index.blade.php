@@ -206,32 +206,64 @@
               <!-- Acciones (Editar, Eliminar) -->
               <td style="padding: 1rem 1.25rem; text-align: right;">
                 <div style="display: inline-flex; align-items: center; gap: 6px; justify-content: flex-end;">
-                  <button type="button" 
-                          onclick="openEditUserModal({{ json_encode([
-                              'id' => $user->id,
-                              'name' => $user->name,
-                              'email' => $user->email,
-                              'role' => $user->role,
-                              'is_admin' => $user->is_admin,
-                              'status' => $user->email_verified_at ? 'activo' : 'pendiente',
-                              'license_number' => $user->license_number ?? '',
-                              'institution' => $user->institution ?? '',
-                              'is_self' => $user->id === auth()->id(),
-                          ]) }})"
-                          class="btn-user-action btn-user-edit"
-                          title="Editar usuario"
-                          aria-label="Editar usuario">
-                    <i class="fa-solid fa-pen-to-square"></i>
-                    <span>Editar</span>
-                  </button>
-                  <button type="button" 
-                          onclick="confirmDeleteUser({{ $user->id }}, '{{ addslashes($user->name) }}', '{{ addslashes($user->email) }}', {{ $user->id === auth()->id() ? 'true' : 'false' }})"
-                          class="btn-user-action btn-user-delete"
-                          title="Eliminar usuario"
-                          aria-label="Eliminar usuario">
-                    <i class="fa-solid fa-trash-can"></i>
-                    <span>Eliminar</span>
-                  </button>
+                  @php
+                    $isTargetSuperAdmin = $user->isSuperAdmin();
+                    $isSelf = $user->id === auth()->id();
+                    $currentUserIsSuperAdmin = auth()->user()?->isSuperAdmin();
+                    
+                    // Si es la cuenta protegida, solo ella misma puede editarse
+                    $canEdit = !$isTargetSuperAdmin || $currentUserIsSuperAdmin;
+
+                    // La cuenta protegida NO se puede eliminar bajo ninguna circunstancia
+                    // Para eliminar a otro admin, se requiere ser la cuenta principal
+                    // Para eliminar usuarios/profesionales, cualquier admin puede hacerlo
+                    $canDelete = false;
+                    if (!$isTargetSuperAdmin && !$isSelf) {
+                        if ($user->is_admin || $user->role === 'admin') {
+                            $canDelete = $currentUserIsSuperAdmin;
+                        } else {
+                            $canDelete = true;
+                        }
+                    }
+                  @endphp
+
+                  @if($canEdit)
+                    <button type="button" 
+                            onclick="openEditUserModal({{ json_encode([
+                                'id' => $user->id,
+                                'name' => $user->name,
+                                'email' => $user->email,
+                                'role' => $user->role,
+                                'is_admin' => $user->is_admin,
+                                'status' => $user->email_verified_at ? 'activo' : 'pendiente',
+                                'license_number' => $user->license_number ?? '',
+                                'institution' => $user->institution ?? '',
+                                'is_self' => $isSelf,
+                                'is_super_admin' => $isTargetSuperAdmin,
+                            ]) }})"
+                            class="btn-user-action btn-user-edit"
+                            title="Editar usuario"
+                            aria-label="Editar usuario">
+                      <i class="fa-solid fa-pen-to-square"></i>
+                      <span>Editar</span>
+                    </button>
+                  @endif
+
+                  @if($canDelete)
+                    <button type="button" 
+                            onclick="confirmDeleteUser({{ $user->id }}, '{{ addslashes($user->name) }}', '{{ addslashes($user->email) }}', false)"
+                            class="btn-user-action btn-user-delete"
+                            title="Eliminar usuario"
+                            aria-label="Eliminar usuario">
+                      <i class="fa-solid fa-trash-can"></i>
+                      <span>Eliminar</span>
+                    </button>
+                  @elseif($isTargetSuperAdmin)
+                    <span style="display: inline-flex; align-items: center; gap: 4px; padding: 0.3rem 0.6rem; border-radius: 7px; font-size: 0.72rem; font-family: 'IBM Plex Mono', monospace; color: #556860; background: #EEF3F0; border: 1px solid #DCE5E0;" title="Cuenta protegida del sistema">
+                      <i class="fa-solid fa-lock" style="font-size: 0.68rem; color: #2E5D4B;"></i>
+                      <span>Protegido</span>
+                    </span>
+                  @endif
                 </div>
               </td>
             </tr>
@@ -321,16 +353,16 @@
           </div>
         </div>
 
-        <!-- ROL SELECTOR (Administrador | Profesional) -->
+        <!-- ROL SELECTOR (Administrador | Profesional | Usuario) -->
         <div style="margin-bottom: 1.5rem; background: #F8FAF9; padding: 1.15rem; border-radius: 12px; border: 1px solid rgba(0,0,0,0.06);">
           <label class="form-label" style="font-size: 0.85rem; font-weight: 700; color: #1A2620; margin-bottom: 0.5rem; display: block;">
             Selecciona el Rol de la Cuenta <span style="color: #DC2626;">*</span>
           </label>
           
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem;">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.75rem;">
             <!-- Opción Administrador -->
             <label style="display: flex; align-items: flex-start; gap: 10px; padding: 0.85rem; border-radius: 10px; border: 2px solid #E2E8F0; background: white; cursor: pointer; transition: all 0.2s ease;" id="labelRoleAdmin">
-              <input type="radio" name="role" value="admin" {{ old('role') !== 'profesional' ? 'checked' : '' }} onchange="toggleRoleFields()" style="margin-top: 3px;">
+              <input type="radio" name="role" value="admin" {{ old('role') === 'admin' ? 'checked' : '' }} onchange="toggleRoleFields()" style="margin-top: 3px;">
               <div>
                 <div style="font-weight: 700; font-size: 0.88rem; color: #1A2620;">Administrador</div>
                 <div style="font-size: 0.75rem; color: #6E887E; margin-top: 2px;">Acceso a la consola gerencial y auditoría.</div>
@@ -342,7 +374,16 @@
               <input type="radio" name="role" value="profesional" {{ old('role') === 'profesional' ? 'checked' : '' }} onchange="toggleRoleFields()" style="margin-top: 3px;">
               <div>
                 <div style="font-weight: 700; font-size: 0.88rem; color: #1A2620;">Profesional</div>
-                <div style="font-size: 0.75rem; color: #6E887E; margin-top: 2px;">Especialista de salud mental acreditado.</div>
+                <div style="font-size: 0.75rem; color: #6E887E; margin-top: 2px;">Especialista de salud acreditado.</div>
+              </div>
+            </label>
+
+            <!-- Opción Usuario Normal / Paciente -->
+            <label style="display: flex; align-items: flex-start; gap: 10px; padding: 0.85rem; border-radius: 10px; border: 2px solid #2E5D4B; background: #F8FAF9; cursor: pointer; transition: all 0.2s ease;" id="labelRoleUser">
+              <input type="radio" name="role" value="usuario" {{ (!old('role') || old('role') === 'usuario') ? 'checked' : '' }} onchange="toggleRoleFields()" style="margin-top: 3px;">
+              <div>
+                <div style="font-weight: 700; font-size: 0.88rem; color: #1A2620;">Usuario / Paciente</div>
+                <div style="font-size: 0.75rem; color: #6E887E; margin-top: 2px;">Cuenta regular con acceso a Mi Espacio.</div>
               </div>
             </label>
           </div>
@@ -359,6 +400,14 @@
           <p style="font-size: 0.78rem; color: #166534; margin: 0 0 1rem;">
             Al dar de alta este profesional, sus credenciales se validarán automáticamente en el sistema sin necesidad de trámites ni alertas posteriores.
           </p>
+
+          <!-- Especialidad o Enfoque Clínico (Opcional) -->
+          <div style="margin-bottom: 1rem;">
+            <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: #166534; margin-bottom: 0.4rem; display: block;">
+              Especialidad o Área de Salud (Opcional)
+            </label>
+            <input type="text" name="specialty" value="{{ old('specialty') }}" class="form-control" placeholder="Ej. Nutrición Clínica, Psicología, Psiquiatría, etc." style="border-radius: 9px; background: white;">
+          </div>
 
           <!-- Grado Escolar -->
           <div style="margin-bottom: 1rem;">
@@ -571,11 +620,13 @@
 
   function toggleRoleFields() {
     const isPro = document.querySelector('input[name="role"][value="profesional"]').checked;
+    const isAdmin = document.querySelector('input[name="role"][value="admin"]').checked;
     const proContainer = document.getElementById('proFieldsContainer');
     const eduSelect = document.getElementById('educationLevelSelect');
     const licInput = document.getElementById('licenseNumberInput');
     const labelAdmin = document.getElementById('labelRoleAdmin');
     const labelPro = document.getElementById('labelRolePro');
+    const labelUser = document.getElementById('labelRoleUser');
 
     if (isPro) {
       proContainer.style.display = 'block';
@@ -583,16 +634,22 @@
       licInput.setAttribute('required', 'required');
       labelPro.style.borderColor = '#2E5D4B';
       labelPro.style.background = '#F0FDF4';
-      labelAdmin.style.borderColor = '#E2E8F0';
-      labelAdmin.style.background = 'white';
+      if (labelAdmin) { labelAdmin.style.borderColor = '#E2E8F0'; labelAdmin.style.background = 'white'; }
+      if (labelUser) { labelUser.style.borderColor = '#E2E8F0'; labelUser.style.background = 'white'; }
     } else {
       proContainer.style.display = 'none';
       eduSelect.removeAttribute('required');
       licInput.removeAttribute('required');
-      labelAdmin.style.borderColor = '#2E5D4B';
-      labelAdmin.style.background = '#F8FAF9';
       labelPro.style.borderColor = '#E2E8F0';
       labelPro.style.background = 'white';
+
+      if (isAdmin) {
+        if (labelAdmin) { labelAdmin.style.borderColor = '#2E5D4B'; labelAdmin.style.background = '#F8FAF9'; }
+        if (labelUser) { labelUser.style.borderColor = '#E2E8F0'; labelUser.style.background = 'white'; }
+      } else {
+        if (labelUser) { labelUser.style.borderColor = '#2E5D4B'; labelUser.style.background = '#F8FAF9'; }
+        if (labelAdmin) { labelAdmin.style.borderColor = '#E2E8F0'; labelAdmin.style.background = 'white'; }
+      }
     }
   }
 
@@ -601,20 +658,42 @@
     const form = document.getElementById('editUserForm');
     form.action = '/admin/usuarios/' + user.id;
 
-    document.getElementById('editUserName').value = user.name || '';
-    document.getElementById('editUserEmail').value = user.email || '';
+    const emailInput = document.getElementById('editUserEmail');
+    const roleAdmin = document.getElementById('editRoleAdmin');
+    const rolePro = document.getElementById('editRolePro');
+    const roleUser = document.getElementById('editRoleUser');
+    const statusPendiente = document.getElementById('editStatusPendiente');
 
-    // Rol (Administrador, Profesional o Usuario)
-    if (user.is_admin || user.role === 'admin') {
-      document.getElementById('editRoleAdmin').checked = true;
-    } else if (user.role === 'profesional') {
-      document.getElementById('editRolePro').checked = true;
+    document.getElementById('editUserName').value = user.name || '';
+    emailInput.value = user.email || '';
+
+    // Si es la cuenta principal protegida
+    if (user.is_super_admin) {
+      emailInput.readOnly = true;
+      emailInput.style.background = '#F3F4F6';
+      roleAdmin.checked = true;
+      rolePro.disabled = true;
+      roleUser.disabled = true;
+      statusPendiente.disabled = true;
     } else {
-      document.getElementById('editRoleUser').checked = true;
+      emailInput.readOnly = false;
+      emailInput.style.background = 'white';
+      rolePro.disabled = false;
+      roleUser.disabled = false;
+      statusPendiente.disabled = false;
+
+      // Rol (Administrador, Profesional o Usuario)
+      if (user.is_admin || user.role === 'admin') {
+        roleAdmin.checked = true;
+      } else if (user.role === 'profesional') {
+        rolePro.checked = true;
+      } else {
+        roleUser.checked = true;
+      }
     }
 
     // Estado (Activo vs Pendiente)
-    if (user.status === 'activo') {
+    if (user.status === 'activo' || user.is_super_admin) {
       document.getElementById('editStatusActivo').checked = true;
     } else {
       document.getElementById('editStatusPendiente').checked = true;
@@ -669,6 +748,16 @@
 
   // ── Eliminar Usuario con Modal de Confirmación ────────
   function confirmDeleteUser(userId, userName, userEmail, isSelf) {
+    if (userEmail && userEmail.toLowerCase() === 'admin@atulado.com.mx') {
+      showAdminNoticeModal({
+        title: 'Acción No Permitida',
+        message: 'La cuenta principal de administración está protegida y no puede ser eliminada.',
+        type: 'danger',
+        confirmText: 'Entendido'
+      });
+      return;
+    }
+
     if (isSelf) {
       showAdminNoticeModal({
         title: 'Acción No Permitida',

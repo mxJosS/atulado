@@ -239,11 +239,11 @@
     <div class="containment-actions-list">
       
       <!-- Acción 1: Línea de crisis 24/7 -->
-      <a href="tel:{{ config('clinical.crisis_numbers.linea_vida', '8002900024') }}" onclick="registrarCrisisAccion('llamar_linea')" class="containment-action-item containment-action-primary">
+      <a href="tel:{{ config('clinical.crisis_numbers.linea_vida', '8009112000') }}" onclick="registrarCrisisAccion('llamar_linea')" class="containment-action-item containment-action-primary">
         <i class="fa-solid fa-phone-volume" style="font-size: 1.25rem;"></i>
         <div style="flex: 1;">
           <div style="font-size: 0.95rem;">Hablar con Línea de la Vida (24/7 Gratuita)</div>
-          <div style="font-size: 0.78rem; opacity: 0.9; font-weight: 400;">{{ config('clinical.crisis_numbers.linea_vida', '800 290 0024') }} · Confidencial</div>
+          <div style="font-size: 0.78rem; opacity: 0.9; font-weight: 400;">{{ config('clinical.crisis_numbers.linea_vida', '800 911 2000') }} · Confidencial</div>
         </div>
         <i class="fa-solid fa-arrow-right" style="font-size: 0.85rem;"></i>
       </a>
@@ -251,7 +251,7 @@
       <!-- Acción 2: Contacto de Emergencia Registrado -->
       @php
         $emergencyContact = auth()->user()?->contactosEmergencia()->first();
-        $contactPhone = $emergencyContact?->telefono ?? auth()->user()?->crisis_contact_phone ?? '8002900024';
+        $contactPhone = $emergencyContact?->telefono ?? auth()->user()?->crisis_contact_phone ?? '8009112000';
         $contactName = $emergencyContact?->nombre ?? auth()->user()?->crisis_contact_name ?? 'Contacto de Apoyo';
       @endphp
       <a href="tel:{{ preg_replace('/[^0-9]/', '', $contactPhone) }}" onclick="registrarCrisisAccion('llamar_contacto')" class="containment-action-item containment-action-secondary">

@@ -88,9 +88,9 @@
                       Detectamos que puedes estar experimentando un dolor o agobio intenso. Sentir dolor es abrumador, pero no estás solo(a) y hay alternativas seguras para acompañarte.
                     </p>
                     <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
-                      <a href="tel:8002900024" class="btn btn-sm btn-crisis" style="gap: 6px; font-size: 0.8rem;">
+                      <a href="tel:8009112000" class="btn btn-sm btn-crisis" style="gap: 6px; font-size: 0.8rem;">
                         <i class="fa-solid fa-phone"></i>
-                        <span>Llamar gratis a Línea de la Vida (800 290 0024)</span>
+                        <span>Llamar gratis a Línea de la Vida (800 911 2000)</span>
                       </a>
                       <a href="{{ route('safety-plan.show') }}" class="btn btn-sm btn-secondary" style="font-size: 0.8rem; background: rgba(255,255,255,0.15); color: #FFFFFF; border-color: rgba(255,255,255,0.3);">
                         <i class="fa-solid fa-shield-heart"></i>

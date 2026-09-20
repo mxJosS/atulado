@@ -240,6 +240,12 @@
                   <span style="color: #92400E; font-weight: 600; font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase;">Grado Escolar:</span>
                   <div style="font-weight: 600; color: #1A2620;">{{ $latestVerification->education_level_label }}</div>
                 </div>
+                @if(!empty($latestVerification->specialty))
+                  <div>
+                    <span style="color: #92400E; font-weight: 600; font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase;">Especialidad / Rama:</span>
+                    <div style="font-weight: 600; color: #1A2620;">{{ $latestVerification->specialty }}</div>
+                  </div>
+                @endif
               </div>
             </div>
           </div>
@@ -254,9 +260,9 @@
               <i class="fa-solid fa-user-doctor"></i>
             </div>
             <div>
-              <h2 style="font-size: 1.05rem; font-weight: 700; color: #1A2620; margin: 0;">¿Eres Profesional de la Salud Mental?</h2>
+              <h2 style="font-size: 1.05rem; font-weight: 700; color: #1A2620; margin: 0;">¿Eres Profesional de la Salud o Bienestar Integral?</h2>
               <p style="font-size: 0.82rem; color: #556860; margin: 0.15rem 0 0 0;">
-                Acredita tu cédula oficial para obtener la insignia verificada y publicar investigaciones en la Revista Científica.
+                Psicólogos, psiquiatras, nutriólogos, médicos y profesionales de la salud. Acredita tu cédula oficial para obtener tu insignia verificada y publicar en la Revista de divulgación científica.
               </p>
             </div>
           </div>
@@ -318,33 +324,43 @@
                 @error('education_level') <div class="form-error">{{ $message }}</div> @enderror
               </div>
 
-              <!-- 4. Comprobante Oficial con CSS estilizado -->
+              <!-- 4. Disciplina o Especialidad -->
               <div class="form-group" style="margin-bottom: 0;">
-                <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #1A2620; margin-bottom: 0.4rem; display: block;">
-                  Comprobante Oficial <span style="font-size: 0.74rem; color: #556860; font-weight: normal;">(Opcional)</span>
+                <label for="specialty" class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #1A2620;">
+                  Disciplina o Especialidad <span style="font-size: 0.74rem; color: #556860; font-weight: normal;">(Opcional)</span>
                 </label>
-                
-                <div class="custom-doc-uploader" id="docUploadBox">
-                  <input type="file" name="document" id="docInputFile" accept=".pdf,.jpg,.jpeg,.png,.webp" style="display: none;" onchange="handleDocSelected(this)">
-                  
-                  <label for="docInputFile" class="doc-upload-clickable-area">
-                    <div class="doc-upload-btn-chip">
-                      <i class="fa-solid fa-cloud-arrow-up"></i>
-                      <span>Elegir archivo</span>
-                    </div>
-                    <div class="doc-upload-status-text" id="docStatusText">
-                      No se eligió ningún archivo
-                    </div>
-                  </label>
-
-                  <button type="button" class="doc-clear-btn" id="docClearBtn" style="display: none;" onclick="clearSelectedDoc()" title="Quitar archivo">
-                    <i class="fa-solid fa-xmark"></i>
-                  </button>
-                </div>
-
-                <span style="font-size: 0.74rem; color: #556860; margin-top: 0.35rem; display: block;">PDF o imagen de tu cédula o título (máx. 5 MB).</span>
-                @error('document') <div class="form-error">{{ $message }}</div> @enderror
+                <input type="text" name="specialty" id="specialty" value="{{ old('specialty', $latestVerification->specialty ?? $user->professional_title ?? '') }}" class="form-control" placeholder="Ej. Psicología Clínica, Nutrición, Medicina, etc." style="border-radius: 10px;">
+                <span style="font-size: 0.74rem; color: #556860;">Área de la salud o bienestar a la que te dedicas.</span>
+                @error('specialty') <div class="form-error">{{ $message }}</div> @enderror
               </div>
+            </div>
+
+            <!-- 5. Comprobante Oficial con CSS estilizado -->
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #1A2620; margin-bottom: 0.4rem; display: block;">
+                Comprobante Oficial <span style="font-size: 0.74rem; color: #556860; font-weight: normal;">(Opcional)</span>
+              </label>
+              
+              <div class="custom-doc-uploader" id="docUploadBox">
+                <input type="file" name="document" id="docInputFile" accept=".pdf,.jpg,.jpeg,.png,.webp" style="display: none;" onchange="handleDocSelected(this)">
+                
+                <label for="docInputFile" class="doc-upload-clickable-area">
+                  <div class="doc-upload-btn-chip">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                    <span>Elegir archivo</span>
+                  </div>
+                  <div class="doc-upload-status-text" id="docStatusText">
+                    No se eligió ningún archivo
+                  </div>
+                </label>
+
+                <button type="button" class="doc-clear-btn" id="docClearBtn" style="display: none;" onclick="clearSelectedDoc()" title="Quitar archivo">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+
+              <span style="font-size: 0.74rem; color: #556860; margin-top: 0.35rem; display: block;">PDF o imagen de tu cédula o título (máx. 5 MB).</span>
+              @error('document') <div class="form-error">{{ $message }}</div> @enderror
             </div>
 
             <div style="display: flex; justify-content: flex-end; align-items: center; gap: 1rem; margin-top: 1.5rem; padding-top: 1.15rem; border-top: 1px solid #DCE8E0;">

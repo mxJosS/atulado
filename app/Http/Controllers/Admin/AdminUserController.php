@@ -62,9 +62,10 @@ class AdminUserController extends Controller
             'last_name' => ['required', 'string', 'max:100'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'confirmed', Password::min(6)],
-            'role' => ['required', 'in:admin,profesional'],
+            'role' => ['required', 'in:admin,profesional,usuario'],
             'education_level' => ['required_if:role,profesional', 'nullable', 'in:licenciatura,especialidad,maestria,doctorado'],
             'license_number' => ['required_if:role,profesional', 'nullable', 'string', 'max:50'],
+            'specialty' => ['nullable', 'string', 'max:150'],
             'institution' => ['nullable', 'string', 'max:150'],
         ], [
             'first_name.required' => 'El o los nombres son obligatorios.',
@@ -89,7 +90,7 @@ class AdminUserController extends Controller
                 'password' => Hash::make($request->password),
                 'is_admin' => $isAdmin,
                 'role' => $role,
-                'avatar_color' => $isAdmin ? 'dark' : 'sage',
+                'avatar_color' => $isAdmin ? 'dark' : ($role === 'profesional' ? 'lav' : 'sage'),
                 'email_verified_at' => now(),
                 'license_number' => $role === 'profesional' ? trim($request->license_number) : null,
                 'institution' => $role === 'profesional' ? trim($request->institution) : null,
@@ -97,12 +98,15 @@ class AdminUserController extends Controller
 
             if ($role === 'profesional') {
                 $degrees = [
-                    'licenciatura' => 'Lic. en Psicología / Salud Mental',
-                    'especialidad' => 'Especialista en Salud Mental',
-                    'maestria' => 'Mtro. en Psicología Clínica',
-                    'doctorado' => 'Dr. en Psicología / Neurociencias',
+                    'licenciatura' => 'Licenciatura',
+                    'especialidad' => 'Especialista',
+                    'maestria' => 'Maestría',
+                    'doctorado' => 'Doctorado',
                 ];
-                $computedTitle = $degrees[$request->education_level] ?? 'Especialista en Salud Mental';
+                $degreeLabel = $degrees[$request->education_level] ?? 'Especialista';
+                $specialtyText = !empty($request->specialty) ? trim($request->specialty) : 'Salud Mental & Bienestar';
+                $computedTitle = $specialtyText . ' · ' . $degreeLabel;
+
                 $user->update(['professional_title' => $computedTitle]);
 
                 ProfessionalVerification::create([
@@ -112,7 +116,7 @@ class AdminUserController extends Controller
                     'education_level' => $request->education_level,
                     'document_path' => null,
                     'status' => 'aprobada',
-                    'admin_notes' => 'Alta directa y verificación automática autorizada por Dirección/Administración.',
+                    'admin_notes' => 'Alta directa y verificación automática autorizada por Dirección/Administración.' . (!empty($request->specialty) ? " Especialidad: {$request->specialty}" : ''),
                     'reviewed_by' => Auth::id(),
                     'reviewed_at' => now(),
                 ]);
@@ -142,12 +146,32 @@ class AdminUserController extends Controller
             'status.required' => 'El estado de la cuenta es obligatorio.',
         ]);
 
-        // 1. Prohibir degradarse a sí mismo si es el admin actual
+        $currentUser = Auth::user();
+
+        // 1. Prohibir modificar la cuenta principal si no es el mismo
+        if ($user->isSuperAdmin() && !$currentUser?->isSuperAdmin()) {
+            return back()->with('error', 'No tienes autorización para modificar la cuenta principal de administración.');
+        }
+
+        // 2. Proteger la integridad de la cuenta principal de administración
+        if ($user->isSuperAdmin()) {
+            if (strtolower(trim($request->email)) !== 'admin@atulado.com.mx') {
+                return back()->with('error', 'El correo electrónico de la cuenta principal no puede ser modificado.');
+            }
+            if ($request->role !== 'admin') {
+                return back()->with('error', 'La cuenta principal debe mantener siempre el rol de administrador.');
+            }
+            if ($request->status !== 'activo') {
+                return back()->with('error', 'La cuenta principal no puede ser suspendida.');
+            }
+        }
+
+        // 3. Prohibir degradarse a sí mismo si es el admin actual
         if ($user->id === Auth::id() && $request->role !== 'admin') {
             return back()->with('error', 'No puedes quitarte los permisos de administrador a ti mismo.');
         }
 
-        // 2. Prohibir degradar al único administrador del sistema
+        // 4. Prohibir degradar al único administrador del sistema
         if ($user->is_admin && $request->role !== 'admin' && User::where('is_admin', true)->where('id', '!=', $user->id)->count() === 0) {
             return back()->with('error', 'No es posible cambiar el rol al único administrador del sistema.');
         }
@@ -198,12 +222,24 @@ class AdminUserController extends Controller
 
     public function destroy(User $user)
     {
-        // 1. Prohibir auto-eliminación
+        $currentUser = Auth::user();
+
+        // 1. Prohibir eliminar la cuenta principal bajo cualquier circunstancia
+        if ($user->isSuperAdmin()) {
+            return back()->with('error', 'La cuenta principal de administración está protegida y no puede ser eliminada.');
+        }
+
+        // 2. Prohibir auto-eliminación
         if ($user->id === Auth::id()) {
             return back()->with('error', 'No puedes eliminar tu propia cuenta de administrador.');
         }
 
-        // 2. Prohibir eliminar al único administrador del sistema
+        // 3. Solo la cuenta principal de administración puede eliminar a otros administradores
+        if (($user->is_admin || $user->role === 'admin') && !$currentUser?->isSuperAdmin()) {
+            return back()->with('error', 'Solo la cuenta principal de administración tiene autorización para eliminar a otros administradores.');
+        }
+
+        // 4. Prohibir eliminar al único administrador del sistema
         if ($user->is_admin && User::where('is_admin', true)->where('id', '!=', $user->id)->count() === 0) {
             return back()->with('error', 'No es posible eliminar al único administrador del sistema.');
         }

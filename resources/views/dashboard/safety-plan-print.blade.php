@@ -396,7 +396,7 @@
         <span>LÍNEAS DE CRISIS Y AYUDA INMEDIATA (24/7 GRATUITO)</span>
       </div>
       <div class="crisis-numbers">
-        <strong>México (Línea de la Vida):</strong> 800 290 0024 &nbsp;·&nbsp;
+        <strong>México (Línea de la Vida):</strong> 800 911 2000 &nbsp;·&nbsp;
         <strong>SAPTEL Cruz Roja:</strong> 55 5259 8121 &nbsp;·&nbsp;
         <strong>Emergencias Nacionales:</strong> 911
       </div>
@@ -417,7 +417,7 @@
             <strong>Si me siento en peligro:</strong><br>
             1. Respira 4-7-8 (4s inhalar, 7s retener, 8s exhalar).<br>
             2. Contacto de emergencia: 
-            <strong>{{ ($safetyPlan->trusted_contacts[0]['name'] ?? 'Apoyo') }}: {{ ($safetyPlan->trusted_contacts[0]['phone'] ?? '800 290 0024') }}</strong>
+            <strong>{{ ($safetyPlan->trusted_contacts[0]['name'] ?? 'Apoyo') }}: {{ ($safetyPlan->trusted_contacts[0]['phone'] ?? '800 911 2000') }}</strong>
           </div>
         </div>
         <div style="text-align: right; font-size: 0.78rem; line-height: 1.4;">
@@ -425,7 +425,7 @@
             LÍNEA DE LA VIDA 24H:
           </div>
           <div style="font-family: 'IBM Plex Mono', monospace; font-size: 1.05rem; font-weight: 700; color: var(--crisis-red);">
-            800 290 0024
+            800 911 2000
           </div>
           <div style="color: var(--text-muted); font-size: 0.72rem; margin-top: 0.2rem;">
             A tu lado · Siempre contigo

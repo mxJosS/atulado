@@ -14,7 +14,7 @@
         <span>Acreditaciones Profesionales</span>
       </h1>
       <p style="color: #556860; font-size: 0.92rem; margin-top: 0.25rem;">
-        Cotejo, revisión y dictamen oficial de cédulas y grados académicos para especialistas de la salud mental.
+        Cotejo, revisión y dictamen oficial de cédulas y grados académicos para especialistas de la salud mental, médica, nutricional y bienestar integral.
       </p>
     </div>
 
@@ -188,9 +188,12 @@
                   </div>
 
                   <div>
-                    <span style="font-size: 0.72rem; font-family: var(--font-mono); color: #556860; text-transform: uppercase; font-weight: 700;">Grado Escolar:</span>
+                    <span style="font-size: 0.72rem; font-family: var(--font-mono); color: #556860; text-transform: uppercase; font-weight: 700;">Grado & Disciplina:</span>
                     <div style="font-size: 0.94rem; font-weight: 600; color: #2E5D4B; margin-top: 2px;">
                       {{ $v->education_level_label }}
+                      @if(!empty($v->specialty))
+                        <span style="font-size: 0.82rem; color: #1A2620; font-weight: 500;">({{ $v->specialty }})</span>
+                      @endif
                     </div>
                   </div>
 

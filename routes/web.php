@@ -11,7 +11,6 @@ use App\Http\Controllers\ToolController;
 use App\Http\Controllers\AssessmentController;
 use App\Http\Controllers\ProfessionalVerificationController;
 use Illuminate\Support\Facades\Route;
-
 /*
 |--------------------------------------------------------------------------
 | Public Routes
@@ -40,6 +39,12 @@ Route::get('/herramientas/grounding', [ToolController::class, 'grounding'])->nam
 Route::get('/herramientas/stop', [ToolController::class, 'stop'])->name('tools.stop');
 Route::get('/crisis', [ToolController::class, 'crisis'])->name('crisis');
 
+// Legal & Compliance (Google Cloud & Public Requirements)
+Route::view('/privacidad', 'privacidad')->name('privacidad');
+Route::view('/terminos', 'terminos')->name('terminos');
+Route::redirect('/privacidad.html', '/privacidad');
+Route::redirect('/terminos.html', '/terminos');
+
 /*
 |--------------------------------------------------------------------------
 | Authentication Routes (Guest Only)
@@ -55,6 +60,12 @@ Route::middleware('guest')->group(function () {
     // Google OAuth Authentication
     Route::get('/auth/google', [AuthController::class, 'redirectToGoogle'])->name('auth.google');
     Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
+
+    // Password Reset
+    Route::get('/olvide-contrasena', [AuthController::class, 'showForgotPassword'])->name('password.request');
+    Route::post('/olvide-contrasena', [AuthController::class, 'sendResetLinkEmail'])->name('password.email')->middleware('throttle:5,1');
+    Route::get('/restablecer-contrasena/{token}', [AuthController::class, 'showResetPassword'])->name('password.reset');
+    Route::post('/restablecer-contrasena', [AuthController::class, 'resetPassword'])->name('password.update')->middleware('throttle:5,1');
 });
 
 /*

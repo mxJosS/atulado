@@ -59,7 +59,7 @@ class AppFlowTest extends TestCase
         CrisisLine::create([
             'country' => 'México',
             'country_code' => 'MX',
-            'phone_number' => '800 290 0024',
+            'phone_number' => '800 911 2000',
             'service_name' => 'Línea de la Vida',
             'description' => 'Servicio gratuito',
             'is_featured' => true,

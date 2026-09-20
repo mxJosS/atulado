@@ -7,7 +7,7 @@ return [
     |--------------------------------------------------------------------------
     */
     'crisis_numbers' => [
-        'linea_vida' => env('CLINICAL_LINEA_VIDA', '800 290 0024'),
+        'linea_vida' => env('CLINICAL_LINEA_VIDA', '800 911 2000'),
         'linea_vida_nacional' => env('CLINICAL_LINEA_VIDA_NACIONAL', '800 911 2000'),
         'linea_amiga_yucatan' => env('CLINICAL_LINEA_AMIGA_YUCATAN', '800 108 8000'),
         'emergencias' => env('CLINICAL_EMERGENCIAS', '911'),

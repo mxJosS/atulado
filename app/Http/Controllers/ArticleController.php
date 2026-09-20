@@ -59,7 +59,8 @@ class ArticleController extends Controller
                           ->orderBy('published_at', 'desc')
                           ->paginate(9);
 
-        $topicAreas = TopicArea::withCount('articles')->get();
+        $this->ensureDefaultTopicAreas();
+        $topicAreas = TopicArea::withCount('articles')->orderBy('name')->get();
         $categories = $topicAreas->pluck('name');
 
         return view('revista.index', compact('articles', 'featuredArticle', 'topicAreas', 'categories'));
@@ -92,22 +93,41 @@ class ArticleController extends Controller
 
     public function create()
     {
+        $this->ensureDefaultTopicAreas();
         $topicAreas = TopicArea::orderBy('name')->get();
 
-        // If no topic areas exist in DB yet, create defaults
-        if ($topicAreas->isEmpty()) {
-            $topicAreas = collect([
-                TopicArea::create(['name' => 'Terapia DBT & Conductual', 'slug' => 'terapia-dbt-conductual', 'icon' => 'fa-brain', 'color' => 'lav']),
-                TopicArea::create(['name' => 'Neurobiología & Fisiología', 'slug' => 'neurobiologia-fisiologia', 'icon' => 'fa-dna', 'color' => 'sky']),
-                TopicArea::create(['name' => 'Regulación Emocional', 'slug' => 'regulacion-emocional', 'icon' => 'fa-heart-pulse', 'color' => 'sage']),
-                TopicArea::create(['name' => 'Ansiedad & Pánico', 'slug' => 'ansiedad-panico', 'icon' => 'fa-wind', 'color' => 'sky']),
-                TopicArea::create(['name' => 'Prevención del Suicidio & Crisis', 'slug' => 'prevencion-suicidio-crisis', 'icon' => 'fa-life-ring', 'color' => 'terra']),
-                TopicArea::create(['name' => 'Mindfulness & Atención Plena', 'slug' => 'mindfulness-atencion-plena', 'icon' => 'fa-seedling', 'color' => 'sage']),
-                TopicArea::create(['name' => 'Psicoeducación & Hábitos', 'slug' => 'psicoeducacion-habitos', 'icon' => 'fa-book-open-reader', 'color' => 'amber']),
-            ]);
-        }
-
         return view('revista.create', compact('topicAreas'));
+    }
+
+    protected function ensureDefaultTopicAreas(): void
+    {
+        try {
+            $count = TopicArea::count();
+            if ($count === 0) {
+                $defaults = [
+                    ['name' => 'Terapia DBT & Conductual', 'slug' => 'terapia-dbt-conductual', 'icon' => 'fa-brain', 'color' => 'lav'],
+                    ['name' => 'Neurobiología & Fisiología', 'slug' => 'neurobiologia-fisiologia', 'icon' => 'fa-dna', 'color' => 'sky'],
+                    ['name' => 'Regulación Emocional', 'slug' => 'regulacion-emocional', 'icon' => 'fa-heart-pulse', 'color' => 'sage'],
+                    ['name' => 'Ansiedad & Pánico', 'slug' => 'ansiedad-panico', 'icon' => 'fa-wind', 'color' => 'sky'],
+                    ['name' => 'Prevención del Suicidio & Crisis', 'slug' => 'prevencion-suicidio-crisis', 'icon' => 'fa-life-ring', 'color' => 'terra'],
+                    ['name' => 'Mindfulness & Atención Plena', 'slug' => 'mindfulness-atencion-plena', 'icon' => 'fa-seedling', 'color' => 'sage'],
+                    ['name' => 'Psicoeducación & Hábitos', 'slug' => 'psicoeducacion-habitos', 'icon' => 'fa-book-open-reader', 'color' => 'amber'],
+                    ['name' => 'Nutrición, Medicina & Salud Integral', 'slug' => 'nutricion-medicina-salud-integral', 'icon' => 'fa-apple-whole', 'color' => 'sage'],
+                ];
+                foreach ($defaults as $item) {
+                    TopicArea::create($item);
+                }
+            } elseif (!TopicArea::where('slug', 'nutricion-medicina-salud-integral')->exists()) {
+                TopicArea::create([
+                    'name' => 'Nutrición, Medicina & Salud Integral',
+                    'slug' => 'nutricion-medicina-salud-integral',
+                    'icon' => 'fa-apple-whole',
+                    'color' => 'sage',
+                ]);
+            }
+        } catch (\Throwable $e) {
+            // Ignorar fallos si la base de datos no está migrada aún
+        }
     }
 
     public function store(Request $request)
