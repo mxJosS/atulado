@@ -105,7 +105,7 @@
 
     <!-- Organization Switcher -->
     <div style="display: flex; gap: 0.65rem; align-items: center;">
-      <select class="form-control" onchange="window.location.href='/admin/instituciones/' + this.value" style="background: #FFFFFF; border: 1.5px solid #DCE8E0; border-radius: 9px; padding: 0.5rem 0.85rem; font-size: 0.84rem; font-weight: 600; color: #1A2620;">
+      <select class="form-control" onchange="window.location.href='/admin/semaforo/' + this.value" style="background: #FFFFFF; border: 1.5px solid #DCE8E0; border-radius: 9px; padding: 0.5rem 0.85rem; font-size: 0.84rem; font-weight: 600; color: #1A2620;">
         @foreach($allInstitutions as $instOption)
           <option value="{{ $instOption->slug }}" {{ $slug === $instOption->slug ? 'selected' : '' }}>
             {{ $instOption->short_name ?: $instOption->name }}

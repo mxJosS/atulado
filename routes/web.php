@@ -144,9 +144,14 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Operación Institucional B2B (Paneles A Tu Lado)
     Route::get('/instituciones', [\App\Http\Controllers\Admin\AdminInstitutionController::class, 'index'])->name('institutions.index');
     Route::post('/instituciones', [\App\Http\Controllers\Admin\AdminInstitutionController::class, 'store'])->name('institutions.store');
-    Route::get('/instituciones/{slug?}', [\App\Http\Controllers\Admin\AdminInstitutionController::class, 'show'])->name('institutions.show');
+    Route::get('/semaforo/{slug?}', [\App\Http\Controllers\Admin\AdminInstitutionController::class, 'show'])->name('institutions.show');
+    Route::get('/instituciones/{slug}', [\App\Http\Controllers\Admin\AdminInstitutionController::class, 'show'])->name('institutions.show.slug');
     Route::get('/analitica', [\App\Http\Controllers\Admin\AdminInstitutionController::class, 'analytics'])->name('analytics.index');
     Route::get('/altas-estructura', [\App\Http\Controllers\Admin\AdminInstitutionController::class, 'structure'])->name('structure.index');
+    Route::get('/altas-estructura/plantilla-csv', [\App\Http\Controllers\Admin\AdminInstitutionController::class, 'downloadCsvTemplate'])->name('structure.template');
+    Route::post('/altas-estructura/importar-csv', [\App\Http\Controllers\Admin\AdminInstitutionController::class, 'importCsv'])->name('structure.import');
+    Route::post('/altas-estructura/areas', [\App\Http\Controllers\Admin\AdminInstitutionController::class, 'storeArea'])->name('structure.area.store');
+    Route::post('/altas-estructura/areas/eliminar', [\App\Http\Controllers\Admin\AdminInstitutionController::class, 'destroyArea'])->name('structure.area.destroy');
     Route::get('/vista-cliente', [\App\Http\Controllers\Admin\AdminInstitutionController::class, 'clientView'])->name('client-view.index');
 
     // Centro de Reportes & Visor PDF

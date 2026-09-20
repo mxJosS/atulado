@@ -202,7 +202,7 @@
         </a>
 
         <!-- 6. Semáforo & Detalle -->
-        <a href="{{ route('admin.institutions.show') }}" class="admin-nav-item {{ request()->routeIs('admin.institutions.show') ? 'active' : '' }}">
+        <a href="{{ route('admin.institutions.show') }}" class="admin-nav-item {{ request()->routeIs('admin.institutions.show*') || request()->is('admin/semaforo*') || request()->is('admin/instituciones/*') ? 'active' : '' }}">
           <div class="nav-icon"><i class="fa-solid fa-traffic-light"></i></div>
           <span>Semáforo & Detalle</span>
         </a>

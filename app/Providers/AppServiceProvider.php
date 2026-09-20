@@ -33,12 +33,8 @@ class AppServiceProvider extends ServiceProvider
                 'email' => $notifiable->getEmailForPasswordReset(),
             ], false));
 
-            return (new MailMessage)
-                ->subject('Restablecer tu contraseña — A tu lado')
-                ->view('emails.reset-password', [
-                    'url' => $url,
-                    'user' => $notifiable,
-                ]);
+            return (new \App\Mail\ResetPasswordMail($url, $notifiable))
+                ->to($notifiable->getEmailForPasswordReset());
         });
     }
 }

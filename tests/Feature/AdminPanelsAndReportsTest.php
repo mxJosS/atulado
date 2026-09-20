@@ -96,6 +96,12 @@ class AdminPanelsAndReportsTest extends TestCase
         $response->assertSee('Administración y Finanzas');
         $response->assertSee('Por Grupos');
         $response->assertSee('Lista Plana');
+
+        // Verificar acceso directo desde el botón "Semáforo & Detalle" del sidebar (/admin/semaforo)
+        $sidebarResponse = $this->actingAs($admin)->get(route('admin.institutions.show'));
+        $sidebarResponse->assertStatus(200);
+        $sidebarResponse->assertSee('Semáforo Clínico por Departamento');
+        $sidebarResponse->assertSee('Empresa Demo S.A.');
     }
 
     public function test_admin_can_access_analytics_and_structure_modules(): void
@@ -395,6 +401,142 @@ class AdminPanelsAndReportsTest extends TestCase
         $viewerResp->assertSee('universidad-maya');
         $viewerResp->assertSee('Universidad Maya del Sureste');
         $viewerResp->assertSee('Dra. Gabriela Solís');
+    }
+
+    public function test_admin_can_download_csv_template(): void
+    {
+        $admin = User::factory()->create(['is_admin' => true]);
+
+        $response = $this->actingAs($admin)->get(route('admin.structure.template'));
+        $response->assertStatus(200);
+        $response->assertHeader('Content-Disposition', 'attachment; filename="plantilla_padron_colaboradores.csv"');
+    }
+
+    public function test_admin_can_import_csv_collaborators(): void
+    {
+        $admin = User::factory()->create(['is_admin' => true]);
+
+        $inst = Institution::create([
+            'slug' => 'empresa-csv-test',
+            'name' => 'Empresa CSV Test S.A.',
+            'category' => 'Servicios',
+            'contact_name' => 'Recursos Humanos',
+            'contact_email' => 'rh@csvtest.com',
+            'professional_name' => 'Psic. Prueba',
+            'plan' => 'Pyme',
+            'users_count' => 0,
+        ]);
+
+        $csvContent = "nombre,email,departamento,macro_grupo,turno,numero_empleado,puesto\n"
+                    . "Laura Sánchez,laura@csvtest.com,Atención a Clientes,Operaciones,Matutino,EMP-01,Ejecutiva\n"
+                    . "Carlos Ruiz,carlos@csvtest.com,Sistemas y TI,Corporativo,Completo,EMP-02,Desarrollador";
+
+        $file = \Illuminate\Http\UploadedFile::fake()->createWithContent('padron.csv', $csvContent);
+
+        $response = $this->actingAs($admin)->post(route('admin.structure.import'), [
+            'institution_id' => $inst->id,
+            'file' => $file,
+        ]);
+
+        $response->assertRedirect(route('admin.structure.index', ['inst' => $inst->slug]));
+        $response->assertSessionHas('success');
+
+        $this->assertDatabaseHas('users', [
+            'email' => 'laura@csvtest.com',
+            'institution_id' => $inst->id,
+            'department' => 'Atención a Clientes',
+        ]);
+
+        $this->assertDatabaseHas('users', [
+            'email' => 'carlos@csvtest.com',
+            'institution_id' => $inst->id,
+            'department' => 'Sistemas y TI',
+        ]);
+
+        $this->assertEquals(2, $inst->fresh()->users_count);
+    }
+
+    public function test_admin_can_add_and_delete_areas(): void
+    {
+        $admin = User::factory()->create(['is_admin' => true]);
+
+        $inst = Institution::create([
+            'slug' => 'empresa-areas-test',
+            'name' => 'Empresa Áreas Test',
+            'category' => 'Construcción',
+            'contact_name' => 'Jefe de Obra',
+            'contact_email' => 'obra@areastest.com',
+            'professional_name' => 'Psic. Obra',
+            'plan' => 'Corporativo',
+            'users_count' => 0,
+            'departments_data' => [
+                [
+                    'id' => 'operaciones',
+                    'name' => 'Operaciones',
+                    'departments' => [
+                        ['name' => 'Cuadrilla Alfa', 'code' => 'cuadrilla_alfa']
+                    ]
+                ]
+            ]
+        ]);
+
+        // Agregar nueva área
+        $addResponse = $this->actingAs($admin)->post(route('admin.structure.area.store'), [
+            'institution_id' => $inst->id,
+            'name' => 'Cuadrilla Beta',
+            'macro_group' => 'Operaciones',
+            'shift' => 'Nocturno',
+        ]);
+
+        $addResponse->assertRedirect(route('admin.structure.index', ['inst' => $inst->slug]));
+        $addResponse->assertSessionHas('success');
+
+        $freshInst = $inst->fresh();
+        $group = collect($freshInst->departments_data)->firstWhere('name', 'Operaciones');
+        $this->assertNotNull(collect($group['departments'])->firstWhere('name', 'Cuadrilla Beta'));
+
+        // Eliminar área
+        $deleteResponse = $this->actingAs($admin)->post(route('admin.structure.area.destroy'), [
+            'institution_id' => $inst->id,
+            'department_name' => 'Cuadrilla Alfa',
+            'macro_group_name' => 'Operaciones',
+        ]);
+
+        $deleteResponse->assertRedirect(route('admin.structure.index', ['inst' => $inst->slug]));
+        $deleteResponse->assertSessionHas('success');
+
+        $freshInstAfterDelete = $inst->fresh();
+        $groupAfter = collect($freshInstAfterDelete->departments_data)->firstWhere('name', 'Operaciones');
+        $this->assertNull(collect($groupAfter['departments'])->firstWhere('name', 'Cuadrilla Alfa'));
+        $this->assertNotNull(collect($groupAfter['departments'])->firstWhere('name', 'Cuadrilla Beta'));
+    }
+
+    public function test_institution_seeder_populates_institution_and_collaborators(): void
+    {
+        $this->seed(\Database\Seeders\InstitutionSeeder::class);
+
+        $inst = Institution::where('slug', 'it-soporte-cancun')->first();
+        $this->assertNotNull($inst);
+        $this->assertEquals('IT Soporte Cancún S.A. de C.V.', $inst->name);
+        $this->assertEquals(4, $inst->users()->count());
+        $this->assertCount(3, $inst->departments_data);
+
+        $admin = User::factory()->create(['is_admin' => true]);
+
+        // Verificar que aparece en Altas y Estructura con sus colaboradores
+        $response = $this->actingAs($admin)->get('/admin/altas-estructura?inst=it-soporte-cancun');
+        $response->assertStatus(200);
+        $response->assertSee('IT Soporte Cancún');
+        $response->assertSee('Williams Pérez');
+        $response->assertSee('Carlos Mendoza Silva');
+        $response->assertSee('Valeria Morales Peña');
+        $response->assertSee('Esteban Rivas Gómez');
+
+        // Verificar que aparece en el Semáforo
+        $semaforoResp = $this->actingAs($admin)->get('/admin/semaforo/it-soporte-cancun');
+        $semaforoResp->assertStatus(200);
+        $semaforoResp->assertSee('IT Soporte Cancún');
+        $semaforoResp->assertSee('Operaciones y Frente de Obra');
     }
 }
 

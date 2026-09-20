@@ -287,4 +287,15 @@ class User extends Authenticatable
 
         return $weekData;
     }
+
+    /**
+     * Send the password reset notification using the branded A Tu Lado template.
+     *
+     * @param  string  $token
+     * @return void
+     */
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new \App\Notifications\ResetPasswordNotification($token));
+    }
 }
