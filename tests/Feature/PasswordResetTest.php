@@ -65,4 +65,24 @@ class PasswordResetTest extends TestCase
 
         $this->assertTrue(Hash::check('nuevaClave123', $user->fresh()->password));
     }
+
+    public function test_custom_password_reset_email_renders_spanish_branded_template(): void
+    {
+        $user = User::factory()->create([
+            'name' => 'Mariana Lopez',
+            'email' => 'mariana@atulado.com.mx',
+        ]);
+
+        $notification = new \Illuminate\Auth\Notifications\ResetPassword('token-12345');
+        $mailMessage = $notification->toMail($user);
+
+        $this->assertEquals('Restablecer tu contraseña — A tu lado', $mailMessage->subject);
+        $this->assertEquals('emails.reset-password', $mailMessage->view);
+
+        $rendered = view($mailMessage->view, $mailMessage->viewData)->render();
+        $this->assertStringContainsString('Restablecer tu contraseña', $rendered);
+        $this->assertStringContainsString('Mariana Lopez', $rendered);
+        $this->assertStringContainsString('A Tu Lado', $rendered);
+        $this->assertStringContainsString('token-12345', $rendered);
+    }
 }

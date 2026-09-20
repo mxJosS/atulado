@@ -37,6 +37,8 @@ class User extends Authenticatable
         'shift',
         'employee_number',
         'position',
+        'verification_code',
+        'verification_code_expires_at',
     ];
 
     public function institution(): BelongsTo
@@ -61,9 +63,47 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'verification_code_expires_at' => 'datetime',
             'password' => 'hashed',
             'is_admin' => 'boolean',
         ];
+    }
+
+    public function hasVerifiedEmail(): bool
+    {
+        return !is_null($this->email_verified_at);
+    }
+
+    public function generateVerificationCode(): string
+    {
+        $code = (string) random_int(100000, 999999);
+        $this->verification_code = $code;
+        $this->verification_code_expires_at = Carbon::now()->addMinutes(15);
+        $this->save();
+
+        return $code;
+    }
+
+    public function isVerificationCodeValid(?string $code): bool
+    {
+        if (empty($code) || empty($this->verification_code) || empty($this->verification_code_expires_at)) {
+            return false;
+        }
+
+        if (trim((string)$code) !== trim((string)$this->verification_code)) {
+            return false;
+        }
+
+        return Carbon::now()->lte($this->verification_code_expires_at);
+    }
+
+    public function markEmailAsVerified(): bool
+    {
+        return $this->forceFill([
+            'email_verified_at' => Carbon::now(),
+            'verification_code' => null,
+            'verification_code_expires_at' => null,
+        ])->save();
     }
 
     public function isProfessional(): bool

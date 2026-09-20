@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\EmailVerificationCodeMail;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
@@ -148,6 +150,22 @@ class AuthController extends Controller
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
             $user = Auth::user();
+
+            // Si el usuario no ha verificado su correo, reenviar código si venció y dirigir a verificación
+            if (!$user->hasVerifiedEmail()) {
+                if (!$user->verification_code || now()->gt($user->verification_code_expires_at)) {
+                    $code = $user->generateVerificationCode();
+                    try {
+                        Mail::to($user->email)->send(new EmailVerificationCodeMail($code, $user->name));
+                    } catch (\Throwable $e) {
+                        Log::error('Error al enviar código de verificación en login: ' . $e->getMessage());
+                    }
+                }
+
+                return redirect()->route('verification.code.notice')
+                    ->with('info', 'Por favor confirma el código de 6 dígitos enviado a tu correo para activar tu cuenta.');
+            }
+
             if ($user->is_admin) {
                 return redirect()->intended(route('admin.dashboard'))
                     ->with('success', '¡Bienvenido al Panel de Administración, ' . $user->name . '!');
@@ -198,13 +216,98 @@ class AuthController extends Controller
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
             'avatar_color' => $validated['avatar_color'] ?? 'sage',
+            'email_verified_at' => null,
         ]);
+
+        $code = $user->generateVerificationCode();
+
+        try {
+            Mail::to($user->email)->send(new EmailVerificationCodeMail($code, $user->name));
+        } catch (\Throwable $e) {
+            Log::error('Error al enviar código de verificación al registrarse: ' . $e->getMessage());
+        }
 
         Auth::login($user);
         $request->session()->regenerate();
 
-        return redirect()->route('dashboard')
-            ->with('success', '¡Tu cuenta ha sido creada exitosamente! Bienvenido a tu espacio seguro.');
+        return redirect()->route('verification.code.notice')
+            ->with('status', '¡Tu cuenta ha sido creada! Hemos enviado un código de 6 dígitos a tu correo electrónico para verificarla.');
+    }
+
+    public function showVerifyCode()
+    {
+        if (!Auth::check()) {
+            return redirect()->route('login');
+        }
+
+        $user = Auth::user();
+        if ($user->hasVerifiedEmail()) {
+            return redirect()->route('dashboard');
+        }
+
+        return view('auth.verify-code');
+    }
+
+    public function verifyCode(Request $request)
+    {
+        $request->validate([
+            'code' => ['required', 'string', 'size:6'],
+        ], [
+            'code.required' => 'Por favor ingresa el código de 6 dígitos.',
+            'code.size' => 'El código de verificación debe tener exactamente 6 dígitos.',
+        ]);
+
+        $user = Auth::user();
+
+        if (!$user) {
+            return redirect()->route('login');
+        }
+
+        if ($user->hasVerifiedEmail()) {
+            return redirect()->route('dashboard');
+        }
+
+        if (!$user->isVerificationCodeValid($request->code)) {
+            if ($user->verification_code_expires_at && now()->gt($user->verification_code_expires_at)) {
+                return back()->withErrors(['code' => 'El código de verificación ha expirado. Haz clic en "Reenviar código" para obtener uno nuevo.']);
+            }
+
+            return back()->withErrors(['code' => 'El código de verificación es incorrecto. Por favor verifica e intenta de nuevo.']);
+        }
+
+        $user->markEmailAsVerified();
+
+        if ($user->is_admin) {
+            return redirect()->intended(route('admin.dashboard'))
+                ->with('success', '¡Correo verificado con éxito! Bienvenido al Panel de Administración.');
+        }
+
+        return redirect()->intended(route('dashboard'))
+            ->with('success', '¡Correo verificado con éxito! Bienvenido a tu espacio seguro.');
+    }
+
+    public function resendVerificationCode(Request $request)
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            return redirect()->route('login');
+        }
+
+        if ($user->hasVerifiedEmail()) {
+            return redirect()->route('dashboard');
+        }
+
+        $code = $user->generateVerificationCode();
+
+        try {
+            Mail::to($user->email)->send(new EmailVerificationCodeMail($code, $user->name));
+        } catch (\Throwable $e) {
+            Log::error('Error al reenviar código de verificación: ' . $e->getMessage());
+            return back()->withErrors(['code' => 'No se pudo enviar el correo en este momento. Por favor intenta en un momento.']);
+        }
+
+        return back()->with('status', 'Hemos enviado un nuevo código de 6 dígitos a tu correo electrónico.');
     }
 
     public function logout(Request $request)

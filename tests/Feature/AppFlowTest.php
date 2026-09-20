@@ -86,6 +86,8 @@ class AppFlowTest extends TestCase
 
     public function test_user_can_register_and_log_in(): void
     {
+        \Illuminate\Support\Facades\Mail::fake();
+
         $response = $this->post('/registro', [
             'name' => 'Test User',
             'email' => 'test@atulado.com.mx',
@@ -94,9 +96,21 @@ class AppFlowTest extends TestCase
             'avatar_color' => 'sage',
         ]);
 
-        $response->assertRedirect('/dashboard');
+        $response->assertRedirect('/verificar-codigo');
         $this->assertAuthenticated();
         $this->assertDatabaseHas('users', ['email' => 'test@atulado.com.mx']);
+
+        $user = User::where('email', 'test@atulado.com.mx')->first();
+        $this->assertNotNull($user->verification_code);
+        $this->assertNull($user->email_verified_at);
+
+        // Verificar código
+        $verifyResponse = $this->post('/verificar-codigo', [
+            'code' => $user->verification_code,
+        ]);
+
+        $verifyResponse->assertRedirect('/dashboard');
+        $this->assertNotNull($user->fresh()->email_verified_at);
     }
 
     public function test_dashboard_is_protected_for_guests(): void

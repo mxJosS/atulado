@@ -76,38 +76,46 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-    // Dashboard Hub
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    // Email 6-Digit Code Verification
+    Route::get('/verificar-codigo', [AuthController::class, 'showVerifyCode'])->name('verification.code.notice');
+    Route::post('/verificar-codigo', [AuthController::class, 'verifyCode'])->name('verification.code.verify')->middleware('throttle:10,1');
+    Route::post('/verificar-codigo/reenviar', [AuthController::class, 'resendVerificationCode'])->name('verification.code.resend')->middleware('throttle:3,1');
 
-    // Mood Tracking & History
-    Route::post('/mood/checkin', [MoodTrackerController::class, 'store'])->name('mood.store');
-    Route::get('/historial', [MoodTrackerController::class, 'history'])->name('mood.history');
-    Route::delete('/mood/{moodLog}', [MoodTrackerController::class, 'destroy'])->name('mood.destroy');
+    // Verified Users Only
+    Route::middleware('verified.code')->group(function () {
+        // Dashboard Hub
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // Safety Plan
-    Route::get('/plan-de-seguridad', [SafetyPlanController::class, 'show'])->name('safety-plan.show');
-    Route::put('/plan-de-seguridad', [SafetyPlanController::class, 'update'])->name('safety-plan.update');
-    Route::get('/plan-de-seguridad/imprimir', [SafetyPlanController::class, 'printView'])->name('safety-plan.print');
+        // Mood Tracking & History
+        Route::post('/mood/checkin', [MoodTrackerController::class, 'store'])->name('mood.store');
+        Route::get('/historial', [MoodTrackerController::class, 'history'])->name('mood.history');
+        Route::delete('/mood/{moodLog}', [MoodTrackerController::class, 'destroy'])->name('mood.destroy');
 
-    // Favorites & Completed Resources
-    Route::post('/recursos/{resource}/favorito', [ResourceController::class, 'toggleFavorite'])->name('recursos.favorite');
-    Route::post('/recursos/{resource}/completar', [ResourceController::class, 'toggleCompleted'])->name('recursos.complete');
-    Route::get('/mis-favoritos', [ResourceController::class, 'userFavorites'])->name('favorites.index');
+        // Safety Plan
+        Route::get('/plan-de-seguridad', [SafetyPlanController::class, 'show'])->name('safety-plan.show');
+        Route::put('/plan-de-seguridad', [SafetyPlanController::class, 'update'])->name('safety-plan.update');
+        Route::get('/plan-de-seguridad/imprimir', [SafetyPlanController::class, 'printView'])->name('safety-plan.print');
 
-    // Clinical Risk Assessment Engine (v1.0)
-    Route::post('/assessment/who5', [AssessmentController::class, 'submitWho5'])->name('assessment.who5');
-    Route::post('/assessment/mdi', [AssessmentController::class, 'submitMdi'])->name('assessment.mdi');
-    Route::post('/assessment/asq', [AssessmentController::class, 'submitAsq'])->name('assessment.asq');
-    Route::post('/assessment/crisis/accion', [AssessmentController::class, 'registrarAccionCrisis'])->name('assessment.crisis.action');
-    Route::post('/assessment/crisis/{evento}/cerrar', [AssessmentController::class, 'cerrarCasoCrisis'])->name('assessment.crisis.close');
+        // Favorites & Completed Resources
+        Route::post('/recursos/{resource}/favorito', [ResourceController::class, 'toggleFavorite'])->name('recursos.favorite');
+        Route::post('/recursos/{resource}/completar', [ResourceController::class, 'toggleCompleted'])->name('recursos.complete');
+        Route::get('/mis-favoritos', [ResourceController::class, 'userFavorites'])->name('favorites.index');
 
-    // Profile Settings
-    Route::get('/perfil', [AuthController::class, 'showProfile'])->name('profile.show');
-    Route::put('/perfil', [AuthController::class, 'updateProfile'])->name('profile.update');
-    Route::put('/perfil/password', [AuthController::class, 'updatePassword'])->name('profile.password');
+        // Clinical Risk Assessment Engine (v1.0)
+        Route::post('/assessment/who5', [AssessmentController::class, 'submitWho5'])->name('assessment.who5');
+        Route::post('/assessment/mdi', [AssessmentController::class, 'submitMdi'])->name('assessment.mdi');
+        Route::post('/assessment/asq', [AssessmentController::class, 'submitAsq'])->name('assessment.asq');
+        Route::post('/assessment/crisis/accion', [AssessmentController::class, 'registrarAccionCrisis'])->name('assessment.crisis.action');
+        Route::post('/assessment/crisis/{evento}/cerrar', [AssessmentController::class, 'cerrarCasoCrisis'])->name('assessment.crisis.close');
 
-    // Professional Healthcare Accreditation (Client Submission)
-    Route::post('/perfil/solicitud-profesional', [ProfessionalVerificationController::class, 'store'])->name('profile.verification.store');
+        // Profile Settings
+        Route::get('/perfil', [AuthController::class, 'showProfile'])->name('profile.show');
+        Route::put('/perfil', [AuthController::class, 'updateProfile'])->name('profile.update');
+        Route::put('/perfil/password', [AuthController::class, 'updatePassword'])->name('profile.password');
+
+        // Professional Healthcare Accreditation (Client Submission)
+        Route::post('/perfil/solicitud-profesional', [ProfessionalVerificationController::class, 'store'])->name('profile.verification.store');
+    });
 });
 
 /*
