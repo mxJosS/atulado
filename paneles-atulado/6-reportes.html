@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Centro de reportes · Consola A Tu Lado</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600..700;1,9..144,400&family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="panel.css">
+</head>
+<body>
+<div class="shell">
+<aside class="sidebar" data-sidebar data-console="atl" data-active="reportes"></aside>
+
+<div class="main">
+  <header class="topbar">
+    <div class="crumbs">consola / <b>centro de reportes</b></div>
+    <div class="topbar-actions">
+      <select class="select" style="width:auto" id="f-inst">
+        <option value="mayab">Constructora Mayab</option>
+        <option value="peninsular">Grupo Peninsular</option>
+        <option value="itcancun">IT Soporte Cancún</option>
+      </select>
+      <select class="select" style="width:auto" id="f-periodo">
+        <option>15/06/2026 – 14/09/2026</option>
+        <option>01/09/2026 – 14/09/2026</option>
+        <option>01/01/2026 – 14/09/2026</option>
+      </select>
+      <button class="btn btn-sm"><i class="fa-solid fa-clock"></i> Programar envíos</button>
+    </div>
+  </header>
+
+  <div class="page">
+    <div class="page-head">
+      <h1 class="page-title">Centro de reportes</h1>
+      <p class="page-sub">Cada documento se emite de verdad: elige destinatario y alcance, el sistema genera folio, arma el PDF paginado y lo abre. Los marcados en verde pueden entregarse a la institución porque no contienen identidad ni conteos; los marcados en rojo sólo existen dentro del plano clínico y del protocolo de crisis.</p>
+    </div>
+
+    <div class="tabs" data-tabs="rep">
+      <button class="tab on" data-pane="catalogo">Catálogo y emisión</button>
+      <button class="tab" data-pane="metricas">Qué contiene cada reporte</button>
+      <button class="tab" data-pane="historial">Emisiones y entregas</button>
+    </div>
+
+    <!-- ════════════ CATÁLOGO ════════════ -->
+    <div class="tabpane on" data-tabpane="rep" data-pane="catalogo">
+      <div class="alert info mb-3">
+        <div class="ico"><i class="fa-solid fa-file-pdf"></i></div>
+        <div class="txt"><b>Los 13 documentos están armados y son imprimibles</b>
+          <span>«Ver» abre el documento paginado tamaño carta tal como saldrá. «Emitir» pasa primero por las validaciones de destinatario y motivo, que es lo que conviene revisar antes de implementarlo.</span></div>
+      </div>
+
+      <div id="cat-institucion"></div>
+      <div id="cat-profesional"></div>
+      <div id="cat-interno"></div>
+
+      <div class="card mt-3">
+        <div class="card-head"><h3>Reglas que aplican a todos los PDF</h3></div>
+        <div class="card-body grid g-4">
+          <div><div class="kpi-label mb-1"><i class="fa-solid fa-hashtag"></i> Folio único</div>
+            <p class="small muted mb-0">Cada emisión genera un folio irrepetible ligado a quién la pidió y por qué.</p></div>
+          <div><div class="kpi-label mb-1"><i class="fa-solid fa-droplet"></i> Marca de agua nominal</div>
+            <p class="small muted mb-0">Los confidenciales llevan el nombre del destinatario en diagonal en cada página.</p></div>
+          <div><div class="kpi-label mb-1"><i class="fa-solid fa-hourglass-half"></i> Enlace con vigencia</div>
+            <p class="small muted mb-0">72 horas por omisión. Al vencer deja de resolver, aunque el PDF descargado permanezca.</p></div>
+          <div><div class="kpi-label mb-1"><i class="fa-solid fa-scale-balanced"></i> Leyenda de uso</div>
+            <p class="small muted mb-0">Prohibición expresa de usarlo para desempeño, sanción, despido o discriminación.</p></div>
+          <div><div class="kpi-label mb-1"><i class="fa-solid fa-triangle-exclamation"></i> Aviso de alcance</div>
+            <p class="small muted mb-0">«A Tu Lado no diagnostica ni sustituye a un profesional de la salud» en todos.</p></div>
+          <div><div class="kpi-label mb-1"><i class="fa-solid fa-book-open"></i> Metodología</div>
+            <p class="small muted mb-0">Fórmula de cada índice y el instrumento del que proviene cada dato.</p></div>
+          <div><div class="kpi-label mb-1"><i class="fa-solid fa-file-lines"></i> Pie con folio y paginación</div>
+            <p class="small muted mb-0">Cada hoja lleva folio y «página N de M», para detectar entregas incompletas.</p></div>
+          <div><div class="kpi-label mb-1"><i class="fa-solid fa-universal-access"></i> Legibilidad</div>
+            <p class="small muted mb-0">Toda gráfica lleva su tabla de datos; ningún dato depende sólo del color.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════ MÉTRICAS ════════════ -->
+    <div class="tabpane" data-tabpane="rep" data-pane="metricas">
+      <div class="card">
+        <div class="card-head"><h3>Qué contiene cada reporte</h3>
+          <span class="spacer section-note">Matriz de métricas por documento y audiencia</span></div>
+        <div class="table-wrap">
+          <table class="data">
+            <thead><tr><th style="min-width:230px">Métrica</th>
+              <th class="center">Ejecutivo<br><span class="xsmall muted">institución</span></th>
+              <th class="center">NOM-035<br><span class="xsmall muted">institución</span></th>
+              <th class="center">Clínico<br><span class="xsmall muted">profesional</span></th>
+              <th class="center">Bitácora<br><span class="xsmall muted">seudónimo</span></th>
+              <th class="center">Plataforma<br><span class="xsmall muted">interno</span></th></tr></thead>
+            <tbody>
+              <tr><td>IBI y su composición</td><td class="center">●</td><td class="center">—</td><td class="center">—</td><td class="center">—</td><td class="center">●</td></tr>
+              <tr><td>Distribución del semáforo en %</td><td class="center">●</td><td class="center">●</td><td class="center">—</td><td class="center">—</td><td class="center">●</td></tr>
+              <tr><td>Conteos absolutos de personas</td><td class="center">—</td><td class="center">—</td><td class="center">●</td><td class="center">●</td><td class="center">●</td></tr>
+              <tr><td>Desglose por departamento</td><td class="center">—</td><td class="center">—</td><td class="center">●</td><td class="center">●</td><td class="center">●</td></tr>
+              <tr><td>Adopción y constancia de uso</td><td class="center">●</td><td class="center">●</td><td class="center">—</td><td class="center">—</td><td class="center">●</td></tr>
+              <tr><td>Cumplimiento de SLA</td><td class="center">●</td><td class="center">●</td><td class="center">●</td><td class="center">●</td><td class="center">●</td></tr>
+              <tr><td>Hallazgos y recomendaciones</td><td class="center">●</td><td class="center">—</td><td class="center">—</td><td class="center">—</td><td class="center">●</td></tr>
+              <tr class="row-red"><td>Nombre de la persona</td><td class="center">—</td><td class="center">—</td><td class="center">●</td><td class="center">—</td><td class="center">—</td></tr>
+              <tr class="row-red"><td>Respuestas ítem por ítem</td><td class="center">—</td><td class="center">—</td><td class="center">●</td><td class="center">—</td><td class="center">—</td></tr>
+              <tr class="row-red"><td>Texto libre de la persona</td><td class="center">—</td><td class="center">—</td><td class="center">●</td><td class="center">—</td><td class="center">—</td></tr>
+              <tr class="row-red"><td>Plan de seguridad y contactos</td><td class="center">—</td><td class="center">—</td><td class="center">●</td><td class="center">—</td><td class="center">—</td></tr>
+              <tr><td>Bitácora de accesos con motivo</td><td class="center">—</td><td class="center">—</td><td class="center">—</td><td class="center">●</td><td class="center">●</td></tr>
+              <tr><td>Perfil estadístico anonimizado</td><td class="center">—</td><td class="center">—</td><td class="center">—</td><td class="center">—</td><td class="center">●</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card-foot">Esta matriz es la especificación de generación: el motor construye cada PDF a partir de una consulta distinta, no filtrando un mismo conjunto de datos. Un dato marcado «—» no llega al generador.</div>
+      </div>
+    </div>
+
+    <!-- ════════════ HISTORIAL ════════════ -->
+    <div class="tabpane" data-tabpane="rep" data-pane="historial">
+      <div class="toolbar">
+        <div class="input-icon" style="min-width:230px"><i class="fa-solid fa-magnifying-glass"></i>
+          <input class="input" placeholder="Buscar por folio o destinatario…"></div>
+        <select class="select" style="width:auto"><option>Todos los tipos</option><option>Confidenciales</option><option>Institucionales</option><option>Internos</option></select>
+        <div class="spacer"></div>
+        <span class="small muted">Retención de emisiones: 5 años</span>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table class="data">
+            <thead><tr><th>Folio</th><th>Reporte</th><th>Institución</th><th>Emitido por</th><th>Destinatario</th><th>Motivo</th><th>Enlace</th><th class="center">Abierto</th><th class="actions"></th></tr></thead>
+            <tbody id="hist-body"></tbody>
+          </table>
+        </div>
+        <div class="card-foot">Cada emisión de un documento confidencial que no fue abierto por su destinatario en 24 horas genera un recordatorio y, a las 72 horas, una nota en la bitácora del caso.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- ══════════════ MODAL DE EMISIÓN ══════════════ -->
+<div class="modal-backdrop" id="m-emitir">
+  <div class="modal narrow">
+    <div class="modal-head" id="em-head">
+      <div><h2 id="em-titulo">Emitir documento</h2><div class="sub" id="em-sub">—</div></div>
+      <button class="x" data-close><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div id="em-aviso"></div>
+
+      <div class="field mb-2"><label>Institución</label>
+        <select class="select" id="em-inst">
+          <option value="mayab">Constructora Mayab S.A. de C.V.</option>
+          <option value="peninsular">Grupo Peninsular S.A. de C.V.</option>
+          <option value="itcancun">IT Soporte Cancún S. de R.L.</option>
+        </select>
+      </div>
+
+      <div class="field mb-2"><label>Periodo</label>
+        <select class="select" id="em-periodo">
+          <option>15/06/2026 – 14/09/2026</option>
+          <option>01/09/2026 – 14/09/2026</option>
+          <option>01/01/2026 – 14/09/2026</option>
+        </select>
+      </div>
+
+      <div class="field mb-2" id="em-persona-wrap" hidden><label>Persona</label>
+        <select class="select" id="em-persona">
+          <option>Luis Manuel Chan Poot — COL-0412 · caso CR-2026-0117 abierto</option>
+          <option>María Isabel Uc Canché — COL-0188 · caso CR-2026-0116 abierto</option>
+          <option>José Armando Pech Kuk — COL-0307 · caso CR-2026-0115 abierto</option>
+          <option disabled>Diana Carolina Ek Balam — COL-0094 · sin protocolo activo</option>
+          <option disabled>Alejandro Herrera Díaz — COL-0028 · sin protocolo activo</option>
+        </select>
+        <span class="hint">Sólo se listan personas con protocolo de crisis activo. Fuera de un protocolo, la emisión no procede.</span>
+      </div>
+
+      <div class="field mb-2"><label>Destinatario</label>
+        <select class="select" id="em-dest"></select>
+        <span class="hint" id="em-dest-hint"></span>
+      </div>
+
+      <div class="field mb-2" id="em-motivo-wrap" hidden><label>Motivo de la emisión</label>
+        <select class="select" id="em-motivo">
+          <option>Protocolo de crisis activo (CR-2026-0117)</option>
+          <option>Seguimiento de caso ya abierto</option>
+          <option>Canalización a servicio externo</option>
+        </select>
+        <span class="hint">El motivo queda asentado en la bitácora junto al folio. Sin motivo, la emisión no se completa.</span>
+      </div>
+
+      <div class="field mb-2" id="em-alcance-wrap" hidden><label>Alcance del documento</label>
+        <div class="card card-pad" style="background:var(--bg-subtler)">
+          <div class="switch-row"><button class="switch on"></button><div class="txt"><b>Trayectoria del ánimo y reglas disparadas</b></div></div>
+          <div class="switch-row"><button class="switch on"></button><div class="txt"><b>Respuestas WHO-5, MDI y ASQ ítem por ítem</b></div></div>
+          <div class="switch-row"><button class="switch on"></button><div class="txt"><b>Texto libre con contexto de las banderas</b></div></div>
+          <div class="switch-row"><button class="switch on"></button><div class="txt"><b>Plan de seguridad y contactos de emergencia</b></div></div>
+          <div class="switch-row"><button class="switch"></button><div class="txt"><b>Historial completo de 12 meses</b><span>Amplía el documento a ~14 páginas.</span></div></div>
+        </div>
+      </div>
+
+      <div class="field mb-2" id="em-vigencia-wrap" hidden><label>Vigencia del enlace</label>
+        <select class="select"><option>72 horas (recomendado)</option><option>24 horas</option><option>7 días</option></select>
+        <span class="hint">Al vencer, el enlace deja de resolver. El PDF descargado conserva folio y marca de agua.</span>
+      </div>
+
+      <div class="card card-pad" style="background:var(--bg-subtler)">
+        <div class="kpi-label mb-1"><i class="fa-solid fa-hashtag"></i> Folio que se asignará</div>
+        <div class="mono strong" id="em-folio" style="font-size:1.05rem">—</div>
+        <div class="xsmall muted mt-1">Se genera al confirmar y queda ligado a esta emisión de forma permanente.</div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <span class="small muted" id="em-pie"></span>
+      <div class="spacer"></div>
+      <button class="btn" data-close>Cancelar</button>
+      <button class="btn btn-primary" id="em-go"><i class="fa-solid fa-file-pdf"></i> Generar documento</button>
+    </div>
+  </div>
+</div>
+
+<script src="panel.js"></script>
+<script src="reportes-data.js"></script>
+<script>
+/* ════════ Catálogo generado desde la definición de los reportes ════════ */
+
+const GRUPOS = [
+  { key: 'institucion', host: 'cat-institucion', titulo: 'Para la institución',
+    nota: 'Sólo porcentajes · sin identidad, sin conteos, sin desglose por área' },
+  { key: 'profesional', host: 'cat-profesional', titulo: 'Para el profesional designado',
+    nota: 'Con identidad · sólo con protocolo de crisis activo y contrato de confidencialidad vigente' },
+  { key: 'interno', host: 'cat-interno', titulo: 'Para A Tu Lado',
+    nota: 'Uso interno · comercial, producto e investigación' }
+];
+
+function etiquetas(r) {
+  const out = [];
+  if (r.audiencia === 'institucion') out.push('<span class="chip green"><i class="fa-solid fa-building"></i> Institución</span>');
+  if (r.audiencia === 'profesional') out.push(r.seudonimo
+    ? '<span class="chip amber"><i class="fa-solid fa-user-secret"></i> Seudonimizado</span>'
+    : '<span class="chip red"><i class="fa-solid fa-lock"></i> Confidencial</span>');
+  if (r.audiencia === 'interno') out.push('<span class="chip dark"><i class="fa-solid fa-shield-halved"></i> Interno</span>');
+  out.push(`<span class="chip mono">${r.periodicidad}</span>`);
+  if (r.requiereProtocolo) out.push('<span class="chip amber">Requiere protocolo activo</span>');
+  return out.join('');
+}
+
+GRUPOS.forEach(g => {
+  const items = Object.entries(REPORTES).filter(([, r]) => r.audiencia === g.key);
+  const cards = items.map(([id, r]) => `
+    <div class="report-card"${r.audiencia === 'profesional' && !r.seudonimo ? ' style="border-color:#E9B7B0"' : ''}>
+      <div class="rico" style="background:${r.color}${r.color === '#0D1410' ? ';color:#A8E6C0' : ''}"><i class="fa-solid ${r.icono}"></i></div>
+      <div style="flex:1">
+        <h4>${r.n} · ${r.nombre}</h4>
+        <p>${r.resumen}</p>
+        <div class="meta">${etiquetas(r)}</div>
+      </div>
+      <div class="col" style="gap:.35rem">
+        <a class="btn btn-sm" href="reporte.html?r=${id}&inst=mayab" target="_blank"><i class="fa-solid fa-eye"></i> Ver</a>
+        <button class="btn btn-sm ${r.audiencia === 'interno' ? 'btn-dark' : (r.audiencia === 'profesional' && !r.seudonimo ? 'btn-danger' : 'btn-primary')}" data-emitir="${id}"><i class="fa-solid fa-paper-plane"></i> Emitir</button>
+      </div>
+    </div>`).join('');
+  document.getElementById(g.host).innerHTML = `
+    <div class="section-head"><h2 class="section-title">${g.titulo}</h2>
+      <span class="section-note">${g.nota}</span></div>
+    <div class="grid g-2">${cards}</div>`;
+});
+
+/* ════════ Flujo de emisión ════════ */
+let repActual = null;
+
+function folioNuevo(pref) {
+  return `${pref}-2026-${Math.floor(Math.random() * 9000) + 1000}`;
+}
+
+const DEST_LABEL = {
+  contacto: id => INSTITUCIONES[id].contacto,
+  direccion: id => 'Dirección General — ' + INSTITUCIONES[id].corto,
+  profesional: id => `${INSTITUCIONES[id].profesional} · Ced. ${INSTITUCIONES[id].cedula} — profesional designado`,
+  guardia: () => 'Psic. Daniela Mena · Ced. 8004112 — guardia A Tu Lado',
+  direccion_atl: () => 'Dirección — A Tu Lado'
+};
+
+function pintarDestinatarios() {
+  const instId = document.getElementById('em-inst').value;
+  const sel = document.getElementById('em-dest');
+  sel.innerHTML = repActual.destinatarios
+    .map(d => `<option value="${d}">${DEST_LABEL[d](instId)}</option>`).join('');
+  if (repActual.audiencia === 'profesional' && !repActual.seudonimo) {
+    sel.innerHTML += `<option disabled>${INSTITUCIONES[instId].contacto} — sin acreditación clínica · NO ELEGIBLE</option>`;
+    document.getElementById('em-dest-hint').textContent =
+      'Sólo aparecen profesionales con cédula verificada y contrato de confidencialidad vigente.';
+  } else if (repActual.audiencia === 'institucion') {
+    document.getElementById('em-dest-hint').textContent =
+      'Cualquier persona con rol institucional puede recibirlo: no contiene datos individuales.';
+  } else {
+    document.getElementById('em-dest-hint').textContent =
+      'Documento de uso interno. No se entrega a instituciones ni a profesionales designados.';
+  }
+}
+
+function abrirEmision(id) {
+  repActual = REPORTES[id];
+  repActual._id = id;
+
+  document.getElementById('em-titulo').textContent = 'Emitir · ' + repActual.nombre;
+  document.getElementById('em-sub').textContent =
+    repActual.audiencia === 'profesional' ? 'Documento confidencial · folio y marca de agua'
+    : repActual.audiencia === 'interno' ? 'Uso interno de A Tu Lado'
+    : 'Apto para entrega a la institución';
+  document.getElementById('em-head').style.background =
+    repActual.audiencia === 'profesional' && !repActual.seudonimo ? '#6E140C' : 'var(--bg-panel)';
+
+  const conf = repActual.audiencia === 'profesional' && !repActual.seudonimo;
+  document.getElementById('em-persona-wrap').hidden = !repActual.requierePersona;
+  document.getElementById('em-motivo-wrap').hidden = !conf;
+  document.getElementById('em-alcance-wrap').hidden = repActual._id !== 'clinico';
+  document.getElementById('em-vigencia-wrap').hidden = !conf;
+
+  document.getElementById('em-aviso').innerHTML = conf
+    ? `<div class="alert crit mb-2"><div class="ico"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        <div class="txt"><b>Este documento sólo puede emitirse con un protocolo de crisis activo</b>
+          <span>Se entregará con folio, marca de agua a nombre del destinatario y enlace de vigencia limitada. La emisión queda asentada en la bitácora de accesos de la institución.</span></div></div>`
+    : repActual.audiencia === 'institucion'
+      ? `<div class="alert ok mb-2"><div class="ico"><i class="fa-solid fa-shield-halved"></i></div>
+          <div class="txt"><b>Contiene sólo proporciones del total de la organización</b>
+            <span>Sin nombres, sin conteos de personas y sin desglose por área: puede entregarse a la institución sin restricción.</span></div></div>`
+      : `<div class="alert info mb-2"><div class="ico"><i class="fa-solid fa-lock"></i></div>
+          <div class="txt"><b>Uso interno</b><span>Incluye conteos, desglose por institución e información comercial.</span></div></div>`;
+
+  document.getElementById('em-pie').innerHTML = conf
+    ? '<i class="fa-solid fa-fingerprint"></i> La emisión queda en bitácora'
+    : '<i class="fa-solid fa-file-pdf"></i> Se abrirá el documento listo para descargar';
+
+  document.getElementById('em-folio').textContent = folioNuevo(repActual.prefijo);
+  pintarDestinatarios();
+  openModal('m-emitir');
+}
+
+document.querySelectorAll('[data-emitir]').forEach(b =>
+  b.addEventListener('click', () => abrirEmision(b.dataset.emitir)));
+
+document.getElementById('em-inst').addEventListener('change', pintarDestinatarios);
+
+document.getElementById('em-go').addEventListener('click', () => {
+  const p = new URLSearchParams({
+    r: repActual._id,
+    inst: document.getElementById('em-inst').value,
+    periodo: document.getElementById('em-periodo').value,
+    dest: document.getElementById('em-dest').value,
+    folio: document.getElementById('em-folio').textContent
+  });
+  window.open('reporte.html?' + p.toString(), '_blank');
+  closeModal('m-emitir');
+});
+
+/* ════════ Historial ════════ */
+const HIST = [
+  ['RC-2026-0117-A', 'clinico', 'Resumen clínico individual', 'Mayab', 'Said Canul', 'Psic. R. Ancona', 'Protocolo CR-2026-0117', '<span class="chip amber">vence en 71 h</span>', '<span class="chip green">Sí · 09:52</span>', 'row-critical'],
+  ['RE-2026-T3-MAYAB', 'ejecutivo', 'Reporte ejecutivo trimestral', 'Mayab', 'Sistema', 'Mónica Rivas (RH)', 'Cierre de trimestre', '<span class="chip green">permanente</span>', '<span class="chip green">Sí · 10:14</span>', ''],
+  ['NOM-2026-T3-MAYAB', 'nom035', 'Constancia NOM-035', 'Mayab', 'Sistema', 'Mónica Rivas (RH)', 'Cierre de trimestre', '<span class="chip green">permanente</span>', '<span class="chip">No</span>', ''],
+  ['AP-2026-0116', 'acta', 'Acta de protocolo', 'Mayab', 'Psic. R. Ancona', 'Psic. R. Ancona', 'Cierre de CR-2026-0116', '<span class="chip">vencido</span>', '<span class="chip green">Sí</span>', 'row-red'],
+  ['BA-2026-08', 'bitacora', 'Bitácora de alertas', 'Mayab', 'Sistema', 'Psic. R. Ancona', 'Corte mensual', '<span class="chip green">permanente</span>', '<span class="chip green">Sí</span>', ''],
+  ['PL-2026-08', 'plataforma', 'Reporte de plataforma', 'todas', 'Sistema', 'Dirección A Tu Lado', 'Corte mensual', '<span class="chip dark">interno</span>', '<span class="chip green">Sí</span>', ''],
+  ['CA-2026-T2', 'calibracion', 'Calibración del motor', 'todas', 'Sistema', 'Dirección A Tu Lado', 'Corte trimestral', '<span class="chip dark">interno</span>', '<span class="chip green">Sí</span>', '']
+];
+
+document.getElementById('hist-body').innerHTML = HIST.map(h => `
+  <tr class="${h[9]}">
+    <td class="mono xsmall">${h[0]}</td><td class="small">${h[2]}</td><td class="small">${h[3]}</td>
+    <td class="small">${h[4]}</td><td class="small">${h[5]}</td><td class="small">${h[6]}</td>
+    <td>${h[7]}</td><td class="center">${h[8]}</td>
+    <td class="actions"><a class="btn btn-sm" href="reporte.html?r=${h[1]}&folio=${h[0]}" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i></a></td>
+  </tr>`).join('');
+</script>
+</body>
+</html>

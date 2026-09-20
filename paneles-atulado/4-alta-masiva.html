@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Altas y estructura · Consola A Tu Lado</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600..700;1,9..144,400&family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="panel.css">
+</head>
+<body>
+<div class="shell">
+<aside class="sidebar" data-sidebar data-console="atl" data-active="altas"></aside>
+
+<div class="main">
+  <header class="topbar">
+    <div class="crumbs"><a href="index.html">instituciones</a> / <a href="2-institucion-detalle.html">constructora mayab</a> / <b>altas y estructura</b></div>
+    <div class="topbar-actions">
+      <span class="chip red"><i class="fa-solid fa-key"></i> Acción de superadministrador</span>
+      <button class="btn btn-sm"><i class="fa-solid fa-clock-rotate-left"></i> Historial de cambios</button>
+    </div>
+  </header>
+
+  <div class="page">
+    <div class="page-head">
+      <h1 class="page-title">Padrón y estructura de la institución</h1>
+      <p class="page-sub">Dar de alta o de baja una institución y a sus integrantes es privilegio exclusivo de los superadministradores de A Tu Lado. La institución puede <b>proponer</b> cambios desde su panel; se aplican cuando un superadministrador los aprueba.</p>
+    </div>
+
+    <div class="tabs" data-tabs="altas">
+      <button class="tab on" data-pane="carga">Carga masiva por Excel</button>
+      <button class="tab" data-pane="estructura">Departamentos y salones</button>
+      <button class="tab" data-pane="padron">Padrón actual</button>
+      <button class="tab" data-pane="bajas">Bajas y retención de datos</button>
+      <button class="tab" data-pane="roles">Roles y accesos</button>
+    </div>
+
+    <!-- ════════════════ CARGA MASIVA ════════════════ -->
+    <div class="tabpane on" data-tabpane="altas" data-pane="carga">
+
+      <div class="steps">
+        <div class="step done"><span class="n"><i class="fa-solid fa-check"></i></span><span class="t">Descargar plantilla</span></div>
+        <div class="step-sep"></div>
+        <div class="step done"><span class="n"><i class="fa-solid fa-check"></i></span><span class="t">Subir archivo</span></div>
+        <div class="step-sep"></div>
+        <div class="step on"><span class="n">3</span><span class="t">Mapear columnas y validar</span></div>
+        <div class="step-sep"></div>
+        <div class="step"><span class="n">4</span><span class="t">Resolver conflictos</span></div>
+        <div class="step-sep"></div>
+        <div class="step"><span class="n">5</span><span class="t">Confirmar e invitar</span></div>
+      </div>
+
+      <div class="grid g-1-2">
+        <div class="card">
+          <div class="card-head"><h3>1 · Plantilla oficial</h3></div>
+          <div class="card-body">
+            <p class="small muted">Descarga el archivo, llénalo con el padrón y súbelo. Las columnas marcadas con <span class="chip red">req</span> son obligatorias; las demás mejoran la analítica pero no bloquean el alta.</p>
+            <button class="btn btn-primary mt-1"><i class="fa-solid fa-file-excel"></i> padron_atulado_v3.xlsx</button>
+            <button class="btn btn-sm mt-1"><i class="fa-solid fa-book"></i> Guía de llenado (PDF)</button>
+            <div class="divider"></div>
+            <div class="section-note mb-1">Validaciones que trae el archivo</div>
+            <ul class="small muted" style="padding-left:1.1rem;margin:0;line-height:1.8">
+              <li>Listas desplegables para departamento, turno y escolaridad</li>
+              <li>Formato de correo y de teléfono a 10 dígitos</li>
+              <li>Año de nacimiento, no fecha completa</li>
+              <li>Bloqueo de celdas de encabezado</li>
+            </ul>
+          </div>
+          <div class="card-foot">La plantilla <b>no pide</b> CURP, RFC, número de seguridad social, domicilio ni diagnóstico alguno. A Tu Lado no los necesita y no los almacena.</div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3>Columnas de la plantilla</h3>
+            <span class="spacer section-note">17 columnas · 4 obligatorias</span></div>
+          <div class="table-wrap">
+            <table class="data">
+              <thead><tr><th>Columna</th><th>Tipo</th><th>Uso</th><th>Ejemplo</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">nombre_completo <span class="chip red">req</span></td><td>Texto</td><td class="small">Identidad para el plano clínico</td><td class="small muted">Luis Manuel Chan Poot</td></tr>
+                <tr><td class="mono">correo <span class="chip red">req</span></td><td>Correo</td><td class="small">Invitación y acceso</td><td class="small muted">lchan@mayab.mx</td></tr>
+                <tr><td class="mono">numero_empleado <span class="chip red">req</span></td><td>Texto</td><td class="small">Llave contra el sistema de RH</td><td class="small muted">1188</td></tr>
+                <tr><td class="mono">departamento <span class="chip red">req</span></td><td>Lista</td><td class="small">Segmentación y agregados</td><td class="small muted">Obra — nocturna</td></tr>
+                <tr><td class="mono">puesto</td><td>Texto</td><td class="small">Cohortes por rol</td><td class="small muted">Oficial albañil</td></tr>
+                <tr><td class="mono">turno</td><td>Lista</td><td class="small">Análisis de jornada</td><td class="small muted">Nocturno</td></tr>
+                <tr><td class="mono">horario</td><td>Texto</td><td class="small">Ventana para contactar en crisis</td><td class="small muted">22:00–06:00</td></tr>
+                <tr><td class="mono">fecha_ingreso</td><td>Fecha</td><td class="small">Cohortes por antigüedad</td><td class="small muted">2024-03-11</td></tr>
+                <tr><td class="mono">sexo</td><td>Lista</td><td class="small">Estadística anónima</td><td class="small muted">M / F / Prefiero no decir</td></tr>
+                <tr><td class="mono">anio_nacimiento</td><td>Número</td><td class="small">Rango de edad, nunca fecha exacta</td><td class="small muted">1991</td></tr>
+                <tr><td class="mono">escolaridad</td><td>Lista</td><td class="small">Estadística anónima</td><td class="small muted">Secundaria</td></tr>
+                <tr><td class="mono">lugar_origen</td><td>Texto</td><td class="small">Estadística anónima</td><td class="small muted">Tekax, Yucatán</td></tr>
+                <tr><td class="mono">tipo_jornada</td><td>Lista</td><td class="small">Estadística anónima</td><td class="small muted">Tiempo completo</td></tr>
+                <tr><td class="mono">contacto_emergencia_nombre</td><td>Texto</td><td class="small">Protocolo de crisis</td><td class="small muted">Rosa Poot Canché</td></tr>
+                <tr><td class="mono">contacto_emergencia_telefono</td><td>Teléfono</td><td class="small">Protocolo de crisis</td><td class="small muted">9994128803</td></tr>
+                <tr><td class="mono">contacto_emergencia_relacion</td><td>Lista</td><td class="small">Protocolo de crisis</td><td class="small muted">Madre</td></tr>
+                <tr><td class="mono">idioma</td><td>Lista</td><td class="small">Interfaz y materiales</td><td class="small muted">Español / Maya</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card-foot">El contacto de emergencia cargado aquí es un <b>respaldo</b>. La persona puede corregirlo o añadir otro desde su perfil, y su versión siempre gana.</div>
+        </div>
+      </div>
+
+      <div class="section-head"><h2 class="section-title">2 · Archivo cargado</h2></div>
+
+      <div class="grid g-1-2">
+        <div class="card card-pad">
+          <div class="dropzone" style="padding:1.6rem 1rem">
+            <div class="big"><i class="fa-solid fa-file-excel"></i></div>
+            <h4>padron_mayab_sep2026.xlsx</h4>
+            <p>418 filas · 17 columnas · 86 KB · subido hace 2 min</p>
+            <button class="btn btn-sm"><i class="fa-solid fa-arrows-rotate"></i> Reemplazar archivo</button>
+          </div>
+          <div class="grid g-2 mt-2">
+            <div class="kpi accent-green" style="padding:.7rem .85rem">
+              <div class="kpi-label">Listas para alta</div><div class="kpi-value" style="font-size:1.5rem">389</div></div>
+            <div class="kpi accent-amber" style="padding:.7rem .85rem">
+              <div class="kpi-label">Con advertencia</div><div class="kpi-value" style="font-size:1.5rem">22</div></div>
+            <div class="kpi accent-red" style="padding:.7rem .85rem">
+              <div class="kpi-label">Con error</div><div class="kpi-value" style="font-size:1.5rem">7</div></div>
+            <div class="kpi accent-violet" style="padding:.7rem .85rem">
+              <div class="kpi-label">Ya existen</div><div class="kpi-value" style="font-size:1.5rem">14</div></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3>3 · Mapeo de columnas</h3>
+            <span class="spacer chip green"><i class="fa-solid fa-wand-magic-sparkles"></i> 15 de 17 detectadas automáticamente</span></div>
+          <div class="card-body">
+            <table class="data">
+              <thead><tr><th>Columna del archivo</th><th></th><th>Campo de A Tu Lado</th><th>Estado</th></tr></thead>
+              <tbody>
+                <tr><td class="mono small">NOMBRE DEL TRABAJADOR</td><td class="muted"><i class="fa-solid fa-arrow-right"></i></td>
+                  <td><select class="select" style="font-size:.78rem;padding:.3rem .5rem"><option>nombre_completo</option></select></td>
+                  <td><span class="chip green">Auto</span></td></tr>
+                <tr><td class="mono small">E-MAIL</td><td class="muted"><i class="fa-solid fa-arrow-right"></i></td>
+                  <td><select class="select" style="font-size:.78rem;padding:.3rem .5rem"><option>correo</option></select></td>
+                  <td><span class="chip green">Auto</span></td></tr>
+                <tr><td class="mono small">No. EMPLEADO</td><td class="muted"><i class="fa-solid fa-arrow-right"></i></td>
+                  <td><select class="select" style="font-size:.78rem;padding:.3rem .5rem"><option>numero_empleado</option></select></td>
+                  <td><span class="chip green">Auto</span></td></tr>
+                <tr><td class="mono small">ÁREA</td><td class="muted"><i class="fa-solid fa-arrow-right"></i></td>
+                  <td><select class="select" style="font-size:.78rem;padding:.3rem .5rem"><option>departamento</option></select></td>
+                  <td><span class="chip green">Auto</span></td></tr>
+                <tr class="row-red"><td class="mono small">CUADRILLA</td><td class="muted"><i class="fa-solid fa-arrow-right"></i></td>
+                  <td><select class="select" style="font-size:.78rem;padding:.3rem .5rem"><option>— sin asignar —</option><option>subdepartamento</option><option>puesto</option><option>Ignorar columna</option></select></td>
+                  <td><span class="chip amber">Requiere decisión</span></td></tr>
+                <tr class="row-red"><td class="mono small">CURP</td><td class="muted"><i class="fa-solid fa-arrow-right"></i></td>
+                  <td><select class="select" style="font-size:.78rem;padding:.3rem .5rem"><option>Ignorar columna</option></select></td>
+                  <td><span class="chip red"><i class="fa-solid fa-ban"></i> No se almacena</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card-foot">Cualquier columna que no corresponda a un campo de la plantilla se ignora y no se guarda, aunque venga en el archivo. La columna CURP fue detectada y bloqueada automáticamente.</div>
+        </div>
+      </div>
+
+      <div class="section-head">
+        <h2 class="section-title">4 · Revisión fila por fila</h2>
+        <div class="spacer"></div>
+        <div class="segmented"><button class="on">Todas (418)</button><button>Errores (7)</button><button>Advertencias (22)</button><button>Duplicados (14)</button></div>
+      </div>
+
+      <div class="card">
+        <div class="table-wrap">
+          <table class="data">
+            <thead><tr><th class="num">#</th><th>Nombre</th><th>Correo</th><th>Emp.</th><th>Departamento</th><th>Turno</th><th>Contacto emerg.</th><th>Estado</th><th class="actions">Acción</th></tr></thead>
+            <tbody>
+              <tr class="row-critical"><td class="num">14</td><td>Ana Karina Puc Chi</td><td class="mono xsmall">akpuc@mayab</td><td class="mono">0930</td><td>Administración</td><td>Matutino</td><td class="small">Sí</td>
+                <td><span class="chip red"><i class="fa-solid fa-circle-xmark"></i> Correo inválido</span></td>
+                <td class="actions"><button class="btn btn-sm">Corregir</button></td></tr>
+              <tr class="row-critical"><td class="num">61</td><td>—</td><td class="mono xsmall">jgomez@mayab.mx</td><td class="mono">1044</td><td>Obra — diurna</td><td>Matutino</td><td class="small">No</td>
+                <td><span class="chip red"><i class="fa-solid fa-circle-xmark"></i> Falta nombre</span></td>
+                <td class="actions"><button class="btn btn-sm">Corregir</button></td></tr>
+              <tr class="row-critical"><td class="num">88</td><td>Pedro Chim Ake</td><td class="mono xsmall">pchim@mayab.mx</td><td class="mono">1102</td><td class="small"><i>Mantenimiento</i></td><td>Vespertino</td><td class="small">Sí</td>
+                <td><span class="chip red"><i class="fa-solid fa-circle-xmark"></i> Departamento inexistente</span></td>
+                <td class="actions"><button class="btn btn-sm" data-open="m-dep">Crear área</button></td></tr>
+              <tr class="row-red"><td class="num">117</td><td>Luis Manuel Chan Poot</td><td class="mono xsmall">lchan@mayab.mx</td><td class="mono">1188</td><td>Obra — nocturna</td><td>Nocturno</td><td class="small">Sí</td>
+                <td><span class="chip violet"><i class="fa-solid fa-clone"></i> Ya existe (COL-0412)</span></td>
+                <td class="actions"><select class="select btn-sm" style="width:auto;font-size:.72rem"><option>Actualizar datos</option><option>Omitir fila</option><option>Crear duplicado</option></select></td></tr>
+              <tr><td class="num">203</td><td>Ricardo Novelo Aguilar</td><td class="mono xsmall">rnovelo@mayab.mx</td><td class="mono">1120</td><td>Obra — nocturna</td><td>Nocturno</td><td class="small muted">—</td>
+                <td><span class="chip amber"><i class="fa-solid fa-triangle-exclamation"></i> Sin contacto de emergencia</span></td>
+                <td class="actions"><button class="btn btn-sm">Alta igual</button></td></tr>
+              <tr><td class="num">244</td><td>Silvia Poot Chuc</td><td class="mono xsmall">spoot@mayab.mx</td><td class="mono">1301</td><td>Dirección</td><td>Matutino</td><td class="small">Sí</td>
+                <td><span class="chip amber"><i class="fa-solid fa-triangle-exclamation"></i> Año de nacimiento vacío</span></td>
+                <td class="actions"><button class="btn btn-sm">Alta igual</button></td></tr>
+              <tr><td class="num">245</td><td>Alejandro Herrera Díaz</td><td class="mono xsmall">aherrera@mayab.mx</td><td class="mono">0203</td><td>Administración</td><td>Matutino</td><td class="small">Sí</td>
+                <td><span class="chip green"><i class="fa-solid fa-circle-check"></i> Lista</span></td>
+                <td class="actions"><span class="muted xsmall">—</span></td></tr>
+              <tr><td class="num">246</td><td>Diana Carolina Ek Balam</td><td class="mono xsmall">dek@mayab.mx</td><td class="mono">0455</td><td>Administración</td><td>Matutino</td><td class="small">Sí</td>
+                <td><span class="chip green"><i class="fa-solid fa-circle-check"></i> Lista</span></td>
+                <td class="actions"><span class="muted xsmall">—</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card-foot row">
+          <span>Las filas con <b>error</b> no se dan de alta hasta corregirse. Las de <b>advertencia</b> sí, con el dato faltante marcado para completarlo después.</span>
+          <div class="spacer"></div>
+          <button class="btn btn-sm"><i class="fa-solid fa-file-csv"></i> Descargar filas con problema</button>
+        </div>
+      </div>
+
+      <div class="section-head"><h2 class="section-title">5 · Confirmar e invitar</h2></div>
+
+      <div class="grid g-2">
+        <div class="card">
+          <div class="card-head"><h3>Cómo se invita a las personas</h3></div>
+          <div class="card-body">
+            <div class="switch-row"><button class="switch on"></button><div class="txt"><b>Enviar invitación por correo</b><span>Con el nombre de la institución y la explicación de qué ve y qué no ve la empresa.</span></div></div>
+            <div class="switch-row"><button class="switch on"></button><div class="txt"><b>Generar código de acceso por departamento</b><span>Útil para quien no tiene correo institucional: se entrega impreso.</span></div></div>
+            <div class="switch-row"><button class="switch"></button><div class="txt"><b>Envío escalonado</b><span>20% por día durante 5 días, para no saturar la primera sesión de acompañamiento.</span></div></div>
+            <div class="switch-row"><button class="switch on"></button><div class="txt"><b>Recordatorio a los 7 días si no activó</b></div></div>
+            <div class="divider"></div>
+            <div class="field"><label>Mensaje de bienvenida (opcional)</label>
+              <textarea class="textarea" placeholder="Constructora Mayab pone a tu disposición A Tu Lado…">Constructora Mayab pone a tu disposición A Tu Lado, un espacio de acompañamiento emocional. Lo que escribas aquí es confidencial: la empresa nunca verá tus respuestas ni tu nombre asociado a ellas.</textarea></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3>Resumen de la operación</h3></div>
+          <div class="card-body">
+            <dl class="dl">
+              <dt>Altas nuevas</dt><dd>389 personas</dd>
+              <dt>Actualizaciones</dt><dd>14 personas (datos de puesto y turno)</dd>
+              <dt>Bloqueadas</dt><dd>7 filas con error</dd>
+              <dt>Áreas nuevas</dt><dd>1 — «Mantenimiento» pendiente de crear</dd>
+              <dt>Padrón resultante</dt><dd>403 personas activas</dd>
+              <dt>Ejecuta</dt><dd>Said Canul · superadministrador</dd>
+              <dt>Queda en bitácora</dt><dd><span class="chip green">Sí, con archivo original adjunto</span></dd>
+            </dl>
+            <div class="alert warn mt-2">
+              <div class="ico"><i class="fa-solid fa-circle-exclamation"></i></div>
+              <div class="txt"><b>Esta operación no puede revertirse en un solo clic</b>
+                <span>Las altas se pueden dar de baja después, pero las invitaciones ya enviadas no se pueden recuperar.</span></div>
+            </div>
+          </div>
+          <div class="card-foot row">
+            <div class="spacer"></div>
+            <button class="btn">Guardar sin ejecutar</button>
+            <button class="btn btn-primary"><i class="fa-solid fa-play"></i> Ejecutar alta de 403 personas</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════ ESTRUCTURA ════════════════ -->
+    <div class="tabpane" data-tabpane="altas" data-pane="estructura">
+      <div class="grid g-2-1">
+        <div class="card">
+          <div class="card-head"><h3>Departamentos de Constructora Mayab</h3>
+            <div class="spacer"></div>
+            <button class="btn btn-primary btn-sm" data-open="m-dep"><i class="fa-solid fa-plus"></i> Nueva área</button></div>
+          <div class="table-wrap">
+            <table class="data">
+              <thead><tr><th>Área</th><th>Tipo</th><th>Responsable operativo</th><th class="num">Personas</th><th class="num">Activas</th><th>Turno predominante</th><th class="actions"></th></tr></thead>
+              <tbody>
+                <tr><td><b>Obra — cuadrilla diurna</b><div class="xsmall muted mono">obra-diurna</div></td><td>Departamento</td><td class="small">Ing. Carlos Uicab</td><td class="num">112</td><td class="num">96</td><td>Matutino</td>
+                  <td class="actions"><button class="btn btn-sm btn-ghost"><i class="fa-solid fa-pen"></i></button></td></tr>
+                <tr class="row-red"><td><b>Obra — cuadrilla nocturna</b><div class="xsmall muted mono">obra-nocturna</div></td><td>Departamento</td><td class="small">Ing. Carlos Uicab</td><td class="num">44</td><td class="num">38</td><td>Nocturno</td>
+                  <td class="actions"><button class="btn btn-sm btn-ghost"><i class="fa-solid fa-pen"></i></button></td></tr>
+                <tr><td><b>Almacén y logística</b><div class="xsmall muted mono">almacen</div></td><td>Departamento</td><td class="small">Lic. Marta Balam</td><td class="num">61</td><td class="num">54</td><td>Mixto</td>
+                  <td class="actions"><button class="btn btn-sm btn-ghost"><i class="fa-solid fa-pen"></i></button></td></tr>
+                <tr><td><b>Administración</b><div class="xsmall muted mono">admin</div></td><td>Departamento</td><td class="small">C.P. Elena Sosa</td><td class="num">80</td><td class="num">72</td><td>Matutino</td>
+                  <td class="actions"><button class="btn btn-sm btn-ghost"><i class="fa-solid fa-pen"></i></button></td></tr>
+                <tr><td><b>Ventas y atención</b><div class="xsmall muted mono">ventas</div></td><td>Departamento</td><td class="small">Lic. Hugo Canché</td><td class="num">52</td><td class="num">45</td><td>Matutino</td>
+                  <td class="actions"><button class="btn btn-sm btn-ghost"><i class="fa-solid fa-pen"></i></button></td></tr>
+                <tr><td><b>Dirección</b><div class="xsmall muted mono">direccion</div></td><td>Departamento</td><td class="small">Ing. Raúl Mayab</td><td class="num">41</td><td class="num">37</td><td>Matutino</td>
+                  <td class="actions"><button class="btn btn-sm btn-ghost"><i class="fa-solid fa-pen"></i></button></td></tr>
+                <tr style="opacity:.6"><td><b>Mantenimiento</b><div class="xsmall muted mono">pendiente</div></td><td>Departamento</td><td class="small muted">—</td><td class="num">22</td><td class="num">0</td><td>Vespertino</td>
+                  <td class="actions"><button class="btn btn-sm btn-primary">Crear</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card-foot">Un área sin responsable operativo funciona igual para la persona usuaria, pero no puede recibir el reporte segmentado ni aparecer en la comparativa por área.</div>
+        </div>
+
+        <div class="col" style="gap:1rem">
+          <div class="card">
+            <div class="card-head"><h3>Modo de segmentación</h3></div>
+            <div class="card-body">
+              <div class="field mb-2"><label>Cómo se llama el nivel principal</label>
+                <select class="select"><option>Departamento (empresa)</option><option>Salón o grupo (escuela)</option><option>Carrera o programa</option><option>Sucursal</option><option>Turno</option></select>
+                <span class="hint">Cambia sólo la etiqueta en toda la interfaz. La estructura de datos es la misma.</span></div>
+              <div class="field mb-2"><label>Segundo nivel</label>
+                <select class="select"><option>Ninguno</option><option>Cuadrilla / equipo</option><option>Sede física</option></select></div>
+              <div class="switch-row"><button class="switch on"></button><div class="txt"><b>Permitir que la persona corrija su área</b><span>Con aprobación del responsable operativo.</span></div></div>
+              <div class="switch-row"><button class="switch"></button><div class="txt"><b>Sincronizar con el sistema de RH</b><span>Requiere conector. No disponible en esta institución.</span></div></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><h3>Regla de agregados</h3></div>
+            <div class="card-body">
+              <div class="alert info">
+                <div class="ico"><i class="fa-solid fa-percent"></i></div>
+                <div class="txt"><b>La institución ve porcentajes de toda la institución</b>
+                  <span>No hay umbral mínimo de personas porque no se publican conteos ni cortes por área hacia el panel institucional: sólo proporciones del total. Así ningún dato puede reconstruirse por diferencia.</span></div>
+              </div>
+              <div class="switch-row mt-1"><button class="switch on"></button><div class="txt"><b>Ocultar conteos absolutos en el panel institucional</b></div></div>
+              <div class="switch-row"><button class="switch"></button><div class="txt"><b>Publicar desglose por área a la institución</b><span>Desactivado: permitiría inferir a quién corresponde un caso en áreas chicas.</span></div></div>
+              <div class="switch-row"><button class="switch on"></button><div class="txt"><b>Redondear porcentajes a entero</b></div></div>
+            </div>
+            <div class="card-foot">El desglose por área sí existe y es visible en esta consola y en el reporte que recibe el profesional designado — nunca en el panel de la institución.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════ PADRÓN ════════════════ -->
+    <div class="tabpane" data-tabpane="altas" data-pane="padron">
+      <div class="toolbar">
+        <div class="input-icon" style="min-width:250px"><i class="fa-solid fa-magnifying-glass"></i>
+          <input class="input" placeholder="Buscar por nombre, correo o número de empleado…"></div>
+        <select class="select" style="width:auto"><option>Todos los departamentos</option></select>
+        <select class="select" style="width:auto"><option>Todos los estados</option><option>Activo</option><option>Invitado sin activar</option><option>Suspendido</option><option>Baja</option></select>
+        <div class="spacer"></div>
+        <button class="btn btn-sm"><i class="fa-solid fa-user-plus"></i> Alta individual</button>
+        <button class="btn btn-sm"><i class="fa-solid fa-file-csv"></i> Exportar</button>
+        <button class="btn btn-primary btn-sm"><i class="fa-solid fa-file-arrow-up"></i> Nueva carga masiva</button>
+      </div>
+
+      <div class="grid g-5 mb-2">
+        <div class="kpi" style="padding:.75rem .9rem"><div class="kpi-label">Padrón total</div><div class="kpi-value" style="font-size:1.5rem">412</div></div>
+        <div class="kpi accent-green" style="padding:.75rem .9rem"><div class="kpi-label">Activos</div><div class="kpi-value" style="font-size:1.5rem">342</div></div>
+        <div class="kpi accent-amber" style="padding:.75rem .9rem"><div class="kpi-label">Invitados sin activar</div><div class="kpi-value" style="font-size:1.5rem">29</div></div>
+        <div class="kpi" style="padding:.75rem .9rem"><div class="kpi-label">Suspendidos</div><div class="kpi-value" style="font-size:1.5rem">3</div></div>
+        <div class="kpi" style="padding:.75rem .9rem"><div class="kpi-label">Bajas este año</div><div class="kpi-value" style="font-size:1.5rem">38</div></div>
+      </div>
+
+      <div class="card">
+        <div class="table-wrap">
+          <table class="data">
+            <thead><tr><th><input type="checkbox"></th><th>Persona</th><th>Puesto</th><th>Departamento</th><th>Turno / horario</th><th>Alta</th><th>Estado de cuenta</th><th>Último acceso</th><th class="actions">Acciones</th></tr></thead>
+            <tbody>
+              <tr><td><input type="checkbox"></td>
+                <td><div class="who-cell"><div class="av">LM</div><div><div class="nm">Luis Manuel Chan Poot</div><div class="sub mono">1188 · lchan@mayab.mx</div></div></div></td>
+                <td>Oficial albañil</td><td>Obra — nocturna</td><td class="small">Nocturno<br><span class="mono xsmall muted">22:00–06:00</span></td>
+                <td class="mono xsmall">11/03/2024</td><td><span class="chip green">Activa</span></td><td class="mono xsmall">hoy 08:47</td>
+                <td class="actions"><button class="btn btn-sm btn-ghost"><i class="fa-solid fa-pen"></i></button><button class="btn btn-sm btn-ghost"><i class="fa-solid fa-user-slash"></i></button></td></tr>
+              <tr><td><input type="checkbox"></td>
+                <td><div class="who-cell"><div class="av" style="background:#8EADA4">JG</div><div><div class="nm">Jorge Gómez Interián</div><div class="sub mono">1044 · jgomez@mayab.mx</div></div></div></td>
+                <td>Maestro de obra</td><td>Obra — diurna</td><td class="small">Matutino<br><span class="mono xsmall muted">07:00–15:00</span></td>
+                <td class="mono xsmall">02/09/2026</td><td><span class="chip amber">Invitado · 12 días</span></td><td class="mono xsmall muted">nunca</td>
+                <td class="actions"><button class="btn btn-sm">Reenviar</button><button class="btn btn-sm btn-ghost"><i class="fa-solid fa-user-slash"></i></button></td></tr>
+              <tr><td><input type="checkbox"></td>
+                <td><div class="who-cell"><div class="av" style="background:#5B4A8A">DC</div><div><div class="nm">Diana Carolina Ek Balam</div><div class="sub mono">0455 · dek@mayab.mx</div></div></div></td>
+                <td>Analista de nómina</td><td>Administración</td><td class="small">Matutino<br><span class="mono xsmall muted">08:00–16:00</span></td>
+                <td class="mono xsmall">15/01/2023</td><td><span class="chip green">Activa</span></td><td class="mono xsmall">hoy 08:05</td>
+                <td class="actions"><button class="btn btn-sm btn-ghost"><i class="fa-solid fa-pen"></i></button><button class="btn btn-sm btn-ghost"><i class="fa-solid fa-user-slash"></i></button></td></tr>
+              <tr style="opacity:.6"><td><input type="checkbox"></td>
+                <td><div class="who-cell"><div class="av" style="background:#8EADA4">MC</div><div><div class="nm">Manuel Castillo Ku</div><div class="sub mono">0871 · —</div></div></div></td>
+                <td>Velador</td><td>Obra — nocturna</td><td class="small">Nocturno</td>
+                <td class="mono xsmall">08/07/2022</td><td><span class="chip">Baja 30/08/2026</span></td><td class="mono xsmall muted">29/08/2026</td>
+                <td class="actions"><button class="btn btn-sm">Reactivar</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card-foot row">
+          <span>Selección múltiple habilita: cambiar de departamento, reenviar invitación, suspender y dar de baja en lote.</span>
+          <div class="spacer"></div>
+          <button class="btn btn-sm" disabled>Acciones en lote (0)</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════ BAJAS ════════════════ -->
+    <div class="tabpane" data-tabpane="altas" data-pane="bajas">
+      <div class="privacy-banner">
+        <div class="ico"><i class="fa-solid fa-box-archive"></i></div>
+        <div><b>Qué pasa con los datos cuando alguien deja la institución</b>
+          <p>Dar de baja no borra: cierra el acceso institucional y desvincula a la persona de la organización. Su cuenta personal y su historial siguen siendo suyos. La institución no conserva ni recupera nada de esa persona en ningún momento.</p></div>
+      </div>
+
+      <div class="grid g-3">
+        <div class="card">
+          <div class="card-head"><h3>Baja de una persona</h3></div>
+          <div class="card-body">
+            <div class="tl">
+              <div class="tl-item"><div class="tl-when">Inmediato</div><div class="tl-what">Se desvincula de la institución</div>
+                <div class="tl-detail">Deja de contar en agregados, alertas y reportes desde el día de la baja.</div></div>
+              <div class="tl-item"><div class="tl-when">Inmediato</div><div class="tl-what">La cuenta personal sigue viva</div>
+                <div class="tl-detail">Puede seguir usando A Tu Lado por su cuenta, sin institución detrás.</div></div>
+              <div class="tl-item amber"><div class="tl-when">30 días</div><div class="tl-what">Ventana de reactivación</div>
+                <div class="tl-detail">Si vuelve a la empresa, se reincorpora sin perder su historial institucional.</div></div>
+              <div class="tl-item green"><div class="tl-when">Permanente</div><div class="tl-what">Su aporte estadístico queda anonimizado</div>
+                <div class="tl-detail">Sus resultados históricos ya estaban sin llave reversible; no se tocan ni se borran.</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3>Baja de una institución</h3></div>
+          <div class="card-body">
+            <div class="tl">
+              <div class="tl-item red"><div class="tl-when">Requisito</div><div class="tl-what">No debe haber protocolos de crisis abiertos</div>
+                <div class="tl-detail">El sistema bloquea la baja hasta cerrar cada caso con contacto verificado.</div></div>
+              <div class="tl-item"><div class="tl-when">Inmediato</div><div class="tl-what">Se revoca el panel institucional y los accesos del profesional designado</div></div>
+              <div class="tl-item"><div class="tl-when">Inmediato</div><div class="tl-what">Cada persona recibe aviso y conserva su cuenta personal</div></div>
+              <div class="tl-item amber"><div class="tl-when">90 días</div><div class="tl-what">Entrega del acta final</div>
+                <div class="tl-detail">Reporte ejecutivo de cierre y constancia de eliminación de vínculos institucionales.</div></div>
+            </div>
+            <button class="btn btn-danger mt-2" style="width:100%"><i class="fa-solid fa-building-circle-xmark"></i> Dar de baja la institución</button>
+          </div>
+          <div class="card-foot">Sólo un superadministrador puede ejecutarla, con doble confirmación y motivo.</div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3>Política de retención</h3></div>
+          <div class="card-body">
+            <table class="data">
+              <thead><tr><th>Dato</th><th>Retención</th><th>Al terminar</th></tr></thead>
+              <tbody>
+                <tr><td class="small">Identidad y contacto</td><td class="small">Vigencia del contrato</td><td class="small">Se desvincula</td></tr>
+                <tr><td class="small">Registros y respuestas</td><td class="small">Propiedad de la persona</td><td class="small">Permanecen en su cuenta</td></tr>
+                <tr><td class="small">Eventos de crisis</td><td class="small">5 años</td><td class="small">Seudonimizado</td></tr>
+                <tr><td class="small">Bitácora de accesos</td><td class="small">5 años</td><td class="small">Inmutable</td></tr>
+                <tr><td class="small">Perfil estadístico</td><td class="small">Indefinido</td><td class="small">Ya es anónimo</td></tr>
+                <tr><td class="small">Agregados institucionales</td><td class="small">Vigencia + 1 año</td><td class="small">Se entrega y se borra</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card-foot">Estas ventanas se declaran en el aviso de privacidad y son las que sostiene la constancia de eliminación al cierre del contrato.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════ ROLES ════════════════ -->
+    <div class="tabpane" data-tabpane="altas" data-pane="roles">
+      <div class="card">
+        <div class="card-head"><h3>Matriz de accesos</h3>
+          <span class="spacer section-note">Esta tabla es la especificación, no una descripción de la vista</span></div>
+        <div class="table-wrap">
+          <table class="data">
+            <thead><tr><th>Capacidad</th>
+              <th class="center">Superadmin<br><span class="xsmall muted">A Tu Lado</span></th>
+              <th class="center">Clínico acreditado<br><span class="xsmall muted">A Tu Lado</span></th>
+              <th class="center">Profesional designado<br><span class="xsmall muted">institución</span></th>
+              <th class="center">RH / Dirección<br><span class="xsmall muted">institución</span></th>
+              <th class="center">Persona usuaria</th></tr></thead>
+            <tbody>
+              <tr><td>Alta y baja de instituciones</td><td class="center"><i class="fa-solid fa-check" style="color:#1E8449"></i></td><td class="center">—</td><td class="center">—</td><td class="center">—</td><td class="center">—</td></tr>
+              <tr><td>Alta y baja de personas</td><td class="center"><i class="fa-solid fa-check" style="color:#1E8449"></i></td><td class="center">—</td><td class="center">—</td><td class="center"><span class="chip amber">Propone</span></td><td class="center">—</td></tr>
+              <tr><td>Ver agregados en porcentaje</td><td class="center"><i class="fa-solid fa-check" style="color:#1E8449"></i></td><td class="center"><i class="fa-solid fa-check" style="color:#1E8449"></i></td><td class="center"><i class="fa-solid fa-check" style="color:#1E8449"></i></td><td class="center"><i class="fa-solid fa-check" style="color:#1E8449"></i></td><td class="center">—</td></tr>
+              <tr><td>Ver conteos absolutos</td><td class="center"><i class="fa-solid fa-check" style="color:#1E8449"></i></td><td class="center"><i class="fa-solid fa-check" style="color:#1E8449"></i></td><td class="center"><i class="fa-solid fa-check" style="color:#1E8449"></i></td><td class="center"><i class="fa-solid fa-xmark" style="color:#B02418"></i></td><td class="center">—</td></tr>
+              <tr class="row-red"><td>Ver lista de personas con nombre y semáforo</td><td class="center"><i class="fa-solid fa-xmark" style="color:#B02418"></i></td><td class="center"><i class="fa-solid fa-check" style="color:#1E8449"></i></td><td class="center"><i class="fa-solid fa-check" style="color:#1E8449"></i></td><td class="center"><i class="fa-solid fa-xmark" style="color:#B02418"></i></td><td class="center">—</td></tr>
+              <tr class="row-red"><td>Abrir ficha con respuestas ítem por ítem</td><td class="center"><i class="fa-solid fa-xmark" style="color:#B02418"></i></td><td class="center"><span class="chip amber">Con motivo</span></td><td class="center"><span class="chip amber">Protocolo activo</span></td><td class="center"><i class="fa-solid fa-xmark" style="color:#B02418"></i></td><td class="center">Sólo lo suyo</td></tr>
+              <tr class="row-red"><td>Leer texto libre del registro diario</td><td class="center"><i class="fa-solid fa-xmark" style="color:#B02418"></i></td><td class="center"><span class="chip amber">Con motivo</span></td><td class="center"><span class="chip amber">Protocolo activo</span></td><td class="center"><i class="fa-solid fa-xmark" style="color:#B02418"></i></td><td class="center">Sólo lo suyo</td></tr>
+              <tr><td>Descargar resumen clínico individual</td><td class="center"><i class="fa-solid fa-xmark" style="color:#B02418"></i></td><td class="center"><span class="chip amber">Para entregar</span></td><td class="center"><i class="fa-solid fa-check" style="color:#1E8449"></i></td><td class="center"><i class="fa-solid fa-xmark" style="color:#B02418"></i></td><td class="center"><i class="fa-solid fa-check" style="color:#1E8449"></i></td></tr>
+              <tr><td>Cerrar un caso de crisis</td><td class="center"><i class="fa-solid fa-xmark" style="color:#B02418"></i></td><td class="center"><i class="fa-solid fa-check" style="color:#1E8449"></i></td><td class="center"><i class="fa-solid fa-check" style="color:#1E8449"></i></td><td class="center"><i class="fa-solid fa-xmark" style="color:#B02418"></i></td><td class="center">—</td></tr>
+              <tr><td>Ver la bitácora de accesos de su institución</td><td class="center"><i class="fa-solid fa-check" style="color:#1E8449"></i></td><td class="center"><i class="fa-solid fa-check" style="color:#1E8449"></i></td><td class="center"><i class="fa-solid fa-check" style="color:#1E8449"></i></td><td class="center"><i class="fa-solid fa-check" style="color:#1E8449"></i></td><td class="center">—</td></tr>
+              <tr><td>Exportar su propia información</td><td class="center">—</td><td class="center">—</td><td class="center">—</td><td class="center">—</td><td class="center"><i class="fa-solid fa-check" style="color:#1E8449"></i></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card-foot">El superadministrador administra la plataforma; <b>no</b> es un rol clínico. Para abrir una ficha se requiere la acreditación clínica, que es un permiso distinto y auditado. Una misma persona puede tener ambos, pero el sistema los registra por separado.</div>
+      </div>
+
+      <div class="grid g-2 mt-2">
+        <div class="card">
+          <div class="card-head"><h3>Profesionales con acceso en esta institución</h3>
+            <button class="btn btn-sm btn-primary spacer"><i class="fa-solid fa-plus"></i> Designar</button></div>
+          <div class="table-wrap">
+            <table class="data">
+              <thead><tr><th>Profesional</th><th>Cédula</th><th>Designado por</th><th>NDA</th><th>Vigencia</th><th>Estado</th></tr></thead>
+              <tbody>
+                <tr><td><b>Psic. Roberto Ancona</b><div class="xsmall muted">Psicología clínica</div></td><td class="mono">7712045</td>
+                  <td class="small">A Tu Lado + Mayab</td><td><span class="chip green">Firmado</span></td><td class="mono xsmall">14/02/2027</td><td><span class="chip green">Activo</span></td></tr>
+                <tr><td><b>Psic. Daniela Mena</b><div class="xsmall muted">Guardia A Tu Lado</div></td><td class="mono">8004112</td>
+                  <td class="small">A Tu Lado</td><td><span class="chip green">Firmado</span></td><td class="mono xsmall">23/09/2026</td><td><span class="chip amber">Vence en 9 d</span></td></tr>
+                <tr style="opacity:.6"><td><b>Mónica Rivas</b><div class="xsmall muted">Recursos Humanos</div></td><td class="mono muted">—</td>
+                  <td class="small">Mayab</td><td><span class="chip">No aplica</span></td><td class="mono xsmall">—</td><td><span class="chip">Sólo panel institucional</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card-foot">Al vencer el NDA, el acceso al plano clínico se corta de forma automática; no depende de que alguien lo revoque a mano.</div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3>Bitácora de accesos · últimas entradas</h3>
+            <a href="#" class="section-note spacer">Ver completa</a></div>
+          <div class="table-wrap">
+            <table class="data">
+              <thead><tr><th>Cuándo</th><th>Quién</th><th>Acción</th><th>Sobre</th><th>Motivo</th></tr></thead>
+              <tbody>
+                <tr><td class="mono xsmall">hoy 09:44</td><td class="small">Said Canul</td><td><span class="chip red">Entrega de resumen</span></td><td class="mono xsmall">COL-0412</td><td class="small">Protocolo CR-2026-0117</td></tr>
+                <tr><td class="mono xsmall">hoy 09:41</td><td class="small">Said Canul</td><td><span class="chip amber">Apertura de ficha</span></td><td class="mono xsmall">COL-0412</td><td class="small">Revisión de caso rojo agudo</td></tr>
+                <tr><td class="mono xsmall">hoy 09:09</td><td class="small">Psic. R. Ancona</td><td><span class="chip amber">Apertura de ficha</span></td><td class="mono xsmall">COL-0412</td><td class="small">Contacto de protocolo</td></tr>
+                <tr><td class="mono xsmall">hoy 08:12</td><td class="small">Mónica Rivas</td><td><span class="chip green">Panel institucional</span></td><td class="small muted">agregado</td><td class="small muted">—</td></tr>
+                <tr><td class="mono xsmall">ayer 21:31</td><td class="small">Psic. R. Ancona</td><td><span class="chip amber">Apertura de ficha</span></td><td class="mono xsmall">COL-0188</td><td class="small">Bandera léxica de ideación</td></tr>
+                <tr><td class="mono xsmall">ayer 18:04</td><td class="small">Said Canul</td><td><span class="chip">Carga de padrón</span></td><td class="small muted">418 filas</td><td class="small">Actualización semestral</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card-foot">Cada entrada es inmutable: no se puede editar ni borrar, y queda a disposición de la autoridad competente si llegara a requerirse.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- ══════════ MODAL: NUEVA ÁREA ══════════ -->
+<div class="modal-backdrop" id="m-dep">
+  <div class="modal narrow">
+    <div class="modal-head"><div><h2>Nueva área</h2><div class="sub">Constructora Mayab</div></div>
+      <button class="x" data-close><i class="fa-solid fa-xmark"></i></button></div>
+    <div class="modal-body">
+      <div class="grid g-2">
+        <div class="field"><label>Nombre visible</label><input class="input" value="Mantenimiento"></div>
+        <div class="field"><label>Clave interna</label><input class="input mono" value="mantenimiento"></div>
+        <div class="field"><label>Turno predominante</label><select class="select"><option>Vespertino</option><option>Matutino</option><option>Nocturno</option><option>Mixto</option></select></div>
+        <div class="field"><label>Personas esperadas</label><input class="input" type="number" value="22"></div>
+      </div>
+      <div class="field mt-2"><label>Responsable operativo</label><input class="input" placeholder="Nombre y correo"></div>
+      <div class="field mt-2"><label>Área superior (opcional)</label><select class="select"><option>— ninguna —</option><option>Obra</option><option>Administración</option></select></div>
+      <div class="alert info mt-2"><div class="ico"><i class="fa-solid fa-circle-info"></i></div>
+        <div class="txt"><b>El área entra en los agregados desde su creación</b><span>Las 22 filas del archivo que la referencian se desbloquean al guardar.</span></div></div>
+    </div>
+    <div class="modal-foot"><div class="spacer"></div><button class="btn" data-close>Cancelar</button>
+      <button class="btn btn-primary">Crear área</button></div>
+  </div>
+</div>
+
+<script src="panel.js"></script>
+</body>
+</html>

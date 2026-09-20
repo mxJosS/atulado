@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Instituciones · Consola A Tu Lado</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600..700;1,9..144,400&family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="panel.css">
+</head>
+<body>
+<div class="shell">
+<aside class="sidebar" data-sidebar data-console="atl" data-active="instituciones"></aside>
+
+<div class="main">
+  <header class="topbar">
+    <div class="crumbs">consola / <b>instituciones</b></div>
+    <div class="topbar-actions">
+      <div class="segmented">
+        <button class="on">7 días</button><button>30 días</button><button>90 días</button><button>Ciclo</button>
+      </div>
+      <button class="btn btn-sm"><i class="fa-solid fa-rotate"></i> Actualizado 09:41</button>
+      <button class="btn btn-primary btn-sm" data-open="m-alta"><i class="fa-solid fa-plus"></i> Nueva institución</button>
+    </div>
+  </header>
+
+  <div class="page">
+    <div class="page-head">
+      <h1 class="page-title">Estado de la plataforma</h1>
+      <p class="page-sub">Vista de operación de A Tu Lado sobre todas las organizaciones contratantes. Los indicadores clínicos de esta pantalla son agregados; el detalle identificado vive dentro de cada institución y queda registrado en la bitácora de accesos.</p>
+    </div>
+
+    <!-- ══════════ KPI DE PLATAFORMA ══════════ -->
+    <div class="section-head">
+      <h2 class="section-title">Pulso operativo</h2>
+      <span class="section-note">Últimos 7 días · comparado contra el periodo anterior</span>
+    </div>
+
+    <div class="grid g-4">
+      <div class="kpi">
+        <div class="kpi-label"><i class="fa-solid fa-building-shield"></i> Instituciones activas</div>
+        <div class="kpi-value">14</div>
+        <div class="kpi-foot"><span class="delta up">+2</span> en el trimestre · 2 en onboarding</div>
+        <div class="kpi-spark" data-spark="[9,10,10,11,12,12,13,14]"></div>
+      </div>
+
+      <div class="kpi">
+        <div class="kpi-label"><i class="fa-solid fa-users"></i> Cuentas activadas</div>
+        <div class="kpi-value">3,186 <span class="unit">/ 4,024</span></div>
+        <div class="kpi-foot"><span class="delta up">79.2%</span> de adopción · meta contractual 75%</div>
+        <div class="kpi-spark" data-spark="[61,64,68,70,73,75,77,79]"></div>
+      </div>
+
+      <div class="kpi">
+        <div class="kpi-label"><i class="fa-solid fa-wave-square"></i> Índice de arraigo (DAU/MAU)</div>
+        <div class="kpi-value">0.41</div>
+        <div class="kpi-foot"><span class="delta up">+0.04</span> · 1,306 activos hoy</div>
+        <div class="kpi-spark" data-spark="[0.31,0.33,0.34,0.36,0.35,0.38,0.40,0.41]"></div>
+      </div>
+
+      <div class="kpi">
+        <div class="kpi-label"><i class="fa-solid fa-calendar-check"></i> Adherencia al registro diario</div>
+        <div class="kpi-value">68 <span class="unit">%</span></div>
+        <div class="kpi-foot"><span class="delta down">−3 pts</span> · cae los fines de semana</div>
+        <div class="kpi-spark" data-spark="[72,74,71,69,70,68,66,68]" data-spark-color="#D9660F"></div>
+      </div>
+    </div>
+
+    <div class="grid g-4 mt-2">
+      <div class="kpi accent-red">
+        <div class="kpi-label"><i class="fa-solid fa-triangle-exclamation"></i> Casos abiertos nivel rojo</div>
+        <div class="kpi-value">7</div>
+        <div class="kpi-foot"><b class="delta down">2 agudos</b> · en 5 instituciones</div>
+      </div>
+
+      <div class="kpi accent-red">
+        <div class="kpi-label"><i class="fa-solid fa-stopwatch"></i> Mediana de primer contacto</div>
+        <div class="kpi-value">21 <span class="unit">min</span></div>
+        <div class="kpi-foot">SLA comprometido: 30 min · <span class="delta up">100% cumplido</span></div>
+      </div>
+
+      <div class="kpi accent-green">
+        <div class="kpi-label"><i class="fa-solid fa-user-check"></i> Cierres con contacto humano verificado</div>
+        <div class="kpi-value">100 <span class="unit">%</span></div>
+        <div class="kpi-foot">38 de 38 casos rojo del trimestre</div>
+      </div>
+
+      <div class="kpi accent-violet">
+        <div class="kpi-label"><i class="fa-solid fa-clipboard-question"></i> Instrumentos aplicados (7d)</div>
+        <div class="kpi-value">1,942</div>
+        <div class="kpi-foot">WHO-5 1,504 · MDI 371 · ASQ 67</div>
+      </div>
+    </div>
+
+    <!-- ══════════ ALERTAS ══════════ -->
+    <div class="grid g-3-2 mt-3">
+      <div>
+        <div class="section-head" style="margin-top:0">
+          <h2 class="section-title">Semáforo consolidado de la plataforma</h2>
+          <span class="section-note">3,186 personas con al menos una clasificación vigente</span>
+        </div>
+        <div class="card card-pad">
+          <div class="dist-bar">
+            <div class="seg" style="background:var(--sem-verde);width:71.4%">71.4% Verde</div>
+            <div class="seg light-text" style="background:var(--sem-amarillo);width:18.2%">18.2% Amarillo</div>
+            <div class="seg" style="background:var(--sem-naranja);width:8.1%">8.1% Naranja</div>
+            <div class="seg" style="background:var(--sem-rojo);width:2.1%">2.1%</div>
+            <div class="seg" style="background:var(--sem-rojo-agudo);width:0.2%"></div>
+          </div>
+          <div class="stack-legend">
+            <span class="legend-item"><span class="sw" style="background:var(--sem-verde)"></span> Verde <b>2,275</b></span>
+            <span class="legend-item"><span class="sw" style="background:var(--sem-amarillo)"></span> Amarillo <b>580</b></span>
+            <span class="legend-item"><span class="sw" style="background:var(--sem-naranja)"></span> Naranja <b>258</b></span>
+            <span class="legend-item"><span class="sw" style="background:var(--sem-rojo)"></span> Rojo <b>67</b></span>
+            <span class="legend-item"><span class="sw" style="background:var(--sem-rojo-agudo)"></span> Rojo agudo <b>6</b></span>
+          </div>
+          <div class="divider"></div>
+          <div class="section-note mb-1">Evolución 12 semanas — proporción del padrón por nivel</div>
+          <div id="ch-evolucion"></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-head" style="margin-top:0">
+          <h2 class="section-title">Alertas que exigen acción</h2>
+          <a href="#" class="section-note spacer">Ver todas</a>
+        </div>
+        <div class="col" style="gap:0.6rem">
+          <div class="alert crit">
+            <div class="ico"><i class="fa-solid fa-heart-pulse"></i></div>
+            <div class="txt"><b>2 casos ROJO AGUDO sin cerrar</b>
+              <span>Constructora Mayab (1) · IT Soporte Cancún (1). Protocolo activo, contacto humano pendiente de verificar.</span></div>
+            <div class="when">hace 12 m</div>
+          </div>
+          <div class="alert crit">
+            <div class="ico"><i class="fa-solid fa-comment-dots"></i></div>
+            <div class="txt"><b>Filtro léxico: 4 detecciones de ideación</b>
+              <span>Texto libre del registro diario. Escaladas automáticamente a ASQ; 3 ya respondidas.</span></div>
+            <div class="when">hace 1 h</div>
+          </div>
+          <div class="alert warn">
+            <div class="ico"><i class="fa-solid fa-volume-xmark"></i></div>
+            <div class="txt"><b>Regla R4 — silencio prolongado</b>
+              <span>41 personas sin registro en 14+ días. Hotel Xcanatún concentra el 38% de ellas.</span></div>
+            <div class="when">hace 3 h</div>
+          </div>
+          <div class="alert warn">
+            <div class="ico"><i class="fa-solid fa-chart-line"></i></div>
+            <div class="txt"><b>Caída de uso sostenida</b>
+              <span>Grupo Peninsular lleva 3 semanas a la baja (−22%). Riesgo de renovación.</span></div>
+            <div class="when">ayer</div>
+          </div>
+          <div class="alert warn">
+            <div class="ico"><i class="fa-solid fa-file-signature"></i></div>
+            <div class="txt"><b>Contrato de confidencialidad por vencer</b>
+              <span>Psic. Daniela Mena (Hotel Xcanatún) vence en 9 días. Sin renovarlo pierde acceso al protocolo.</span></div>
+            <div class="when">ayer</div>
+          </div>
+          <div class="alert info">
+            <div class="ico"><i class="fa-solid fa-clipboard-list"></i></div>
+            <div class="txt"><b>Ciclos WHO-5 vencidos</b>
+              <span>126 aplicaciones programadas sin responder a más de 7 días de la fecha objetivo.</span></div>
+            <div class="when">hoy</div>
+          </div>
+          <div class="alert ok">
+            <div class="ico"><i class="fa-solid fa-shield-halved"></i></div>
+            <div class="txt"><b>Integridad de la separación de planos</b>
+              <span>0 intentos de acceso de un panel institucional a datos identificados en 30 días.</span></div>
+            <div class="when">continuo</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ LISTA DE INSTITUCIONES ══════════ -->
+    <div class="section-head">
+      <h2 class="section-title">Instituciones</h2>
+      <span class="section-note">Clic en una tarjeta para entrar a su detalle</span>
+      <div class="spacer"></div>
+      <div class="segmented"><button class="on">Tarjetas</button><button>Tabla</button></div>
+    </div>
+
+    <div class="toolbar">
+      <div class="input-icon" style="min-width:250px">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input class="input" placeholder="Buscar institución, RFC o contacto…">
+      </div>
+      <select class="select" style="width:auto"><option>Todos los sectores</option><option>Manufactura</option><option>Hotelería</option><option>Educación</option><option>Servicios</option><option>Salud</option></select>
+      <select class="select" style="width:auto"><option>Todos los estados</option><option>Activa</option><option>Onboarding</option><option>Suspendida</option><option>Por renovar</option></select>
+      <select class="select" style="width:auto"><option>Ordenar: prioridad clínica</option><option>Ordenar: actividad</option><option>Ordenar: adopción</option><option>Ordenar: alta más reciente</option></select>
+      <div class="spacer"></div>
+      <button class="btn btn-sm"><i class="fa-solid fa-file-csv"></i> Exportar padrón</button>
+      <button class="btn btn-primary btn-sm" data-open="m-alta"><i class="fa-solid fa-plus"></i> Nueva institución</button>
+    </div>
+
+    <div class="inst-grid">
+
+      <a href="2-institucion-detalle.html" class="inst-card has-crit">
+        <div class="inst-top">
+          <div class="inst-logo" style="background:#2E5D4B">CM</div>
+          <div style="flex:1">
+            <div class="inst-name">Constructora Mayab S.A. de C.V.</div>
+            <div class="inst-meta">Manufactura y obra · Mérida, Yuc. · 6 departamentos</div>
+          </div>
+          <span class="sem sem-rojo"><span class="dot"></span> 1 agudo</span>
+        </div>
+        <div class="bar-track" style="height:10px">
+          <div class="seg" style="background:var(--sem-verde);width:62%"></div>
+          <div class="seg" style="background:var(--sem-amarillo);width:22%"></div>
+          <div class="seg" style="background:var(--sem-naranja);width:12%"></div>
+          <div class="seg" style="background:var(--sem-rojo);width:4%"></div>
+        </div>
+        <div class="inst-stats">
+          <div class="inst-stat"><div class="v">412</div><div class="l">Colaboradores</div></div>
+          <div class="inst-stat"><div class="v">83%</div><div class="l">Adopción</div></div>
+          <div class="inst-stat"><div class="v">0.47</div><div class="l">Arraigo</div></div>
+        </div>
+        <div class="row" style="gap:.35rem;flex-wrap:wrap">
+          <span class="chip red"><i class="fa-solid fa-triangle-exclamation"></i> 3 casos abiertos</span>
+          <span class="chip green"><i class="fa-solid fa-user-shield"></i> Prof. designado activo</span>
+          <span class="chip mono">Renueva 14/02/27</span>
+        </div>
+      </a>
+
+      <a href="2-institucion-detalle.html" class="inst-card">
+        <div class="inst-top">
+          <div class="inst-logo" style="background:#5B4A8A">GP</div>
+          <div style="flex:1">
+            <div class="inst-name">Grupo Peninsular</div>
+            <div class="inst-meta">Servicios corporativos · Mérida, Yuc. · 9 departamentos</div>
+          </div>
+          <span class="sem sem-amarillo"><span class="dot"></span> Uso a la baja</span>
+        </div>
+        <div class="bar-track" style="height:10px">
+          <div class="seg" style="background:var(--sem-verde);width:74%"></div>
+          <div class="seg" style="background:var(--sem-amarillo);width:17%"></div>
+          <div class="seg" style="background:var(--sem-naranja);width:7%"></div>
+          <div class="seg" style="background:var(--sem-rojo);width:2%"></div>
+        </div>
+        <div class="inst-stats">
+          <div class="inst-stat"><div class="v">738</div><div class="l">Colaboradores</div></div>
+          <div class="inst-stat"><div class="v">71%</div><div class="l">Adopción</div></div>
+          <div class="inst-stat"><div class="v">0.29</div><div class="l">Arraigo</div></div>
+        </div>
+        <div class="row" style="gap:.35rem;flex-wrap:wrap">
+          <span class="chip amber"><i class="fa-solid fa-arrow-trend-down"></i> −22% en 3 semanas</span>
+          <span class="chip green"><i class="fa-solid fa-user-shield"></i> Prof. designado activo</span>
+          <span class="chip mono">Renueva 30/09/26</span>
+        </div>
+      </a>
+
+      <a href="2-institucion-detalle.html" class="inst-card has-crit">
+        <div class="inst-top">
+          <div class="inst-logo" style="background:#2A78D6">IT</div>
+          <div style="flex:1">
+            <div class="inst-name">IT Soporte Cancún</div>
+            <div class="inst-meta">Tecnología · Cancún, Q. Roo · 4 departamentos</div>
+          </div>
+          <span class="sem sem-rojo"><span class="dot"></span> 1 agudo</span>
+        </div>
+        <div class="bar-track" style="height:10px">
+          <div class="seg" style="background:var(--sem-verde);width:66%"></div>
+          <div class="seg" style="background:var(--sem-amarillo);width:20%"></div>
+          <div class="seg" style="background:var(--sem-naranja);width:11%"></div>
+          <div class="seg" style="background:var(--sem-rojo);width:3%"></div>
+        </div>
+        <div class="inst-stats">
+          <div class="inst-stat"><div class="v">186</div><div class="l">Colaboradores</div></div>
+          <div class="inst-stat"><div class="v">88%</div><div class="l">Adopción</div></div>
+          <div class="inst-stat"><div class="v">0.52</div><div class="l">Arraigo</div></div>
+        </div>
+        <div class="row" style="gap:.35rem;flex-wrap:wrap">
+          <span class="chip red"><i class="fa-solid fa-triangle-exclamation"></i> 2 casos abiertos</span>
+          <span class="chip green"><i class="fa-solid fa-user-shield"></i> Prof. designado activo</span>
+          <span class="chip mono">Renueva 01/12/26</span>
+        </div>
+      </a>
+
+      <a href="2-institucion-detalle.html" class="inst-card">
+        <div class="inst-top">
+          <div class="inst-logo" style="background:#1BAF7A">TM</div>
+          <div style="flex:1">
+            <div class="inst-name">Tecnológico de Mérida — Escolar</div>
+            <div class="inst-meta">Educación superior · Mérida, Yuc. · 11 salones/carreras</div>
+          </div>
+          <span class="sem sem-verde"><span class="dot"></span> Estable</span>
+        </div>
+        <div class="bar-track" style="height:10px">
+          <div class="seg" style="background:var(--sem-verde);width:69%"></div>
+          <div class="seg" style="background:var(--sem-amarillo);width:21%"></div>
+          <div class="seg" style="background:var(--sem-naranja);width:8%"></div>
+          <div class="seg" style="background:var(--sem-rojo);width:2%"></div>
+        </div>
+        <div class="inst-stats">
+          <div class="inst-stat"><div class="v">1,204</div><div class="l">Estudiantes</div></div>
+          <div class="inst-stat"><div class="v">76%</div><div class="l">Adopción</div></div>
+          <div class="inst-stat"><div class="v">0.44</div><div class="l">Arraigo</div></div>
+        </div>
+        <div class="row" style="gap:.35rem;flex-wrap:wrap">
+          <span class="chip green"><i class="fa-solid fa-check"></i> Sin casos abiertos</span>
+          <span class="chip violet"><i class="fa-solid fa-graduation-cap"></i> Modo escolar</span>
+          <span class="chip mono">Renueva 31/07/27</span>
+        </div>
+      </a>
+
+      <a href="2-institucion-detalle.html" class="inst-card">
+        <div class="inst-top">
+          <div class="inst-logo" style="background:#C98500">HX</div>
+          <div style="flex:1">
+            <div class="inst-name">Hotel Xcanatún Collection</div>
+            <div class="inst-meta">Hotelería · Mérida, Yuc. · 7 departamentos</div>
+          </div>
+          <span class="sem sem-naranja"><span class="dot"></span> Silencio alto</span>
+        </div>
+        <div class="bar-track" style="height:10px">
+          <div class="seg" style="background:var(--sem-verde);width:58%"></div>
+          <div class="seg" style="background:var(--sem-amarillo);width:24%"></div>
+          <div class="seg" style="background:var(--sem-naranja);width:15%"></div>
+          <div class="seg" style="background:var(--sem-rojo);width:3%"></div>
+        </div>
+        <div class="inst-stats">
+          <div class="inst-stat"><div class="v">294</div><div class="l">Colaboradores</div></div>
+          <div class="inst-stat"><div class="v">61%</div><div class="l">Adopción</div></div>
+          <div class="inst-stat"><div class="v">0.22</div><div class="l">Arraigo</div></div>
+        </div>
+        <div class="row" style="gap:.35rem;flex-wrap:wrap">
+          <span class="chip amber"><i class="fa-solid fa-volume-xmark"></i> 16 en silencio R4</span>
+          <span class="chip red"><i class="fa-solid fa-file-signature"></i> NDA vence en 9 días</span>
+          <span class="chip mono">Renueva 15/11/26</span>
+        </div>
+      </a>
+
+      <a href="2-institucion-detalle.html" class="inst-card" style="opacity:.72">
+        <div class="inst-top">
+          <div class="inst-logo" style="background:#8EADA4">TR</div>
+          <div style="flex:1">
+            <div class="inst-name">TRAsystems</div>
+            <div class="inst-meta">Servicios técnicos · Mérida, Yuc. · 2 departamentos</div>
+          </div>
+          <span class="chip"><i class="fa-solid fa-hourglass-half"></i> Onboarding</span>
+        </div>
+        <div class="bar-track" style="height:10px"><div class="seg" style="background:var(--bg-subtle);width:100%"></div></div>
+        <div class="inst-stats">
+          <div class="inst-stat"><div class="v">18</div><div class="l">En padrón</div></div>
+          <div class="inst-stat"><div class="v">22%</div><div class="l">Adopción</div></div>
+          <div class="inst-stat"><div class="v">—</div><div class="l">Arraigo</div></div>
+        </div>
+        <div class="row" style="gap:.35rem;flex-wrap:wrap">
+          <span class="chip"><i class="fa-solid fa-list-check"></i> Falta designar profesional</span>
+          <span class="chip mono">Alta 02/09/26</span>
+        </div>
+      </a>
+
+    </div>
+
+    <!-- ══════════ COMPARATIVO ══════════ -->
+    <div class="section-head">
+      <h2 class="section-title">Comparativo entre instituciones</h2>
+      <span class="section-note">Ordenado por prioridad clínica. Todos los valores son agregados.</span>
+    </div>
+
+    <div class="card">
+      <div class="table-wrap">
+        <table class="data">
+          <thead>
+            <tr>
+              <th>Institución</th><th>Sector</th><th class="num">Padrón</th><th class="num">Adopción</th>
+              <th style="min-width:150px">Distribución del semáforo</th>
+              <th class="num">Casos abiertos</th><th class="num">1er contacto</th>
+              <th class="num">WHO-5 inst.</th><th class="num">Adherencia</th><th class="num">R4 silencio</th><th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="row-red">
+              <td><b>Constructora Mayab</b></td><td class="muted small">Manufactura</td>
+              <td class="num">412</td><td class="num">83%</td>
+              <td><div class="bar-track"><div class="seg" style="background:var(--sem-verde);width:62%"></div><div class="seg" style="background:var(--sem-amarillo);width:22%"></div><div class="seg" style="background:var(--sem-naranja);width:12%"></div><div class="seg" style="background:var(--sem-rojo);width:4%"></div></div></td>
+              <td class="num"><span class="sem sem-rojo"><span class="dot"></span> 3</span></td>
+              <td class="num">17 min</td><td class="num">58</td><td class="num">72%</td><td class="num">9</td>
+              <td><span class="chip green">Activa</span></td>
+            </tr>
+            <tr class="row-red">
+              <td><b>IT Soporte Cancún</b></td><td class="muted small">Tecnología</td>
+              <td class="num">186</td><td class="num">88%</td>
+              <td><div class="bar-track"><div class="seg" style="background:var(--sem-verde);width:66%"></div><div class="seg" style="background:var(--sem-amarillo);width:20%"></div><div class="seg" style="background:var(--sem-naranja);width:11%"></div><div class="seg" style="background:var(--sem-rojo);width:3%"></div></div></td>
+              <td class="num"><span class="sem sem-rojo"><span class="dot"></span> 2</span></td>
+              <td class="num">12 min</td><td class="num">61</td><td class="num">81%</td><td class="num">4</td>
+              <td><span class="chip green">Activa</span></td>
+            </tr>
+            <tr>
+              <td><b>Hotel Xcanatún</b></td><td class="muted small">Hotelería</td>
+              <td class="num">294</td><td class="num">61%</td>
+              <td><div class="bar-track"><div class="seg" style="background:var(--sem-verde);width:58%"></div><div class="seg" style="background:var(--sem-amarillo);width:24%"></div><div class="seg" style="background:var(--sem-naranja);width:15%"></div><div class="seg" style="background:var(--sem-rojo);width:3%"></div></div></td>
+              <td class="num"><span class="sem sem-naranja"><span class="dot"></span> 1</span></td>
+              <td class="num">29 min</td><td class="num">52</td><td class="num">54%</td><td class="num">16</td>
+              <td><span class="chip amber">Por renovar</span></td>
+            </tr>
+            <tr>
+              <td><b>Grupo Peninsular</b></td><td class="muted small">Servicios</td>
+              <td class="num">738</td><td class="num">71%</td>
+              <td><div class="bar-track"><div class="seg" style="background:var(--sem-verde);width:74%"></div><div class="seg" style="background:var(--sem-amarillo);width:17%"></div><div class="seg" style="background:var(--sem-naranja);width:7%"></div><div class="seg" style="background:var(--sem-rojo);width:2%"></div></div></td>
+              <td class="num"><span class="sem sem-amarillo"><span class="dot"></span> 1</span></td>
+              <td class="num">24 min</td><td class="num">64</td><td class="num">63%</td><td class="num">11</td>
+              <td><span class="chip amber">Por renovar</span></td>
+            </tr>
+            <tr>
+              <td><b>Tecnológico de Mérida</b></td><td class="muted small">Educación</td>
+              <td class="num">1,204</td><td class="num">76%</td>
+              <td><div class="bar-track"><div class="seg" style="background:var(--sem-verde);width:69%"></div><div class="seg" style="background:var(--sem-amarillo);width:21%"></div><div class="seg" style="background:var(--sem-naranja);width:8%"></div><div class="seg" style="background:var(--sem-rojo);width:2%"></div></div></td>
+              <td class="num"><span class="chip green">0</span></td>
+              <td class="num">—</td><td class="num">63</td><td class="num">70%</td><td class="num">1</td>
+              <td><span class="chip green">Activa</span></td>
+            </tr>
+            <tr>
+              <td><b>TRAsystems</b></td><td class="muted small">Servicios técnicos</td>
+              <td class="num">18</td><td class="num">22%</td>
+              <td><span class="locked"><i class="fa-solid fa-hourglass-half"></i> Sin datos suficientes</span></td>
+              <td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td>
+              <td><span class="chip">Onboarding</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card-foot">
+        <b>WHO-5 institucional</b> es el promedio de la última aplicación válida por persona, en escala 0–100. Un valor bajo 50 es el punto de corte que la literatura asocia a riesgo de sintomatología depresiva y activa revisión con el profesional designado. <b>Arraigo</b> = usuarios activos día / usuarios activos mes.
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- ══════════════ MODAL: ALTA DE INSTITUCIÓN ══════════════ -->
+<div class="modal-backdrop" id="m-alta">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <h2>Alta de institución</h2>
+        <div class="sub">Sólo superadministradores de A Tu Lado · queda registrado en bitácora</div>
+      </div>
+      <button class="x" data-close><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+
+      <div class="steps">
+        <div class="step on"><span class="n">1</span><span class="t">Datos de la organización</span></div>
+        <div class="step-sep"></div>
+        <div class="step"><span class="n">2</span><span class="t">Estructura</span></div>
+        <div class="step-sep"></div>
+        <div class="step"><span class="n">3</span><span class="t">Profesional designado</span></div>
+        <div class="step-sep"></div>
+        <div class="step"><span class="n">4</span><span class="t">Padrón</span></div>
+      </div>
+
+      <div class="grid g-2">
+        <div class="field"><label>Razón social</label><input class="input" placeholder="Constructora Mayab S.A. de C.V."></div>
+        <div class="field"><label>Nombre corto</label><input class="input" placeholder="Constructora Mayab"></div>
+        <div class="field"><label>RFC</label><input class="input mono" placeholder="CMA210415H21"></div>
+        <div class="field"><label>Sector</label><select class="select"><option>Manufactura y obra</option><option>Hotelería y turismo</option><option>Educación</option><option>Servicios</option><option>Salud</option><option>Comercio</option><option>Gobierno</option></select></div>
+        <div class="field"><label>Tipo de organización</label><select class="select"><option>Empresa — colaboradores</option><option>Institución educativa — estudiantes</option><option>Institución educativa — personal</option><option>Mixta</option></select></div>
+        <div class="field"><label>Tamaño del padrón estimado</label><input class="input" type="number" placeholder="412"></div>
+        <div class="field"><label>Ciudad y estado</label><input class="input" placeholder="Mérida, Yucatán"></div>
+        <div class="field"><label>Zona horaria</label><select class="select"><option>America/Merida (UTC−6)</option><option>America/Cancun (UTC−5)</option><option>America/Mexico_City (UTC−6)</option></select></div>
+      </div>
+
+      <div class="doc-section-title" style="color:var(--sage-base)">Contacto administrativo (verá sólo el panel institucional)</div>
+      <div class="grid g-3">
+        <div class="field"><label>Nombre</label><input class="input" placeholder="Mónica Rivas"></div>
+        <div class="field"><label>Puesto</label><input class="input" placeholder="Gerente de Recursos Humanos"></div>
+        <div class="field"><label>Correo institucional</label><input class="input" type="email" placeholder="rh@constructoramayab.mx"></div>
+      </div>
+
+      <div class="doc-section-title" style="color:var(--sage-base)">Contrato y vigencia</div>
+      <div class="grid g-3">
+        <div class="field"><label>Inicio de vigencia</label><input class="input" type="date" value="2026-09-14"></div>
+        <div class="field"><label>Fin de vigencia</label><input class="input" type="date" value="2027-09-13"></div>
+        <div class="field"><label>Plan</label><select class="select"><option>Acompañamiento estándar</option><option>Acompañamiento + guardia 24/7</option><option>Piloto (90 días)</option></select></div>
+      </div>
+
+      <div class="doc-section-title" style="color:var(--sage-base)">Reglas de privacidad del contrato</div>
+      <div class="card card-pad" style="background:var(--bg-subtler)">
+        <div class="switch-row">
+          <button class="switch on" aria-label="activo"></button>
+          <div class="txt"><b>El panel institucional muestra únicamente porcentajes</b>
+            <span>Sin identidad, sin conteos absolutos y sin texto libre. Se aplica en la capa de datos, no sólo en la vista.</span></div>
+        </div>
+        <div class="switch-row">
+          <button class="switch on" aria-label="activo"></button>
+          <div class="txt"><b>La información individual sólo se libera al activarse el protocolo de crisis</b>
+            <span>Y únicamente al profesional designado por A Tu Lado y la institución, con contrato de confidencialidad firmado y vigente.</span></div>
+        </div>
+        <div class="switch-row">
+          <button class="switch on" aria-label="activo"></button>
+          <div class="txt"><b>Aportar datos anonimizados al perfil estadístico de producto</b>
+            <span>Resultados sin nombre, sin fecha de nacimiento y sin ninguna llave reversible hacia la persona.</span></div>
+        </div>
+        <div class="switch-row">
+          <button class="switch" aria-label="inactivo"></button>
+          <div class="txt"><b>Guardia nocturna extendida (22:00–06:00)</b>
+            <span>Requiere segundo profesional designado con disponibilidad verificada.</span></div>
+        </div>
+      </div>
+
+      <div class="privacy-banner mt-2" style="margin-bottom:0">
+        <div class="ico"><i class="fa-solid fa-scale-balanced"></i></div>
+        <div><b>Queda asentado en el contrato</b>
+          <p>La institución no podrá usar la información de A Tu Lado para evaluaciones de desempeño, promociones, sanciones, despidos ni ninguna decisión que discrimine a una persona. El profesional designado firma un anexo de confidencialidad con esa misma prohibición expresa.</p></div>
+      </div>
+
+    </div>
+    <div class="modal-foot">
+      <span class="small muted"><i class="fa-solid fa-circle-info"></i> El padrón se carga en el siguiente paso desde plantilla Excel.</span>
+      <div class="spacer"></div>
+      <button class="btn" data-close>Cancelar</button>
+      <button class="btn btn-primary">Continuar a estructura <i class="fa-solid fa-arrow-right"></i></button>
+    </div>
+  </div>
+</div>
+
+<script src="panel.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  stackedArea(document.getElementById('ch-evolucion'), {
+    height: 210,
+    labels: ['S1','S2','S3','S4','S5','S6','S7','S8','S9','S10','S11','S12'],
+    series: [
+      { name:'Verde',    color:'#1E8449', data:[64,65,66,67,68,68,69,70,70,71,71,71] },
+      { name:'Amarillo', color:'#DCAF00', data:[22,22,21,21,20,20,19,19,19,18,18,18] },
+      { name:'Naranja',  color:'#D9660F', data:[11,10,10,9,9,9,9,8,8,8,8,8] },
+      { name:'Rojo',     color:'#B02418', data:[3,3,3,3,3,3,3,3,3,3,3,3] }
+    ]
+  });
+});
+</script>
+</body>
+</html>

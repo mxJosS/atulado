@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Analítica e índices · Consola A Tu Lado</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600..700;1,9..144,400&family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="panel.css">
+</head>
+<body>
+<div class="shell">
+<aside class="sidebar" data-sidebar data-console="atl" data-active="analitica"></aside>
+
+<div class="main">
+  <header class="topbar">
+    <div class="crumbs"><a href="index.html">instituciones</a> / <a href="2-institucion-detalle.html">constructora mayab</a> / <b>analítica</b></div>
+    <div class="topbar-actions">
+      <select class="select" style="width:auto"><option>Constructora Mayab</option><option>Todas las instituciones</option><option>Grupo Peninsular</option><option>IT Soporte Cancún</option></select>
+      <div class="segmented"><button>30 d</button><button class="on">90 d</button><button>12 m</button></div>
+      <button class="btn btn-dark btn-sm"><i class="fa-solid fa-file-pdf"></i> Exportar informe</button>
+    </div>
+  </header>
+
+  <div class="page">
+    <div class="page-head">
+      <h1 class="page-title">Indicadores y analítica</h1>
+      <p class="page-sub">Los índices de esta pantalla están construidos para responder tres preguntas distintas: <b>¿la gente está mejor?</b> (clínicos), <b>¿la herramienta se está usando?</b> (adopción) y <b>¿estamos respondiendo bien?</b> (operación). Cada tarjeta declara su fórmula.</p>
+    </div>
+
+    <!-- ══════════ ÍNDICES CABECERA ══════════ -->
+    <div class="grid g-3">
+      <div class="card">
+        <div class="card-head"><h3>Índice de Bienestar Institucional</h3><span class="chip mono spacer">IBI</span></div>
+        <div class="card-body row" style="gap:1.3rem;align-items:center">
+          <div id="g-ibi"></div>
+          <div style="flex:1">
+            <div class="row mb-1"><span class="delta up">+6 pts</span><span class="small muted">vs. trimestre anterior</span></div>
+            <table class="data" style="font-size:.76rem">
+              <tbody>
+                <tr><td>WHO-5 normalizado <span class="chip mono">40%</span></td><td class="num">58</td></tr>
+                <tr><td>Distribución del semáforo <span class="chip mono">30%</span></td><td class="num">71</td></tr>
+                <tr><td>Adherencia al registro <span class="chip mono">20%</span></td><td class="num">72</td></tr>
+                <tr><td>Uso de herramientas <span class="chip mono">10%</span></td><td class="num">54</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card-foot"><b>IBI</b> = 0.40·WHO5 + 0.30·(%verde + 0.5·%amarillo) + 0.20·adherencia + 0.10·uso de herramientas. Escala 0–100. Bajo 45 activa revisión con dirección.</div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h3>Índice de Riesgo Concentrado</h3><span class="chip mono spacer">IRC</span></div>
+        <div class="card-body row" style="gap:1.3rem;align-items:center">
+          <div id="g-irc"></div>
+          <div style="flex:1">
+            <div class="row mb-1"><span class="delta down">+9 pts</span><span class="small muted">empeoró</span></div>
+            <p class="small muted mb-1">Mide qué tan concentradas están las alertas en pocas áreas. Un valor alto no significa una institución peor, significa un problema <b>localizable</b>.</p>
+            <div class="row wrap" style="gap:.3rem">
+              <span class="chip red">Obra nocturna 67%</span><span class="chip amber">Obra diurna 18%</span><span class="chip">Resto 15%</span>
+            </div>
+          </div>
+        </div>
+        <div class="card-foot"><b>IRC</b> = índice de Gini sobre la tasa de alertas por departamento, ×100. Este valor alto es buena noticia: dice dónde intervenir.</div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h3>Índice de Respuesta Operativa</h3><span class="chip mono spacer">IRO</span></div>
+        <div class="card-body row" style="gap:1.3rem;align-items:center">
+          <div id="g-iro"></div>
+          <div style="flex:1">
+            <div class="row mb-1"><span class="delta up">+2 pts</span><span class="small muted">estable</span></div>
+            <table class="data" style="font-size:.76rem">
+              <tbody>
+                <tr><td>Contacto &lt; 30 min</td><td class="num">100%</td></tr>
+                <tr><td>Cierre verificado</td><td class="num">91%</td></tr>
+                <tr><td>Salidas sin contacto</td><td class="num">0</td></tr>
+                <tr><td>ASQ respondidas en 24 h</td><td class="num">86%</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card-foot"><b>IRO</b> pondera cumplimiento de SLA, cierres verificados y ausencia de salidas sin contacto. Es el índice que se audita, no el que se presume.</div>
+      </div>
+    </div>
+
+    <!-- ══════════ TENDENCIAS ══════════ -->
+    <div class="section-head">
+      <h2 class="section-title">Cómo evolucionó la población</h2>
+      <span class="section-note">12 semanas · proporción del padrón activo</span>
+    </div>
+
+    <div class="grid g-2">
+      <div class="card">
+        <div class="card-head"><h3>Migración entre niveles del semáforo</h3></div>
+        <div class="card-body"><div id="ch-semaforo"></div></div>
+        <div class="card-foot">La banda verde creció 7 puntos mientras naranja cedió 3. El rojo es plano: son casos nuevos que entran y casos que salen, no acumulación.</div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3>WHO-5 institucional vs. corte de riesgo</h3>
+          <span class="spacer section-note">Una sola escala 0–100</span></div>
+        <div class="card-body"><div id="ch-who5-inst"></div>
+          <div class="stack-legend">
+            <span class="legend-item"><span class="sw" style="background:#2A78D6"></span> Institución completa</span>
+            <span class="legend-item"><span class="sw" style="background:#D9660F"></span> Obra nocturna</span>
+            <span class="legend-item"><span class="sw" style="background:#8EADA4;border-radius:0;height:2px"></span> Corte 50</span>
+          </div>
+        </div>
+        <div class="card-foot">La cuadrilla nocturna estuvo bajo el corte 7 de las 12 semanas. El resto de la institución nunca lo cruzó.</div>
+      </div>
+    </div>
+
+    <!-- ══════════ MATRIZ DE TRANSICIÓN ══════════ -->
+    <div class="grid g-2 mt-2">
+      <div class="card">
+        <div class="card-head"><h3>Matriz de transición mensual</h3>
+          <span class="spacer section-note">De dónde salió y a dónde llegó cada persona</span></div>
+        <div class="card-body">
+          <table class="data">
+            <thead><tr><th>De ↓ / A →</th><th class="num">Verde</th><th class="num">Amarillo</th><th class="num">Naranja</th><th class="num">Rojo</th><th class="num">Silencio</th></tr></thead>
+            <tbody>
+              <tr><td><span class="sem sem-verde"><span class="dot"></span> Verde</span></td>
+                <td class="num" style="background:#E3F3E9"><b>88%</b></td><td class="num">9%</td><td class="num">2%</td><td class="num">0%</td><td class="num">1%</td></tr>
+              <tr><td><span class="sem sem-amarillo"><span class="dot"></span> Amarillo</span></td>
+                <td class="num" style="background:#E3F3E9">31%</td><td class="num" style="background:#FBF2D4"><b>54%</b></td><td class="num">11%</td><td class="num">1%</td><td class="num">3%</td></tr>
+              <tr><td><span class="sem sem-naranja"><span class="dot"></span> Naranja</span></td>
+                <td class="num">7%</td><td class="num" style="background:#FBF2D4">34%</td><td class="num" style="background:#FBEADC"><b>46%</b></td><td class="num">8%</td><td class="num">5%</td></tr>
+              <tr class="row-red"><td><span class="sem sem-rojo"><span class="dot"></span> Rojo</span></td>
+                <td class="num">2%</td><td class="num">13%</td><td class="num" style="background:#FBEADC">41%</td><td class="num" style="background:#F8E2DF"><b>38%</b></td><td class="num">6%</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card-foot">La diagonal es permanencia. Lo importante está debajo: <b>54% de quienes estaban en rojo bajaron de nivel</b> en un mes, y sólo 6% cayó en silencio — ese 6% es el que hay que perseguir.</div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h3>Embudo de acompañamiento</h3>
+          <span class="spacer section-note">Del alta al caso atendido · 90 días</span></div>
+        <div class="card-body"><div id="ch-embudo"></div></div>
+        <div class="card-foot">La fuga grande está entre «invitado» y «activó cuenta»: 29 personas nunca entraron. Es un problema de difusión interna, no del producto.</div>
+      </div>
+    </div>
+
+    <!-- ══════════ USO ══════════ -->
+    <div class="section-head">
+      <h2 class="section-title">Cómo se usa la aplicación</h2>
+      <span class="section-note">Interacción por módulo, hora y día · insumo para producto y para el discurso comercial</span>
+    </div>
+
+    <div class="grid g-2-1">
+      <div class="card">
+        <div class="card-head"><h3>Interacciones por módulo</h3>
+          <span class="spacer section-note">90 días · 41,208 eventos</span></div>
+        <div class="card-body"><div id="ch-modulos"></div></div>
+        <div class="card-foot">El registro diario es el ancla de uso; las herramientas de regulación son el segundo motor. La Revista y el Foro sostienen la permanencia de quienes ya están en verde.</div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h3>Hora del día</h3><span class="spacer section-note">% de sesiones</span></div>
+        <div class="card-body">
+          <div id="ch-horas"></div>
+          <div class="alert warn mt-2">
+            <div class="ico"><i class="fa-solid fa-moon"></i></div>
+            <div class="txt"><b>14% de las sesiones ocurren entre 22:00 y 06:00</b>
+              <span>En la cuadrilla nocturna sube a 41%. El uso nocturno correlaciona con puntajes altos en el ítem de sueño del MDI.</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ HEATMAP DEPARTAMENTO × SEMANA ══════════ -->
+    <div class="card mt-2">
+      <div class="card-head"><h3>WHO-5 por departamento y semana</h3>
+        <span class="spacer section-note">Una sola escala de magnitud · más oscuro = mejor bienestar</span></div>
+      <div class="card-body">
+        <div id="heat-dep"></div>
+        <div class="row mt-2" style="gap:.5rem;align-items:center">
+          <span class="xsmall muted mono">30</span>
+          <div style="display:flex;height:10px;border-radius:5px;overflow:hidden;width:180px">
+            <div style="flex:1;background:#CDE2FB"></div><div style="flex:1;background:#9EC5F4"></div><div style="flex:1;background:#6DA7EC"></div>
+            <div style="flex:1;background:#3987E5"></div><div style="flex:1;background:#256ABF"></div><div style="flex:1;background:#184F95"></div>
+          </div>
+          <span class="xsmall muted mono">85</span>
+          <span class="xsmall muted">· las celdas con valor bajo el corte 50 llevan borde rojo</span>
+        </div>
+      </div>
+      <div class="card-foot">La lectura vertical señala una semana mala para toda la institución (quincena, cierre de obra); la horizontal señala un área con un problema propio. Aquí el patrón es claramente horizontal.</div>
+    </div>
+
+    <!-- ══════════ FILTRO LÉXICO ══════════ -->
+    <div class="section-head">
+      <h2 class="section-title">Filtro léxico y señales de conducta</h2>
+      <span class="section-note">Sobre texto libre del registro diario · nunca sobre conversaciones privadas</span>
+    </div>
+
+    <div class="grid g-2-1">
+      <div class="card">
+        <div class="card-head"><h3>Detecciones por categoría</h3>
+          <span class="spacer section-note">90 días · 71 detecciones en 4,912 registros con texto</span></div>
+        <div class="card-body"><div id="ch-lexico"></div></div>
+        <div class="card-foot">Sólo <b>ideación</b> escala de forma automática a ASQ. Las demás categorías alimentan la vigilancia y la estadística de producto; no disparan alertas por sí solas para no saturar al profesional.</div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h3>Configuración del diccionario</h3></div>
+        <div class="card-body col" style="gap:.55rem">
+          <div class="switch-row" style="padding:.3rem 0"><button class="switch on"></button><div class="txt"><b>Ideación</b><span>Escala a ASQ inmediata · 11 patrones</span></div></div>
+          <div class="switch-row" style="padding:.3rem 0"><button class="switch on"></button><div class="txt"><b>Desesperanza</b><span>Adelanta WHO-5 · 18 patrones</span></div></div>
+          <div class="switch-row" style="padding:.3rem 0"><button class="switch on"></button><div class="txt"><b>Aislamiento</b><span>Suma a vigilancia · 14 patrones</span></div></div>
+          <div class="switch-row" style="padding:.3rem 0"><button class="switch on"></button><div class="txt"><b>Alteración del sueño</b><span>Suma a Puchol fisiológico · 9 patrones</span></div></div>
+          <div class="switch-row" style="padding:.3rem 0"><button class="switch on"></button><div class="txt"><b>Violencia o miedo</b><span>Aviso al profesional · 12 patrones</span></div></div>
+          <div class="switch-row" style="padding:.3rem 0"><button class="switch"></button><div class="txt"><b>Consumo de sustancias</b><span>Desactivado por contrato en esta institución</span></div></div>
+          <div class="divider" style="margin:.4rem 0"></div>
+          <div class="row"><span class="chip mono">Falsos positivos revisados: 9</span><span class="chip mono">Precisión estimada: 87%</span></div>
+          <button class="btn btn-sm mt-1"><i class="fa-solid fa-pen"></i> Editar diccionario</button>
+        </div>
+        <div class="card-foot">Cada patrón nuevo se revisa contra un corpus de prueba antes de activarse. Las revisiones quedan en bitácora.</div>
+      </div>
+    </div>
+
+    <!-- ══════════ COHORTES ANÓNIMAS ══════════ -->
+    <div class="section-head">
+      <h2 class="section-title">Perfil estadístico anónimo</h2>
+      <span class="section-note">Sin nombre, sin fecha de nacimiento, sin llave reversible hacia la persona</span>
+    </div>
+
+    <div class="privacy-banner">
+      <div class="ico"><i class="fa-solid fa-database"></i></div>
+      <div><b>Cómo se construye esta sección</b>
+        <p>La tabla <span class="mono">perfil_estadistico</span> guarda resultados agregados junto a variables de contexto (puesto, sexo, rango de edad, escolaridad, antigüedad, tipo de jornada, lugar de origen, interacción) sin ninguna llave que permita regresar al usuario. Sirve para mejorar el producto y para la investigación; no puede usarse para identificar a nadie ni para alimentar el panel institucional.</p></div>
+    </div>
+
+    <div class="grid g-2">
+      <div class="card">
+        <div class="card-head"><h3>WHO-5 por tipo de jornada</h3></div>
+        <div class="card-body"><div id="ch-jornada"></div></div>
+        <div class="card-foot">La jornada nocturna es la variable con mayor diferencia de medias de todo el corte (−14 puntos contra la jornada matutina).</div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3>Distribución del semáforo por antigüedad</h3></div>
+        <div class="card-body">
+          <table class="data">
+            <thead><tr><th>Antigüedad</th><th class="num">% del padrón</th><th style="min-width:200px">Distribución</th><th class="num">WHO-5</th><th class="num">Adherencia</th></tr></thead>
+            <tbody>
+              <tr><td>Menos de 6 meses</td><td class="num">18%</td>
+                <td><div class="bar-track"><div class="seg" style="background:#1E8449;width:54%"></div><div class="seg" style="background:#DCAF00;width:27%"></div><div class="seg" style="background:#D9660F;width:15%"></div><div class="seg" style="background:#B02418;width:4%"></div></div></td>
+                <td class="num">51</td><td class="num">64%</td></tr>
+              <tr><td>6 meses – 2 años</td><td class="num">34%</td>
+                <td><div class="bar-track"><div class="seg" style="background:#1E8449;width:61%"></div><div class="seg" style="background:#DCAF00;width:23%"></div><div class="seg" style="background:#D9660F;width:12%"></div><div class="seg" style="background:#B02418;width:4%"></div></div></td>
+                <td class="num">57</td><td class="num">70%</td></tr>
+              <tr><td>2 – 5 años</td><td class="num">29%</td>
+                <td><div class="bar-track"><div class="seg" style="background:#1E8449;width:68%"></div><div class="seg" style="background:#DCAF00;width:20%"></div><div class="seg" style="background:#D9660F;width:10%"></div><div class="seg" style="background:#B02418;width:2%"></div></div></td>
+                <td class="num">62</td><td class="num">76%</td></tr>
+              <tr><td>Más de 5 años</td><td class="num">19%</td>
+                <td><div class="bar-track"><div class="seg" style="background:#1E8449;width:66%"></div><div class="seg" style="background:#DCAF00;width:21%"></div><div class="seg" style="background:#D9660F;width:11%"></div><div class="seg" style="background:#B02418;width:2%"></div></div></td>
+                <td class="num">60</td><td class="num">81%</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card-foot">El primer semestre es el más vulnerable y el de menor adherencia. Hallazgo directamente accionable para el proceso de inducción.</div>
+      </div>
+    </div>
+
+    <!-- ══════════ OPERACIÓN ══════════ -->
+    <div class="section-head">
+      <h2 class="section-title">Desempeño de la respuesta</h2>
+      <span class="section-note">Lo que se audita cuando alguien pregunta si el servicio funciona</span>
+    </div>
+
+    <div class="grid g-2-1">
+      <div class="card">
+        <div class="card-head"><h3>Tiempo hasta el primer contacto humano</h3>
+          <span class="spacer section-note">38 casos rojo del trimestre</span></div>
+        <div class="card-body"><div id="ch-sla"></div></div>
+        <div class="card-foot">Ningún caso rebasó el SLA de 30 minutos. La mediana es 21 min y el peor caso registrado, 28 min.</div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3>Integridad del sistema</h3></div>
+        <div class="card-body col" style="gap:.55rem">
+          <div class="alert ok"><div class="ico"><i class="fa-solid fa-check"></i></div>
+            <div class="txt"><b>0 cierres sin contacto verificado</b><span>La regla está implementada en la capa de datos.</span></div></div>
+          <div class="alert ok"><div class="ico"><i class="fa-solid fa-check"></i></div>
+            <div class="txt"><b>0 accesos institucionales a datos identificados</b><span>34 intentos de consulta, todos del plano clínico acreditado.</span></div></div>
+          <div class="alert ok"><div class="ico"><i class="fa-solid fa-check"></i></div>
+            <div class="txt"><b>100% de aperturas de ficha con motivo declarado</b><span>Sin motivo, la ficha no abre.</span></div></div>
+          <div class="alert warn"><div class="ico"><i class="fa-solid fa-clock"></i></div>
+            <div class="txt"><b>1 NDA por vencer</b><span>Al vencer, el profesional pierde acceso automáticamente.</span></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ DICCIONARIO DE INDICADORES ══════════ -->
+    <div class="section-head">
+      <h2 class="section-title">Diccionario de indicadores</h2>
+      <span class="section-note">Cada número de este panel tiene una definición única y auditable</span>
+    </div>
+
+    <div class="card">
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th>Indicador</th><th>Definición</th><th>Fuente</th><th>Periodicidad</th><th>Visible para</th></tr></thead>
+          <tbody>
+            <tr><td><b>IBI</b> — Bienestar institucional</td><td class="small">0.40·WHO-5 + 0.30·semáforo ponderado + 0.20·adherencia + 0.10·uso de herramientas</td><td class="mono xsmall">aplicaciones_who5, clasificaciones, mood_logs, interacciones_modulo</td><td>Semanal</td><td><span class="chip green">Institución</span></td></tr>
+            <tr><td><b>IRC</b> — Riesgo concentrado</td><td class="small">Gini de la tasa de alertas por departamento ×100</td><td class="mono xsmall">clasificaciones, departamentos</td><td>Mensual</td><td><span class="chip">A Tu Lado</span></td></tr>
+            <tr><td><b>IRO</b> — Respuesta operativa</td><td class="small">0.5·cumplimiento SLA + 0.3·cierres verificados + 0.2·(1 − salidas sin contacto)</td><td class="mono xsmall">eventos_crisis, auditoria_clinica</td><td>Mensual</td><td><span class="chip green">Institución</span></td></tr>
+            <tr><td><b>WHO-5 institucional</b></td><td class="small">Media de la última aplicación válida por persona activa, escala 0–100</td><td class="mono xsmall">aplicaciones_who5</td><td>Continuo</td><td><span class="chip green">Institución</span></td></tr>
+            <tr><td><b>Adherencia al registro</b></td><td class="small">Días con registro ÷ días esperados del periodo, por persona activa</td><td class="mono xsmall">mood_logs</td><td>Diario</td><td><span class="chip green">Institución</span></td></tr>
+            <tr><td><b>Índice de arraigo</b></td><td class="small">Usuarios activos día ÷ usuarios activos mes (DAU/MAU)</td><td class="mono xsmall">sessions, interacciones_modulo</td><td>Diario</td><td><span class="chip green">Institución</span></td></tr>
+            <tr><td><b>Silencio R4</b></td><td class="small">Personas activadas sin registro en ≥14 días consecutivos</td><td class="mono xsmall">series_vigilancia</td><td>Diario</td><td><span class="chip green">Institución</span> <span class="chip">sólo %</span></td></tr>
+            <tr><td><b>Tiempo a primer contacto</b></td><td class="small">Mediana de (contactado_en − disparado_en) de los casos rojo</td><td class="mono xsmall">eventos_crisis</td><td>Por caso</td><td><span class="chip green">Institución</span></td></tr>
+            <tr class="row-red"><td><b>Detecciones léxicas</b></td><td class="small">Registros con al menos un patrón del diccionario, por categoría</td><td class="mono xsmall">mood_logs.terminos_detectados</td><td>Diario</td><td><span class="chip red">Sólo A Tu Lado</span></td></tr>
+            <tr class="row-red"><td><b>Puntaje individual</b></td><td class="small">Valor crudo de cualquier instrumento asociado a una persona</td><td class="mono xsmall">aplicaciones_*</td><td>Por aplicación</td><td><span class="chip red">Clínico acreditado · protocolo activo</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card-foot">La columna <b>Visible para</b> es la que se implementa en la capa de datos. Un indicador marcado «Sólo A Tu Lado» no existe en la consulta que alimenta el panel institucional, no se oculta en la vista.</div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<script src="panel.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+  gaugeRing(document.getElementById('g-ibi'), { value: 64, color:'#2E5D4B', caption:'/ 100' });
+  gaugeRing(document.getElementById('g-irc'), { value: 58, color:'#D9660F', caption:'/ 100' });
+  gaugeRing(document.getElementById('g-iro'), { value: 94, color:'#1E8449', caption:'/ 100' });
+
+  const S = ['S1','S2','S3','S4','S5','S6','S7','S8','S9','S10','S11','S12'];
+
+  stackedArea(document.getElementById('ch-semaforo'), {
+    height: 230, labels: S,
+    series: [
+      { name:'Verde',    color:'#1E8449', data:[55,56,57,58,59,59,60,61,61,62,62,62] },
+      { name:'Amarillo', color:'#DCAF00', data:[25,25,24,24,23,23,23,22,22,22,22,22] },
+      { name:'Naranja',  color:'#D9660F', data:[16,15,15,14,14,14,13,13,13,12,12,12] },
+      { name:'Rojo',     color:'#B02418', data:[4,4,4,4,4,4,4,4,4,4,4,4] }
+    ]
+  });
+
+  lineChart(document.getElementById('ch-who5-inst'), {
+    height: 230, labels: S, min: 30, max: 75, ticks: 3, refLine: 50, refLabel: 'corte 50',
+    series: [
+      { name:'Institución',   color:'#2A78D6', data:[52,53,53,54,55,55,56,56,57,57,58,58] },
+      { name:'Obra nocturna', color:'#D9660F', data:[46,45,44,43,44,45,44,43,44,44,45,44] }
+    ]
+  });
+
+  barChart(document.getElementById('ch-embudo'), {
+    labelW: 190, unit: '', max: 412, rowH: 32,
+    data: [
+      { k:'Invitados al padrón',      v:412, color:'#2E5D4B' },
+      { k:'Activaron cuenta',         v:383, color:'#3D7A5F' },
+      { k:'Registro diario ≥ 1 vez',  v:342, color:'#2A78D6' },
+      { k:'Registro sostenido 7 d',   v:246, color:'#5B4A8A' },
+      { k:'Respondieron WHO-5',       v:301, color:'#1BAF7A' },
+      { k:'Escalaron a MDI',          v:54,  color:'#D9660F' },
+      { k:'Escalaron a ASQ',          v:11,  color:'#B02418' },
+      { k:'Atendidos por profesional',v:11,  color:'#1E8449' }
+    ]
+  });
+
+  barChart(document.getElementById('ch-modulos'), {
+    labelW: 200, unit: '', max: 18000, rowH: 30,
+    data: [
+      { k:'Registro diario',        v:16204, color:'#2A78D6' },
+      { k:'Herramientas (STOP…)',   v:9188,  color:'#5B4A8A' },
+      { k:'Recursos y artículos',   v:6042,  color:'#1BAF7A' },
+      { k:'Revista comunitaria',    v:4310,  color:'#C98500' },
+      { k:'Cuestionarios',          v:3106,  color:'#D55181' },
+      { k:'Plan de seguridad',      v:1502,  color:'#8EADA4' },
+      { k:'Botón de crisis',        v:856,   color:'#B02418' }
+    ]
+  });
+
+  columnChart(document.getElementById('ch-horas'), {
+    height: 200, unit:'%', showValues: false, max: 12,
+    data: [
+      {k:'00',v:2.1,color:'#5B4A8A'},{k:'02',v:1.4,color:'#5B4A8A'},{k:'04',v:1.8,color:'#5B4A8A'},
+      {k:'06',v:9.4,color:'#2E5D4B'},{k:'08',v:11.2,color:'#2E5D4B'},{k:'10',v:7.6,color:'#2E5D4B'},
+      {k:'12',v:8.1,color:'#2E5D4B'},{k:'14',v:6.9,color:'#2E5D4B'},{k:'16',v:7.2,color:'#2E5D4B'},
+      {k:'18',v:9.8,color:'#2E5D4B'},{k:'20',v:10.1,color:'#2E5D4B'},{k:'22',v:5.6,color:'#5B4A8A'}
+    ]
+  });
+
+  barChart(document.getElementById('ch-lexico'), {
+    labelW: 190, rowH: 30, max: 30,
+    data: [
+      { k:'Alteración del sueño', v:26, color:'#DCAF00' },
+      { k:'Carga / agotamiento',  v:19, color:'#C98500' },
+      { k:'Aislamiento',          v:12, color:'#D9660F' },
+      { k:'Desesperanza',         v:8,  color:'#D9660F' },
+      { k:'Violencia o miedo',    v:3,  color:'#B02418' },
+      { k:'Ideación',             v:3,  color:'#B02418' }
+    ]
+  });
+
+  barChart(document.getElementById('ch-jornada'), {
+    labelW: 170, rowH: 32, max: 100, unit:' / 100',
+    data: [
+      { k:'Matutina',  v:62, color:'#2A78D6' },
+      { k:'Vespertina',v:57, color:'#2A78D6' },
+      { k:'Mixta / rotativa', v:53, color:'#D9660F' },
+      { k:'Nocturna',  v:48, color:'#B02418' }
+    ]
+  });
+
+  columnChart(document.getElementById('ch-sla'), {
+    height: 210, unit:' casos',
+    data: [
+      {k:'0–5 min',v:6,color:'#1E8449'},{k:'6–10',v:9,color:'#1E8449'},{k:'11–15',v:8,color:'#1E8449'},
+      {k:'16–20',v:6,color:'#1E8449'},{k:'21–25',v:6,color:'#DCAF00'},{k:'26–30',v:3,color:'#D9660F'},
+      {k:'>30 (SLA)',v:0,color:'#B02418'}
+    ]
+  });
+
+  /* Heatmap departamento × semana */
+  const deps = ['Obra nocturna','Obra diurna','Almacén','Administración','Ventas','Dirección'];
+  const vals = [
+    [46,45,44,43,44,45,44,43],
+    [54,55,56,55,57,56,57,56],
+    [56,57,57,58,57,58,58,57],
+    [62,63,63,64,63,64,65,63],
+    [59,60,60,61,60,61,60,60],
+    [60,61,61,60,62,61,62,61]
+  ];
+  const ramp = v => {
+    const steps = ['#CDE2FB','#9EC5F4','#6DA7EC','#3987E5','#256ABF','#184F95'];
+    const i = Math.min(5, Math.max(0, Math.floor(((v - 30) / 55) * 6)));
+    return steps[i];
+  };
+  const host = document.getElementById('heat-dep');
+  let html = '<div class="heat" style="grid-template-columns:130px repeat(8,1fr)">';
+  html += '<div class="hlabel"></div>' + ['S5','S6','S7','S8','S9','S10','S11','S12']
+    .map(s => `<div class="hlabel" style="justify-content:center">${s}</div>`).join('');
+  deps.forEach((d, r) => {
+    html += `<div class="hlabel">${d}</div>`;
+    vals[r].forEach(v => {
+      const dark = v >= 58;
+      const border = v < 50 ? 'box-shadow:inset 0 0 0 2px #B02418;' : '';
+      html += `<div class="cell" style="background:${ramp(v)};color:${dark ? '#fff' : '#1A2620'};${border}" title="${d} · WHO-5 ${v}">${v}</div>`;
+    });
+  });
+  html += '</div>';
+  host.innerHTML = html;
+});
+</script>
+</body>
+</html>

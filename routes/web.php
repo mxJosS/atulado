@@ -132,4 +132,16 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     // Foros & Revista
     Route::get('/foros', [\App\Http\Controllers\Admin\AdminForumController::class, 'index'])->name('forums.index');
+
+    // Operación Institucional B2B (Paneles A Tu Lado)
+    Route::get('/instituciones', [\App\Http\Controllers\Admin\AdminInstitutionController::class, 'index'])->name('institutions.index');
+    Route::post('/instituciones', [\App\Http\Controllers\Admin\AdminInstitutionController::class, 'store'])->name('institutions.store');
+    Route::get('/instituciones/{slug?}', [\App\Http\Controllers\Admin\AdminInstitutionController::class, 'show'])->name('institutions.show');
+    Route::get('/analitica', [\App\Http\Controllers\Admin\AdminInstitutionController::class, 'analytics'])->name('analytics.index');
+    Route::get('/altas-estructura', [\App\Http\Controllers\Admin\AdminInstitutionController::class, 'structure'])->name('structure.index');
+    Route::get('/vista-cliente', [\App\Http\Controllers\Admin\AdminInstitutionController::class, 'clientView'])->name('client-view.index');
+
+    // Centro de Reportes & Visor PDF
+    Route::get('/reportes', [\App\Http\Controllers\Admin\AdminReportController::class, 'index'])->name('reports.index');
+    Route::get('/reportes/visor', [\App\Http\Controllers\Admin\AdminReportController::class, 'viewer'])->name('reports.viewer');
 });

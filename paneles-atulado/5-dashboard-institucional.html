@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Estado general · Panel institucional A Tu Lado</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600..700;1,9..144,400&family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="panel.css">
+</head>
+<body>
+<div class="shell">
+<aside class="sidebar" data-sidebar data-console="inst" data-active="institucional"></aside>
+
+<div class="main">
+  <header class="topbar">
+    <div class="crumbs">constructora mayab / <b>estado general</b></div>
+    <div class="topbar-actions">
+      <div class="segmented"><button>Mes</button><button class="on">Trimestre</button><button>Año</button></div>
+      <a class="btn btn-sm" href="reporte.html?r=nom035&amp;inst=mayab" target="_blank"><i class="fa-solid fa-clipboard-check"></i> Evidencia NOM-035</a>
+      <a class="btn btn-primary btn-sm" href="reporte.html?r=ejecutivo&amp;inst=mayab" target="_blank"><i class="fa-solid fa-file-pdf"></i> Descargar reporte ejecutivo</a>
+    </div>
+  </header>
+
+  <div class="page">
+    <div class="page-head">
+      <h1 class="page-title">Estado general de la organización</h1>
+      <p class="page-sub">Constructora Mayab S.A. de C.V. · periodo 15/06 – 14/09/2026. Este panel es <b>independiente</b> del panel de A Tu Lado y muestra únicamente indicadores agregados de toda la institución, expresados en porcentaje.</p>
+    </div>
+
+    <!-- ══════════ BANNER DE PRIVACIDAD ══════════ -->
+    <div class="privacy-banner">
+      <div class="ico"><i class="fa-solid fa-shield-halved"></i></div>
+      <div><b>Lo que este panel muestra y lo que nunca mostrará</b>
+        <p>Aquí no hay nombres, ni áreas desglosadas, ni conteos de personas, ni respuestas, ni texto escrito por nadie. Sólo proporciones del total de la organización, para que ningún dato pueda atribuirse a una persona por descarte. Cuando una situación requiere atención individual, A Tu Lado activa el protocolo de crisis y entrega el resumen únicamente al <b>profesional designado</b> por la institución y por A Tu Lado, que firmó un contrato de confidencialidad. La dirección y el área de Recursos Humanos reciben el aviso de que el protocolo ocurrió y se cerró, nunca su contenido.</p></div>
+    </div>
+
+    <!-- ══════════ ÍNDICE PRINCIPAL ══════════ -->
+    <div class="grid g-1-2">
+      <div class="card">
+        <div class="card-head"><h3>Índice de Bienestar Institucional</h3><span class="chip mono spacer">IBI</span></div>
+        <div class="card-body center">
+          <div id="g-ibi" style="display:flex;justify-content:center"></div>
+          <div class="row center mt-2" style="justify-content:center">
+            <span class="delta up">+6 pts</span><span class="small muted">vs. trimestre anterior</span>
+          </div>
+          <div class="row wrap mt-2" style="justify-content:center;gap:.35rem">
+            <span class="chip red">0–44 Atención urgente</span>
+            <span class="chip amber">45–59 Vigilar</span>
+            <span class="chip green">60–100 Saludable</span>
+          </div>
+        </div>
+        <div class="card-foot">Índice propio de A Tu Lado en escala 0–100. Combina el bienestar que las personas reportan, cómo se distribuye el acompañamiento, la constancia de uso y el uso de las herramientas de la app.</div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h3>Evolución del índice</h3>
+          <span class="spacer section-note">12 semanas · organización completa</span></div>
+        <div class="card-body"><div id="ch-ibi"></div></div>
+        <div class="card-foot">La mejora sostenida coincide con la campaña de difusión interna de la semana 4 y con el ajuste de rotación de turnos de la semana 7.</div>
+      </div>
+    </div>
+
+    <!-- ══════════ INDICADORES EN % ══════════ -->
+    <div class="section-head">
+      <h2 class="section-title">Indicadores del periodo</h2>
+      <span class="section-note">Todos expresados como porcentaje del total de la organización</span>
+    </div>
+
+    <div class="grid g-4">
+      <div class="kpi">
+        <div class="kpi-label"><i class="fa-solid fa-user-check"></i> Adopción</div>
+        <div class="kpi-value">83 <span class="unit">%</span></div>
+        <div class="kpi-foot"><span class="delta up">+11 pts</span> · de la plantilla activó su cuenta</div>
+        <div class="kpi-spark" data-spark="[68,70,72,75,77,79,81,83]"></div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label"><i class="fa-solid fa-calendar-check"></i> Uso semanal</div>
+        <div class="kpi-value">61 <span class="unit">%</span></div>
+        <div class="kpi-foot"><span class="delta up">+5 pts</span> · usó la app al menos una vez por semana</div>
+        <div class="kpi-spark" data-spark="[51,53,54,56,57,59,60,61]"></div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label"><i class="fa-solid fa-face-smile"></i> Constancia del registro</div>
+        <div class="kpi-value">72 <span class="unit">%</span></div>
+        <div class="kpi-foot"><span class="delta up">+4 pts</span> · de los días esperados con registro</div>
+        <div class="kpi-spark" data-spark="[63,65,64,67,69,70,71,72]"></div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label"><i class="fa-solid fa-heart"></i> Bienestar reportado</div>
+        <div class="kpi-value">58 <span class="unit">/ 100</span></div>
+        <div class="kpi-foot"><span class="delta up">+3</span> · lo que las personas reportan en la app</div>
+        <div class="kpi-spark" data-spark="[52,53,54,55,55,56,57,58]"></div>
+      </div>
+    </div>
+
+    <!-- ══════════ SEMÁFORO ══════════ -->
+    <div class="grid g-3-2 mt-3">
+      <div class="card">
+        <div class="card-head"><h3>Distribución del acompañamiento</h3>
+          <span class="spacer section-note">Proporción de la organización en cada nivel</span></div>
+        <div class="card-body">
+          <div class="dist-bar" style="height:44px">
+            <div class="seg" style="background:var(--sem-verde);width:62%">62% Estándar</div>
+            <div class="seg light-text" style="background:var(--sem-amarillo);width:22%">22% Ampliado</div>
+            <div class="seg" style="background:var(--sem-naranja);width:12%">12%</div>
+            <div class="seg" style="background:var(--sem-rojo);width:4%"></div>
+          </div>
+          <div class="grid g-4 mt-2">
+            <div class="card card-pad" style="border-color:#BFE0CC;background:var(--sem-verde-soft)">
+              <div class="row"><span class="sem sem-verde"><span class="dot"></span> Estándar</span></div>
+              <p class="small mt-1 mb-0">A Tu Lado entrega el contenido y las herramientas generales de la app.</p></div>
+            <div class="card card-pad" style="border-color:#E8D79A;background:var(--sem-amarillo-soft)">
+              <div class="row"><span class="sem sem-amarillo"><span class="dot"></span> Ampliado</span></div>
+              <p class="small mt-1 mb-0">A Tu Lado entrega más información, recursos y ejercicios de la app.</p></div>
+            <div class="card card-pad" style="border-color:#EFC6A3;background:var(--sem-naranja-soft)">
+              <div class="row"><span class="sem sem-naranja"><span class="dot"></span> Reforzado</span></div>
+              <p class="small mt-1 mb-0">A Tu Lado entrega información y recursos con mayor frecuencia y acompaña más de cerca.</p></div>
+            <div class="card card-pad" style="border-color:#E9B7B0;background:var(--sem-rojo-soft)">
+              <div class="row"><span class="sem sem-rojo"><span class="dot"></span> Canalización</span></div>
+              <p class="small mt-1 mb-0">A Tu Lado pone a la persona en contacto con el profesional designado, dentro de los 30 minutos.</p></div>
+          </div>
+          <div class="divider"></div>
+          <div class="section-note mb-1">Cómo se movió la organización en 12 semanas</div>
+          <div id="ch-semaforo"></div>
+        </div>
+        <div class="card-foot">La lectura correcta de este gráfico es la <b>tendencia</b>, no la foto. Una proporción estable en el nivel de canalización significa que las situaciones entran y salen, no que se acumulen. Los niveles describen <b>cuánto acompañamiento entrega A Tu Lado</b>, no el estado de salud de ninguna persona.</div>
+      </div>
+
+      <div class="col" style="gap:1rem">
+        <div class="card">
+          <div class="card-head"><h3>Respuesta del servicio</h3><span class="chip green spacer">Al día</span></div>
+          <div class="card-body">
+            <dl class="dl">
+              <dt>Canalizaciones al profesional</dt><dd>2.7% de la plantilla en el trimestre</dd>
+              <dt>Contacto dentro del SLA</dt><dd>100% <span class="chip green">30 min</span></dd>
+              <dt>Canalizaciones concluidas</dt><dd>91% · el resto en curso</dd>
+              <dt>Cierres con contacto humano verificado</dt><dd>100%</dd>
+              <dt>Canal disponible</dt><dd>24/7 los 92 días del periodo</dd>
+            </dl>
+            <div class="alert ok mt-2">
+              <div class="ico"><i class="fa-solid fa-circle-check"></i></div>
+              <div class="txt"><b>Ninguna canalización quedó sin contacto humano</b>
+                <span>A Tu Lado no da por concluida una canalización por vencimiento de tiempo.</span></div>
+            </div>
+          </div>
+          <div class="card-foot">La institución no conoce quién fue canalizado. Este indicador existe para que pueda verificar que el servicio respondió.</div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3>Avisos para la dirección</h3></div>
+          <div class="card-body col" style="gap:.55rem">
+            <div class="alert warn">
+              <div class="ico"><i class="fa-solid fa-moon"></i></div>
+              <div class="txt"><b>El indicador nocturno está por debajo del resto</b>
+                <span>El bienestar que reportan quienes trabajan en jornada nocturna es notoriamente menor. A Tu Lado recomienda revisar rotación y descansos, no evaluar personas.</span></div>
+            </div>
+            <div class="alert warn">
+              <div class="ico"><i class="fa-solid fa-user-plus"></i></div>
+              <div class="txt"><b>El primer semestre de antigüedad es el que menos usa la app</b>
+                <span>Menor constancia de uso y menor bienestar reportado que cualquier otro grupo. Sugerimos integrar el tema al proceso de inducción.</span></div>
+            </div>
+            <div class="alert info">
+              <div class="ico"><i class="fa-solid fa-bullhorn"></i></div>
+              <div class="txt"><b>17% de la plantilla aún no activa su cuenta</b>
+                <span>Una campaña de difusión de una semana subió la adopción 11 puntos la última vez.</span></div>
+            </div>
+          </div>
+          <div class="card-foot">Los avisos describen <b>patrones de la organización</b>. Nunca señalan a un área con pocas personas ni a un individuo.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ USO ══════════ -->
+    <div class="section-head">
+      <h2 class="section-title">Cómo está usando la organización la herramienta</h2>
+      <span class="section-note">Distribución del uso en porcentaje · sin identidad ni conteos</span>
+    </div>
+
+    <div class="grid g-2">
+      <div class="card">
+        <div class="card-head"><h3>Uso por sección de la aplicación</h3></div>
+        <div class="card-body"><div id="ch-modulos"></div></div>
+        <div class="card-foot">Que las herramientas de la app sean la segunda sección más usada indica que las personas no sólo entran a registrar cómo están: también usan lo que A Tu Lado les ofrece.</div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3>Constancia de uso a lo largo del trimestre</h3></div>
+        <div class="card-body"><div id="ch-uso"></div>
+          <div class="stack-legend">
+            <span class="legend-item"><span class="sw" style="background:#2A78D6"></span> Uso semanal</span>
+            <span class="legend-item"><span class="sw" style="background:#1BAF7A"></span> Constancia del registro</span>
+          </div>
+        </div>
+        <div class="card-foot">Las caídas coinciden con periodos vacacionales y cierres de obra. Es esperable y no es una señal de deterioro.</div>
+      </div>
+    </div>
+
+    <!-- ══════════ NOM-035 ══════════ -->
+    <div class="section-head">
+      <h2 class="section-title">Cumplimiento NOM-035-STPS-2018</h2>
+      <span class="section-note">Evidencia lista para una inspección</span>
+    </div>
+
+    <div class="grid g-2-1">
+      <div class="card">
+        <div class="card-head"><h3>Elementos cubiertos por A Tu Lado</h3></div>
+        <div class="table-wrap">
+          <table class="data">
+            <thead><tr><th>Elemento de la norma</th><th>Cómo se cubre</th><th>Evidencia</th><th class="center">Estado</th></tr></thead>
+            <tbody>
+              <tr><td class="small"><b>Canal de atención</b> para acontecimientos traumáticos severos</td>
+                <td class="small">Botón de ayuda inmediata, líneas de apoyo y contacto con el profesional designado</td>
+                <td class="small">Bitácora de disponibilidad 24/7</td>
+                <td class="center"><span class="chip green"><i class="fa-solid fa-check"></i> Cubierto</span></td></tr>
+              <tr><td class="small"><b>Identificación</b> de trabajadores expuestos</td>
+                <td class="small">Seguimiento continuo de lo que la persona reporta en la app</td>
+                <td class="small">Reporte agregado del periodo</td>
+                <td class="center"><span class="chip green"><i class="fa-solid fa-check"></i> Cubierto</span></td></tr>
+              <tr><td class="small"><b>Canalización</b> a atención médica o psicológica</td>
+                <td class="small">Contacto humano y canalización al profesional designado</td>
+                <td class="small">Constancia de canalizaciones del periodo</td>
+                <td class="center"><span class="chip green"><i class="fa-solid fa-check"></i> Cubierto</span></td></tr>
+              <tr><td class="small"><b>Difusión</b> de la política de riesgo psicosocial</td>
+                <td class="small">Materiales de campaña y acuse de lectura en la app</td>
+                <td class="small">83% de acuses registrados</td>
+                <td class="center"><span class="chip amber"><i class="fa-solid fa-clock"></i> En progreso</span></td></tr>
+              <tr><td class="small"><b>Registros</b> conservados y disponibles</td>
+                <td class="small">Retención declarada y exportable</td>
+                <td class="small">Política de retención firmada</td>
+                <td class="center"><span class="chip green"><i class="fa-solid fa-check"></i> Cubierto</span></td></tr>
+              <tr><td class="small"><b>Evaluación del entorno organizacional</b> (Guía III)</td>
+                <td class="small">Fuera del alcance de A Tu Lado</td>
+                <td class="small muted">—</td>
+                <td class="center"><span class="chip">Responsabilidad de la empresa</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card-foot">A Tu Lado cubre la parte de <b>atención y canalización</b> de la norma. La evaluación del entorno organizacional y la política escrita siguen siendo obligación directa del patrón; el reporte trimestral sirve como insumo para ambas.</div>
+      </div>
+
+      <div class="col" style="gap:1rem">
+        <div class="card">
+          <div class="card-head"><h3>Profesional designado</h3></div>
+          <div class="card-body">
+            <div class="who-cell mb-2"><div class="av" style="width:40px;height:40px;background:#5B4A8A">RA</div>
+              <div><div class="nm">Psic. Roberto Ancona</div><div class="sub">Cédula 7712045 · Psicología clínica</div></div></div>
+            <dl class="dl">
+              <dt>Designado por</dt><dd>Constructora Mayab y A Tu Lado</dd>
+              <dt>Contrato de confidencialidad</dt><dd><span class="chip green">Firmado y vigente</span></dd>
+              <dt>Vence</dt><dd>14/02/2027</dd>
+              <dt>Disponibilidad</dt><dd>Lunes a domingo, 24 h</dd>
+              <dt>Suplente</dt><dd>Guardia A Tu Lado</dd>
+            </dl>
+            <button class="btn btn-sm mt-2" style="width:100%"><i class="fa-solid fa-file-signature"></i> Ver contrato y alcance</button>
+          </div>
+          <div class="card-foot">Es la única persona que puede recibir información individual, y sólo con un protocolo de crisis activo.</div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3>Descargables del periodo</h3></div>
+          <div class="card-body col" style="gap:.55rem">
+            <a href="reporte.html?r=ejecutivo&amp;inst=mayab" target="_blank" class="btn" style="justify-content:flex-start"><i class="fa-solid fa-file-pdf"></i> Reporte ejecutivo trimestral</a>
+            <a href="reporte.html?r=nom035&amp;inst=mayab" target="_blank" class="btn" style="justify-content:flex-start"><i class="fa-solid fa-clipboard-check"></i> Constancia NOM-035</a>
+            <a href="6-reportes.html" class="btn" style="justify-content:flex-start"><i class="fa-solid fa-bullhorn"></i> Kit de difusión interna</a>
+          </div>
+          <div class="card-foot">Todos los documentos que la institución puede descargar contienen exclusivamente porcentajes.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ SOLICITUDES ══════════ -->
+    <div class="section-head">
+      <h2 class="section-title">Solicitudes a A Tu Lado</h2>
+      <span class="section-note">Los cambios de padrón los ejecuta A Tu Lado; aquí se proponen</span>
+    </div>
+
+    <div class="card">
+      <div class="card-body row wrap" style="gap:.6rem">
+        <button class="btn"><i class="fa-solid fa-user-plus"></i> Proponer altas de personal</button>
+        <button class="btn"><i class="fa-solid fa-user-minus"></i> Proponer bajas</button>
+        <button class="btn"><i class="fa-solid fa-sitemap"></i> Proponer cambio de áreas</button>
+        <button class="btn"><i class="fa-solid fa-user-shield"></i> Cambiar profesional designado</button>
+        <button class="btn"><i class="fa-solid fa-calendar-plus"></i> Solicitar sesión de resultados</button>
+        <div class="spacer"></div>
+        <span class="small muted"><i class="fa-solid fa-circle-info"></i> Tiempo de respuesta comprometido: 2 días hábiles</span>
+      </div>
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th>Solicitud</th><th>Enviada</th><th>Estado</th><th>Respuesta</th></tr></thead>
+          <tbody>
+            <tr><td class="small">Alta de 22 personas del área Mantenimiento</td><td class="mono xsmall">13/09/2026</td>
+              <td><span class="chip amber">En revisión</span></td><td class="small muted">Falta designar responsable del área</td></tr>
+            <tr><td class="small">Baja de 3 personas por terminación</td><td class="mono xsmall">08/09/2026</td>
+              <td><span class="chip green">Aplicada</span></td><td class="small muted">Ejecutada el 09/09</td></tr>
+            <tr><td class="small">Sesión de presentación de resultados a dirección</td><td class="mono xsmall">01/09/2026</td>
+              <td><span class="chip green">Agendada</span></td><td class="small muted">26/09/2026, 10:00</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card-foot">Ninguna solicitud de la institución puede desbloquear acceso a información individual. Ese acceso sólo existe dentro de un protocolo de crisis y sólo para el profesional designado.</div>
+    </div>
+
+    <div class="privacy-banner mt-3">
+      <div class="ico"><i class="fa-solid fa-scale-balanced"></i></div>
+      <div><b>Compromiso contractual</b>
+        <p>La información de este panel no puede utilizarse para evaluaciones de desempeño, decisiones de promoción, sanciones, terminación de la relación laboral, ni para ningún acto que discrimine a una persona.</p>
+        <p style="margin-top:.6rem">A Tu Lado es un servicio de acompañamiento: <b>no diagnostica, no da tratamiento y no sustituye la atención de un profesional de la salud</b>. Lo que hace es entregar información, recursos y acompañamiento, y cuando hace falta poner a la persona en contacto con el profesional designado. La metodología con la que A Tu Lado decide cuánta información entregar a cada persona es propia y confidencial, y no se comparte con la institución.</p></div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<script src="panel.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  gaugeRing(document.getElementById('g-ibi'), { value: 64, color: '#2E5D4B', size: 190, caption: '/ 100 · Saludable' });
+
+  const S = ['S1','S2','S3','S4','S5','S6','S7','S8','S9','S10','S11','S12'];
+
+  lineChart(document.getElementById('ch-ibi'), {
+    height: 215, labels: S, min: 45, max: 75, ticks: 3, refLine: 60, refLabel: 'umbral saludable',
+    series: [{ name:'IBI', color:'#2E5D4B', data:[58,58,59,60,61,61,62,62,63,63,64,64] }]
+  });
+
+  stackedArea(document.getElementById('ch-semaforo'), {
+    height: 215, labels: S,
+    series: [
+      { name:'Estándar',    color:'#1E8449', data:[55,56,57,58,59,59,60,61,61,62,62,62] },
+      { name:'Ampliado',    color:'#DCAF00', data:[25,25,24,24,23,23,23,22,22,22,22,22] },
+      { name:'Reforzado',   color:'#D9660F', data:[16,15,15,14,14,14,13,13,13,12,12,12] },
+      { name:'Canalización',color:'#B02418', data:[4,4,4,4,4,4,4,4,4,4,4,4] }
+    ]
+  });
+
+  barChart(document.getElementById('ch-modulos'), {
+    labelW: 200, rowH: 31, unit:'%', max: 45,
+    data: [
+      { k:'Registro diario',      v:39, color:'#2A78D6' },
+      { k:'Herramientas',         v:22, color:'#5B4A8A' },
+      { k:'Recursos y artículos', v:15, color:'#1BAF7A' },
+      { k:'Revista comunitaria',  v:11, color:'#C98500' },
+      { k:'Cuestionarios',        v:8,  color:'#D55181' },
+      { k:'Plan personal de apoyo', v:4, color:'#8EADA4' },
+      { k:'Canal de ayuda inmediata', v:1, color:'#B02418' }
+    ]
+  });
+
+  lineChart(document.getElementById('ch-uso'), {
+    height: 215, labels: S, min: 40, max: 80, ticks: 4, unit: '%',
+    series: [
+      { name:'Uso semanal',  color:'#2A78D6', data:[51,53,54,49,56,57,59,60,55,61,61,61] },
+      { name:'Constancia',   color:'#1BAF7A', data:[63,65,64,58,67,69,70,71,64,72,72,72] }
+    ]
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,237 @@
+/* ════════════════════════════════════════════════════════════
+   A TU LADO — Motor de emisión de documentos
+   Hojas tamaño carta, paginación real y CSS de impresión.
+   ════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Carta exacta en pulgadas: 216mm es ~0.004in más ancho que 8.5in y
+     eso basta para que Chrome reflote el contenido al generar el PDF.
+     El alto deja 0.05in de holgura para que nunca se desborde una hoja. */
+  --sheet-w: 8.5in;
+  --sheet-h: 10.95in;
+  --sheet-pad-x: 16mm;
+  --sheet-pad-t: 14mm;
+  --sheet-pad-b: 18mm;
+}
+
+body.doc-mode {
+  background: #6C7A73;
+  margin: 0;
+}
+
+/* ── Barra de emisión (no se imprime) ── */
+.emit-bar {
+  position: sticky; top: 0; z-index: 60;
+  display: flex; align-items: center; gap: .7rem; flex-wrap: wrap;
+  padding: .75rem 1.2rem;
+  background: var(--bg-panel);
+  color: var(--text-off-white);
+  border-bottom: 1px solid var(--border-dark);
+}
+.emit-bar .brand { display: flex; align-items: center; gap: .55rem; font-family: var(--font-display); font-weight: 600; }
+.emit-bar .sep { width: 1px; height: 22px; background: rgba(255,255,255,.14); }
+.emit-bar .meta { font-family: var(--font-mono); font-size: .72rem; color: var(--text-light-gray); }
+.emit-bar .meta b { color: var(--mint-accent); }
+.emit-bar .spacer { margin-left: auto; }
+.emit-bar .btn { border-color: rgba(255,255,255,.18); background: rgba(255,255,255,.07); color: var(--text-off-white); }
+.emit-bar .btn:hover { background: rgba(255,255,255,.14); border-color: var(--mint-accent); }
+.emit-bar .btn-primary { background: var(--mint-accent); border-color: var(--mint-accent); color: #14382A; }
+.emit-bar .btn-primary:hover { background: #8FD8AC; border-color: #8FD8AC; color: #14382A; }
+
+.emit-note {
+  padding: .6rem 1.2rem; background: #142019; color: var(--text-pale-mint);
+  font-size: .76rem; border-bottom: 1px solid var(--border-dark);
+}
+.emit-note b { color: var(--mint-accent); }
+
+/* ── La hoja ── */
+.sheets { padding: 22px 12px 40px; }
+
+.sheet {
+  width: var(--sheet-w);
+  height: var(--sheet-h);
+  margin: 0 auto 20px;
+  padding: var(--sheet-pad-t) var(--sheet-pad-x) var(--sheet-pad-b);
+  background: #fff;
+  color: #1A2620;
+  box-shadow: 0 10px 34px rgba(0,0,0,.28);
+  position: relative;
+  overflow: hidden;
+  font-size: 9.6pt;
+  line-height: 1.5;
+  display: block;
+}
+/* El alto del cuerpo lo fija el motor al crear cada hoja; el pie vive
+   dentro del margen inferior, para que la caja de contenido no cambie
+   entre la medición en pantalla y la maquetación de impresión.
+   (Un contenedor flex fragmenta mal en medios paginados: Chrome empujaba
+   el pie a una página extra.) */
+.sheet-body { overflow: hidden; }
+
+/* Banco de medición: mismo ancho útil que la hoja, fuera de pantalla */
+.stage {
+  position: absolute; left: -12000px; top: 0;
+  width: calc(var(--sheet-w) - var(--sheet-pad-x) * 2);
+  font-size: 9.6pt; line-height: 1.5; color: #1A2620;
+}
+
+/* Marca de agua, una por hoja */
+.wm { position: absolute; inset: 0; pointer-events: none; display: grid; place-items: center; z-index: 0; }
+.wm span {
+  font-family: var(--font-display); font-weight: 700; font-size: 34pt;
+  color: rgba(176,36,24,.07); transform: rotate(-26deg);
+  letter-spacing: .08em; text-align: center; line-height: 1.35; white-space: nowrap;
+}
+.sheet > *:not(.wm) { position: relative; z-index: 1; }
+
+/* ── Encabezado y pie de hoja ── */
+.sh-head {
+  display: flex; align-items: flex-start; gap: 10px;
+  border-bottom: 2px solid #0D1410; padding-bottom: 7px; margin-bottom: 12px;
+}
+.sh-head .tt { font-family: var(--font-display); font-size: 13pt; font-weight: 600; letter-spacing: -.02em; margin: 0; line-height: 1.2; }
+.sh-head .st { font-family: var(--font-mono); font-size: 7pt; color: #556860; margin-top: 2px; }
+.sh-head .fo { margin-left: auto; text-align: right; font-family: var(--font-mono); font-size: 6.6pt; color: #556860; line-height: 1.75; }
+.sh-head .fo b { color: #1A2620; }
+
+.sh-cont { /* encabezado reducido de hojas 2+ */
+  display: flex; align-items: center; gap: 8px;
+  border-bottom: 1px solid #DCE8E0; padding-bottom: 5px; margin-bottom: 11px;
+  font-family: var(--font-mono); font-size: 6.6pt; color: #556860;
+}
+.sh-cont .spacer { margin-left: auto; }
+
+.sh-foot {
+  position: absolute; left: var(--sheet-pad-x); right: var(--sheet-pad-x); bottom: 7mm;
+  padding-top: 5px; border-top: 1px solid #DCE8E0;
+  display: flex; gap: 10px; align-items: center;
+  font-family: var(--font-mono); font-size: 6.4pt; color: #7C908A;
+}
+.sh-foot .spacer { margin-left: auto; }
+
+/* ── Tipografía del documento ── */
+.sheet h3.sec {
+  font-family: var(--font-mono); font-size: 7.2pt; text-transform: uppercase;
+  letter-spacing: .09em; color: #2E5D4B; font-weight: 700;
+  border-bottom: 1px solid #DCE8E0; padding-bottom: 3px;
+  margin: 13px 0 7px;
+}
+.sheet h3.sec:first-child { margin-top: 0; }
+.sheet p { margin: 0 0 7px; }
+.sheet ul, .sheet ol { margin: 0 0 7px; padding-left: 15px; }
+.sheet li { margin-bottom: 3px; }
+.sheet .lead { font-size: 10.5pt; line-height: 1.55; }
+.sheet .fine { font-size: 8pt; color: #556860; }
+
+/* ── Tablas del documento ── */
+table.doc {
+  width: 100%; border-collapse: collapse; font-size: 8.4pt;
+  border: 1px solid #DCE8E0; break-inside: avoid;
+}
+table.doc thead th {
+  background: #EEF4F0; text-align: left; padding: 4px 6px;
+  border-bottom: 1px solid #C2D6CA;
+  font-family: var(--font-mono); font-size: 6.6pt; text-transform: uppercase;
+  letter-spacing: .06em; color: #556860; font-weight: 700;
+}
+table.doc tbody td { padding: 4px 6px; border-bottom: 1px solid #EEF4F0; vertical-align: top; }
+table.doc tbody tr:last-child td { border-bottom: none; }
+table.doc .n { text-align: right; font-variant-numeric: tabular-nums; font-family: var(--font-mono); font-size: 8pt; }
+table.doc .hi { background: #FCEEEC; }
+table.doc .hiy { background: #FBF2D4; }
+table.doc .hig { background: #E3F3E9; }
+
+/* ── Bloques ── */
+.kv { display: grid; grid-template-columns: max-content 1fr; gap: 3px 12px; font-size: 8.6pt; }
+.kv dt { font-family: var(--font-mono); font-size: 6.8pt; text-transform: uppercase; letter-spacing: .05em; color: #556860; font-weight: 700; padding-top: 1px; }
+.kv dd { margin: 0; font-weight: 600; }
+
+.callout {
+  border-left: 3px solid #2E5D4B; background: #F3F8F5;
+  padding: 7px 10px; margin: 8px 0; font-size: 8.6pt; break-inside: avoid;
+}
+.callout.red { border-left-color: #B02418; background: #FCEEEC; }
+.callout.amber { border-left-color: #DCAF00; background: #FBF2D4; }
+.callout.green { border-left-color: #1E8449; background: #E3F3E9; }
+.callout b { display: block; margin-bottom: 2px; }
+
+.cols2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.cols3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+
+.statbox { border: 1px solid #DCE8E0; border-radius: 5px; padding: 7px 9px; break-inside: avoid; }
+.statbox .l { font-family: var(--font-mono); font-size: 6.4pt; text-transform: uppercase; letter-spacing: .06em; color: #556860; font-weight: 700; }
+.statbox .v { font-family: var(--font-display); font-size: 17pt; font-weight: 600; letter-spacing: -.03em; line-height: 1.15; margin-top: 1px; }
+.statbox .v .u { font-size: 8pt; color: #556860; font-weight: 500; }
+.statbox .d { font-size: 7.4pt; color: #556860; }
+
+.tag {
+  display: inline-block; padding: 1px 6px; border-radius: 4px;
+  font-size: 7pt; font-weight: 700; border: 1px solid #DCE8E0; background: #EEF4F0; color: #556860;
+}
+.tag.g { background: #E3F3E9; border-color: #BFE0CC; color: #14582F; }
+.tag.y { background: #FBF2D4; border-color: #E8D79A; color: #6B5400; }
+.tag.o { background: #FBEADC; border-color: #EFC6A3; color: #8A3F06; }
+.tag.r { background: #F8E2DF; border-color: #E9B7B0; color: #8C1C10; }
+.tag.k { background: #0D1410; border-color: #0D1410; color: #A8E6C0; }
+
+.dist { display: flex; height: 26px; border-radius: 5px; overflow: hidden; break-inside: avoid; }
+.dist .s { display: grid; place-items: center; color: #fff; font-family: var(--font-mono); font-size: 7pt; font-weight: 700; overflow: hidden; white-space: nowrap; min-width: 0; }
+.dist .s + .s { border-left: 2px solid #fff; }
+.dist .s.dk { color: #201900; }
+
+.lg { display: flex; flex-wrap: wrap; gap: 3px 14px; margin-top: 5px; font-size: 7.4pt; color: #556860; }
+.lg i { width: 8px; height: 8px; border-radius: 2px; display: inline-block; }
+
+.legal { font-size: 7.2pt; color: #556860; line-height: 1.6; border-top: 1px solid #DCE8E0; padding-top: 8px; margin-top: 12px; break-inside: avoid; }
+.legal b { color: #1A2620; }
+.legal p { margin: 0 0 5px; }
+
+.signs { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; margin-top: 26px; break-inside: avoid; }
+.signs div { border-top: 1px solid #1A2620; padding-top: 4px; font-size: 7.4pt; text-align: center; color: #556860; }
+.signs div b { display: block; color: #1A2620; font-size: 8.2pt; }
+
+.chartbox { break-inside: avoid; margin: 6px 0 4px; }
+.chartbox svg text { font-size: 9px; }
+
+/* Portada del certificado */
+.cert { text-align: center; padding-top: 26mm; }
+.cert .k { font-family: var(--font-mono); font-size: 8pt; letter-spacing: .3em; text-transform: uppercase; color: #2E5D4B; }
+.cert h1 { font-family: var(--font-display); font-size: 27pt; font-weight: 600; letter-spacing: -.03em; margin: 10px 0 4px; }
+.cert .who { font-family: var(--font-editorial); font-style: italic; font-size: 20pt; margin: 18px 0 6px; }
+.cert .body { max-width: 135mm; margin: 0 auto; font-size: 10pt; line-height: 1.7; color: #38473F; }
+
+/* Sello */
+.seal {
+  width: 30mm; height: 30mm; border-radius: 50%; border: 2px solid #2E5D4B;
+  display: grid; place-items: center; text-align: center; margin: 0 auto;
+  font-family: var(--font-mono); font-size: 6.4pt; color: #2E5D4B; line-height: 1.5; padding: 5px;
+}
+
+/* ── IMPRESIÓN ── */
+@page { size: Letter; margin: 0; }
+
+@media print {
+  body.doc-mode { background: #fff; }
+  .emit-bar, .emit-note, .no-print { display: none !important; }
+  .sheets { padding: 0; }
+  .sheet {
+    box-shadow: none; margin: 0; width: var(--sheet-w); height: var(--sheet-h);
+    break-after: page; page-break-after: always;
+  }
+  .stage { display: none !important; }
+  .sheet:last-child { break-after: auto; page-break-after: auto; }
+  /* La paginación ya está resuelta por el motor: cualquier sugerencia
+     de salto adicional sólo puede contradecirla. */
+  .sheet * { break-inside: auto; break-before: auto; break-after: auto; }
+}
+
+/* El corte va muy por debajo de 816px (8.5in), que es el ancho con el que
+   el navegador maqueta al generar el PDF: si la media query alcanzara ese
+   ancho, las rejillas del documento se colapsarían a una columna en la
+   impresión y cada hoja crecería. */
+@media (max-width: 760px) {
+  .sheet { width: 100%; height: auto !important; min-height: 0; padding: 18px 16px 40px; font-size: 12px; }
+  .sheet-body { overflow: visible; height: auto !important; }
+  .sheets { padding: 12px 8px 30px; }
+  .cols2, .cols3 { grid-template-columns: 1fr; }
+}

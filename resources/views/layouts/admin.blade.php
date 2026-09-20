@@ -151,10 +151,11 @@
         </a>
       </div>
 
-      <!-- Navigation Menu: ONLY 4 SPECIFIED MODULES -->
-      <nav class="sidebar-nav-group" style="padding: 0 0.85rem; flex: 1;">
+      <!-- Navigation Menu: Categorized Modules -->
+      <nav class="sidebar-nav-group" style="padding: 0 0.85rem; flex: 1; overflow-y: auto;">
+        <!-- GESTIÓN GENERAL -->
         <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; text-transform: uppercase; color: #6E887E; font-weight: 600; letter-spacing: 0.08em; margin-bottom: 0.65rem; padding-left: 0.45rem;">
-          Módulos Principales
+          Gestión General
         </div>
         
         <!-- 1. Dashboard -->
@@ -183,10 +184,57 @@
           <span>Usuarios</span>
         </a>
 
-        <!-- 4. Foros -->
+        <!-- 4. Foros & Revista -->
         <a href="{{ route('admin.forums.index') }}" class="admin-nav-item {{ request()->routeIs('admin.forums.*') ? 'active' : '' }}">
           <div class="nav-icon"><i class="fa-solid fa-comments"></i></div>
-          <span>Foros</span>
+          <span>Foros & Revista</span>
+        </a>
+
+        <!-- OPERACIÓN INSTITUCIONAL B2B -->
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; text-transform: uppercase; color: #6E887E; font-weight: 600; letter-spacing: 0.08em; margin: 1.25rem 0 0.65rem; padding-left: 0.45rem;">
+          Operación Institucional (B2B)
+        </div>
+
+        <!-- 5. Instituciones -->
+        <a href="{{ route('admin.institutions.index') }}" class="admin-nav-item {{ request()->routeIs('admin.institutions.index') ? 'active' : '' }}">
+          <div class="nav-icon"><i class="fa-solid fa-building-shield"></i></div>
+          <span>Instituciones</span>
+        </a>
+
+        <!-- 6. Semáforo & Detalle -->
+        <a href="{{ route('admin.institutions.show') }}" class="admin-nav-item {{ request()->routeIs('admin.institutions.show') ? 'active' : '' }}">
+          <div class="nav-icon"><i class="fa-solid fa-traffic-light"></i></div>
+          <span>Semáforo & Detalle</span>
+        </a>
+
+        <!-- 7. Analítica e Índices -->
+        <a href="{{ route('admin.analytics.index') }}" class="admin-nav-item {{ request()->routeIs('admin.analytics.*') ? 'active' : '' }}">
+          <div class="nav-icon"><i class="fa-solid fa-chart-line"></i></div>
+          <span>Analítica e Índices</span>
+        </a>
+
+        <!-- 8. Altas y Estructura -->
+        <a href="{{ route('admin.structure.index') }}" class="admin-nav-item {{ request()->routeIs('admin.structure.*') ? 'active' : '' }}">
+          <div class="nav-icon"><i class="fa-solid fa-file-arrow-up"></i></div>
+          <span>Altas y Estructura</span>
+        </a>
+
+        <!-- REPORTES & ENTREGABLES -->
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; text-transform: uppercase; color: #6E887E; font-weight: 600; letter-spacing: 0.08em; margin: 1.25rem 0 0.65rem; padding-left: 0.45rem;">
+          Reportes & Entregables
+        </div>
+
+        <!-- 9. Centro de Reportes -->
+        <a href="{{ route('admin.reports.index') }}" class="admin-nav-item {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}">
+          <div class="nav-icon"><i class="fa-solid fa-file-pdf"></i></div>
+          <span>Centro de Reportes</span>
+          <span style="margin-left: auto; background: rgba(168,230,192,0.18); color: #A8E6C0; border-radius: 6px; padding: 2px 6px; font-size: 0.62rem; font-weight: 700; font-family: monospace;">13</span>
+        </a>
+
+        <!-- 10. Vista Cliente (Demo) -->
+        <a href="{{ route('admin.client-view.index') }}" class="admin-nav-item {{ request()->routeIs('admin.client-view.*') ? 'active' : '' }}">
+          <div class="nav-icon"><i class="fa-solid fa-eye"></i></div>
+          <span>Vista Cliente (Demo)</span>
         </a>
       </nav>
 

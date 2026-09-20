@@ -5,6 +5,7 @@ namespace App\Models;
 use Carbon\Carbon;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -30,7 +31,18 @@ class User extends Authenticatable
         'professional_title',
         'license_number',
         'institution',
+        'institution_id',
+        'macro_group',
+        'department',
+        'shift',
+        'employee_number',
+        'position',
     ];
+
+    public function institution(): BelongsTo
+    {
+        return $this->belongsTo(Institution::class);
+    }
 
     public function getAvatarUrlAttribute(): ?string
     {

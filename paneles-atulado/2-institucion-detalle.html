@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Constructora Mayab · Consola A Tu Lado</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600..700;1,9..144,400&family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="panel.css">
+</head>
+<body>
+<div class="shell">
+<aside class="sidebar" data-sidebar data-console="atl" data-active="detalle"></aside>
+
+<div class="main">
+  <header class="topbar">
+    <div class="crumbs"><a href="index.html">instituciones</a> / <b>constructora mayab</b></div>
+    <div class="topbar-actions">
+      <select class="select" style="width:auto"><option>Constructora Mayab</option><option>Grupo Peninsular</option><option>IT Soporte Cancún</option><option>Hotel Xcanatún</option><option>Tecnológico de Mérida</option></select>
+      <div class="segmented"><button>7 d</button><button class="on">30 d</button><button>90 d</button></div>
+      <a href="3-analitica.html" class="btn btn-sm"><i class="fa-solid fa-chart-line"></i> Analítica</a>
+      <button class="btn btn-dark btn-sm" data-open="m-reporte"><i class="fa-solid fa-file-pdf"></i> Reportes</button>
+    </div>
+  </header>
+
+  <div class="page">
+
+    <!-- ══════════ ENCABEZADO ══════════ -->
+    <div class="row mb-3" style="gap:1rem;align-items:flex-start">
+      <div class="inst-logo" style="width:56px;height:56px;background:#2E5D4B;font-size:1.3rem">CM</div>
+      <div style="flex:1">
+        <h1 class="page-title" style="margin-bottom:.15rem">Constructora Mayab S.A. de C.V.</h1>
+        <div class="row wrap" style="gap:.4rem">
+          <span class="chip mono">RFC CMA210415H21</span>
+          <span class="chip">Manufactura y obra</span>
+          <span class="chip">Mérida, Yucatán</span>
+          <span class="chip">6 departamentos</span>
+          <span class="chip green"><i class="fa-solid fa-circle-check"></i> Contrato vigente al 14/02/27</span>
+          <span class="chip violet"><i class="fa-solid fa-user-shield"></i> Prof. designado: Psic. Roberto Ancona (Ced. 7712045)</span>
+        </div>
+      </div>
+      <div class="col" style="gap:.4rem;align-items:flex-end">
+        <button class="btn btn-danger" data-open="m-crisis"><i class="fa-solid fa-tower-broadcast"></i> Protocolo de crisis</button>
+        <span class="xsmall muted">3 casos abiertos · último a las 08:52</span>
+      </div>
+    </div>
+
+    <div class="privacy-banner">
+      <div class="ico"><i class="fa-solid fa-user-lock"></i></div>
+      <div><b>Plano clínico · acceso acreditado</b>
+        <p>Estás viendo esta institución con identidad porque tu cuenta pertenece al equipo clínico acreditado de A Tu Lado. Cada apertura de ficha individual exige un motivo, se sella en la bitácora de accesos, que es inmutable. La institución <b>nunca</b> ve esta pantalla: su panel muestra sólo porcentajes globales.</p></div>
+    </div>
+
+    <!-- ══════════ MÉTRICAS SUPERIORES ══════════ -->
+    <div class="section-head" style="margin-top:0">
+      <h2 class="section-title">Indicadores de la institución</h2>
+      <span class="section-note">Últimos 30 días · 412 personas en padrón</span>
+    </div>
+
+    <div class="grid g-4">
+      <div class="kpi">
+        <div class="kpi-label"><i class="fa-solid fa-user-check"></i> Usuarios activos</div>
+        <div class="kpi-value">342 <span class="unit">/ 412</span></div>
+        <div class="kpi-foot"><span class="delta up">83.0%</span> de adopción · 29 nunca activaron</div>
+        <div class="kpi-spark" data-spark="[289,301,310,318,325,331,338,342]"></div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label"><i class="fa-solid fa-face-smile"></i> Adherencia al registro diario</div>
+        <div class="kpi-value">72 <span class="unit">%</span></div>
+        <div class="kpi-foot"><span class="delta up">+4 pts</span> · racha media 9 días</div>
+        <div class="kpi-spark" data-spark="[63,65,64,67,69,70,71,72]"></div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label"><i class="fa-solid fa-heart"></i> WHO-5 institucional</div>
+        <div class="kpi-value">58 <span class="unit">/ 100</span></div>
+        <div class="kpi-foot"><span class="delta up">+3</span> · corte de riesgo en 50</div>
+        <div class="kpi-spark" data-spark="[52,53,54,55,55,56,57,58]"></div>
+      </div>
+      <div class="kpi accent-red">
+        <div class="kpi-label"><i class="fa-solid fa-triangle-exclamation"></i> Casos abiertos</div>
+        <div class="kpi-value">3</div>
+        <div class="kpi-foot">1 agudo · 2 rojo · mediana de contacto 17 min</div>
+      </div>
+    </div>
+
+    <div class="grid g-6 mt-2">
+      <div class="kpi">
+        <div class="kpi-label">Herramientas usadas</div>
+        <div class="kpi-value" style="font-size:1.5rem">1,188</div>
+        <div class="kpi-foot">respiración · grounding · STOP</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Planes de seguridad</div>
+        <div class="kpi-value" style="font-size:1.5rem">41 <span class="unit">/ 54</span></div>
+        <div class="kpi-foot">76% de naranja+ con plan</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Silencio R4 (14 d+)</div>
+        <div class="kpi-value" style="font-size:1.5rem">9</div>
+        <div class="kpi-foot">de ellas 4 venían de amarillo</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Banderas léxicas (30 d)</div>
+        <div class="kpi-value" style="font-size:1.5rem">23</div>
+        <div class="kpi-foot">3 de categoría ideación</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Contactos de emergencia</div>
+        <div class="kpi-value" style="font-size:1.5rem">88 <span class="unit">%</span></div>
+        <div class="kpi-foot">del padrón activo lo registró</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Uso nocturno (22–06 h)</div>
+        <div class="kpi-value" style="font-size:1.5rem">14 <span class="unit">%</span></div>
+        <div class="kpi-foot">sesiones · señal de insomnio</div>
+      </div>
+    </div>
+
+    <!-- ══════════ DISTRIBUCIÓN + ALERTAS ══════════ -->
+    <div class="grid g-3-2 mt-3">
+      <div class="card">
+        <div class="card-head"><h3>Semáforo por departamento</h3>
+          <span class="spacer section-note">Proporción del padrón activo de cada área</span></div>
+        <div class="card-body">
+          <div class="dist-bar mb-2">
+            <div class="seg" style="background:var(--sem-verde);width:62%">62% Verde</div>
+            <div class="seg light-text" style="background:var(--sem-amarillo);width:22%">22% Amarillo</div>
+            <div class="seg" style="background:var(--sem-naranja);width:12%">12% Naranja</div>
+            <div class="seg" style="background:var(--sem-rojo);width:3.2%">3%</div>
+            <div class="seg" style="background:var(--sem-rojo-agudo);width:0.8%"></div>
+          </div>
+          <table class="data" style="margin-top:1rem">
+            <thead><tr><th>Departamento</th><th class="num">Activos</th><th style="min-width:200px">Distribución</th><th class="num">WHO-5</th><th class="num">Adherencia</th><th class="num">Alertas</th></tr></thead>
+            <tbody>
+              <tr class="row-red">
+                <td><b>Obra — Cuadrilla nocturna</b></td><td class="num">38</td>
+                <td><div class="bar-track"><div class="seg" style="background:var(--sem-verde);width:42%"></div><div class="seg" style="background:var(--sem-amarillo);width:29%"></div><div class="seg" style="background:var(--sem-naranja);width:21%"></div><div class="seg" style="background:var(--sem-rojo);width:8%"></div></div></td>
+                <td class="num">44</td><td class="num">61%</td><td class="num"><span class="sem sem-rojo"><span class="dot"></span> 2</span></td>
+              </tr>
+              <tr>
+                <td><b>Obra — Cuadrilla diurna</b></td><td class="num">96</td>
+                <td><div class="bar-track"><div class="seg" style="background:var(--sem-verde);width:60%"></div><div class="seg" style="background:var(--sem-amarillo);width:23%"></div><div class="seg" style="background:var(--sem-naranja);width:13%"></div><div class="seg" style="background:var(--sem-rojo);width:4%"></div></div></td>
+                <td class="num">56</td><td class="num">70%</td><td class="num"><span class="sem sem-naranja"><span class="dot"></span> 1</span></td>
+              </tr>
+              <tr>
+                <td><b>Almacén y logística</b></td><td class="num">54</td>
+                <td><div class="bar-track"><div class="seg" style="background:var(--sem-verde);width:63%"></div><div class="seg" style="background:var(--sem-amarillo);width:24%"></div><div class="seg" style="background:var(--sem-naranja);width:11%"></div><div class="seg" style="background:var(--sem-rojo);width:2%"></div></div></td>
+                <td class="num">57</td><td class="num">68%</td><td class="num">0</td>
+              </tr>
+              <tr>
+                <td><b>Administración</b></td><td class="num">72</td>
+                <td><div class="bar-track"><div class="seg" style="background:var(--sem-verde);width:71%"></div><div class="seg" style="background:var(--sem-amarillo);width:19%"></div><div class="seg" style="background:var(--sem-naranja);width:8%"></div><div class="seg" style="background:var(--sem-rojo);width:2%"></div></div></td>
+                <td class="num">63</td><td class="num">79%</td><td class="num">0</td>
+              </tr>
+              <tr>
+                <td><b>Ventas y atención</b></td><td class="num">45</td>
+                <td><div class="bar-track"><div class="seg" style="background:var(--sem-verde);width:66%"></div><div class="seg" style="background:var(--sem-amarillo);width:22%"></div><div class="seg" style="background:var(--sem-naranja);width:10%"></div><div class="seg" style="background:var(--sem-rojo);width:2%"></div></div></td>
+                <td class="num">60</td><td class="num">75%</td><td class="num">0</td>
+              </tr>
+              <tr>
+                <td><b>Dirección</b></td><td class="num">37</td>
+                <td><div class="bar-track"><div class="seg" style="background:var(--sem-verde);width:70%"></div><div class="seg" style="background:var(--sem-amarillo);width:19%"></div><div class="seg" style="background:var(--sem-naranja);width:9%"></div><div class="seg" style="background:var(--sem-rojo);width:2%"></div></div></td>
+                <td class="num">61</td><td class="num">73%</td><td class="num">0</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card-foot">La cuadrilla nocturna concentra el 67% de las alertas con el 11% del padrón. Es el hallazgo accionable de esta institución: sugiere revisar rotación de turnos, no a las personas.</div>
+      </div>
+
+      <div class="col" style="gap:1rem">
+        <div class="card">
+          <div class="card-head"><h3>Cola de atención clínica</h3><span class="chip red spacer">3 abiertos</span></div>
+          <div class="card-body col" style="gap:.6rem">
+            <div class="alert crit">
+              <div class="ico"><i class="fa-solid fa-heart-pulse"></i></div>
+              <div class="txt"><b>COL-0412 · ASQ positiva aguda</b><span>Ideación con plan. Protocolo activo desde 08:52. Contacto humano pendiente.</span></div>
+              <div class="when">hoy 08:52</div>
+            </div>
+            <div class="alert crit">
+              <div class="ico"><i class="fa-solid fa-comment-dots"></i></div>
+              <div class="txt"><b>COL-0188 · bandera léxica + MDI 34</b><span>«ya no quiero seguir» en registro libre. ASQ enviada, sin responder.</span></div>
+              <div class="when">ayer 21:14</div>
+            </div>
+            <div class="alert crit">
+              <div class="ico"><i class="fa-solid fa-arrow-trend-down"></i></div>
+              <div class="txt"><b>COL-0307 · R3 caída abrupta</b><span>De 1 a 4 en el valor invertido en 48 h. WHO-5 adelantado disparado.</span></div>
+              <div class="when">ayer 07:40</div>
+            </div>
+            <div class="alert warn">
+              <div class="ico"><i class="fa-solid fa-volume-xmark"></i></div>
+              <div class="txt"><b>9 personas en silencio R4</b><span>Sin registro en 14+ días. 4 venían de nivel amarillo.</span></div>
+              <div class="when">continuo</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3>Cumplimiento del protocolo</h3></div>
+          <div class="card-body">
+            <dl class="dl">
+              <dt>Casos del trimestre</dt><dd>11</dd>
+              <dt>Contacto &lt; 30 min</dt><dd>11 / 11 <span class="chip green">100%</span></dd>
+              <dt>Cierre verificado</dt><dd>10 / 11 · <span class="chip red">1 en curso</span></dd>
+              <dt>Salidas sin contacto</dt><dd>0 <span class="chip green">regla respetada</span></dd>
+              <dt>Entregas al profesional</dt><dd>10 resúmenes · NDA vigente</dd>
+              <dt>Accesos a ficha</dt><dd>34 · todos con motivo</dd>
+            </dl>
+          </div>
+          <div class="card-foot">Un caso rojo sólo se cierra con contacto humano verificado por un profesional. El sistema no permite cierre automático por tiempo.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ LISTA DE COLABORADORES ══════════ -->
+    <div class="section-head">
+      <h2 class="section-title">Colaboradores</h2>
+      <span class="section-note">Ordenado por prioridad clínica, no alfabéticamente</span>
+      <div class="spacer"></div>
+      <span class="locked"><i class="fa-solid fa-lock"></i> Vista exclusiva del plano clínico acreditado</span>
+    </div>
+
+    <div class="toolbar">
+      <div class="input-icon" style="min-width:230px">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input class="input" placeholder="Nombre, número de empleado o folio…">
+      </div>
+      <select class="select" style="width:auto"><option>Todos los departamentos</option><option>Obra — nocturna</option><option>Obra — diurna</option><option>Almacén y logística</option><option>Administración</option><option>Ventas y atención</option><option>Dirección</option></select>
+      <select class="select" style="width:auto"><option>Todos los turnos</option><option>Matutino</option><option>Vespertino</option><option>Nocturno</option><option>Mixto</option></select>
+      <div class="segmented">
+        <button class="on">Todos</button>
+        <button>Rojo</button><button>Naranja</button><button>Amarillo</button><button>Verde</button><button>Silencio</button>
+      </div>
+      <div class="spacer"></div>
+      <label class="row small muted" style="gap:.35rem"><input type="checkbox"> Sólo con bandera léxica</label>
+      <button class="btn btn-sm"><i class="fa-solid fa-sliders"></i> Columnas</button>
+    </div>
+
+    <div class="card">
+      <div class="table-wrap">
+        <table class="data">
+          <thead>
+            <tr>
+              <th style="min-width:210px">Colaborador</th>
+              <th>Puesto</th><th>Departamento</th><th>Turno / horario</th>
+              <th>Semáforo</th><th class="num">WHO-5</th><th class="num">MDI</th><th>ASQ</th>
+              <th class="num">Último acceso</th><th class="num">Racha</th><th>Señales</th>
+              <th>Contacto de emergencia</th><th class="actions">Ficha</th>
+            </tr>
+          </thead>
+          <tbody>
+
+            <tr class="row-critical">
+              <td><div class="who-cell"><div class="av" style="background:#6E140C">LM</div>
+                <div><div class="nm">Luis Manuel Chan Poot</div><div class="sub mono">COL-0412 · Emp. 1188</div></div></div></td>
+              <td>Oficial albañil</td><td>Obra — nocturna</td><td class="small">Nocturno<br><span class="muted mono xsmall">22:00–06:00</span></td>
+              <td><span class="sem sem-rojo-agudo"><span class="dot"></span> Rojo agudo</span></td>
+              <td class="num">24</td><td class="num">38</td>
+              <td><span class="chip red">Positiva aguda</span></td>
+              <td class="num">hoy 08:47</td><td class="num">3 d</td>
+              <td><span class="chip red" title="Ideación">ideación</span></td>
+              <td class="small">Rosa Poot · madre<br><span class="mono xsmall muted">999 412 88 03</span></td>
+              <td class="actions"><button class="btn btn-sm btn-danger" data-open="m-ficha"><i class="fa-solid fa-folder-open"></i> Abrir</button></td>
+            </tr>
+
+            <tr class="row-red">
+              <td><div class="who-cell"><div class="av" style="background:#B02418">MI</div>
+                <div><div class="nm">María Isabel Uc Canché</div><div class="sub mono">COL-0188 · Emp. 0904</div></div></div></td>
+              <td>Auxiliar de almacén</td><td>Almacén y logística</td><td class="small">Vespertino<br><span class="muted mono xsmall">14:00–22:00</span></td>
+              <td><span class="sem sem-rojo"><span class="dot"></span> Rojo</span></td>
+              <td class="num">28</td><td class="num">34</td>
+              <td><span class="chip amber">Enviada · sin responder</span></td>
+              <td class="num">ayer 21:14</td><td class="num">11 d</td>
+              <td><span class="chip red">desesperanza</span></td>
+              <td class="small">Jorge Uc · hermano<br><span class="mono xsmall muted">999 208 41 77</span></td>
+              <td class="actions"><button class="btn btn-sm btn-danger" data-open="m-ficha"><i class="fa-solid fa-folder-open"></i> Abrir</button></td>
+            </tr>
+
+            <tr class="row-red">
+              <td><div class="who-cell"><div class="av" style="background:#B02418">JA</div>
+                <div><div class="nm">José Armando Pech Kuk</div><div class="sub mono">COL-0307 · Emp. 1042</div></div></div></td>
+              <td>Operador de maquinaria</td><td>Obra — nocturna</td><td class="small">Nocturno<br><span class="muted mono xsmall">22:00–06:00</span></td>
+              <td><span class="sem sem-rojo"><span class="dot"></span> Rojo</span></td>
+              <td class="num">32</td><td class="num">31</td>
+              <td><span class="chip green">Negativa</span></td>
+              <td class="num">ayer 07:40</td><td class="num">22 d</td>
+              <td><span class="chip amber">R3 caída</span></td>
+              <td class="small">Leticia Kuk · esposa<br><span class="mono xsmall muted">999 774 12 60</span></td>
+              <td class="actions"><button class="btn btn-sm btn-danger" data-open="m-ficha"><i class="fa-solid fa-folder-open"></i> Abrir</button></td>
+            </tr>
+
+            <tr>
+              <td><div class="who-cell"><div class="av" style="background:#D9660F">GS</div>
+                <div><div class="nm">Gabriela Sosa Medina</div><div class="sub mono">COL-0221 · Emp. 0771</div></div></div></td>
+              <td>Coordinadora de obra</td><td>Obra — diurna</td><td class="small">Matutino<br><span class="muted mono xsmall">07:00–15:00</span></td>
+              <td><span class="sem sem-naranja"><span class="dot"></span> Naranja</span></td>
+              <td class="num">41</td><td class="num">26</td>
+              <td><span class="chip">No aplica</span></td>
+              <td class="num">hoy 07:12</td><td class="num">31 d</td>
+              <td><span class="chip amber">R2 persistencia</span></td>
+              <td class="small">Ana Medina · madre<br><span class="mono xsmall muted">999 331 09 12</span></td>
+              <td class="actions"><button class="btn btn-sm" data-open="m-ficha"><i class="fa-solid fa-folder-open"></i> Abrir</button></td>
+            </tr>
+
+            <tr>
+              <td><div class="who-cell"><div class="av" style="background:#D9660F">RN</div>
+                <div><div class="nm">Ricardo Novelo Aguilar</div><div class="sub mono">COL-0356 · Emp. 1120</div></div></div></td>
+              <td>Ayudante general</td><td>Obra — nocturna</td><td class="small">Nocturno<br><span class="muted mono xsmall">22:00–06:00</span></td>
+              <td><span class="sem sem-naranja"><span class="dot"></span> Naranja</span></td>
+              <td class="num">44</td><td class="num">23</td>
+              <td><span class="chip">No aplica</span></td>
+              <td class="num">hoy 06:30</td><td class="num">7 d</td>
+              <td><span class="chip amber">sueño</span></td>
+              <td class="small">— <span class="chip amber xsmall">sin registrar</span></td>
+              <td class="actions"><button class="btn btn-sm" data-open="m-ficha"><i class="fa-solid fa-folder-open"></i> Abrir</button></td>
+            </tr>
+
+            <tr>
+              <td><div class="who-cell"><div class="av" style="background:#DCAF00;color:#201900">DC</div>
+                <div><div class="nm">Diana Carolina Ek Balam</div><div class="sub mono">COL-0094 · Emp. 0455</div></div></div></td>
+              <td>Analista de nómina</td><td>Administración</td><td class="small">Matutino<br><span class="muted mono xsmall">08:00–16:00</span></td>
+              <td><span class="sem sem-amarillo"><span class="dot"></span> Amarillo</span></td>
+              <td class="num">48</td><td class="num">17</td>
+              <td><span class="chip">No aplica</span></td>
+              <td class="num">hoy 08:05</td><td class="num">45 d</td>
+              <td><span class="chip">—</span></td>
+              <td class="small">Miguel Ek · padre<br><span class="mono xsmall muted">999 118 22 45</span></td>
+              <td class="actions"><button class="btn btn-sm" data-open="m-ficha"><i class="fa-solid fa-folder-open"></i> Abrir</button></td>
+            </tr>
+
+            <tr>
+              <td><div class="who-cell"><div class="av" style="background:#8EADA4">FT</div>
+                <div><div class="nm">Fernando Tuz Canul</div><div class="sub mono">COL-0140 · Emp. 0612</div></div></div></td>
+              <td>Chofer</td><td>Almacén y logística</td><td class="small">Mixto<br><span class="muted mono xsmall">rotativo</span></td>
+              <td><span class="chip"><i class="fa-solid fa-volume-xmark"></i> Silencio 19 d</span></td>
+              <td class="num">51</td><td class="num">—</td>
+              <td><span class="chip">No aplica</span></td>
+              <td class="num">26/08 18:20</td><td class="num">0 d</td>
+              <td><span class="chip amber">R4 silencio</span></td>
+              <td class="small">Sara Canul · esposa<br><span class="mono xsmall muted">999 550 73 18</span></td>
+              <td class="actions"><button class="btn btn-sm" data-open="m-ficha"><i class="fa-solid fa-folder-open"></i> Abrir</button></td>
+            </tr>
+
+            <tr>
+              <td><div class="who-cell"><div class="av" style="background:#1E8449">AH</div>
+                <div><div class="nm">Alejandro Herrera Díaz</div><div class="sub mono">COL-0028 · Emp. 0203</div></div></div></td>
+              <td>Jefe de compras</td><td>Administración</td><td class="small">Matutino<br><span class="muted mono xsmall">08:00–16:00</span></td>
+              <td><span class="sem sem-verde"><span class="dot"></span> Verde</span></td>
+              <td class="num">72</td><td class="num">—</td>
+              <td><span class="chip">No aplica</span></td>
+              <td class="num">hoy 08:58</td><td class="num">120 d</td>
+              <td><span class="chip">—</span></td>
+              <td class="small">Paola Díaz · esposa<br><span class="mono xsmall muted">999 402 61 30</span></td>
+              <td class="actions"><button class="btn btn-sm" data-open="m-ficha"><i class="fa-solid fa-folder-open"></i> Abrir</button></td>
+            </tr>
+
+            <tr>
+              <td><div class="who-cell"><div class="av" style="background:#1E8449">SP</div>
+                <div><div class="nm">Silvia Poot Chuc</div><div class="sub mono">COL-0511 · Emp. 1301</div></div></div></td>
+              <td>Recepcionista</td><td>Dirección</td><td class="small">Matutino<br><span class="muted mono xsmall">09:00–17:00</span></td>
+              <td><span class="sem sem-verde"><span class="dot"></span> Verde</span></td>
+              <td class="num">80</td><td class="num">—</td>
+              <td><span class="chip">No aplica</span></td>
+              <td class="num">hoy 09:10</td><td class="num">62 d</td>
+              <td><span class="chip">—</span></td>
+              <td class="small">Luis Chuc · hermano<br><span class="mono xsmall muted">999 887 04 22</span></td>
+              <td class="actions"><button class="btn btn-sm" data-open="m-ficha"><i class="fa-solid fa-folder-open"></i> Abrir</button></td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+      <div class="card-foot row">
+        <span>Mostrando 9 de 342 personas activas · <b>Racha</b> = días consecutivos con registro diario · <b>Señales</b> = reglas de vigilancia R1–R4 y categorías del filtro léxico.</span>
+        <div class="spacer"></div>
+        <div class="row" style="gap:.3rem">
+          <button class="btn btn-sm"><i class="fa-solid fa-chevron-left"></i></button>
+          <button class="btn btn-sm btn-primary">1</button><button class="btn btn-sm">2</button><button class="btn btn-sm">3</button>
+          <button class="btn btn-sm"><i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- ══════════════ MODAL: FICHA INDIVIDUAL ══════════════ -->
+<div class="modal-backdrop" id="m-ficha">
+  <div class="modal wide">
+    <div class="modal-head">
+      <div class="who-cell" style="gap:.9rem">
+        <div class="av" style="width:44px;height:44px;background:#6E140C;font-size:.9rem">LM</div>
+        <div>
+          <h2>Luis Manuel Chan Poot</h2>
+          <div class="sub">COL-0412 · Emp. 1188 · Obra nocturna · Constructora Mayab</div>
+        </div>
+      </div>
+      <span class="sem sem-rojo-agudo" style="align-self:center"><span class="dot"></span> Rojo agudo</span>
+      <button class="x" data-close><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <div class="modal-body">
+
+      <div class="alert crit mb-3">
+        <div class="ico"><i class="fa-solid fa-fingerprint"></i></div>
+        <div class="txt"><b>Acceso registrado en bitácora</b>
+          <span>Abierto por Said Canul (clínico acreditado) el 14/09/2026 09:41 · motivo declarado: «revisión de caso rojo agudo abierto». Este registro es inmutable: no se puede editar ni borrar.</span></div>
+      </div>
+
+      <div class="tabs" data-tabs="ficha">
+        <button class="tab on" data-pane="resumen">Resumen clínico</button>
+        <button class="tab" data-pane="diario">Registro diario</button>
+        <button class="tab" data-pane="who5">WHO-5</button>
+        <button class="tab" data-pane="mdi">MDI</button>
+        <button class="tab" data-pane="asq">ASQ</button>
+        <button class="tab" data-pane="lexico">Texto libre y banderas</button>
+        <button class="tab" data-pane="plan">Plan de seguridad</button>
+        <button class="tab" data-pane="bitacora">Bitácora</button>
+      </div>
+
+      <!-- ─── RESUMEN ─── -->
+      <div class="tabpane on" data-tabpane="ficha" data-pane="resumen">
+        <div class="grid g-2-1">
+          <div class="card">
+            <div class="card-head"><h3>Trayectoria del ánimo · 30 días</h3>
+              <span class="spacer section-note">0 excelente — 4 terrible (valor invertido)</span></div>
+            <div class="card-body">
+              <div id="ch-animo"></div>
+              <div class="stack-legend">
+                <span class="legend-item"><span class="sw" style="background:#2E5D4B"></span> Registro diario</span>
+                <span class="legend-item"><span class="sw" style="background:#8EADA4;border-radius:0"></span> Línea base 30 d</span>
+                <span class="legend-item"><i class="fa-solid fa-flag" style="color:#B02418"></i> Evento de vigilancia</span>
+              </div>
+            </div>
+          </div>
+          <div class="col" style="gap:1rem">
+            <div class="card card-pad">
+              <div class="kpi-label mb-1">Clasificación vigente</div>
+              <span class="sem sem-rojo-agudo" style="font-size:.85rem"><span class="dot"></span> ROJO AGUDO</span>
+              <dl class="dl mt-2">
+                <dt>Origen</dt><dd>ASQ · ítem 5 positivo</dd>
+                <dt>Desde</dt><dd>14/09/2026 08:52</dd>
+                <dt>Ruta activa</dt><dd>Ruta C</dd>
+                <dt>Caso</dt><dd class="mono">CR-2026-0117 · abierto</dd>
+              </dl>
+            </div>
+            <div class="card card-pad">
+              <div class="kpi-label mb-1">Reglas de vigilancia disparadas</div>
+              <div class="col" style="gap:.4rem">
+                <div class="row"><span class="chip red">R1</span> <span class="small">Desviación de línea base — 11/09</span></div>
+                <div class="row"><span class="chip red">R2</span> <span class="small">Persistencia ≥ 5 días en 3–4 — 12/09</span></div>
+                <div class="row"><span class="chip red">R3</span> <span class="small">Caída abrupta de 1 a 4 — 13/09</span></div>
+                <div class="row"><span class="chip">R4</span> <span class="small muted">Silencio — no aplica</span></div>
+              </div>
+            </div>
+            <div class="card card-pad">
+              <div class="kpi-label mb-1">Contacto de emergencia</div>
+              <div class="strong">Rosa Poot Canché</div>
+              <div class="small muted">Madre · principal</div>
+              <div class="mono mt-1">999 412 88 03</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid g-4 mt-2">
+          <div class="kpi"><div class="kpi-label">WHO-5 actual</div><div class="kpi-value">24</div><div class="kpi-foot"><span class="delta down">−31</span> vs. aplicación previa</div></div>
+          <div class="kpi"><div class="kpi-label">MDI total</div><div class="kpi-value">38 <span class="unit">/ 50</span></div><div class="kpi-foot">nivel ROJO · ítem 6 en 4</div></div>
+          <div class="kpi"><div class="kpi-label">Registros en 30 d</div><div class="kpi-value">26</div><div class="kpi-foot">87% de adherencia</div></div>
+          <div class="kpi"><div class="kpi-label">Herramientas usadas</div><div class="kpi-value">9</div><div class="kpi-foot">respiración 6 · STOP 3</div></div>
+        </div>
+      </div>
+
+      <!-- ─── DIARIO ─── -->
+      <div class="tabpane" data-tabpane="ficha" data-pane="diario">
+        <div class="card">
+          <div class="card-head"><h3>Registro diario de caritas · últimos 14 días</h3>
+            <span class="spacer section-note">Capa 0 del motor clínico</span></div>
+          <div class="table-wrap">
+            <table class="data">
+              <thead><tr><th>Fecha</th><th>Hora</th><th>Estado</th><th class="num">Valor invertido</th><th>Texto libre</th><th>Bandera</th><th>Regla</th></tr></thead>
+              <tbody>
+                <tr class="row-critical"><td class="mono">14/09/2026</td><td class="mono">08:47</td><td><span class="sem sem-rojo"><span class="dot"></span> Terrible</span></td><td class="num">4</td><td class="small">«ya no le veo salida a esto, ya lo pensé bien»</td><td><span class="chip red">ideación</span></td><td><span class="chip red">R2</span></td></tr>
+                <tr class="row-red"><td class="mono">13/09/2026</td><td class="mono">06:12</td><td><span class="sem sem-rojo"><span class="dot"></span> Terrible</span></td><td class="num">4</td><td class="small muted">—</td><td>—</td><td><span class="chip red">R3</span></td></tr>
+                <tr class="row-red"><td class="mono">12/09/2026</td><td class="mono">05:58</td><td><span class="sem sem-naranja"><span class="dot"></span> Mal</span></td><td class="num">3</td><td class="small">«no dormí otra vez»</td><td><span class="chip amber">sueño</span></td><td><span class="chip red">R2</span></td></tr>
+                <tr><td class="mono">11/09/2026</td><td class="mono">07:20</td><td><span class="sem sem-naranja"><span class="dot"></span> Mal</span></td><td class="num">3</td><td class="small muted">—</td><td>—</td><td><span class="chip red">R1</span></td></tr>
+                <tr><td class="mono">10/09/2026</td><td class="mono">06:41</td><td><span class="sem sem-naranja"><span class="dot"></span> Mal</span></td><td class="num">3</td><td class="small">«todo pesa»</td><td>—</td><td>—</td></tr>
+                <tr><td class="mono">09/09/2026</td><td class="mono">07:03</td><td><span class="sem sem-amarillo"><span class="dot"></span> Regular</span></td><td class="num">2</td><td class="small muted">—</td><td>—</td><td>—</td></tr>
+                <tr><td class="mono">08/09/2026</td><td class="mono">06:55</td><td><span class="sem sem-amarillo"><span class="dot"></span> Regular</span></td><td class="num">2</td><td class="small muted">—</td><td>—</td><td>—</td></tr>
+                <tr><td class="mono">07/09/2026</td><td class="mono">08:10</td><td><span class="sem sem-verde"><span class="dot"></span> Bien</span></td><td class="num">1</td><td class="small">«descansé el domingo»</td><td>—</td><td>—</td></tr>
+                <tr><td class="mono">06/09/2026</td><td class="mono">07:44</td><td><span class="sem sem-verde"><span class="dot"></span> Bien</span></td><td class="num">1</td><td class="small muted">—</td><td>—</td><td>—</td></tr>
+                <tr><td class="mono">05/09/2026</td><td class="mono">06:30</td><td><span class="sem sem-verde"><span class="dot"></span> Bien</span></td><td class="num">1</td><td class="small muted">—</td><td>—</td><td>—</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card-foot">La <b>línea base 30 días</b> de esta persona es 1.4 y su <b>media móvil de 7 días</b> es 3.3. La desviación sostenida es lo que disparó R1 y luego R2.</div>
+        </div>
+      </div>
+
+      <!-- ─── WHO-5 ─── -->
+      <div class="tabpane" data-tabpane="ficha" data-pane="who5">
+        <div class="row mb-2 wrap">
+          <span class="chip mono">Aplicación 14/09/2026 · origen: adelantada por ruta B</span>
+          <span class="chip red">Crudo 6 / 25 · Escala 24 / 100</span>
+          <span class="chip">Anterior: 55 (16/08/2026)</span>
+        </div>
+        <div class="card card-pad">
+          <div class="section-note mb-2">En las últimas dos semanas…  <span class="muted">(0 = nunca · 5 = todo el tiempo)</span></div>
+          <div class="qa-item flag"><span class="qa-num">1</span><div class="qa-q">Me he sentido alegre y de buen humor</div><span class="qa-a">1 — Alguna vez</span></div>
+          <div class="qa-item flag"><span class="qa-num">2</span><div class="qa-q">Me he sentido tranquilo y relajado</div><span class="qa-a">1 — Alguna vez</span></div>
+          <div class="qa-item flag"><span class="qa-num">3</span><div class="qa-q">Me he sentido activo y con energía</div><span class="qa-a">0 — Nunca</span></div>
+          <div class="qa-item flag"><span class="qa-num">4</span><div class="qa-q">Me he despertado sintiéndome fresco y descansado</div><span class="qa-a">0 — Nunca</span></div>
+          <div class="qa-item warn"><span class="qa-num">5</span><div class="qa-q">Mi vida diaria ha estado llena de cosas que me interesan</div><span class="qa-a">4 — La mayor parte</span></div>
+        </div>
+        <div class="card mt-2">
+          <div class="card-head"><h3>Histórico de aplicaciones</h3></div>
+          <div class="card-body"><div id="ch-who5"></div></div>
+          <div class="card-foot">El corte de 50 es el umbral que la literatura asocia a revisión clínica. Este descenso de 55 a 24 en cuatro semanas es lo que abrió la ruta a MDI y luego a ASQ.</div>
+        </div>
+      </div>
+
+      <!-- ─── MDI ─── -->
+      <div class="tabpane" data-tabpane="ficha" data-pane="mdi">
+        <div class="row mb-2 wrap">
+          <span class="chip mono">Aplicación 14/09/2026</span>
+          <span class="chip red">Total 38 / 50 · nivel ROJO</span>
+          <span class="chip red"><i class="fa-solid fa-triangle-exclamation"></i> Ítem 6 (ideación) en 4</span>
+        </div>
+        <div class="card card-pad">
+          <div class="section-note mb-2">¿Con qué frecuencia en las últimas dos semanas…? <span class="muted">(0 = en ningún momento · 5 = todo el tiempo)</span></div>
+          <div class="qa-item flag"><span class="qa-num">1</span><div class="qa-q">Te has sentido decaído, triste</div><span class="qa-a">5</span></div>
+          <div class="qa-item flag"><span class="qa-num">2</span><div class="qa-q">Has perdido el interés en tus actividades cotidianas</div><span class="qa-a">5</span></div>
+          <div class="qa-item flag"><span class="qa-num">3</span><div class="qa-q">Te has sentido falto de energía y fuerza</div><span class="qa-a">4</span></div>
+          <div class="qa-item flag"><span class="qa-num">4</span><div class="qa-q">Has tenido menos confianza en ti mismo</div><span class="qa-a">4</span></div>
+          <div class="qa-item flag"><span class="qa-num">5</span><div class="qa-q">Has tenido mala conciencia o sentimientos de culpa</div><span class="qa-a">4</span></div>
+          <div class="qa-item flag"><span class="qa-num">6</span><div class="qa-q"><b>Has sentido que la vida no merece la pena vivirse</b></div><span class="qa-a">4</span></div>
+          <div class="qa-item flag"><span class="qa-num">7</span><div class="qa-q">Has tenido dificultad para concentrarte</div><span class="qa-a">4</span></div>
+          <div class="qa-item warn"><span class="qa-num">8</span><div class="qa-q">Te has sentido muy inquieto <span class="muted xsmall">(8a) </span> / muy lento <span class="muted xsmall">(8b)</span></div><span class="qa-a">máx 3</span></div>
+          <div class="qa-item warn"><span class="qa-num">9</span><div class="qa-q">Has tenido problemas para dormir por la noche</div><span class="qa-a">5</span></div>
+          <div class="qa-item warn"><span class="qa-num">10</span><div class="qa-q">Has perdido el apetito <span class="muted xsmall">(10a)</span> / has tenido mucho apetito <span class="muted xsmall">(10b)</span></div><span class="qa-a">máx 3</span></div>
+        </div>
+        <div class="alert crit mt-2">
+          <div class="ico"><i class="fa-solid fa-arrow-right-long"></i></div>
+          <div class="txt"><b>Encadenamiento automático</b><span>El ítem 6 en 4 obliga a aplicar ASQ de inmediato. El motor lo hizo a las 08:51; la respuesta llegó a las 08:52.</span></div>
+        </div>
+      </div>
+
+      <!-- ─── ASQ ─── -->
+      <div class="tabpane" data-tabpane="ficha" data-pane="asq">
+        <div class="row mb-2 wrap">
+          <span class="chip mono">Aplicación 14/09/2026 08:52</span>
+          <span class="chip red">Resultado: POSITIVA AGUDA</span>
+          <span class="chip red">Nivel: ROJO AGUDO</span>
+        </div>
+        <div class="card card-pad">
+          <div class="section-note mb-2">Ask Suicide-Screening Questions (NIMH) · versión en español</div>
+          <div class="qa-item"><span class="qa-num">1</span><div class="qa-q">En las últimas semanas, ¿has deseado estar muerto?</div><span class="qa-a">Sí</span></div>
+          <div class="qa-item"><span class="qa-num">2</span><div class="qa-q">En las últimas semanas, ¿has sentido que tú o tu familia estarían mejor si tú estuvieras muerto?</div><span class="qa-a">Sí</span></div>
+          <div class="qa-item"><span class="qa-num">3</span><div class="qa-q">En la última semana, ¿has tenido pensamientos sobre quitarte la vida?</div><span class="qa-a">Sí</span></div>
+          <div class="qa-item"><span class="qa-num">4</span><div class="qa-q">¿Alguna vez has intentado quitarte la vida?</div><span class="qa-a">No</span></div>
+          <div class="qa-item flag"><span class="qa-num">5</span><div class="qa-q"><b>¿Estás teniendo pensamientos de quitarte la vida ahora mismo?</b></div><span class="qa-a">Sí</span></div>
+        </div>
+        <div class="alert crit mt-2">
+          <div class="ico"><i class="fa-solid fa-tower-broadcast"></i></div>
+          <div class="txt"><b>El ítem 5 positivo define POSITIVA AGUDA</b>
+            <span>La app no permitió salida sin contacto: mostró la pantalla de crisis, ofreció «estoy con alguien», activó la línea de ayuda y notificó al profesional designado en el mismo minuto. El caso no se cierra hasta que un profesional registre el contacto humano verificado.</span></div>
+        </div>
+      </div>
+
+      <!-- ─── LÉXICO ─── -->
+      <div class="tabpane" data-tabpane="ficha" data-pane="lexico">
+        <div class="card">
+          <div class="card-head"><h3>Detecciones del filtro léxico</h3>
+            <span class="spacer section-note">Sobre el texto libre del registro diario · nunca sobre conversaciones privadas</span></div>
+          <div class="table-wrap">
+            <table class="data">
+              <thead><tr><th>Fecha</th><th>Categoría</th><th>Términos</th><th>Fragmento</th><th>Acción del motor</th></tr></thead>
+              <tbody>
+                <tr class="row-critical"><td class="mono">14/09 08:47</td><td><span class="chip red">Ideación</span></td><td class="mono xsmall">«no le veo salida», «ya lo pensé»</td><td class="small">«ya no le veo salida a esto, ya lo pensé bien»</td><td class="small">MDI adelantado + ASQ</td></tr>
+                <tr class="row-red"><td class="mono">12/09 05:58</td><td><span class="chip amber">Alteración del sueño</span></td><td class="mono xsmall">«no dormí»</td><td class="small">«no dormí otra vez»</td><td class="small">Suma a Puchol fisiológico</td></tr>
+                <tr><td class="mono">10/09 06:41</td><td><span class="chip amber">Carga / agotamiento</span></td><td class="mono xsmall">«todo pesa»</td><td class="small">«todo pesa»</td><td class="small">Registrada, sin escalamiento</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card-foot">El diccionario está agrupado en 6 categorías: <b>ideación</b>, <b>desesperanza</b>, <b>aislamiento</b>, <b>consumo de sustancias</b>, <b>violencia o miedo</b> y <b>alteración del sueño</b>. Sólo la categoría ideación escala de forma automática; las demás alimentan el perfil de vigilancia.</div>
+        </div>
+        <div class="card mt-2">
+          <div class="card-head"><h3>Puchol · distribución de síntomas</h3></div>
+          <div class="card-body"><div id="ch-puchol"></div></div>
+        </div>
+      </div>
+
+      <!-- ─── PLAN ─── -->
+      <div class="tabpane" data-tabpane="ficha" data-pane="plan">
+        <div class="grid g-2">
+          <div class="card">
+            <div class="card-head"><h3>Plan de seguridad</h3><span class="chip green spacer">Actualizado 13/09</span></div>
+            <div class="card-body">
+              <div class="doc-section-title">Señales de alarma que reconozco</div>
+              <p class="small">«Cuando dejo de contestar el teléfono», «cuando no como en todo el turno».</p>
+              <div class="doc-section-title">Cosas que me ayudan por mi cuenta</div>
+              <p class="small">Caminar al terminar el turno · escuchar música · la respiración 4-7-8 de la app.</p>
+              <div class="doc-section-title">Personas a las que puedo llamar</div>
+              <p class="small">Rosa (mamá) · Andrés (compañero de cuadrilla).</p>
+              <div class="doc-section-title">Cómo hago mi entorno más seguro</div>
+              <p class="small">«Dejar las herramientas en el almacén, no llevarlas a casa».</p>
+            </div>
+          </div>
+          <div class="col" style="gap:1rem">
+            <div class="card">
+              <div class="card-head"><h3>Contactos de emergencia</h3></div>
+              <div class="card-body col" style="gap:.7rem">
+                <div class="row"><div class="av who-cell"></div>
+                  <div><div class="strong">Rosa Poot Canché</div><div class="small muted">Madre · principal</div><div class="mono small">999 412 88 03</div></div></div>
+                <div class="divider" style="margin:.3rem 0"></div>
+                <div><div class="strong">Andrés Cauich Ek</div><div class="small muted">Compañero de trabajo</div><div class="mono small">999 620 41 09</div></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-head"><h3>Líneas de ayuda mostradas</h3></div>
+              <div class="card-body">
+                <div class="small"><b>Línea de la Vida</b> · 800 911 2000 — mostrada 14/09 08:52</div>
+                <div class="small mt-1"><b>SAPTEL</b> · 55 5259 8121 — mostrada 14/09 08:52</div>
+                <div class="small mt-1"><b>Guardia A Tu Lado</b> · notificada 08:52, atendió 09:09</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── BITÁCORA ─── -->
+      <div class="tabpane" data-tabpane="ficha" data-pane="bitacora">
+        <div class="card card-pad">
+          <div class="tl">
+            <div class="tl-item red">
+              <div class="tl-when">14/09/2026 · 08:52</div>
+              <div class="tl-what">ASQ positiva aguda — caso CR-2026-0117 abierto</div>
+              <div class="tl-detail">Motor clínico · notificación inmediata al profesional designado y a la guardia.</div>
+            </div>
+            <div class="tl-item red">
+              <div class="tl-when">14/09/2026 · 08:53</div>
+              <div class="tl-what">Pantalla de crisis mostrada · salida sin contacto bloqueada</div>
+              <div class="tl-detail">La persona marcó «estoy con alguien»: su compañero de cuadrilla.</div>
+            </div>
+            <div class="tl-item amber">
+              <div class="tl-when">14/09/2026 · 09:09</div>
+              <div class="tl-what">Primer contacto telefónico — Psic. Roberto Ancona</div>
+              <div class="tl-detail">17 minutos desde el disparo. SLA comprometido: 30 min.</div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-when">14/09/2026 · 09:41</div>
+              <div class="tl-what">Consulta de ficha — Said Canul (clínico A Tu Lado)</div>
+              <div class="tl-detail">Motivo: «revisión de caso rojo agudo abierto».</div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-when">14/09/2026 · 09:44</div>
+              <div class="tl-what">Resumen clínico generado y entregado</div>
+              <div class="tl-detail">Folio RC-2026-0117-A · destinatario Psic. Roberto Ancona · NDA vigente hasta 14/02/27.</div>
+            </div>
+            <div class="tl-item green">
+              <div class="tl-when">pendiente</div>
+              <div class="tl-what">Cierre con contacto humano verificado</div>
+              <div class="tl-detail">Requiere firma del profesional. El sistema no cierra este caso por tiempo.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="modal-foot">
+      <span class="small muted"><i class="fa-solid fa-shield-halved"></i> La institución no tiene acceso a ninguna pestaña de esta ficha.</span>
+      <div class="spacer"></div>
+      <button class="btn" data-close>Cerrar</button>
+      <button class="btn btn-dark" data-open="m-entrega"><i class="fa-solid fa-file-pdf"></i> Generar resumen para el profesional</button>
+      <button class="btn btn-danger"><i class="fa-solid fa-tower-broadcast"></i> Escalar protocolo</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ MODAL: ENTREGA DEL RESUMEN ══════════════ -->
+<div class="modal-backdrop" id="m-entrega">
+  <div class="modal narrow">
+    <div class="modal-head">
+      <div><h2>Entregar resumen clínico</h2><div class="sub">Documento confidencial · folio y marca de agua</div></div>
+      <button class="x" data-close><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="field mb-2"><label>Destinatario</label>
+        <select class="select">
+          <option>Psic. Roberto Ancona — profesional designado (Ced. 7712045) · NDA vigente</option>
+          <option>Psic. Daniela Mena — guardia A Tu Lado (Ced. 8004112) · NDA vigente</option>
+          <option disabled>Mónica Rivas — RH (sin acreditación clínica) · NO ELEGIBLE</option>
+        </select>
+        <span class="hint">Sólo aparecen profesionales con cédula verificada y contrato de confidencialidad vigente.</span>
+      </div>
+      <div class="field mb-2"><label>Motivo de la entrega</label>
+        <select class="select"><option>Protocolo de crisis activo (CR-2026-0117)</option><option>Seguimiento de caso ya abierto</option><option>Canalización a servicio externo</option></select>
+        <span class="hint">Fuera de un protocolo activo, la entrega de información individual no está permitida por contrato.</span>
+      </div>
+      <div class="field mb-2"><label>Alcance del documento</label>
+        <div class="card card-pad" style="background:var(--bg-subtler)">
+          <div class="switch-row"><button class="switch on"></button><div class="txt"><b>Trayectoria del ánimo y reglas disparadas</b></div></div>
+          <div class="switch-row"><button class="switch on"></button><div class="txt"><b>Respuestas WHO-5, MDI y ASQ ítem por ítem</b></div></div>
+          <div class="switch-row"><button class="switch on"></button><div class="txt"><b>Texto libre con contexto de las banderas</b></div></div>
+          <div class="switch-row"><button class="switch on"></button><div class="txt"><b>Plan de seguridad y contactos de emergencia</b></div></div>
+          <div class="switch-row"><button class="switch"></button><div class="txt"><b>Historial completo de 12 meses</b><span>Amplía el documento a ~14 páginas.</span></div></div>
+        </div>
+      </div>
+      <div class="field mb-2"><label>Vigencia del enlace</label>
+        <select class="select"><option>72 horas (recomendado)</option><option>24 horas</option><option>7 días</option></select>
+        <span class="hint">Al vencer, el enlace deja de resolver. El PDF descargado lleva folio y marca de agua con el nombre del destinatario.</span>
+      </div>
+      <div class="alert warn">
+        <div class="ico"><i class="fa-solid fa-file-signature"></i></div>
+        <div class="txt"><b>Se adjunta la leyenda del contrato</b><span>Prohibido usar esta información para evaluación de desempeño, sanciones, despido o cualquier acto discriminatorio.</span></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <div class="spacer"></div>
+      <button class="btn" data-close>Cancelar</button>
+      <a class="btn btn-primary" href="reporte.html?r=clinico&amp;inst=mayab&amp;dest=profesional&amp;folio=RC-2026-0117-A" target="_blank"><i class="fa-solid fa-download"></i> Generar y enviar</a>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ MODAL: PROTOCOLO DE CRISIS ══════════════ -->
+<div class="modal-backdrop" id="m-crisis">
+  <div class="modal narrow">
+    <div class="modal-head" style="background:#6E140C">
+      <div><h2>Protocolo de crisis</h2><div class="sub">Constructora Mayab · 3 casos abiertos</div></div>
+      <button class="x" data-close><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="col" style="gap:.6rem">
+        <div class="alert crit"><div class="ico"><i class="fa-solid fa-1"></i></div>
+          <div class="txt"><b>CR-2026-0117 · COL-0412</b><span>Rojo agudo · disparado 08:52 · contacto 09:09 · cierre pendiente de firma</span></div></div>
+        <div class="alert crit"><div class="ico"><i class="fa-solid fa-2"></i></div>
+          <div class="txt"><b>CR-2026-0116 · COL-0188</b><span>Rojo · disparado ayer 21:14 · contacto 21:29 · en atención</span></div></div>
+        <div class="alert crit"><div class="ico"><i class="fa-solid fa-3"></i></div>
+          <div class="txt"><b>CR-2026-0115 · COL-0307</b><span>Rojo · disparado ayer 07:40 · contacto 07:52 · en atención</span></div></div>
+      </div>
+      <div class="divider"></div>
+      <div class="doc-section-title">Cadena de responsabilidad</div>
+      <dl class="dl">
+        <dt>Profesional designado</dt><dd>Psic. Roberto Ancona · Ced. 7712045 · NDA hasta 14/02/27</dd>
+        <dt>Suplente</dt><dd>Psic. Daniela Mena (guardia A Tu Lado)</dd>
+        <dt>Enlace institucional</dt><dd>Mónica Rivas (RH) — <span class="chip">sólo recibe el aviso, no el contenido</span></dd>
+        <dt>Regla de cierre</dt><dd>Contacto humano verificado + nota de cierre firmada</dd>
+      </dl>
+      <div class="alert info mt-2">
+        <div class="ico"><i class="fa-solid fa-circle-info"></i></div>
+        <div class="txt"><b>Qué recibe la institución</b><span>Un aviso de que se activó un protocolo y la confirmación de su cierre. Nunca el nombre, el instrumento, el puntaje ni el texto de la persona.</span></div>
+      </div>
+    </div>
+    <div class="modal-foot"><div class="spacer"></div><button class="btn" data-close>Cerrar</button></div>
+  </div>
+</div>
+
+<!-- ══════════════ MODAL: REPORTES RÁPIDOS ══════════════ -->
+<div class="modal-backdrop" id="m-reporte">
+  <div class="modal narrow">
+    <div class="modal-head"><div><h2>Generar reporte</h2><div class="sub">Constructora Mayab · periodo 15/08 – 14/09/2026</div></div>
+      <button class="x" data-close><i class="fa-solid fa-xmark"></i></button></div>
+    <div class="modal-body col" style="gap:.7rem">
+      <a href="reporte.html?r=ejecutivo&amp;inst=mayab" target="_blank" class="report-card"><div class="rico" style="background:#2E5D4B"><i class="fa-solid fa-chart-pie"></i></div>
+        <div><h4>Reporte ejecutivo institucional</h4><p>Sólo porcentajes. Es el documento que la institución puede recibir.</p>
+        <div class="meta"><span class="chip">PDF · 6 pág.</span><span class="chip green">Apto para la institución</span></div></div></a>
+      <a href="reporte.html?r=clinico&amp;inst=mayab&amp;dest=profesional" target="_blank" class="report-card"><div class="rico" style="background:#B02418"><i class="fa-solid fa-user-doctor"></i></div>
+        <div><h4>Resumen clínico individual</h4><p>Con identidad y respuestas. Sólo al profesional designado con protocolo activo.</p>
+        <div class="meta"><span class="chip">PDF · 4 pág.</span><span class="chip red">Confidencial</span></div></div></a>
+      <a href="reporte.html?r=bitacora&amp;inst=mayab" target="_blank" class="report-card"><div class="rico" style="background:#D9660F"><i class="fa-solid fa-bell"></i></div>
+        <div><h4>Bitácora de alertas del periodo</h4><p>Eventos, tiempos de respuesta y quién cerró cada caso.</p>
+        <div class="meta"><span class="chip">PDF · 3 pág.</span><span class="chip amber">Seudonimizado</span></div></div></a>
+      <a href="reporte.html?r=nom035&amp;inst=mayab" target="_blank" class="report-card"><div class="rico" style="background:#5B4A8A"><i class="fa-solid fa-clipboard-check"></i></div>
+        <div><h4>Constancia NOM-035</h4><p>Evidencia de canal habilitado, difusión y atención de casos.</p>
+        <div class="meta"><span class="chip">PDF · 2 pág.</span><span class="chip green">Apto para la institución</span></div></div></a>
+    </div>
+    <div class="modal-foot"><div class="spacer"></div><button class="btn" data-close>Cerrar</button>
+      <a href="6-reportes.html" class="btn btn-primary">Ver centro de reportes</a></div>
+  </div>
+</div>
+
+<script src="panel.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const dias = ['15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','01','02','03','04','05','06','07','08','09','10','11','12','13','14'];
+  lineChart(document.getElementById('ch-animo'), {
+    height: 200, labels: dias, min: 0, max: 4, ticks: 4,
+    refLine: 1.4, refLabel: 'línea base 30 d',
+    series: [{ name:'Valor invertido', color:'#2E5D4B',
+      data:[1,1,2,1,1,2,1,1,1,2,1,1,2,1,1,1,2,1,1,1,1,1,1,1,1,2,3,3,3,4,4] }]
+  });
+  lineChart(document.getElementById('ch-who5'), {
+    height: 190, labels: ['12/06','10/07','16/08','14/09'], min: 0, max: 100, ticks: 4,
+    refLine: 50, refLabel: 'corte de riesgo',
+    series: [{ name:'WHO-5', color:'#2A78D6', data:[68,61,55,24] }]
+  });
+  barChart(document.getElementById('ch-puchol'), {
+    labelW: 150, unit: ' pts', max: 10,
+    data: [
+      { k:'Fisiológica', v:8, color:'#B02418' },
+      { k:'Cognitiva',   v:7, color:'#D9660F' },
+      { k:'Emocional',   v:9, color:'#B02418' },
+      { k:'Motora',      v:3, color:'#DCAF00' }
+    ]
+  });
+});
+</script>
+</body>
+</html>
