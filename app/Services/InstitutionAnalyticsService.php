@@ -222,7 +222,7 @@ class InstitutionAnalyticsService
         $anyUserHasGroup = $users->contains(fn($u) => !empty($u->macro_group));
 
         foreach ($rawGroups as $group) {
-            $gName = $group['name'];
+            $gName = $group['name'] ?? ($group['macro_group'] ?? 'General');
             if ($anyUserHasGroup) {
                 $groupUsers = $users->filter(fn($u) => trim(mb_strtolower($u->macro_group ?? '')) === trim(mb_strtolower($gName)));
             } else {
@@ -255,7 +255,7 @@ class InstitutionAnalyticsService
             $anyUserHasDept = $groupUsers->contains(fn($u) => !empty($u->department));
 
             foreach ($deptList as $dept) {
-                $dName = $dept['name'];
+                $dName = $dept['name'] ?? 'Área General';
                 if ($anyUserHasDept) {
                     $deptUsers = $groupUsers->filter(fn($u) => trim(mb_strtolower($u->department ?? '')) === trim(mb_strtolower($dName)));
                 } else {

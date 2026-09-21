@@ -8,6 +8,7 @@ use App\Models\MoodLog;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
 
 class AdminPanelsAndReportsTest extends TestCase
@@ -625,6 +626,147 @@ class AdminPanelsAndReportsTest extends TestCase
 
         $this->assertEquals(1, $inst->fresh()->users_count);
         $this->assertNull($user->fresh()->institution_id);
+    }
+
+    public function test_admin_can_import_csv_with_windows_1252_encoding_and_semicolons(): void
+    {
+        $admin = User::factory()->create(['is_admin' => true]);
+
+        $inst = Institution::create([
+            'slug' => 'empresa-excel-ansi',
+            'name' => 'Constructora Maya S.A.',
+            'category' => 'Construcción',
+            'contact_name' => 'Ing. Martínez',
+            'contact_email' => 'admin@constructora.com',
+            'professional_name' => 'Psic. Especialista',
+            'plan' => 'Corporativo',
+            'users_count' => 0,
+            'departments_data' => [
+                [
+                    'name' => 'Operaciones y Construcción',
+                    'macro_group' => 'Operaciones y Construcción',
+                    'departments' => [
+                        ['name' => 'Frente Cancún', 'shift' => 'Matutino']
+                    ]
+                ]
+            ]
+        ]);
+
+        // Simular archivo generado por Excel en Windows (Windows-1252 ANSI, delimitador punto y coma, acentos)
+        $csvUtf8 = "nombre;email;departamento;macro_group;turno;numero_empleado;puesto\r\n" .
+                   "Martín López Pérez;martin.lopez@constructora.com;Frente Cancún;Operaciones y Construcción;Matutino;EMP-001;Residente de Obra\r\n" .
+                   "Sofía Peña Gómez;sofia.pena@constructora.com;Atención y Calidad;Corporativo y Dirección;Vespertino;EMP-002;Supervisora\r\n";
+
+        $csvWindows1252 = mb_convert_encoding($csvUtf8, 'Windows-1252', 'UTF-8');
+
+        $file = UploadedFile::fake()->createWithContent('padron_colaboradores.csv', $csvWindows1252);
+
+        $response = $this->actingAs($admin)->post(route('admin.structure.import'), [
+            'institution_id' => $inst->id,
+            'file' => $file,
+        ]);
+
+        $response->assertRedirect(route('admin.structure.index', ['inst' => $inst->slug]));
+        $response->assertSessionHas('success');
+
+        $this->assertDatabaseHas('users', [
+            'name' => 'Martín López Pérez',
+            'email' => 'martin.lopez@constructora.com',
+            'institution_id' => $inst->id,
+            'macro_group' => 'Operaciones y Construcción',
+            'department' => 'Frente Cancún',
+            'employee_number' => 'EMP-001',
+            'position' => 'Residente de Obra',
+        ]);
+
+        $this->assertDatabaseHas('users', [
+            'name' => 'Sofía Peña Gómez',
+            'email' => 'sofia.pena@constructora.com',
+            'institution_id' => $inst->id,
+            'macro_group' => 'Corporativo y Dirección',
+            'department' => 'Atención y Calidad',
+            'employee_number' => 'EMP-002',
+            'position' => 'Supervisora',
+        ]);
+
+        $u1 = User::where('email', 'martin.lopez@constructora.com')->first();
+        $this->assertNotNull($u1->email_verified_at);
+
+        $freshInst = $inst->fresh();
+        $this->assertEquals(2, $freshInst->users_count);
+        $this->assertIsArray($freshInst->departments_data);
+
+        // Verificar que ambos grupos tienen tanto name como macro_group
+        foreach ($freshInst->departments_data as $grp) {
+            $this->assertArrayHasKey('name', $grp);
+            $this->assertArrayHasKey('macro_group', $grp);
+        }
+    }
+
+    public function test_admin_can_import_csv_with_utf8_bom_and_commas(): void
+    {
+        $admin = User::factory()->create(['is_admin' => true]);
+
+        $inst = Institution::create([
+            'slug' => 'empresa-utf8-bom',
+            'name' => 'Servicios Peninsulares',
+            'category' => 'Servicios',
+            'contact_name' => 'Contacto',
+            'contact_email' => 'contacto@peninsulares.com',
+            'professional_name' => 'Psic. Prueba',
+            'plan' => 'Pyme',
+            'users_count' => 0,
+        ]);
+
+        // UTF-8 BOM + delimitador coma + encabezados alternativos en español
+        $bom = "\xEF\xBB\xBF";
+        $csvContent = $bom . "Nombre Completo,Correo Electrónico,Área Operativa,Grupo,Turno,ID,Puesto\n" .
+                             "Álvaro Nuñez,alvaro.nunez@peninsulares.com,Mantenimiento Eléctrico,Técnicos de Campo,Nocturno,TEC-88,Electricista Senior\n";
+
+        $file = UploadedFile::fake()->createWithContent('padron_utf8.csv', $csvContent);
+
+        $response = $this->actingAs($admin)->post(route('admin.structure.import'), [
+            'institution_id' => $inst->id,
+            'file' => $file,
+        ]);
+
+        $response->assertRedirect(route('admin.structure.index', ['inst' => $inst->slug]));
+        $response->assertSessionHas('success');
+
+        $this->assertDatabaseHas('users', [
+            'name' => 'Álvaro Nuñez',
+            'email' => 'alvaro.nunez@peninsulares.com',
+            'institution_id' => $inst->id,
+            'department' => 'Mantenimiento Eléctrico',
+            'macro_group' => 'Técnicos de Campo',
+            'employee_number' => 'TEC-88',
+            'position' => 'Electricista Senior',
+        ]);
+    }
+
+    public function test_import_csv_rejects_binary_excel_file(): void
+    {
+        $admin = User::factory()->create(['is_admin' => true]);
+
+        $inst = Institution::create([
+            'slug' => 'empresa-reject',
+            'name' => 'Empresa Rechazo',
+            'category' => 'Comercio',
+            'contact_name' => 'Contacto',
+            'contact_email' => 'contacto@rechazo.com',
+            'professional_name' => 'Psic. Prueba',
+            'plan' => 'Pyme',
+            'users_count' => 0,
+        ]);
+
+        $file = UploadedFile::fake()->create('padron.xlsx', 100);
+
+        $response = $this->actingAs($admin)->post(route('admin.structure.import'), [
+            'institution_id' => $inst->id,
+            'file' => $file,
+        ]);
+
+        $response->assertSessionHasErrors(['file']);
     }
 }
 

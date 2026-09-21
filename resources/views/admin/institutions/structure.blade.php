@@ -250,7 +250,7 @@
                       </td>
                       <td style="padding: 0.75rem 0.5rem;">
                         <span style="background: #EEF4F0; color: #2E5D4B; padding: 2px 8px; border-radius: 5px; font-size: 0.75rem; font-weight: 600;">
-                          {{ $grp['name'] }}
+                          {{ $grp['name'] ?? ($grp['macro_group'] ?? 'General') }}
                         </span>
                       </td>
                       <td style="padding: 0.75rem 0.5rem; font-size: 0.82rem; color: #556860;">
@@ -269,7 +269,7 @@
                           @csrf
                           <input type="hidden" name="institution_id" value="{{ $selectedInst->id }}">
                           <input type="hidden" name="department_name" value="{{ $d['name'] }}">
-                          <input type="hidden" name="macro_group_name" value="{{ $grp['name'] }}">
+                          <input type="hidden" name="macro_group_name" value="{{ $grp['name'] ?? ($grp['macro_group'] ?? '') }}">
                           <button 
                             type="submit" 
                             title="Eliminar área" 

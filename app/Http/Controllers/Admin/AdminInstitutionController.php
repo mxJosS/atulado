@@ -142,6 +142,7 @@ class AdminInstitutionController extends Controller
             $departmentsData[] = [
                 'id' => $gSlug,
                 'name' => $gName,
+                'macro_group' => $gName,
                 'badge' => 'Estable',
                 'badge_color' => '#1E8449',
                 'active_count' => 0,
@@ -382,171 +383,265 @@ class AdminInstitutionController extends Controller
         $institution = Institution::findOrFail($request->input('institution_id'));
         $uploadedFile = $request->file('file');
 
-        $content = file_get_contents($uploadedFile->getRealPath());
-
-        // Remover BOM UTF-8 si existe
-        $bom = pack('H*', 'EFBBBF');
-        $content = preg_replace("/^$bom/", '', $content);
-
-        // Normalizar saltos de línea
-        $content = str_replace(["\r\n", "\r"], "\n", $content);
-        $lines = array_filter(explode("\n", $content), fn($l) => trim($l) !== '');
-
-        if (count($lines) < 2) {
-            return back()->withErrors(['file' => 'El archivo CSV está vacío o solo contiene la fila de encabezados.']);
+        // Validar si el usuario subió un archivo binario de Excel (.xlsx o .xls)
+        $clientExtension = strtolower($uploadedFile->getClientOriginalExtension());
+        if (in_array($clientExtension, ['xlsx', 'xls'])) {
+            return back()->withErrors([
+                'file' => 'El archivo subido es un libro de Excel (.' . $clientExtension . '). Para importarlo, por favor guárdalo como archivo CSV: en Excel haz clic en Archivo > Guardar como > Tipo: CSV (delimitado por comas) (*.csv).'
+            ]);
         }
 
-        // Detectar delimitador (coma o punto y coma)
-        $firstLine = $lines[0];
-        $delimiter = substr_count($firstLine, ';') > substr_count($firstLine, ',') ? ';' : ',';
+        $rawContent = file_get_contents($uploadedFile->getRealPath());
+        if ($rawContent === false || strlen(trim($rawContent)) === 0) {
+            return back()->withErrors(['file' => 'El archivo subido está vacío.']);
+        }
 
-        $headerRow = str_getcsv(array_shift($lines), $delimiter);
+        // 1. Detección y conversión de codificación (UTF-16, Windows-1252 / ANSI, ISO-8859-1 a UTF-8)
+        $content = $rawContent;
+        if (str_starts_with($content, "\xFF\xFE") || str_starts_with($content, "\xFE\xFF")) {
+            $content = mb_convert_encoding($content, 'UTF-8', 'UTF-16');
+        } elseif (!mb_check_encoding($content, 'UTF-8')) {
+            $detected = mb_detect_encoding($content, ['Windows-1252', 'ISO-8859-1', 'UTF-8'], true);
+            $content = mb_convert_encoding($content, 'UTF-8', $detected ?: 'Windows-1252');
+        }
+
+        // 2. Remover BOM UTF-8 (\xEF\xBB\xBF) si existe
+        $content = preg_replace('/^\xEF\xBB\xBF/', '', $content);
+
+        // 3. Detectar delimitador inspeccionando la primera línea
+        $firstLine = strtok($content, "\r\n");
+        if ($firstLine === false || trim($firstLine) === '') {
+            return back()->withErrors(['file' => 'El archivo CSV no contiene líneas válidas de información.']);
+        }
+
+        $semicolons = substr_count($firstLine, ';');
+        $commas = substr_count($firstLine, ',');
+        $tabs = substr_count($firstLine, "\t");
+
+        $delimiter = ',';
+        if ($semicolons > $commas && $semicolons >= $tabs) {
+            $delimiter = ';';
+        } elseif ($tabs > $commas && $tabs > $semicolons) {
+            $delimiter = "\t";
+        }
+
+        // 4. Abrir flujo en memoria con fgetcsv para parsear respetando comillas y saltos de línea
+        $stream = fopen('php://temp', 'r+');
+        fwrite($stream, $content);
+        rewind($stream);
+
+        $headerRow = fgetcsv($stream, 0, $delimiter);
+        if (!$headerRow || count(array_filter($headerRow)) === 0) {
+            fclose($stream);
+            return back()->withErrors(['file' => 'El archivo CSV está vacío o la fila de encabezados no es legible.']);
+        }
+
         $cleanHeaders = array_map(function ($h) {
-            $h = strtolower(trim($h));
-            $trans = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $h);
-            $h = $trans !== false ? $trans : $h;
-            return preg_replace('/[^a-z0-9_]/', '', str_replace([' ', '-'], '_', $h));
+            return Str::slug(Str::ascii((string)$h), '_');
         }, $headerRow);
 
         $fieldMap = [];
         foreach ($cleanHeaders as $idx => $h) {
-            if (str_contains($h, 'nom') || $h === 'name') $fieldMap['name'] = $idx;
-            elseif (str_contains($h, 'mail') || str_contains($h, 'correo')) $fieldMap['email'] = $idx;
-            elseif (str_contains($h, 'dep') || str_contains($h, 'area')) $fieldMap['department'] = $idx;
-            elseif (str_contains($h, 'grup') || str_contains($h, 'macro')) $fieldMap['macro_group'] = $idx;
-            elseif (str_contains($h, 'turn') || str_contains($h, 'shift')) $fieldMap['shift'] = $idx;
-            elseif (str_contains($h, 'emp') || str_contains($h, 'num') || str_contains($h, 'id')) $fieldMap['employee_number'] = $idx;
-            elseif (str_contains($h, 'puest') || str_contains($h, 'cargo') || str_contains($h, 'pos')) $fieldMap['position'] = $idx;
+            if (str_contains($h, 'mail') || str_contains($h, 'correo')) {
+                $fieldMap['email'] = $idx;
+            } elseif (str_contains($h, 'nom') || $h === 'name') {
+                $fieldMap['name'] = $idx;
+            } elseif (str_contains($h, 'macro') || str_contains($h, 'grup')) {
+                $fieldMap['macro_group'] = $idx;
+            } elseif (str_contains($h, 'dep') || str_contains($h, 'area')) {
+                $fieldMap['department'] = $idx;
+            } elseif (str_contains($h, 'turn') || str_contains($h, 'shift')) {
+                $fieldMap['shift'] = $idx;
+            } elseif (str_contains($h, 'puest') || str_contains($h, 'cargo') || str_contains($h, 'pos') || str_contains($h, 'rol')) {
+                $fieldMap['position'] = $idx;
+            } elseif (str_contains($h, 'emp') || str_contains($h, 'num') || str_contains($h, 'id') || str_contains($h, 'matr')) {
+                $fieldMap['employee_number'] = $idx;
+            }
         }
 
         if (!isset($fieldMap['email'])) {
-            return back()->withErrors(['file' => 'No se encontró la columna de correo electrónico (email o correo) en el archivo CSV.']);
+            fclose($stream);
+            return back()->withErrors(['file' => 'No se encontró la columna de correo electrónico (email o correo) en el archivo CSV. Por favor revisa los encabezados de la primera fila.']);
         }
 
         $imported = 0;
         $updated = 0;
         $departmentsData = $institution->departments_data ?: [];
 
-        DB::transaction(function () use ($lines, $delimiter, $fieldMap, $institution, &$imported, &$updated, &$departmentsData) {
-            foreach ($lines as $line) {
-                $row = str_getcsv($line, $delimiter);
-                if (empty($row) || !isset($row[$fieldMap['email']])) {
-                    continue;
-                }
+        try {
+            DB::transaction(function () use ($stream, $delimiter, $fieldMap, $institution, &$imported, &$updated, &$departmentsData) {
+                while (($row = fgetcsv($stream, 0, $delimiter)) !== false) {
+                    if (empty($row) || !isset($row[$fieldMap['email']])) {
+                        continue;
+                    }
 
-                $email = strtolower(trim($row[$fieldMap['email']]));
-                if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                    continue;
-                }
+                    $email = strtolower(trim((string)$row[$fieldMap['email']]));
+                    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                        continue;
+                    }
 
-                $name = isset($fieldMap['name']) && isset($row[$fieldMap['name']]) ? trim($row[$fieldMap['name']]) : '';
-                if (empty($name)) {
-                    $name = explode('@', $email)[0];
-                }
+                    $name = isset($fieldMap['name']) && isset($row[$fieldMap['name']]) ? trim((string)$row[$fieldMap['name']]) : '';
+                    if (empty($name)) {
+                        $name = explode('@', $email)[0];
+                    }
 
-                $department = isset($fieldMap['department']) && isset($row[$fieldMap['department']]) ? trim($row[$fieldMap['department']]) : 'Área General';
-                $macroGroup = isset($fieldMap['macro_group']) && isset($row[$fieldMap['macro_group']]) ? trim($row[$fieldMap['macro_group']]) : 'General';
-                $shift = isset($fieldMap['shift']) && isset($row[$fieldMap['shift']]) ? trim($row[$fieldMap['shift']]) : 'General';
-                $employeeNumber = isset($fieldMap['employee_number']) && isset($row[$fieldMap['employee_number']]) ? trim($row[$fieldMap['employee_number']]) : null;
-                $position = isset($fieldMap['position']) && isset($row[$fieldMap['position']]) ? trim($row[$fieldMap['position']]) : 'Colaborador';
+                    $department = isset($fieldMap['department']) && isset($row[$fieldMap['department']]) && trim((string)$row[$fieldMap['department']]) !== ''
+                        ? trim((string)$row[$fieldMap['department']])
+                        : 'Área General';
 
-                // Asegurar que el área y macro-grupo existan en la estructura departments_data
-                $groupFound = false;
-                foreach ($departmentsData as &$grp) {
-                    if (strcasecmp($grp['name'], $macroGroup) === 0) {
-                        $groupFound = true;
-                        $deptFound = false;
-                        foreach ($grp['departments'] ?? [] as &$d) {
-                            if (strcasecmp($d['name'], $department) === 0) {
-                                $deptFound = true;
-                                $d['active'] = ($d['active'] ?? 0) + 1;
-                                break;
+                    $macroGroup = isset($fieldMap['macro_group']) && isset($row[$fieldMap['macro_group']]) && trim((string)$row[$fieldMap['macro_group']]) !== ''
+                        ? trim((string)$row[$fieldMap['macro_group']])
+                        : 'General';
+
+                    $shift = isset($fieldMap['shift']) && isset($row[$fieldMap['shift']]) && trim((string)$row[$fieldMap['shift']]) !== ''
+                        ? trim((string)$row[$fieldMap['shift']])
+                        : 'General';
+
+                    $employeeNumber = isset($fieldMap['employee_number']) && isset($row[$fieldMap['employee_number']]) && trim((string)$row[$fieldMap['employee_number']]) !== ''
+                        ? trim((string)$row[$fieldMap['employee_number']])
+                        : null;
+
+                    $position = isset($fieldMap['position']) && isset($row[$fieldMap['position']]) && trim((string)$row[$fieldMap['position']]) !== ''
+                        ? trim((string)$row[$fieldMap['position']])
+                        : 'Colaborador';
+
+                    // Garantizar caracteres UTF-8 limpios
+                    $name = mb_convert_encoding($name, 'UTF-8', 'UTF-8');
+                    $department = mb_convert_encoding($department, 'UTF-8', 'UTF-8');
+                    $macroGroup = mb_convert_encoding($macroGroup, 'UTF-8', 'UTF-8');
+                    $shift = mb_convert_encoding($shift, 'UTF-8', 'UTF-8');
+                    $position = mb_convert_encoding($position, 'UTF-8', 'UTF-8');
+                    if ($employeeNumber) {
+                        $employeeNumber = mb_convert_encoding($employeeNumber, 'UTF-8', 'UTF-8');
+                    }
+
+                    // Asegurar que el área y macro-grupo existan en departments_data
+                    $groupFound = false;
+                    foreach ($departmentsData as &$grp) {
+                        $grpName = $grp['name'] ?? ($grp['macro_group'] ?? '');
+                        if (strcasecmp($grpName, $macroGroup) === 0) {
+                            $groupFound = true;
+                            $grp['name'] = $macroGroup;
+                            $grp['macro_group'] = $macroGroup;
+
+                            $deptFound = false;
+                            foreach ($grp['departments'] ?? [] as &$d) {
+                                if (strcasecmp($d['name'] ?? '', $department) === 0) {
+                                    $deptFound = true;
+                                    $d['active'] = ($d['active'] ?? 0) + 1;
+                                    $d['total'] = ($d['total'] ?? 0) + 1;
+                                    break;
+                                }
                             }
+                            unset($d);
+
+                            if (!$deptFound) {
+                                $grp['departments'][] = [
+                                    'name' => $department,
+                                    'code' => Str::slug($department),
+                                    'shift' => $shift,
+                                    'total' => 1,
+                                    'active' => 1,
+                                    'dist' => ['verde' => 0, 'amarillo' => 0, 'naranja' => 0, 'rojo' => 0],
+                                    'who5' => 0,
+                                    'adherence' => '0%',
+                                    'alerts' => 0,
+                                    'alert_type' => 'verde',
+                                    'note' => 'Área agregada automáticamente desde padrón CSV.',
+                                ];
+                            }
+                            break;
                         }
-                        if (!$deptFound) {
-                            $grp['departments'][] = [
-                                'name' => $department,
-                                'code' => Str::slug($department),
-                                'active' => 1,
-                                'dist' => ['verde' => 0, 'amarillo' => 0, 'naranja' => 0, 'rojo' => 0],
-                                'who5' => 0,
-                                'adherence' => '0%',
-                                'alerts' => 0,
-                                'alert_type' => 'verde',
-                                'note' => 'Área agregada automáticamente desde padrón CSV.',
-                            ];
-                        }
-                        break;
+                    }
+                    unset($grp);
+
+                    if (!$groupFound) {
+                        $gSlug = Str::slug($macroGroup);
+                        $departmentsData[] = [
+                            'id' => $gSlug,
+                            'name' => $macroGroup,
+                            'macro_group' => $macroGroup,
+                            'badge' => 'Estable',
+                            'badge_color' => '#1E8449',
+                            'active_count' => 1,
+                            'total' => 1,
+                            'who5_avg' => 0,
+                            'adherence_avg' => 0,
+                            'alerts_count' => 0,
+                            'distribution' => ['verde' => 0, 'amarillo' => 0, 'naranja' => 0, 'rojo' => 0],
+                            'departments' => [
+                                [
+                                    'name' => $department,
+                                    'code' => Str::slug($department),
+                                    'shift' => $shift,
+                                    'total' => 1,
+                                    'active' => 1,
+                                    'dist' => ['verde' => 0, 'amarillo' => 0, 'naranja' => 0, 'rojo' => 0],
+                                    'who5' => 0,
+                                    'adherence' => '0%',
+                                    'alerts' => 0,
+                                    'alert_type' => 'verde',
+                                    'note' => 'Área agregada automáticamente desde padrón CSV.',
+                                ]
+                            ]
+                        ];
+                    }
+
+                    $user = User::where('email', $email)->first();
+                    if ($user) {
+                        $user->update([
+                            'institution_id' => $institution->id,
+                            'name' => $name ?: $user->name,
+                            'department' => $department,
+                            'macro_group' => $macroGroup,
+                            'shift' => $shift,
+                            'employee_number' => $employeeNumber ?: $user->employee_number,
+                            'position' => $position ?: $user->position,
+                            'email_verified_at' => $user->email_verified_at ?: now(),
+                        ]);
+                        $updated++;
+                    } else {
+                        User::create([
+                            'name' => $name,
+                            'email' => $email,
+                            'password' => Hash::make(Str::random(16)),
+                            'institution_id' => $institution->id,
+                            'department' => $department,
+                            'macro_group' => $macroGroup,
+                            'shift' => $shift,
+                            'employee_number' => $employeeNumber,
+                            'position' => $position,
+                            'role' => 'usuario',
+                            'avatar_color' => 'sage',
+                            'email_verified_at' => now(),
+                        ]);
+                        $imported++;
                     }
                 }
-                unset($grp);
 
-                if (!$groupFound) {
-                    $gSlug = Str::slug($macroGroup);
-                    $departmentsData[] = [
-                        'id' => $gSlug,
-                        'name' => $macroGroup,
-                        'badge' => 'Estable',
-                        'badge_color' => '#1E8449',
-                        'active_count' => 1,
-                        'who5_avg' => 0,
-                        'adherence_avg' => 0,
-                        'alerts_count' => 0,
-                        'distribution' => ['verde' => 0, 'amarillo' => 0, 'naranja' => 0, 'rojo' => 0],
-                        'departments' => [
-                            [
-                                'name' => $department,
-                                'code' => Str::slug($department),
-                                'active' => 1,
-                                'dist' => ['verde' => 0, 'amarillo' => 0, 'naranja' => 0, 'rojo' => 0],
-                                'who5' => 0,
-                                'adherence' => '0%',
-                                'alerts' => 0,
-                                'alert_type' => 'verde',
-                                'note' => 'Área agregada automáticamente desde padrón CSV.',
-                            ]
-                        ]
-                    ];
-                }
+                $totalCount = $institution->users()->count();
+                $institution->departments_data = array_values($departmentsData);
+                $institution->users_count = $totalCount;
+                $institution->active_count = $totalCount;
+                $institution->save();
+            });
+        } catch (\Throwable $e) {
+            fclose($stream);
+            \Log::error('Error importing CSV collaborators: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return back()->withErrors([
+                'file' => 'Ocurrió un error al procesar el archivo CSV: ' . $e->getMessage()
+            ]);
+        }
 
-                $user = User::where('email', $email)->first();
-                if ($user) {
-                    $user->update([
-                        'institution_id' => $institution->id,
-                        'name' => $name ?: $user->name,
-                        'department' => $department,
-                        'macro_group' => $macroGroup,
-                        'shift' => $shift,
-                        'employee_number' => $employeeNumber ?: $user->employee_number,
-                        'position' => $position ?: $user->position,
-                        'email_verified_at' => $user->email_verified_at ?: now(),
-                    ]);
-                    $updated++;
-                } else {
-                    User::create([
-                        'name' => $name,
-                        'email' => $email,
-                        'password' => Hash::make(Str::random(16)),
-                        'institution_id' => $institution->id,
-                        'department' => $department,
-                        'macro_group' => $macroGroup,
-                        'shift' => $shift,
-                        'employee_number' => $employeeNumber,
-                        'position' => $position,
-                        'role' => 'usuario',
-                        'avatar_color' => 'sage',
-                        'email_verified_at' => now(),
-                    ]);
-                    $imported++;
-                }
-            }
+        fclose($stream);
 
-            $totalCount = $institution->users()->count();
-            $institution->departments_data = array_values($departmentsData);
-            $institution->users_count = $totalCount;
-            $institution->active_count = $totalCount;
-            $institution->save();
-        });
+        if ($imported === 0 && $updated === 0) {
+            return back()->withErrors([
+                'file' => 'No se encontraron registros con correo electrónico válido para importar en el archivo CSV.'
+            ]);
+        }
 
         $msg = "¡Padrón procesado exitosamente para {$institution->name}! {$imported} colaboradores nuevos dados de alta";
         if ($updated > 0) {
@@ -585,10 +680,13 @@ class AdminInstitutionController extends Controller
 
         $groupFound = false;
         foreach ($departmentsData as &$grp) {
-            if (strcasecmp($grp['name'], $targetGroup) === 0) {
+            $grpName = $grp['name'] ?? ($grp['macro_group'] ?? '');
+            if (strcasecmp($grpName, $targetGroup) === 0) {
                 $groupFound = true;
+                $grp['name'] = $targetGroup;
+                $grp['macro_group'] = $targetGroup;
                 foreach ($grp['departments'] ?? [] as $d) {
-                    if (strcasecmp($d['name'], $areaName) === 0) {
+                    if (strcasecmp($d['name'] ?? '', $areaName) === 0) {
                         return back()->withErrors(['name' => "El área '{$areaName}' ya existe dentro del macro-grupo '{$targetGroup}'."]);
                     }
                 }
@@ -614,6 +712,7 @@ class AdminInstitutionController extends Controller
             $departmentsData[] = [
                 'id' => $gSlug,
                 'name' => $targetGroup,
+                'macro_group' => $targetGroup,
                 'badge' => 'Estable',
                 'badge_color' => '#1E8449',
                 'active_count' => 0,
@@ -666,13 +765,14 @@ class AdminInstitutionController extends Controller
 
         $found = false;
         foreach ($departmentsData as &$grp) {
-            if ($macroGroupName && strcasecmp($grp['name'], $macroGroupName) !== 0) {
+            $grpName = $grp['name'] ?? ($grp['macro_group'] ?? '');
+            if ($macroGroupName && strcasecmp($grpName, $macroGroupName) !== 0) {
                 continue;
             }
 
             if (isset($grp['departments']) && is_array($grp['departments'])) {
                 foreach ($grp['departments'] as $dKey => $dept) {
-                    if (strcasecmp($dept['name'], $deptNameToDelete) === 0) {
+                    if (strcasecmp($dept['name'] ?? '', $deptNameToDelete) === 0) {
                         unset($grp['departments'][$dKey]);
                         $grp['departments'] = array_values($grp['departments']);
                         $found = true;
@@ -747,8 +847,12 @@ class AdminInstitutionController extends Controller
             $groupFound = false;
 
             foreach ($departmentsData as &$grp) {
-                if (strcasecmp($grp['macro_group'] ?? '', $macroGroup) === 0) {
+                $grpName = $grp['name'] ?? ($grp['macro_group'] ?? '');
+                if (strcasecmp($grpName, $macroGroup) === 0) {
                     $groupFound = true;
+                    $grp['name'] = $macroGroup;
+                    $grp['macro_group'] = $macroGroup;
+
                     $deptFound = false;
                     foreach ($grp['departments'] ?? [] as &$d) {
                         if (strcasecmp($d['name'] ?? '', $department) === 0) {
@@ -762,6 +866,7 @@ class AdminInstitutionController extends Controller
                     if (!$deptFound) {
                         $grp['departments'][] = [
                             'name' => $department,
+                            'code' => Str::slug($department),
                             'shift' => $shift,
                             'total' => 1,
                             'active' => 1,
@@ -779,11 +884,23 @@ class AdminInstitutionController extends Controller
             unset($grp);
 
             if (!$groupFound) {
+                $gSlug = Str::slug($macroGroup);
                 $departmentsData[] = [
+                    'id' => $gSlug,
+                    'name' => $macroGroup,
                     'macro_group' => $macroGroup,
+                    'badge' => 'Estable',
+                    'badge_color' => '#1E8449',
+                    'active_count' => 1,
+                    'total' => 1,
+                    'who5_avg' => 0,
+                    'adherence_avg' => 0,
+                    'alerts_count' => 0,
+                    'distribution' => ['verde' => 0, 'amarillo' => 0, 'naranja' => 0, 'rojo' => 0],
                     'departments' => [
                         [
                             'name' => $department,
+                            'code' => Str::slug($department),
                             'shift' => $shift,
                             'total' => 1,
                             'active' => 1,
