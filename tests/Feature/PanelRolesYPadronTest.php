@@ -79,13 +79,17 @@ class PanelRolesYPadronTest extends TestCase
     public function test_clinical_only_account_sees_the_clinical_panel_but_not_administration(): void
     {
         $clinico = User::factory()->create(['role' => 'clinico', 'is_clinico_atulado' => true]);
+        $clinico->institucionesAsignadas()->attach($this->institucion);
 
         $this->actingAs($clinico)->get(route('admin.instituciones.index'))->assertOk();
         $this->actingAs($clinico)->get(route('admin.cola.index'))->assertOk();
         $this->actingAs($clinico)->get(route('admin.instituciones.show', $this->institucion))
             ->assertOk()
             ->assertDontSee('Editar empresa')
-            ->assertDontSee('data-pane="padron"', false);
+            ->assertSee('data-pane="padron"', false)
+            ->assertDontSee('Agregar persona')
+            ->assertDontSee('Subir padrón');
+        $this->actingAs($clinico)->get(route('admin.instituciones.show', Institucion::factory()->create()))->assertNotFound();
 
         $this->actingAs($clinico)->get(route('admin.users.index'))->assertRedirect(route('dashboard'));
         $this->actingAs($clinico)->get(route('admin.dashboard'))->assertRedirect(route('dashboard'));

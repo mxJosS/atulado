@@ -121,15 +121,22 @@ class MotorYColaTest extends TestCase
         $this->actingAs($admin)->get(route('admin.cola.index'))->assertOk()->assertDontSee('Luis Chan');
         $this->assertNull($caso->fresh()->notificado_en, 'Un admin sin acreditación no cuenta como visto');
 
+        // Sin institución, el caso no le toca a un clínico sin ser administrador.
         $clinico = User::factory()->create(['role' => 'clinico', 'is_clinico_atulado' => true]);
-        $this->actingAs($clinico)->get(route('admin.cola.index'))->assertOk()->assertSee('Luis Chan')->assertSee('Sin contacto');
+        $this->actingAs($clinico)->get(route('admin.cola.index'))->assertOk()->assertDontSee('Luis Chan');
+        $this->assertNull($caso->fresh()->notificado_en);
+
+        $adminClinico = User::factory()->create(['is_admin' => true, 'role' => 'admin', 'is_clinico_atulado' => true]);
+        $this->actingAs($adminClinico)->get(route('admin.cola.index'))->assertOk()->assertSee('Luis Chan')->assertSee('Sin contacto');
         $this->assertNotNull($caso->fresh()->notificado_en);
     }
 
     public function test_clinician_registers_contact_and_closes_from_the_queue(): void
     {
-        $caso = EventoCrisis::create(['user_id' => User::factory()->create()->id, 'nivel' => 'ROJO', 'origen' => 'mdi', 'disparado_en' => now(), 'estado' => 'abierto']);
+        $inst = Institucion::factory()->create();
+        $caso = EventoCrisis::create(['user_id' => User::factory()->create()->id, 'institucion_id' => $inst->id, 'nivel' => 'ROJO', 'origen' => 'mdi', 'disparado_en' => now(), 'estado' => 'abierto']);
         $clinico = User::factory()->create(['role' => 'clinico', 'is_clinico_atulado' => true]);
+        $clinico->institucionesAsignadas()->attach($inst);
         $admin = User::factory()->create(['is_admin' => true]);
 
         $this->actingAs($admin)->post(route('admin.cola.contacto', $caso))->assertForbidden();

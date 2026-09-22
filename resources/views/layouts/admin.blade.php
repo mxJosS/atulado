@@ -197,8 +197,8 @@
 
         <!-- 6. Cola de atención (casos de crisis, atención manual) -->
         @php
-          $casosAbiertos = \App\Models\EventoCrisis::abiertos()->count();
-          $sinAtender = \App\Models\EventoCrisis::abiertos()->whereNull('contactado_en')->count();
+          $casosAbiertos = \App\Models\EventoCrisis::visiblesPara(auth()->user())->abiertos()->count();
+          $sinAtender = \App\Models\EventoCrisis::visiblesPara(auth()->user())->abiertos()->whereNull('contactado_en')->count();
         @endphp
         <a href="{{ route('admin.cola.index') }}" class="admin-nav-item {{ request()->routeIs('admin.cola.*') ? 'active' : '' }}" style="position: relative;">
           <div class="nav-icon"><i class="fa-solid fa-life-ring"></i></div>

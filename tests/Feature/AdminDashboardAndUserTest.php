@@ -210,9 +210,8 @@ class AdminDashboardAndUserTest extends TestCase
         // Dashboard test
         $response = $this->actingAs($admin)->get('/admin/dashboard');
         $response->assertStatus(200);
-        $response->assertViewHas('totalAdmins', 1);
-        $response->assertViewHas('totalProfessionals', 1);
-        $response->assertViewHas('totalRegularUsers', 1);
+        // Psicólogos: la cuenta profesional cuenta entre quienes publican; admin y usuario no.
+        $response->assertViewHas('kpis', fn ($k) => $k['psicologos']['publican'] === 1 && $k['psicologos']['clinicos'] === 0);
 
         // Regular user should have "Usuario" badge in dashboard
         $response->assertSee('iscjoseangel@gmail.com');

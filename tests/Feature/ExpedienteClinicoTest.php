@@ -19,6 +19,7 @@ use App\Services\ClinicalEngineService;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class ExpedienteClinicoTest extends TestCase
@@ -39,6 +40,7 @@ class ExpedienteClinicoTest extends TestCase
         $this->clinico = User::factory()->create(['is_admin' => false, 'role' => 'clinico', 'is_clinico_atulado' => true, 'name' => 'Said Canul']);
         $this->admin = User::factory()->create(['is_admin' => true, 'role' => 'admin']);
         $this->institucion = Institucion::factory()->create(['profesional_nombre' => 'Psic. Rodrigo Ancona']);
+        $this->clinico->institucionesAsignadas()->attach($this->institucion);
     }
 
     private function persona(string $nombre, array $membresia = []): Membresia
@@ -132,11 +134,20 @@ class ExpedienteClinicoTest extends TestCase
 
         $url = route('admin.instituciones.show', $this->institucion);
 
-        $this->actingAs($this->clinico)->get($url . '?semaforo=ROJO')->assertSee('Rodrigo Rojo')->assertDontSee('Valeria Verde');
-        $this->actingAs($this->clinico)->get($url . '?semaforo=VERDE')->assertSee('Valeria Verde')->assertDontSee('Rodrigo Rojo');
-        $this->actingAs($this->clinico)->get($url . '?q=1188')->assertSee('Rodrigo Rojo')->assertDontSee('Valeria Verde');
-        $this->actingAs($this->clinico)->get($url . '?q=' . $verde->folio)->assertSee('Valeria Verde')->assertDontSee('Rodrigo Rojo');
-        $this->actingAs($this->clinico)->get($url . '?bandera=1')->assertSee('Rodrigo Rojo')->assertDontSee('Valeria Verde');
+        $this->assertFiltra($url . '?semaforo=ROJO', 'Rodrigo Rojo', 'Valeria Verde');
+        $this->assertFiltra($url . '?semaforo=VERDE', 'Valeria Verde', 'Rodrigo Rojo');
+        $this->assertFiltra($url . '?q=1188', 'Rodrigo Rojo', 'Valeria Verde');
+        $this->assertFiltra($url . '?q=' . $verde->folio, 'Valeria Verde', 'Rodrigo Rojo');
+        $this->assertFiltra($url . '?bandera=1', 'Rodrigo Rojo', 'Valeria Verde');
+    }
+
+    /** Revisa sólo la tabla del plano clínico: el padrón, en modo lectura, lista a todas las personas. */
+    private function assertFiltra(string $url, string $ve, string $noVe): void
+    {
+        $plano = Str::after($this->actingAs($this->clinico)->get($url)->assertOk()->getContent(), 'id="tab-clinico"');
+
+        $this->assertStringContainsString($ve, $plano);
+        $this->assertStringNotContainsString($noVe, $plano);
     }
 
     public function test_silence_and_open_crisis_drive_the_traffic_light(): void

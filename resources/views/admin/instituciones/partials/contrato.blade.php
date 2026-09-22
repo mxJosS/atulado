@@ -40,10 +40,16 @@
            value="{{ old('umbral_anonimato', $i ? $i->umbral_anonimato : 1) }}">
     @error('umbral_anonimato') <span class="form-error">{{ $message }}</span> @enderror
   </div>
-  <div style="grid-column: span 2; align-self: end;">
+  <div>
+    <label class="form-group-label" for="{{ $prefijo }}-meta_adopcion">Meta de cuentas activadas (%)</label>
+    <input type="number" id="{{ $prefijo }}-meta_adopcion" name="meta_adopcion" class="form-input-styled @error('meta_adopcion') con-error @enderror" min="1" max="100"
+           value="{{ old('meta_adopcion', $i ? $i->meta_adopcion : 75) }}">
+    @error('meta_adopcion') <span class="form-error">{{ $message }}</span> @enderror
+  </div>
+  <div style="align-self: end;">
     <span class="form-hint-styled">
-      Un reporte agregado sólo se genera si el corte tiene al menos este número de personas. Con 1 funciona desde la primera persona;
-      con números bajos es más fácil deducir quién es quién, así que súbelo cuando el padrón crezca (15 es lo recomendado).
+      Mínimo por reporte: un reporte agregado sólo se genera si el corte tiene al menos esas personas (1 = desde la primera; 15 es lo recomendado para anonimato).
+      Meta: el porcentaje del padrón que el contrato espera con cuenta activada.
     </span>
   </div>
 </div>

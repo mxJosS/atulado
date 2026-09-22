@@ -12,11 +12,13 @@
   <div class="card-atl-head">
     <div>
       <h3>Personas en el padrón</h3>
-      <p>{{ $personas->where('estado', '!=', 'baja')->count() }} en padrón · {{ $personas->where('estado', 'baja')->count() }} de baja. Las bajas conservan su historial.</p>
+      <p>{{ $personas->where('estado', '!=', 'baja')->count() }} en padrón · {{ $personas->where('estado', 'baja')->count() }} de baja. Las bajas conservan su historial.@unless($esAdmin) <b>Sólo lectura.</b>@endunless</p>
     </div>
+@if($esAdmin)
     <button type="button" class="btn-atl primario sm" data-open="m-persona-nueva" @disabled($opcionesArea->isEmpty()) title="{{ $opcionesArea->isEmpty() ? 'Primero crea las áreas en «Áreas y Macro-Grupos»' : '' }}">
       <i class="fa-solid fa-user-plus"></i> Agregar persona
     </button>
+@endif
   </div>
 
   @if($personas->isEmpty())
@@ -41,6 +43,7 @@
               <td>{{ $p->turno ? ucfirst($p->turno) : '—' }}{{ $p->horario ? ' · ' . $p->horario : '' }}</td>
               <td><span class="chip-atl {{ $tono }}">{{ $textoEstado }}</span></td>
               <td style="white-space: nowrap; text-align: right;">
+                @if($esAdmin)
                 @if($p->estado === 'baja')
                   @if($p->puedeReactivarse())
                     <form method="POST" action="{{ route('admin.instituciones.personas.reactivar', [$institucion, $p]) }}" style="display: inline;">
@@ -63,6 +66,7 @@
                     <button class="btn-atl linea sm" type="submit" style="color: #B02418;" title="Dar de baja"><i class="fa-solid fa-user-minus"></i></button>
                   </form>
                 @endif
+                @endif
               </td>
             </tr>
           @endforeach
@@ -73,6 +77,7 @@
 </div>
 
 {{-- Alta y edición de una persona --}}
+@if($esAdmin)
 @foreach(['nueva' => null, 'editar' => true] as $modo => $esEdicion)
   <div class="modal-backdrop" id="m-persona-{{ $modo }}">
     <div class="modal modal-atl">
@@ -153,3 +158,4 @@
     </div>
   </div>
 @endforeach
+@endif

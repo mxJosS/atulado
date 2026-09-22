@@ -73,6 +73,7 @@ class GuardarInstitucionRequest extends FormRequest
             'padron_estimado' => ['nullable', 'integer', 'min:0', 'max:1000000'],
             'vigencia_fin' => ['nullable', 'date'],
             'umbral_anonimato' => ['nullable', 'integer', 'min:1', 'max:1000'],
+            'meta_adopcion' => ['nullable', 'integer', 'min:1', 'max:100'],
             'macro_areas' => [$esAlta ? 'required' : 'nullable', 'string', 'max:2000'],
             'areas' => ['nullable', 'array'],
             'areas.*.nombre' => ['nullable', 'string', 'max:150'],
@@ -127,6 +128,7 @@ class GuardarInstitucionRequest extends FormRequest
             'profesional_email' => 'correo del profesional',
             'profesional_nda_hasta' => 'vigencia del NDA',
             'umbral_anonimato' => 'mínimo de personas por reporte',
+            'meta_adopcion' => 'meta de cuentas activadas',
             'plan' => 'plan institucional',
             'padron_estimado' => 'padrón estimado',
             'vigencia_fin' => 'fecha de renovación',
@@ -147,7 +149,7 @@ class GuardarInstitucionRequest extends FormRequest
             'razon_social', 'nombre_corto', 'sector', 'rfc', 'ciudad',
             'contacto_nombre', 'contacto_puesto', 'contacto_email', 'contacto_telefono',
             'profesional_nombre', 'profesional_cedula', 'profesional_email', 'profesional_nda_hasta',
-            'plan', 'padron_estimado', 'vigencia_fin', 'umbral_anonimato',
+            'plan', 'padron_estimado', 'vigencia_fin', 'umbral_anonimato', 'meta_adopcion',
         ]);
 
         $datos['padron_estimado'] = (int) ($datos['padron_estimado'] ?? 0);
@@ -155,6 +157,9 @@ class GuardarInstitucionRequest extends FormRequest
         // Sólo si vienen en el formulario: una actualización parcial no los borra.
         if (array_key_exists('profesional_email', $datos)) {
             $datos['profesional_email'] = strtolower(trim((string) $datos['profesional_email'])) ?: null;
+        }
+        if (array_key_exists('meta_adopcion', $datos)) {
+            $datos['meta_adopcion'] = min(100, max(1, (int) ($datos['meta_adopcion'] ?? 75)));
         }
         if (array_key_exists('umbral_anonimato', $datos)) {
             $datos['umbral_anonimato'] = max(1, (int) ($datos['umbral_anonimato'] ?? 1));

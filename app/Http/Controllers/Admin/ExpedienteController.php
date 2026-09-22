@@ -36,6 +36,8 @@ class ExpedienteController extends Controller
     {
         abort_unless($request->user()?->isClinicoAcreditado(), 403, 'Se requiere acreditación clínica.');
         abort_unless($membresia->institucion_id === $institucion->id, 404);
+        // Un clínico sólo actúa en las instituciones que tiene asignadas.
+        abort_unless($request->user()->puedeAtenderInstitucion($institucion->id), 404);
     }
 
     private function registrar(Request $request, Membresia $membresia, string $accion, string $motivo, ?string $detalle = null): AuditoriaClinica

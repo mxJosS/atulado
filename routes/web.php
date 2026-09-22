@@ -153,6 +153,7 @@ Route::middleware(['auth', 'panel'])->prefix('admin')->name('admin.')->group(fun
 */
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard/exportar-padron', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'exportarPadron'])->name('dashboard.exportar-padron');
 
     // Acreditaciones
     Route::get('/solicitudes-profesionales', [ProfessionalVerificationController::class, 'index'])->name('verifications.index');
