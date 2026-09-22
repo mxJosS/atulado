@@ -8,6 +8,7 @@ use App\Models\AplicacionWho5;
 use App\Models\AuditoriaClinica;
 use App\Models\Clasificacion;
 use App\Models\EventoCrisis;
+use App\Models\Membresia;
 use App\Models\MoodLog;
 use App\Models\SerieVigilancia;
 use App\Models\User;
@@ -41,8 +42,10 @@ class ClinicalEngineService
         // 3. Serie histórica de registros diarios (hasta 30 días previos más el actual)
         $serieHistorica = $this->obtenerSerieHistorica($user, $valorInvertido);
 
-        // 4. Evaluar las 4 reglas de vigilancia diaria
-        $senalVigilancia = $this->evaluarReglasVigilancia($serieHistorica);
+        // 4. Evaluar las 4 reglas de vigilancia diaria. R4 (silencio) la detecta
+        //    la tarea diaria; aquí se aplica al volver la persona.
+        $senalVigilancia = $this->evaluarReglasVigilancia($serieHistorica)
+            ?? ($this->silencioPendiente($user) ? 'R4_SILENCIO' : null);
 
         // Guardar registro en series_vigilancia para trazabilidad
         $this->guardarSerieVigilancia($user, $serieHistorica, $senalVigilancia);
@@ -183,7 +186,7 @@ class ClinicalEngineService
         $base30 = count($ultimos30) > 0 ? (array_sum($ultimos30) / count($ultimos30)) : 0;
 
         // R1: Desviación de línea base (requiere >= 14 días de historia)
-        if ($n >= $minHistoriaR1 && ($movil7 - base30) >= $umbralDesviacion) {
+        if ($n >= $minHistoriaR1 && ($movil7 - $base30) >= $umbralDesviacion) {
             return 'R1_DESVIACION';
         }
 
@@ -211,6 +214,88 @@ class ClinicalEngineService
         }
 
         return null;
+    }
+
+    /**
+     * R4 · Silencio tras patrón regular (lo ejecuta la tarea diaria).
+     *
+     * Marca a quien dejó de registrar DIAS_SILENCIO días o más después de haber
+     * registrado con regularidad (al menos la mitad de los 14 días previos a
+     * su último registro). Como las demás reglas, sólo adelanta el WHO-5:
+     * nunca asigna nivel ni manda mensajes («nada de llevas 5 días sin registrar»).
+     *
+     * @return int personas marcadas en esta corrida
+     */
+    public function detectarSilencios(?Carbon $hoy = null): int
+    {
+        $hoy ??= Carbon::today();
+        $umbral = (int) config('clinical.surveillance.dias_silencio', 5);
+        $minimoPatron = 7;
+        $marcadas = 0;
+
+        $ultimos = MoodLog::query()
+            ->selectRaw('user_id, max(logged_date) as ultimo')
+            ->groupBy('user_id')
+            ->havingRaw('max(logged_date) <= ?', [$hoy->copy()->subDays($umbral)->toDateString()])
+            ->get();
+
+        foreach ($ultimos as $fila) {
+            $ultimo = Carbon::parse($fila->ultimo)->startOfDay();
+
+            $yaMarcado = SerieVigilancia::where('user_id', $fila->user_id)
+                ->where('ultima_senal', 'R4_SILENCIO')
+                ->whereDate('fecha', '>', $ultimo)
+                ->exists();
+            if ($yaMarcado) {
+                continue;
+            }
+
+            $registrosPrevios = MoodLog::where('user_id', $fila->user_id)
+                ->whereDate('logged_date', '>', $ultimo->copy()->subDays(14))
+                ->whereDate('logged_date', '<=', $ultimo)
+                ->count();
+            if ($registrosPrevios < $minimoPatron) {
+                continue; // sin patrón regular no hay «silencio», sólo uso esporádico
+            }
+
+            $previa = SerieVigilancia::where('user_id', $fila->user_id)->orderByDesc('fecha')->orderByDesc('id')->first();
+
+            SerieVigilancia::create([
+                'user_id' => $fila->user_id,
+                'base30' => $previa?->base30,
+                'movil7' => $previa?->movil7,
+                'dias_silencio' => (int) $ultimo->diffInDays($hoy),
+                'ultima_senal' => 'R4_SILENCIO',
+                'fecha' => $hoy,
+            ]);
+            $marcadas++;
+        }
+
+        return $marcadas;
+    }
+
+    /** ¿Hay un silencio (R4) detectado desde su último registro previo a hoy? */
+    protected function silencioPendiente(User $user): bool
+    {
+        $anterior = $user->moodLogs()->whereDate('logged_date', '<', Carbon::today())->value('logged_date');
+
+        return $anterior !== null && SerieVigilancia::where('user_id', $user->id)
+            ->where('ultima_senal', 'R4_SILENCIO')
+            ->whereDate('fecha', '>', Carbon::parse($anterior))
+            ->exists();
+    }
+
+    /**
+     * WHO-5 programado: cada DIAS_MIN_LONGITUDINAL días (14), aunque el ánimo
+     * del día no lo pida. Sin él no se ve la caída longitudinal de quien
+     * siempre marca «Bien».
+     */
+    public function who5Programado(User $user): bool
+    {
+        $ultima = $user->aplicacionesWho5()->value('fecha');
+
+        return $ultima === null
+            || Carbon::parse($ultima)->diffInDays(Carbon::today()) >= (int) config('clinical.who5.dias_min_longitudinal', 14);
     }
 
     /**
@@ -388,8 +473,10 @@ class ClinicalEngineService
 
             if ($nivel === 'ROJO') {
                 $this->registrarEventoCrisis($user, [
+                    'nivel' => 'ROJO',
+                    'origen' => 'mdi',
                     'disparado_en' => now(),
-                    'notificado_en' => now(),
+                    'notificado_en' => null,
                 ]);
             }
 
@@ -473,8 +560,10 @@ class ClinicalEngineService
 
             // Disparar evento de crisis
             $eventoCrisis = $this->registrarEventoCrisis($user, [
+                'nivel' => $nivel,
+                'origen' => 'asq',
                 'disparado_en' => now(),
-                'notificado_en' => now(),
+                'notificado_en' => null,
             ]);
         }
 
@@ -488,13 +577,20 @@ class ClinicalEngineService
 
     /**
      * Registro de evento de crisis
+     *
+     * La institución se congela al momento del disparo: si la persona cambia
+     * de organización después, el caso histórico no se mueve con ella.
      */
     public function registrarEventoCrisis(User $user, array $datos = []): EventoCrisis
     {
         return EventoCrisis::create([
             'user_id' => $user->id,
+            'institucion_id' => $datos['institucion_id'] ?? $this->institucionDe($user),
+            'nivel' => $datos['nivel'] ?? 'ROJO',
+            'origen' => $datos['origen'] ?? null,
             'disparado_en' => $datos['disparado_en'] ?? now(),
-            'notificado_en' => $datos['notificado_en'] ?? now(),
+            // Sin avisos automáticos: se marca cuando un clínico ve el caso en la cola de atención.
+            'notificado_en' => $datos['notificado_en'] ?? null,
             'contactado_en' => null,
             'salida_sin_contacto' => false,
             'estoy_con_alguien' => false,
@@ -502,6 +598,51 @@ class ClinicalEngineService
             'notas_cierre' => null,
             'estado' => 'abierto',
         ]);
+    }
+
+    /**
+     * Institución vigente de una persona, o null si no pertenece a ninguna.
+     */
+    protected function institucionDe(User $user): ?int
+    {
+        return Membresia::where('user_id', $user->id)
+            ->whereIn('estado', ['invitado', 'activo'])
+            ->value('institucion_id');
+    }
+
+    /**
+     * Registrar el contacto humano con la persona.
+     *
+     * Es un paso separado del cierre a propósito: hasta que alguien habla
+     * de verdad con la persona, el caso no puede cerrarse.
+     */
+    public function registrarContactoHumano(EventoCrisis $evento, User $profesional, ?string $nota = null): bool
+    {
+        if (!$profesional->isClinicoAcreditado()) {
+            return false;
+        }
+
+        if ($evento->contactado_en !== null) {
+            return true; // ya había contacto; no se pisa la marca original
+        }
+
+        $evento->update([
+            'contactado_en' => now(),
+            'primer_contacto_por' => $profesional->id,
+            'estado' => 'en_atencion',
+        ]);
+
+        AuditoriaClinica::create([
+            'profesional_id' => $profesional->id,
+            'usuario_consultado_id' => $evento->user_id,
+            'institucion_id' => $evento->institucion_id,
+            'accion' => 'registro_contacto',
+            'motivo' => 'Contacto de protocolo',
+            'detalle' => "Contacto humano registrado en el caso {$evento->id}." . ($nota ? " Nota: {$nota}" : ''),
+            'ip' => request()?->ip(),
+        ]);
+
+        return true;
     }
 
     /**
@@ -530,12 +671,22 @@ class ClinicalEngineService
      */
     public function verificarCierreCaso(EventoCrisis $evento, User $profesional, string $notas): bool
     {
-        if (!$profesional->isProfessional()) {
+        if (!$profesional->isClinicoAcreditado()) {
+            return false;
+        }
+
+        // Sin contacto humano previo no hay cierre. Antes esta misma función
+        // escribía contactado_en = now() al cerrar, con lo cual el "contacto
+        // verificado" se daba por bueno solo, que es justo lo contrario.
+        if ($evento->contactado_en === null) {
+            return false;
+        }
+
+        if ($evento->estado === 'cerrado') {
             return false;
         }
 
         $evento->update([
-            'contactado_en' => now(),
             'cierre_verificado_por' => $profesional->id,
             'notas_cierre' => $notas,
             'estado' => 'cerrado',
@@ -545,8 +696,11 @@ class ClinicalEngineService
         AuditoriaClinica::create([
             'profesional_id' => $profesional->id,
             'usuario_consultado_id' => $evento->user_id,
+            'institucion_id' => $evento->institucion_id,
             'accion' => 'cierre_crisis',
+            'motivo' => 'Cierre con contacto humano verificado',
             'detalle' => "Caso de crisis ID {$evento->id} verificado y cerrado con contacto humano. Notas: {$notas}",
+            'ip' => request()?->ip(),
         ]);
 
         return true;
@@ -570,16 +724,21 @@ class ClinicalEngineService
 
         if (in_array($nuevoNivel, ['ROJO', 'ROJO_AGUDO'], true)) {
             $this->registrarEventoCrisis($paciente, [
+                'nivel' => $nuevoNivel,
+                'origen' => 'manual',
                 'disparado_en' => now(),
-                'notificado_en' => now(),
+                'notificado_en' => null,
             ]);
         }
 
         AuditoriaClinica::create([
             'profesional_id' => $profesional->id,
             'usuario_consultado_id' => $paciente->id,
+            'institucion_id' => $this->institucionDe($paciente),
             'accion' => 'elevacion_nivel',
+            'motivo' => $justificacion,
             'detalle' => "Elevación manual a nivel {$nuevoNivel}. Justificación: {$justificacion}",
+            'ip' => request()?->ip(),
         ]);
 
         return $clasificacion;
@@ -590,12 +749,22 @@ class ClinicalEngineService
      * Regla 3: Separación estricta de planos, umbral mínimo de 15 personas por corte.
      * Solo retorna porcentajes agregados y NUNCA texto libre ni puntajes individuales.
      */
-    public function obtenerVistaGerencialAgregada(?int $orgId = null): array
+    public function obtenerVistaGerencialAgregada(?int $institucionId = null): array
     {
-        $umbralMinimo = config('clinical.plano_gerencial.umbral_minimo_anonimato', 15);
+        $umbralMinimo = max(1, (int) ($institucionId
+            ? (\App\Models\Institucion::whereKey($institucionId)->value('umbral_anonimato') ?? config('clinical.plano_gerencial.umbral_minimo_anonimato', 1))
+            : config('clinical.plano_gerencial.umbral_minimo_anonimato', 1)));
+
+        // Ids de la población del corte. Antes esto filtraba por users.org_id,
+        // una columna que nunca existió en ninguna migración.
+        $idsDelCorte = $institucionId
+            ? Membresia::where('institucion_id', $institucionId)
+                ->whereIn('estado', ['invitado', 'activo', 'suspendido'])
+                ->pluck('user_id')
+            : null;
 
         $totalUsuarios = User::query()
-            ->when($orgId, fn($q) => $q->where('org_id', $orgId))
+            ->when($idsDelCorte !== null, fn ($q) => $q->whereIn('id', $idsDelCorte))
             ->count();
 
         if ($totalUsuarios < $umbralMinimo) {
@@ -607,16 +776,16 @@ class ClinicalEngineService
             ];
         }
 
-        // Obtener la última clasificación de cada usuario
+        // Última clasificación de cada usuario del corte. El filtro por
+        // institución entra en la subconsulta, no después: si no, "la última"
+        // se calcularía sobre toda la plataforma y luego se descartarían filas.
         $ultimasClasificaciones = Clasificacion::query()
             ->select('user_id', 'nivel')
-            ->whereIn('id', function ($query) use ($orgId) {
+            ->whereIn('id', function ($query) use ($idsDelCorte) {
                 $query->selectRaw('MAX(id)')
                     ->from('clasificaciones')
+                    ->when($idsDelCorte !== null, fn ($q) => $q->whereIn('user_id', $idsDelCorte))
                     ->groupBy('user_id');
-            })
-            ->when($orgId, function ($query) use ($orgId) {
-                $query->whereHas('user', fn($q) => $q->where('org_id', $orgId));
             })
             ->get();
 

@@ -76,8 +76,8 @@
                 style="resize: vertical; font-size: 0.92rem; line-height: 1.6; background: #FFFFFF; color: #1A2620;"
               >{{ old('journal_entry', $todayLog?->journal_entry) }}</textarea>
 
-              <!-- ════ SENSITIVE / CRISIS EMPATHIC FILTER ALERT BANNER ════ -->
-              <div id="crisisEmpathicAlert" class="crisis-empathic-alert">
+              {{-- Mensaje de apoyo: el servidor decide si se muestra; el navegador no conoce la lista de términos --}}
+              <div id="crisisEmpathicAlert" class="crisis-empathic-alert" @if($todayLog?->bandera_lexica) style="display: block;" @endif>
                 <div style="display: flex; align-items: flex-start; gap: 0.85rem;">
                   <i class="fa-solid fa-hand-holding-heart" style="color: #FFA59C; font-size: 1.5rem; margin-top: 2px;"></i>
                   <div style="flex: 1;">
@@ -237,17 +237,7 @@
         <!-- Dynamic Pixel Tree Preview with JUGAR BUTTON (ITEM 5) -->
         <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.85rem; background: rgba(255, 255, 255, 0.85); border-radius: 16px; padding: 0.85rem 1.1rem; border: 1.5px solid rgba(200, 184, 122, 0.35); box-shadow: 0 2px 8px rgba(0,0,0,0.03); flex-wrap: wrap;">
           <div style="display: flex; align-items: center; gap: 0.75rem;">
-            <svg class="ptree" viewBox="0 0 16 16" width="34" height="34" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 2px 4px rgba(45, 107, 58, 0.2));">
-              <rect x="5" y="0" width="6" height="2" fill="#2D6B3A"/>
-              <rect x="3" y="2" width="10" height="2" fill="#3D8C4F"/>
-              <rect x="2" y="4" width="12" height="2" fill="#5AB56E"/>
-              <rect x="3" y="6" width="10" height="2" fill="#3D8C4F"/>
-              <rect x="5" y="8" width="6" height="2" fill="#2D6B3A"/>
-              <rect x="7" y="10" width="2" height="4" fill="#6B3A1F"/>
-              <rect x="4" y="1" width="1" height="1" fill="#C0392B"/>
-              <rect x="11" y="3" width="1" height="1" fill="#C0392B"/>
-              <rect x="9" y="7" width="1" height="1" fill="#C0392B"/>
-            </svg>
+            <x-logo :size="34" style="filter: drop-shadow(0 2px 4px rgba(45, 107, 58, 0.2));" />
             <div style="font-size: 0.82rem; color: #1A2620;">
               <strong>Árbol de bienestar:</strong> <span style="color: #2E5D4B; font-weight: 700;">Nivel {{ min(5, max(1, intdiv($streak, 3) + 1)) }}</span>
               <div style="font-size: 0.74rem; color: #556860;">Raíces fuertes y follaje activo</div>
@@ -309,7 +299,6 @@
   </div>
 </div>
 
-<!-- ════ MODALES DEL MOTOR CLÍNICO (WHO-5, MDI, ASQ Y CONTENCIÓN) ════ -->
 @include('components.clinical-modals')
 
 <!-- ══════════════════════════════════════════════════════════════════════
@@ -1069,63 +1058,44 @@
 
 @push('scripts')
 <script>
-  // SENSITIVE & SUICIDAL TENDENCY WORDS / STEMS FILTER (ACCENT & CASE AGNOSTIC)
-  const SENSITIVE_KEYWORDS = [
-    'suicid', 'suicida', 'suicidio', 'suicidios', 'suicidarme', 'suicidarse', 'suicidarte', 'suicidar',
-    'morir', 'morirme', 'morirse', 'morirte', 'quiero morir', 'deseo morir', 'desearia morir', 'muerto', 'muerta', 'no quiero vivir', 'dejar de vivir',
-    'matar', 'matarme', 'matarse', 'matarte', 'mataria', 'quitarme la vida', 'quitarse la vida', 'quitarte la vida',
-    'acabar con todo', 'acabar con mi vida', 'terminar con mi vida', 'hacerme dano', 'hacerse dano', 'hacerme dolor',
-    'ahorc', 'ahorcar', 'ahorcarme', 'ahorcarse', 'ahorcarte', 'asfixia', 'asfixiarme',
-    'cortar', 'cortarme', 'cortarse', 'cortarte', 'cortarme las venas', 'cortarme las munecas', 'desangrar', 'desangrarme',
-    'autolesi', 'autolesion', 'autolesionarme', 'autolesionarse', 'autolesiones',
-    'pastillas para dormir', 'pastillas todas', 'tomar pastillas', 'sobredosis', 'envenenar', 'envenenarme',
-    'armas', 'arma', 'pistola', 'bala', 'disparar', 'dispararme', 'pegarme un tiro', 'darme un tiro',
-    'no vale la pena vivir', 'ya no puedo mas', 'no puedo mas', 'ya no aguanto', 'no aguanto mas',
-    'desaparecer', 'no encuentro salida', 'sin salida', 'sin esperanza', 'nadie me va a extranar', 'seria mejor si no existiera', 'no debi nacer'
-  ];
-
+  // Mensaje de apoyo mientras se escribe. La lista de términos está sólo en el
+  // servidor: aquí se manda el borrador (no se guarda) y vuelve un sí o un no.
   const journalInput = document.getElementById('journal_entry');
   const crisisAlert = document.getElementById('crisisEmpathicAlert');
 
-  function checkSensitiveKeywords() {
-    if (!journalInput || !crisisAlert) return;
-    const rawText = journalInput.value || '';
-    const text = rawText
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?"'¡!¿]/g, " ")
-      .replace(/\s+/g, " ");
-
-    let detected = false;
-
-    if (text.trim().length > 0) {
-      for (const kw of SENSITIVE_KEYWORDS) {
-        const normalizedKw = kw
-          .toLowerCase()
-          .normalize("NFD")
-          .replace(/[\u0300-\u036f]/g, "")
-          .trim();
-
-        if (normalizedKw && text.includes(normalizedKw)) {
-          detected = true;
-          break;
-        }
-      }
-    }
-
-    crisisAlert.style.display = detected ? 'block' : 'none';
-  }
-
   if (journalInput && crisisAlert) {
-    ['input', 'keyup', 'change', 'paste', 'blur'].forEach(evt => {
-      journalInput.addEventListener(evt, () => {
-        setTimeout(checkSensitiveKeywords, 10);
-      });
-    });
-    // Run on initial page load if text was already filled
-    document.addEventListener('DOMContentLoaded', checkSensitiveKeywords);
-    setTimeout(checkSensitiveKeywords, 100);
+    let espera = null;
+    let ultimoRevisado = journalInput.value || '';
+
+    const revisarTexto = async () => {
+      const texto = journalInput.value || '';
+      if (texto === ultimoRevisado) return;
+      ultimoRevisado = texto;
+      if (texto.trim() === '') { crisisAlert.style.display = 'none'; return; }
+
+      try {
+        const res = await fetch(@json(route('apoyo.texto')), {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),
+          },
+          body: JSON.stringify({ texto }),
+        });
+        if (!res.ok) return;
+        const datos = await res.json();
+        // Si siguió escribiendo mientras llegaba la respuesta, decide la revisión siguiente.
+        if (texto === journalInput.value) crisisAlert.style.display = datos.apoyo ? 'block' : 'none';
+      } catch (err) {}
+    };
+
+    ['input', 'paste', 'change'].forEach(evt => journalInput.addEventListener(evt, () => {
+      clearTimeout(espera);
+      espera = setTimeout(revisarTexto, 700);
+    }));
+    journalInput.addEventListener('blur', revisarTexto);
   }
 
   // Smilies selector & Emotion tag buttons

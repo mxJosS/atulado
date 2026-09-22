@@ -1,0 +1,22 @@
+# Trabajador de la cola de Laravel: envía los correos de invitación en segundo plano.
+#
+# Instalación:
+#   sudo cp deploy/atulado-cola.service /etc/systemd/system/
+#   (ajusta User y WorkingDirectory si tu ruta no es /var/www/atulado)
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now atulado-cola
+#   systemctl status atulado-cola
+[Unit]
+Description=A Tu Lado - trabajador de la cola
+After=network.target mysql.service
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/atulado
+ExecStart=/usr/bin/php8.5 artisan queue:work --sleep=3 --tries=3 --backoff=60 --max-time=3600
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

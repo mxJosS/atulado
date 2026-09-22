@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\CrisisLine;
 use App\Models\SafetyPlan;
+use App\Services\PucholService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -15,7 +16,43 @@ class SafetyPlanController extends Controller
         $safetyPlan = $user->safetyPlan ?? new SafetyPlan(['user_id' => $user->id]);
         $crisisLines = CrisisLine::where('is_featured', true)->take(4)->get();
 
-        return view('dashboard.safety-plan', compact('safetyPlan', 'crisisLines'));
+        // Revisión mensual: bloques que puede responder a su ritmo y herramientas sugeridas.
+        $revision = app(PucholService::class);
+        $revisionPendiente = $revision->bloquesDisponibles($user);
+        $sugerencias = array_values(array_filter(
+            $revision->sugerencias($user),
+            fn ($s) => !in_array(self::textoSugerencia($s), $safetyPlan->internal_coping ?? [], true)
+        ));
+
+        return view('dashboard.safety-plan', compact('safetyPlan', 'crisisLines', 'revisionPendiente', 'sugerencias'));
+    }
+
+    private static function textoSugerencia(array $sugerencia): string
+    {
+        return $sugerencia['titulo'] . ' (herramienta de A Tu Lado)';
+    }
+
+    /**
+     * Agrega a «Cosas que me ayudan por mi cuenta» una herramienta sugerida.
+     */
+    public function agregarSugerencia(Request $request)
+    {
+        $user = Auth::user();
+        $sugerencia = collect(app(PucholService::class)->sugerencias($user))
+            ->firstWhere('clave', $request->input('clave'));
+        abort_unless($sugerencia, 404);
+
+        $plan = $user->safetyPlan ?? new SafetyPlan(['user_id' => $user->id]);
+        $texto = self::textoSugerencia($sugerencia);
+        $actuales = $plan->internal_coping ?? [];
+
+        if (!in_array($texto, $actuales, true)) {
+            $plan->internal_coping = [...$actuales, $texto];
+            $plan->user_id = $user->id;
+            $plan->save();
+        }
+
+        return redirect()->route('safety-plan.show')->with('success', "Agregamos «{$sugerencia['titulo']}» a las cosas que te ayudan.");
     }
 
     public function update(Request $request)

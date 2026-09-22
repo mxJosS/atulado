@@ -27,6 +27,7 @@ class User extends Authenticatable
         'crisis_contact_name',
         'crisis_contact_phone',
         'is_admin',
+        'is_clinico_atulado',
         'role',
         'professional_title',
         'license_number',
@@ -67,7 +68,22 @@ class User extends Authenticatable
             'verification_code_expires_at' => 'datetime',
             'password' => 'hashed',
             'is_admin' => 'boolean',
+            'is_clinico_atulado' => 'boolean',
         ];
+    }
+
+    /**
+     * Pertenencia institucional. Sustituye a las columnas sueltas
+     * institution_id / macro_group / department / shift / employee_number.
+     */
+    public function membresias(): HasMany
+    {
+        return $this->hasMany(Membresia::class);
+    }
+
+    public function membresiaActiva(): HasOne
+    {
+        return $this->hasOne(Membresia::class)->whereIn('estado', ['invitado', 'activo']);
     }
 
     public function hasVerifiedEmail(): bool
@@ -133,17 +149,79 @@ class User extends Authenticatable
         }
     }
 
+    /**
+     * Puede publicar en la revista (perfil «publica» o «ambos», o administración).
+     * No da acceso a información clínica: eso es isClinicoAcreditado().
+     */
     public function isProfessional(): bool
     {
         return $this->role === 'profesional' || $this->role === 'admin' || $this->is_admin;
     }
 
     /**
-     * Determina si el usuario es la cuenta administradora principal protegida
+     * Perfil de una cuenta profesional:
+     *   publica → role 'profesional', sin acreditación clínica
+     *   clinico → role 'clinico', con acreditación clínica (no publica)
+     *   ambos   → role 'profesional', con acreditación clínica
+     */
+    public function getPerfilProfesionalAttribute(): ?string
+    {
+        return match (true) {
+            $this->role === 'clinico' => 'clinico',
+            $this->role === 'profesional' && $this->is_clinico_atulado => 'ambos',
+            $this->role === 'profesional' => 'publica',
+            default => null,
+        };
+    }
+
+    /**
+     * Aplica el rol elegido en la administración de usuarios.
+     *
+     * @param  'admin'|'profesional'|'usuario'  $rol
+     * @param  'publica'|'clinico'|'ambos'|null  $perfil  sólo para profesionales
+     * @param  bool  $clinicoAdmin  acreditación clínica para un administrador
+     */
+    public function asignarRol(string $rol, ?string $perfil = null, bool $clinicoAdmin = false): void
+    {
+        [$role, $clinico] = match (true) {
+            $rol === 'admin' => ['admin', $clinicoAdmin],
+            $rol === 'profesional' && $perfil === 'clinico' => ['clinico', true],
+            $rol === 'profesional' && $perfil === 'ambos' => ['profesional', true],
+            $rol === 'profesional' => ['profesional', false],
+            default => ['usuario', false],
+        };
+
+        $this->forceFill([
+            'role' => $role,
+            'is_admin' => $rol === 'admin',
+            'is_clinico_atulado' => $clinico,
+        ]);
+    }
+
+    /** Entra al panel: administración u operación clínica. */
+    public function puedeUsarPanel(): bool
+    {
+        return (bool) $this->is_admin || $this->isClinicoAcreditado();
+    }
+
+    /**
+     * Determina si el usuario es una cuenta administradora principal protegida
      */
     public function isSuperAdmin(): bool
     {
-        return strtolower(trim($this->email ?? '')) === 'admin@atulado.com.mx';
+        $email = strtolower(trim($this->email ?? ''));
+
+        return $email !== '' && in_array($email, config('atulado.superadmin_emails', []), true);
+    }
+
+    /**
+     * Permiso clínico acreditado: habilita ver información individual.
+     * Distinto de is_admin, que sólo da acceso a la operación de plataforma.
+     */
+    public function isClinicoAcreditado(): bool
+    {
+        // Sólo la acreditación explícita. Ser profesional que publica artículos no basta.
+        return (bool) ($this->is_clinico_atulado ?? false);
     }
 
     public function articles(): HasMany

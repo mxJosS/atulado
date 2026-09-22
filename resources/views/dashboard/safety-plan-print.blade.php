@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Plan de Seguridad — {{ $user->name }} — A tu lado</title>
+  @include('partials.iconos')
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700;1,9..144,400&family=IBM+Plex+Mono:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -273,17 +274,7 @@
       </div>
       <div style="text-align: right;">
         <!-- Pixel Tree Logo -->
-        <svg viewBox="0 0 16 16" width="34" height="34" xmlns="http://www.w3.org/2000/svg" style="margin-left: auto; margin-bottom: 0.35rem;">
-          <rect x="5" y="0" width="6" height="2" fill="#2D6B3A"/>
-          <rect x="3" y="2" width="10" height="2" fill="#3D8C4F"/>
-          <rect x="2" y="4" width="12" height="2" fill="#5AB56E"/>
-          <rect x="3" y="6" width="10" height="2" fill="#3D8C4F"/>
-          <rect x="5" y="8" width="6" height="2" fill="#2D6B3A"/>
-          <rect x="7" y="10" width="2" height="4" fill="#6B3A1F"/>
-          <rect x="4" y="1" width="1" height="1" fill="#C0392B"/>
-          <rect x="11" y="3" width="1" height="1" fill="#C0392B"/>
-          <rect x="9" y="7" width="1" height="1" fill="#C0392B"/>
-        </svg>
+        <x-logo :size="34" style="margin-left: auto; margin-bottom: 0.35rem;" />
         <div class="meta-tag">A tu lado · {{ date('d/m/Y') }}</div>
       </div>
     </div>

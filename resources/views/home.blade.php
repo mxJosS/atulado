@@ -14,36 +14,7 @@
 
     <!-- Tree Pixel Art Official Logo -->
     <div style="display: flex; justify-content: center; margin-bottom: 2rem;">
-      <svg class="ptree" viewBox="0 0 32 32" width="130" height="130" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 12px 24px rgba(0,0,0,0.4));">
-        <!-- Soil & Ground -->
-        <rect x="0" y="27" width="32" height="5" fill="#1E4A25"/>
-        <rect x="0" y="26" width="32" height="1" fill="#2D6B3A"/>
-        <!-- Trunk -->
-        <rect x="14" y="19" width="4" height="8" fill="#6B3A1F"/>
-        <rect x="13" y="21" width="1" height="5" fill="#4A2710"/>
-        <rect x="17" y="22" width="1" height="4" fill="#4A2710"/>
-        <rect x="10" y="20" width="4" height="2" fill="#6B3A1F"/>
-        <rect x="18" y="21" width="4" height="2" fill="#6B3A1F"/>
-        <!-- Foliage Outer Dark -->
-        <rect x="7" y="6" width="18" height="14" fill="#2D6B3A"/>
-        <rect x="5" y="8" width="22" height="12" fill="#2D6B3A"/>
-        <!-- Foliage Medium & Light -->
-        <rect x="8" y="7" width="16" height="12" fill="#3D8C4F"/>
-        <rect x="10" y="5" width="12" height="14" fill="#5AB56E"/>
-        <rect x="12" y="4" width="8" height="3" fill="#3D8C4F"/>
-        <rect x="11" y="7" width="5" height="3" fill="#7FD68A"/>
-        <rect x="10" y="10" width="3" height="2" fill="#A8E6C0"/>
-        <rect x="18" y="9" width="3" height="2" fill="#A8E6C0"/>
-        <!-- Red Apples -->
-        <rect x="9" y="12" width="2" height="2" fill="#C0392B"/>
-        <rect x="9" y="11" width="2" height="1" fill="#C0392B"/>
-        <rect x="20" y="11" width="2" height="2" fill="#C0392B"/>
-        <rect x="20" y="10" width="2" height="1" fill="#C0392B"/>
-        <rect x="15" y="15" width="2" height="2" fill="#C0392B"/>
-        <rect x="15" y="14" width="2" height="1" fill="#C0392B"/>
-        <rect x="13" y="9" width="2" height="2" fill="#C0392B"/>
-        <rect x="13" y="8" width="2" height="1" fill="#C0392B"/>
-      </svg>
+      <x-logo :size="130" style="filter: drop-shadow(0 12px 24px rgba(0,0,0,0.35));" />
     </div>
 
     <!-- Title 'a tu lado' with editorial italic -->

@@ -65,11 +65,28 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Puchol (test breve del estado de ánimo, 22 ítems en 4 bloques)
+    |--------------------------------------------------------------------------
+    | Se reparte en bloques cortos: uno al día como máximo, sólo en días sin
+    | otras preguntas. Resultados informativos; impulsos suicidas > 0 = Rojo.
+    */
+    'puchol' => [
+        'dias_ciclo' => 30,                 // cada cuánto empieza un ciclo nuevo
+        'max_ofrecimientos' => 3,           // veces que se ofrece un bloque sin respuesta antes de esperar al siguiente ciclo
+        'dias_sin_repetir_adelanto' => 7,   // el MDI no adelanta un ciclo si hubo uno hace menos de esto
+        'item_mdi_alto' => 4,               // ítems 3, 8 o 9 del MDI en este valor o más adelantan el ciclo
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Separación de Planos (Plano Gerencial)
     |--------------------------------------------------------------------------
     */
     'plano_gerencial' => [
-        'umbral_minimo_anonimato' => 15, // Mínimo de 15 personas por corte para reportes agregados
+        // Mínimo de personas por corte para reportes agregados. Cada institución puede
+        // fijar el suyo (instituciones.umbral_anonimato); éste es el valor general.
+        // 15 es lo recomendado para anonimato; en el piloto se trabaja desde 1.
+        'umbral_minimo_anonimato' => (int) env('ATULADO_UMBRAL_ANONIMATO', 1),
     ],
 
     /*

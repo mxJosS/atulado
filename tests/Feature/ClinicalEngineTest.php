@@ -29,7 +29,8 @@ class ClinicalEngineTest extends TestCase
         ]);
         $this->profesional = User::factory()->create([
             'email' => 'profesional@atulado.com.mx',
-            'role' => 'profesional',
+            'role' => 'clinico',
+            'is_clinico_atulado' => true,
         ]);
     }
 
@@ -127,7 +128,17 @@ class ClinicalEngineTest extends TestCase
         $this->assertFalse($intentoUsuarioComun);
         $this->assertEquals('abierto', $evento->fresh()->estado);
 
-        // Cierre por un profesional autorizado -> Éxito
+        // Un profesional tampoco puede cerrar si nadie ha hablado con la persona
+        $sinContacto = $this->engine->verificarCierreCaso($evento, $this->profesional, 'Cierro sin haber contactado');
+        $this->assertFalse($sinContacto, 'Un caso no puede cerrarse sin contacto humano previo');
+        $this->assertEquals('abierto', $evento->fresh()->estado);
+
+        // Con el contacto registrado, el cierre sí procede
+        $this->assertTrue($this->engine->registrarContactoHumano($evento, $this->profesional));
+        $evento->refresh();
+        $this->assertNotNull($evento->contactado_en);
+        $this->assertEquals('en_atencion', $evento->estado);
+
         $cierreExitoso = $this->engine->verificarCierreCaso($evento, $this->profesional, 'Contacto telefónico realizado con éxito');
         $this->assertTrue($cierreExitoso);
         $this->assertEquals('cerrado', $evento->fresh()->estado);
@@ -135,10 +146,28 @@ class ClinicalEngineTest extends TestCase
     }
 
     /**
+     * La bitácora de accesos clínicos no admite modificación ni borrado.
+     */
+    public function test_auditoria_clinica_is_immutable(): void
+    {
+        $evento = $this->engine->registrarEventoCrisis($this->user);
+        $this->engine->registrarContactoHumano($evento, $this->profesional);
+
+        $registro = \App\Models\AuditoriaClinica::latest('id')->first();
+        $this->assertNotNull($registro);
+
+        $this->expectException(\RuntimeException::class);
+        $registro->update(['detalle' => 'intento de reescritura']);
+    }
+
+    /**
      * Verificación 8 y 9: Plano gerencial aplica umbral mínimo de 15 personas para reporte agregado
      */
     public function test_managerial_view_enforces_15_user_anonymity_threshold(): void
     {
+        // Con el umbral recomendado de 15 (el valor general del piloto es 1).
+        config(['clinical.plano_gerencial.umbral_minimo_anonimato' => 15]);
+
         // Caso A: Menos de 15 usuarios
         $reporteIncompleto = $this->engine->obtenerVistaGerencialAgregada();
         $this->assertFalse($reporteIncompleto['disponible']);
@@ -159,14 +188,13 @@ class ClinicalEngineTest extends TestCase
         $this->actingAs($this->user);
 
         // Submit WHO-5
-        $resWho5 = $this->postJson('/assessment/who5', [
+        $resWho5 = $this->postJson('/preguntas/1', [
             'i1' => 4, 'i2' => 4, 'i3' => 4, 'i4' => 4, 'i5' => 4,
-            'origen' => 'programada',
         ]);
         $resWho5->assertStatus(200)->assertJson(['success' => true]);
 
         // Submit MDI
-        $resMdi = $this->postJson('/assessment/mdi', [
+        $resMdi = $this->postJson('/preguntas/2', [
             'i1' => 1, 'i2' => 1, 'i3' => 1, 'i4' => 1, 'i5' => 1,
             'i6' => 0, 'i7' => 1, 'i8a' => 1, 'i8b' => 0, 'i9' => 1,
             'i10a' => 1, 'i10b' => 0,
@@ -174,7 +202,7 @@ class ClinicalEngineTest extends TestCase
         $resMdi->assertStatus(200)->assertJson(['success' => true]);
 
         // Submit ASQ
-        $resAsq = $this->postJson('/assessment/asq', [
+        $resAsq = $this->postJson('/preguntas/3', [
             'p1' => 'no', 'p2' => 'no', 'p3' => 'no', 'p4' => 'no',
         ]);
         $resAsq->assertStatus(200)->assertJson(['success' => true]);

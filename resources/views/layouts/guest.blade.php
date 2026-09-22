@@ -5,10 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>@yield('title', 'A tu lado — Apoyo y Bienestar Emocional')</title>
+  @include('partials.iconos')
   <meta name="description" content="Plataforma de acompañamiento psicológico, regulación emocional basada en evidencia DBT, plan de seguridad personal y directorio de crisis 24/7.">
   
   <!-- Favicon / Brand CSS with Cache Buster -->
   <link rel="stylesheet" href="{{ asset('css/style.css') }}?v={{ file_exists(public_path('css/style.css')) ? filemtime(public_path('css/style.css')) : time() }}">
+  {{-- Pulido visual de las páginas públicas del menú (sólo con body.sitio-publico) --}}
+  <link rel="stylesheet" href="{{ asset('css/publico.css') }}?v={{ filemtime(public_path('css/publico.css')) }}">
   <!-- Google Fonts: Fraunces, Instrument Serif, Manrope, IBM Plex Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,7 +25,7 @@
   <script src="{{ asset('js/game-icons-pack.js') }}?v={{ file_exists(public_path('js/game-icons-pack.js')) ? filemtime(public_path('js/game-icons-pack.js')) : time() }}" defer></script>
   @stack('styles')
 </head>
-<body style="background-color: #F8FAF9; color: #1A2620;">
+<body @class(['sitio-publico' => request()->routeIs('home', 'sientes', 'tools.*', 'recursos.*', 'revista.index', 'revista.show', 'crisis')]) style="background-color: #F8FAF9; color: #1A2620;">
 
   <!-- PUBLIC NAVBAR -->
   <nav class="site-navbar" id="siteNavbar">
@@ -30,17 +33,7 @@
       
       <!-- Brand Logo -->
       <a href="{{ route('home') }}" class="nav-brand" aria-label="Ir a inicio">
-        <svg class="ptree" viewBox="0 0 16 16" width="28" height="28" xmlns="http://www.w3.org/2000/svg">
-          <rect x="5" y="0" width="6" height="2" fill="#2D6B3A"/>
-          <rect x="3" y="2" width="10" height="2" fill="#3D8C4F"/>
-          <rect x="2" y="4" width="12" height="2" fill="#5AB56E"/>
-          <rect x="3" y="6" width="10" height="2" fill="#3D8C4F"/>
-          <rect x="5" y="8" width="6" height="2" fill="#2D6B3A"/>
-          <rect x="7" y="10" width="2" height="4" fill="#6B3A1F"/>
-          <rect x="4" y="1" width="1" height="1" fill="#C0392B"/>
-          <rect x="11" y="3" width="1" height="1" fill="#C0392B"/>
-          <rect x="9" y="7" width="1" height="1" fill="#C0392B"/>
-        </svg>
+        <x-logo :size="28" />
         <span>a tu <em class="editorial-italic" style="color: #A8E6C0;">lado</em></span>
       </a>
 
@@ -136,17 +129,7 @@
     <div class="footer-grid">
       <div>
         <div class="footer-brand">
-          <svg class="ptree" viewBox="0 0 16 16" width="26" height="26" xmlns="http://www.w3.org/2000/svg">
-            <rect x="5" y="0" width="6" height="2" fill="#2D6B3A"/>
-            <rect x="3" y="2" width="10" height="2" fill="#3D8C4F"/>
-            <rect x="2" y="4" width="12" height="2" fill="#5AB56E"/>
-            <rect x="3" y="6" width="10" height="2" fill="#3D8C4F"/>
-            <rect x="5" y="8" width="6" height="2" fill="#2D6B3A"/>
-            <rect x="7" y="10" width="2" height="4" fill="#6B3A1F"/>
-            <rect x="4" y="1" width="1" height="1" fill="#C0392B"/>
-            <rect x="11" y="3" width="1" height="1" fill="#C0392B"/>
-            <rect x="9" y="7" width="1" height="1" fill="#C0392B"/>
-          </svg>
+          <x-logo :size="26" />
           <span>a tu <em class="editorial-italic" style="color: #A8E6C0;">lado</em></span>
         </div>
         <p class="footer-desc">

@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Institution;
+use App\Models\Institucion;
+use App\Models\Membresia;
 use App\Models\ProfessionalVerification;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -17,7 +18,7 @@ class AdminUserController extends Controller
 {
     public function index(Request $request)
     {
-        $query = User::query()->with('institution');
+        $query = User::query()->with('membresiaActiva.institucion:id,slug,nombre_corto', 'membresiaActiva.departamento:id,nombre');
 
         if ($request->filled('rol')) {
             if ($request->rol === 'admin') {
@@ -25,7 +26,7 @@ class AdminUserController extends Controller
                     $q->where('is_admin', true)->orWhere('role', 'admin');
                 });
             } elseif ($request->rol === 'profesional') {
-                $query->where('role', 'profesional')->where('is_admin', false);
+                $query->whereIn('role', ['profesional', 'clinico'])->where('is_admin', false);
             } elseif ($request->rol === 'usuario') {
                 $query->where(function ($q) {
                     $q->where('role', 'usuario')->orWhereNull('role');
@@ -43,12 +44,12 @@ class AdminUserController extends Controller
         }
 
         $users = $query->latest()->paginate(15)->withQueryString();
-        $institutions = Institution::orderBy('name')->get();
+        $institutions = Institucion::orderBy('nombre_corto')->get(['id', 'nombre_corto']);
 
         $counts = [
             'todos' => User::count(),
             'admins' => User::where('is_admin', true)->orWhere('role', 'admin')->count(),
-            'profesionales' => User::where('role', 'profesional')->where('is_admin', false)->count(),
+            'profesionales' => User::whereIn('role', ['profesional', 'clinico'])->where('is_admin', false)->count(),
             'usuarios' => User::where(function ($q) {
                 $q->where('role', 'usuario')->orWhereNull('role');
             })->where('is_admin', false)->count(),
@@ -65,11 +66,13 @@ class AdminUserController extends Controller
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'confirmed', Password::min(6)],
             'role' => ['required', 'in:admin,profesional,usuario'],
+            'perfil_profesional' => ['nullable', 'in:publica,clinico,ambos'], // sin valor: sólo publica, como antes
+            'clinico_admin' => ['nullable', 'boolean'],
             'education_level' => ['required_if:role,profesional', 'nullable', 'in:licenciatura,especialidad,maestria,doctorado'],
             'license_number' => ['required_if:role,profesional', 'nullable', 'string', 'max:50'],
             'specialty' => ['nullable', 'string', 'max:150'],
             'institution' => ['nullable', 'string', 'max:150'],
-            'institution_id' => ['nullable', 'exists:institutions,id'],
+            'institucion_id' => ['nullable', 'exists:instituciones,id'],
         ], [
             'first_name.required' => 'El o los nombres son obligatorios.',
             'last_name.required' => 'Los apellidos son obligatorios.',
@@ -83,33 +86,22 @@ class AdminUserController extends Controller
         ]);
 
         $fullName = trim($request->first_name . ' ' . $request->last_name);
-        $isAdmin = $request->role === 'admin';
         $role = $request->role;
-        $institutionId = $request->filled('institution_id') ? (int) $request->institution_id : null;
 
-        DB::transaction(function () use ($request, $fullName, $isAdmin, $role, $institutionId) {
-            $user = User::create([
+        DB::transaction(function () use ($request, $fullName, $role) {
+            $user = new User([
                 'name' => $fullName,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
-                'is_admin' => $isAdmin,
-                'role' => $role,
-                'avatar_color' => $isAdmin ? 'dark' : ($role === 'profesional' ? 'lav' : 'sage'),
+                'avatar_color' => $role === 'admin' ? 'dark' : ($role === 'profesional' ? 'lav' : 'sage'),
                 'email_verified_at' => now(),
-                'institution_id' => $institutionId,
                 'license_number' => $role === 'profesional' ? trim($request->license_number) : null,
-                'institution' => $role === 'profesional' ? trim($request->institution) : null,
+                'institution' => $role === 'profesional' ? trim((string) $request->institution) : null,
             ]);
+            $user->asignarRol($role, $request->perfil_profesional, $request->boolean('clinico_admin'));
+            $user->save();
 
-            if ($user->institution_id) {
-                $inst = Institution::find($user->institution_id);
-                if ($inst) {
-                    $cnt = $inst->users()->count();
-                    $inst->users_count = $cnt;
-                    $inst->active_count = $cnt;
-                    $inst->save();
-                }
-            }
+            $this->vincularInstitucion($user, $request->filled('institucion_id') ? (int) $request->institucion_id : null);
 
             if ($role === 'profesional') {
                 $degrees = [
@@ -120,9 +112,8 @@ class AdminUserController extends Controller
                 ];
                 $degreeLabel = $degrees[$request->education_level] ?? 'Especialista';
                 $specialtyText = !empty($request->specialty) ? trim($request->specialty) : 'Salud Mental & Bienestar';
-                $computedTitle = $specialtyText . ' · ' . $degreeLabel;
 
-                $user->update(['professional_title' => $computedTitle]);
+                $user->update(['professional_title' => $specialtyText . ' · ' . $degreeLabel]);
 
                 ProfessionalVerification::create([
                     'user_id' => $user->id,
@@ -148,11 +139,13 @@ class AdminUserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
             'role' => ['required', 'in:admin,profesional,usuario'],
+            'perfil_profesional' => ['nullable', 'in:publica,clinico,ambos'], // sin valor: sólo publica, como antes
+            'clinico_admin' => ['nullable', 'boolean'],
             'status' => ['required', 'in:activo,pendiente'],
             'password' => ['nullable', 'string', 'min:6'],
             'license_number' => ['nullable', 'string', 'max:50'],
             'institution' => ['nullable', 'string', 'max:150'],
-            'institution_id' => ['nullable', 'exists:institutions,id'],
+            'institucion_id' => ['nullable', 'exists:instituciones,id'],
         ], [
             'name.required' => 'El nombre es obligatorio.',
             'email.required' => 'El correo electrónico es obligatorio.',
@@ -171,7 +164,7 @@ class AdminUserController extends Controller
 
         // 2. Proteger la integridad de la cuenta principal de administración
         if ($user->isSuperAdmin()) {
-            if (strtolower(trim($request->email)) !== 'admin@atulado.com.mx') {
+            if (strtolower(trim($request->email)) !== strtolower(trim($user->email))) {
                 return back()->with('error', 'El correo electrónico de la cuenta principal no puede ser modificado.');
             }
             if ($request->role !== 'admin') {
@@ -192,13 +185,11 @@ class AdminUserController extends Controller
             return back()->with('error', 'No es posible cambiar el rol al único administrador del sistema.');
         }
 
-        $isAdmin = $request->role === 'admin';
         $role = $request->role;
 
         $user->name = trim($request->name);
         $user->email = trim($request->email);
-        $user->is_admin = $isAdmin;
-        $user->role = $role;
+        $user->asignarRol($role, $request->perfil_profesional, $request->boolean('clinico_admin'));
 
         // Gestión del Estado (Activo vs Pendiente)
         if ($request->status === 'activo') {
@@ -230,35 +221,48 @@ class AdminUserController extends Controller
             $user->professional_title = null;
         }
 
-        $oldInstId = $user->institution_id;
-        $newInstId = $request->filled('institution_id') ? (int) $request->institution_id : null;
-        $user->institution_id = $newInstId;
-
-        $user->save();
-
-        if ($oldInstId !== $newInstId) {
-            if ($oldInstId) {
-                $oldInst = Institution::find($oldInstId);
-                if ($oldInst) {
-                    $cnt = $oldInst->users()->count();
-                    $oldInst->users_count = $cnt;
-                    $oldInst->active_count = $cnt;
-                    $oldInst->save();
-                }
-            }
-            if ($newInstId) {
-                $newInst = Institution::find($newInstId);
-                if ($newInst) {
-                    $cnt = $newInst->users()->count();
-                    $newInst->users_count = $cnt;
-                    $newInst->active_count = $cnt;
-                    $newInst->save();
-                }
-            }
-        }
+        DB::transaction(function () use ($user, $request) {
+            $user->save();
+            $this->vincularInstitucion($user, $request->filled('institucion_id') ? (int) $request->institucion_id : null);
+        });
 
         return redirect()->route('admin.users.index')
             ->with('success', 'Usuario "' . $user->name . '" actualizado exitosamente.');
+    }
+
+    /**
+     * Deja a la persona en el padrón de la institución elegida (o en ninguno).
+     * Cambiar de institución da de baja la membresía anterior en vez de
+     * borrarla, para no perder su historia.
+     */
+    private function vincularInstitucion(User $user, ?int $institucionId): void
+    {
+        $actual = $user->membresiaActiva()->first();
+
+        if ($actual?->institucion_id === $institucionId) {
+            return;
+        }
+
+        $actual?->update(['estado' => 'baja', 'baja_en' => now(), 'baja_motivo' => 'Cambio de institución desde administración de usuarios.']);
+
+        if ($institucionId === null) {
+            return;
+        }
+
+        $existente = Membresia::where('institucion_id', $institucionId)->where('user_id', $user->id)->first();
+        $estado = $user->email_verified_at ? 'activo' : 'invitado';
+
+        if ($existente) {
+            $existente->update(['estado' => $estado, 'baja_en' => null, 'baja_motivo' => null]);
+        } else {
+            Membresia::create([
+                'institucion_id' => $institucionId,
+                'user_id' => $user->id,
+                'rol_institucional' => 'colaborador',
+                'estado' => $estado,
+                'activado_en' => $estado === 'activo' ? now() : null,
+            ]);
+        }
     }
 
     public function destroy(User $user)

@@ -90,7 +90,7 @@ class PasswordResetTest extends TestCase
         $this->assertStringContainsString('Mariana Lopez', $html);
         $this->assertStringContainsString('A Tu Lado', $html);
         $this->assertStringContainsString('token-12345', $html);
-        $this->assertStringContainsString('🌲', $html);
+        $this->assertStringContainsString('images/marca/logo-atulado-64.png', $html); // logo oficial
 
         // Render Text view
         $text = view($mailable->content()->text, $mailable->content()->with)->render();

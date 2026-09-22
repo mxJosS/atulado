@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Aviso de Privacidad — A tu lado</title>
+  @include('partials.iconos')
 <meta name="description" content="Aviso de privacidad integral de A tu lado: qué datos recabamos, para qué los usamos, con quién los compartimos y cómo ejercer tus derechos ARCO.">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="{{ url('/privacidad') }}">
@@ -203,7 +204,7 @@ p.entrada{color:var(--text-medium-gray); font-size:1rem; margin:0}
 
 <nav class="site-navbar">
   <div class="nav-container">
-    <a href="{{ route('home') }}" class="nav-brand"><svg viewBox="0 0 16 16" width="28" height="28" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="5" y="0" width="6" height="2" fill="#2D6B3A"/><rect x="3" y="2" width="10" height="2" fill="#3D8C4F"/><rect x="2" y="4" width="12" height="2" fill="#5AB56E"/><rect x="3" y="6" width="10" height="2" fill="#3D8C4F"/><rect x="5" y="8" width="6" height="2" fill="#2D6B3A"/><rect x="7" y="10" width="2" height="4" fill="#6B3A1F"/><rect x="4" y="1" width="1" height="1" fill="#C0392B"/><rect x="11" y="3" width="1" height="1" fill="#C0392B"/><rect x="9" y="7" width="1" height="1" fill="#C0392B"/></svg><span>a tu <em class="editorial-italic" style="color:#A8E6C0">lado</em></span></a>
+    <a href="{{ route('home') }}" class="nav-brand"><x-logo :size="28" /><span>a tu <em class="editorial-italic" style="color:#A8E6C0">lado</em></span></a>
     <ul class="nav-menu">
       <li><a href="{{ route('home') }}" class="nav-link">Inicio</a></li>
       <li><a href="{{ route('sientes') }}" class="nav-link">&iquest;C&oacute;mo te sientes?</a></li>
@@ -510,7 +511,7 @@ p.entrada{color:var(--text-medium-gray); font-size:1rem; margin:0}
 <footer class="site-footer">
   <div class="footer-grid">
     <div>
-      <div class="footer-brand"><svg viewBox="0 0 16 16" width="26" height="26" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="5" y="0" width="6" height="2" fill="#2D6B3A"/><rect x="3" y="2" width="10" height="2" fill="#3D8C4F"/><rect x="2" y="4" width="12" height="2" fill="#5AB56E"/><rect x="3" y="6" width="10" height="2" fill="#3D8C4F"/><rect x="5" y="8" width="6" height="2" fill="#2D6B3A"/><rect x="7" y="10" width="2" height="4" fill="#6B3A1F"/><rect x="4" y="1" width="1" height="1" fill="#C0392B"/><rect x="11" y="3" width="1" height="1" fill="#C0392B"/><rect x="9" y="7" width="1" height="1" fill="#C0392B"/></svg><span>a tu <em class="editorial-italic" style="color:#A8E6C0">lado</em></span></div>
+      <div class="footer-brand"><x-logo :size="26" /><span>a tu <em class="editorial-italic" style="color:#A8E6C0">lado</em></span></div>
       <p class="footer-desc">Un espacio seguro y confidencial de acompa&ntilde;amiento emocional, herramientas de regulaci&oacute;n y prevenci&oacute;n en crisis para M&eacute;xico y Latinoam&eacute;rica.</p>
       <a href="tel:8002900024" class="footer-crisis"><svg viewBox="0 0 16 16" width="11" height="11" fill="currentColor" aria-hidden="true"><path d="M3.1 1.4a1.2 1.2 0 0 1 1.7.2l1.3 1.7a1.2 1.2 0 0 1-.1 1.6l-.8.8c.6 1.3 1.8 2.5 3.1 3.1l.8-.8a1.2 1.2 0 0 1 1.6-.1l1.7 1.3a1.2 1.2 0 0 1 .2 1.7l-.8 1c-.5.6-1.3.8-2 .6C6.5 11.3 4.7 9.5 3.4 6.2c-.3-.8 0-1.6.6-2.1l-.9-2.7z"/></svg><span>L&iacute;nea 24h: 800 290 0024</span></a>
     </div>

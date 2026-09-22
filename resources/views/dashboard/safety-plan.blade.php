@@ -24,6 +24,58 @@
     </div>
   </div>
 
+  {{-- Revisión del mes: bloques cortos que la persona responde a su ritmo --}}
+  @if(!empty($revisionPendiente) || !empty($sugerencias))
+    <div class="card" id="revisionMensual" style="margin-bottom: 1.5rem; border: 1.5px solid #DCE8E0;">
+      <div class="card-body">
+        @if(!empty($revisionPendiente))
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 0.4rem;">
+            <span class="badge badge-sage" style="font-size: 0.72rem;">Revisión del mes</span>
+            <h2 style="font-family: var(--font-display); font-size: 1.2rem; margin: 0; color: #1A2620;">¿Cómo has estado últimamente?</h2>
+          </div>
+          <p style="font-size: 0.88rem; color: #556860; margin: 0 0 0.9rem; line-height: 1.5;">
+            Son unas pocas preguntas, en partes cortas. Puedes contestarlas aquí cuando quieras; si no, te iremos haciendo una parte a la vez después de tu registro diario.
+          </p>
+          <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
+            @foreach($revisionPendiente as $i => $letra)
+              <button type="button" class="btn btn-secondary btn-sm" onclick="abrirBloque4('{{ $letra }}')" style="gap: 6px;">
+                <i class="fa-regular fa-circle"></i>
+                Parte {{ array_search($letra, array_keys(\App\Services\PucholService::BLOQUES)) + 1 }}
+                <span style="opacity: 0.7; font-weight: 400;">· {{ count(\App\Services\PucholService::BLOQUES[$letra]) }} preguntas</span>
+              </button>
+            @endforeach
+          </div>
+        @endif
+
+        @if(!empty($sugerencias))
+          <div style="{{ !empty($revisionPendiente) ? 'margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid #EEF3F0;' : '' }}">
+            <div style="font-weight: 700; font-size: 0.92rem; color: #1A2620; margin-bottom: 0.6rem;">
+              <i class="fa-solid fa-seedling" style="color: #2E5D4B;"></i> Herramientas que pueden ayudarte ahora
+            </div>
+            <div style="display: grid; gap: 0.6rem;">
+              @foreach($sugerencias as $s)
+                <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap; background: #F8FAF9; border: 1px solid #E2ECE7; border-radius: 12px; padding: 0.7rem 0.9rem;">
+                  <div>
+                    <b style="font-size: 0.9rem;">{{ $s['titulo'] }}</b>
+                    <div style="font-size: 0.8rem; color: #556860;">{{ $s['texto'] }}</div>
+                  </div>
+                  <div style="display: flex; gap: 0.5rem;">
+                    <a href="{{ route($s['ruta']) }}" class="btn btn-secondary btn-sm">Probar</a>
+                    <form method="POST" action="{{ route('safety-plan.sugerencia') }}" data-no-spa style="margin: 0;">
+                      @csrf
+                      <input type="hidden" name="clave" value="{{ $s['clave'] }}">
+                      <button type="submit" class="btn btn-primary btn-sm" style="gap: 6px;"><i class="fa-solid fa-plus"></i> Agregar a mi plan</button>
+                    </form>
+                  </div>
+                </div>
+              @endforeach
+            </div>
+          </div>
+        @endif
+      </div>
+    </div>
+  @endif
+
   <form method="POST" action="{{ route('safety-plan.update') }}">
     @csrf
     @method('PUT')
@@ -264,6 +316,7 @@
   </form>
 
 </div>
+@include('components.clinical-modals')
 @endsection
 
 @push('scripts')

@@ -8,6 +8,7 @@
     $errors = $errors ?? new \Illuminate\Support\ViewErrorBag();
   @endphp
   <title>@yield('title', 'Mi Espacio') — A tu lado</title>
+  @include('partials.iconos')
   
   <!-- CSS & Official Fonts with Cache Buster -->
   <link rel="stylesheet" href="{{ asset('css/style.css') }}?v={{ file_exists(public_path('css/style.css')) ? filemtime(public_path('css/style.css')) : time() }}">
@@ -34,17 +35,7 @@
       <!-- Brand Header -->
       <div class="sidebar-header">
         <a href="{{ route('home') }}" class="sidebar-brand">
-          <svg class="ptree" viewBox="0 0 16 16" width="22" height="22" xmlns="http://www.w3.org/2000/svg">
-            <rect x="5" y="0" width="6" height="2" fill="#2D6B3A"/>
-            <rect x="3" y="2" width="10" height="2" fill="#3D8C4F"/>
-            <rect x="2" y="4" width="12" height="2" fill="#5AB56E"/>
-            <rect x="3" y="6" width="10" height="2" fill="#3D8C4F"/>
-            <rect x="5" y="8" width="6" height="2" fill="#2D6B3A"/>
-            <rect x="7" y="10" width="2" height="4" fill="#6B3A1F"/>
-            <rect x="4" y="1" width="1" height="1" fill="#C0392B"/>
-            <rect x="11" y="3" width="1" height="1" fill="#C0392B"/>
-            <rect x="9" y="7" width="1" height="1" fill="#C0392B"/>
-          </svg>
+          <x-logo :size="22" />
           <span>a tu <em class="editorial-italic" style="color: #A8E6C0;">lado</em></span>
         </a>
       </div>
@@ -57,6 +48,11 @@
           <a href="{{ route('admin.dashboard') }}" class="sidebar-item" style="background: rgba(168,230,192,0.12); color: #A8E6C0; border: 1px solid rgba(168,230,192,0.25); margin-bottom: 0.5rem;" title="Ir al Panel de Administración">
             <div class="sidebar-item-icon"><i class="fa-solid fa-shield-halved" style="color: #A8E6C0;"></i></div>
             <span style="font-weight: 700;">Torre de Control</span>
+          </a>
+        @elseif(auth()->user()?->isClinicoAcreditado())
+          <a href="{{ route('admin.cola.index') }}" class="sidebar-item" style="background: rgba(168,230,192,0.12); color: #A8E6C0; border: 1px solid rgba(168,230,192,0.25); margin-bottom: 0.5rem;" title="Ir al panel clínico">
+            <div class="sidebar-item-icon"><i class="fa-solid fa-user-doctor" style="color: #A8E6C0;"></i></div>
+            <span style="font-weight: 700;">Panel clínico</span>
           </a>
         @endif
 
@@ -182,6 +178,11 @@
             <a href="{{ route('admin.dashboard') }}" class="btn btn-sm" style="background: #111A14; color: #A8E6C0; border: 1px solid rgba(168,230,192,0.3); font-weight: 700; font-size: 0.78rem; padding: 0.45rem 0.85rem; border-radius: 9999px; gap: 6px; text-decoration: none; display: inline-flex; align-items: center;" title="Volver a la consola de administración">
               <i class="fa-solid fa-shield-halved" style="color: #A8E6C0;"></i>
               <span>Torre de Control</span>
+            </a>
+          @elseif(auth()->user()?->isClinicoAcreditado())
+            <a href="{{ route('admin.cola.index') }}" class="btn btn-sm" style="background: #111A14; color: #A8E6C0; border: 1px solid rgba(168,230,192,0.3); font-weight: 700; font-size: 0.78rem; padding: 0.45rem 0.85rem; border-radius: 9999px; gap: 6px; text-decoration: none; display: inline-flex; align-items: center;" title="Ir al panel clínico">
+              <i class="fa-solid fa-user-doctor" style="color: #A8E6C0;"></i>
+              <span>Panel clínico</span>
             </a>
           @endif
 
