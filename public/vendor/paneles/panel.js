@@ -4,12 +4,7 @@
    micro-gráficas SVG. Sin dependencias, funciona con file://
    ════════════════════════════════════════════════════════════════ */
 
-const TREE_SVG = `<svg viewBox="0 0 16 16" width="22" height="22" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-  <rect x="5" y="0" width="6" height="2" fill="#2D6B3A"/><rect x="3" y="2" width="10" height="2" fill="#3D8C4F"/>
-  <rect x="2" y="4" width="12" height="2" fill="#5AB56E"/><rect x="3" y="6" width="10" height="2" fill="#3D8C4F"/>
-  <rect x="5" y="8" width="6" height="2" fill="#2D6B3A"/><rect x="7" y="10" width="2" height="4" fill="#6B3A1F"/>
-  <rect x="4" y="1" width="1" height="1" fill="#C0392B"/><rect x="11" y="3" width="1" height="1" fill="#C0392B"/>
-  <rect x="9" y="7" width="1" height="1" fill="#C0392B"/></svg>`;
+const TREE_SVG = `<img src="/images/marca/logo-atulado-64.png" width="22" height="22" alt="" aria-hidden="true" style="object-fit:contain">`;
 
 const NAV_ATL = [
   { label: 'Operación de plataforma' },
@@ -90,8 +85,13 @@ function openModal(id) {
   if (m) { m.classList.add('open'); document.body.style.overflow = 'hidden'; }
 }
 function closeModal(id) {
-  const m = id ? document.getElementById(id) : document.querySelector('.modal-backdrop.open');
-  if (m) { m.classList.remove('open'); document.body.style.overflow = ''; }
+  // Sin id se cierra la ventana de arriba (la última abierta), no la primera del documento.
+  const abiertas = [...document.querySelectorAll('.modal-backdrop.open')];
+  const m = id ? document.getElementById(id) : abiertas[abiertas.length - 1];
+  if (!m) return;
+  m.classList.remove('open');
+  // El scroll de la página sólo vuelve cuando ya no queda ninguna ventana abierta.
+  if (!document.querySelector('.modal-backdrop.open')) document.body.style.overflow = '';
 }
 function wireModals() {
   document.querySelectorAll('[data-open]').forEach(b =>

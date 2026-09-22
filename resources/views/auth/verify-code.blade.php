@@ -17,17 +17,7 @@
       <!-- Card Header -->
       <div style="text-align: center; margin-bottom: 1.75rem;">
         <a href="{{ route('home') }}" style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none; margin-bottom: 1rem;">
-          <svg class="ptree" viewBox="0 0 16 16" width="32" height="32" xmlns="http://www.w3.org/2000/svg">
-            <rect x="5" y="0" width="6" height="2" fill="#2D6B3A"/>
-            <rect x="3" y="2" width="10" height="2" fill="#3D8C4F"/>
-            <rect x="2" y="4" width="12" height="2" fill="#5AB56E"/>
-            <rect x="3" y="6" width="10" height="2" fill="#3D8C4F"/>
-            <rect x="5" y="8" width="6" height="2" fill="#2D6B3A"/>
-            <rect x="7" y="10" width="2" height="4" fill="#6B3A1F"/>
-            <rect x="4" y="1" width="1" height="1" fill="#C0392B"/>
-            <rect x="11" y="3" width="1" height="1" fill="#C0392B"/>
-            <rect x="9" y="7" width="1" height="1" fill="#C0392B"/>
-          </svg>
+          <x-logo :size="32" />
           <span style="font-family: var(--font-display); font-size: 1.35rem; color: #2E5D4B; font-weight: 700;">a tu <em class="editorial-italic" style="color: #5AB56E;">lado</em></span>
         </a>
 

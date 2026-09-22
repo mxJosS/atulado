@@ -1,0 +1,5 @@
+# Programador de tareas de Laravel (regla R4 de silencio, WHO-5 cada 14 días, etc.).
+# Se instala UNA vez, con el usuario que ejecuta la app:
+#   sudo crontab -u www-data -e
+# y se pega esta línea (ajusta la ruta si no es /var/www/atulado):
+* * * * * cd /var/www/atulado && /usr/bin/php8.5 artisan schedule:run >> /dev/null 2>&1

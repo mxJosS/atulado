@@ -8,6 +8,7 @@
     $errors = $errors ?? new \Illuminate\Support\ViewErrorBag();
   @endphp
   <title>@yield('title', 'Panel de Administración') — A tu lado</title>
+  @include('partials.iconos')
   
   <!-- CSS & Official Fonts -->
   <link rel="stylesheet" href="{{ asset('css/style.css') }}?v={{ file_exists(public_path('css/style.css')) ? filemtime(public_path('css/style.css')) : time() }}">
@@ -120,18 +121,8 @@
       
       <!-- Brand Header -->
       <div class="sidebar-header">
-        <a href="{{ route('admin.dashboard') }}" class="sidebar-brand">
-          <svg class="ptree" viewBox="0 0 16 16" width="22" height="22" xmlns="http://www.w3.org/2000/svg">
-            <rect x="5" y="0" width="6" height="2" fill="#2D6B3A"/>
-            <rect x="3" y="2" width="10" height="2" fill="#3D8C4F"/>
-            <rect x="2" y="4" width="12" height="2" fill="#5AB56E"/>
-            <rect x="3" y="6" width="10" height="2" fill="#3D8C4F"/>
-            <rect x="5" y="8" width="6" height="2" fill="#2D6B3A"/>
-            <rect x="7" y="10" width="2" height="4" fill="#6B3A1F"/>
-            <rect x="4" y="1" width="1" height="1" fill="#C0392B"/>
-            <rect x="11" y="3" width="1" height="1" fill="#C0392B"/>
-            <rect x="9" y="7" width="1" height="1" fill="#C0392B"/>
-          </svg>
+        <a href="{{ auth()->user()?->is_admin ? route('admin.dashboard') : route('admin.instituciones.index') }}" class="sidebar-brand">
+          <x-logo :size="22" />
           <span>a tu <em class="editorial-italic" style="color: #A8E6C0;">lado</em></span>
         </a>
       </div>
@@ -153,6 +144,7 @@
 
       <!-- Navigation Menu: Categorized Modules -->
       <nav class="sidebar-nav-group" style="padding: 0 0.85rem; flex: 1; overflow-y: auto;">
+        @if(auth()->user()?->is_admin)
         <!-- GESTIÓN GENERAL -->
         <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; text-transform: uppercase; color: #6E887E; font-weight: 600; letter-spacing: 0.08em; margin-bottom: 0.65rem; padding-left: 0.45rem;">
           Gestión General
@@ -190,51 +182,32 @@
           <span>Foros & Revista</span>
         </a>
 
+        @endif
+
         <!-- OPERACIÓN INSTITUCIONAL B2B -->
         <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; text-transform: uppercase; color: #6E887E; font-weight: 600; letter-spacing: 0.08em; margin: 1.25rem 0 0.65rem; padding-left: 0.45rem;">
           Operación Institucional (B2B)
         </div>
 
         <!-- 5. Instituciones -->
-        <a href="{{ route('admin.institutions.index') }}" class="admin-nav-item {{ request()->routeIs('admin.institutions.index') ? 'active' : '' }}">
+        <a href="{{ route('admin.instituciones.index') }}" class="admin-nav-item {{ request()->routeIs('admin.instituciones.*') ? 'active' : '' }}">
           <div class="nav-icon"><i class="fa-solid fa-building-shield"></i></div>
           <span>Instituciones</span>
         </a>
 
-        <!-- 6. Semáforo & Detalle -->
-        <a href="{{ route('admin.institutions.show') }}" class="admin-nav-item {{ request()->routeIs('admin.institutions.show*') || request()->is('admin/semaforo*') || request()->is('admin/instituciones/*') ? 'active' : '' }}">
-          <div class="nav-icon"><i class="fa-solid fa-traffic-light"></i></div>
-          <span>Semáforo & Detalle</span>
-        </a>
-
-        <!-- 7. Analítica e Índices -->
-        <a href="{{ route('admin.analytics.index') }}" class="admin-nav-item {{ request()->routeIs('admin.analytics.*') ? 'active' : '' }}">
-          <div class="nav-icon"><i class="fa-solid fa-chart-line"></i></div>
-          <span>Analítica e Índices</span>
-        </a>
-
-        <!-- 8. Altas y Estructura -->
-        <a href="{{ route('admin.structure.index') }}" class="admin-nav-item {{ request()->routeIs('admin.structure.*') ? 'active' : '' }}">
-          <div class="nav-icon"><i class="fa-solid fa-file-arrow-up"></i></div>
-          <span>Altas y Estructura</span>
-        </a>
-
-        <!-- REPORTES & ENTREGABLES -->
-        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; text-transform: uppercase; color: #6E887E; font-weight: 600; letter-spacing: 0.08em; margin: 1.25rem 0 0.65rem; padding-left: 0.45rem;">
-          Reportes & Entregables
-        </div>
-
-        <!-- 9. Centro de Reportes -->
-        <a href="{{ route('admin.reports.index') }}" class="admin-nav-item {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}">
-          <div class="nav-icon"><i class="fa-solid fa-file-pdf"></i></div>
-          <span>Centro de Reportes</span>
-          <span style="margin-left: auto; background: rgba(168,230,192,0.18); color: #A8E6C0; border-radius: 6px; padding: 2px 6px; font-size: 0.62rem; font-weight: 700; font-family: monospace;">13</span>
-        </a>
-
-        <!-- 10. Vista Cliente (Demo) -->
-        <a href="{{ route('admin.client-view.index') }}" class="admin-nav-item {{ request()->routeIs('admin.client-view.*') ? 'active' : '' }}">
-          <div class="nav-icon"><i class="fa-solid fa-eye"></i></div>
-          <span>Vista Cliente (Demo)</span>
+        <!-- 6. Cola de atención (casos de crisis, atención manual) -->
+        @php
+          $casosAbiertos = \App\Models\EventoCrisis::abiertos()->count();
+          $sinAtender = \App\Models\EventoCrisis::abiertos()->whereNull('contactado_en')->count();
+        @endphp
+        <a href="{{ route('admin.cola.index') }}" class="admin-nav-item {{ request()->routeIs('admin.cola.*') ? 'active' : '' }}" style="position: relative;">
+          <div class="nav-icon"><i class="fa-solid fa-life-ring"></i></div>
+          <span>Cola de atención</span>
+          @if($casosAbiertos > 0)
+            <span style="margin-left: auto; background: {{ $sinAtender > 0 ? '#B02418' : '#D97706' }}; color: white; border-radius: 999px; padding: 2px 7px; font-size: 0.68rem; font-weight: 700;" title="{{ $sinAtender }} sin contacto de {{ $casosAbiertos }} abiertos">
+              {{ $casosAbiertos }}
+            </span>
+          @endif
         </a>
       </nav>
 

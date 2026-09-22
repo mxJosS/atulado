@@ -7,19 +7,23 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * Idempotente: User::generateVerificationCode() crea estas columnas en
+     * caliente si no existen, así que en producción pueden estar ya creadas.
+     * Sin la comprobación, la migración truena por columna duplicada y
+     * detiene todas las que vienen después.
      */
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('verification_code', 6)->nullable()->after('email_verified_at');
-            $table->timestamp('verification_code_expires_at')->nullable()->after('verification_code');
+            if (!Schema::hasColumn('users', 'verification_code')) {
+                $table->string('verification_code', 6)->nullable()->after('email_verified_at');
+            }
+            if (!Schema::hasColumn('users', 'verification_code_expires_at')) {
+                $table->timestamp('verification_code_expires_at')->nullable()->after('verification_code');
+            }
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {

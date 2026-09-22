@@ -19,12 +19,12 @@ class EnsureUserIsProfessional
 
         if (!$user) {
             return redirect()->route('login')
-                ->with('error', 'Debes iniciar sesi?n para publicar un art?culo.');
+                ->with('error', 'Debes iniciar sesión para publicar un artículo.');
         }
 
         if (!$user->isProfessional()) {
             return redirect()->route('profile.show')
-                ->with('error', 'Para publicar art?culos en la revista cient?fica debes ser un Profesional de la Salud verificado. Por favor, completa tu solicitud de acreditaci?n al final de tu perfil.');
+                ->with('error', 'Para publicar artículos en la revista científica debes ser un Profesional de la Salud verificado. Por favor, completa tu solicitud de acreditación al final de tu perfil.');
         }
 
         return $next($request);

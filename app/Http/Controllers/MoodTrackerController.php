@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\MoodLog;
 use App\Services\ClinicalEngineService;
+use App\Services\PucholService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -57,13 +58,33 @@ class MoodTrackerController extends Controller
             ]
         );
 
+        // Qué bloque de preguntas sigue. La ruta, la señal y el filtro léxico
+        // no salen del servidor; el origen del bloque 1 se queda en la sesión.
+        $siguiente = null;
+        if ($evaluacion['abrir_who5'] ?? false) {
+            $siguiente = 'bloque_1';
+            $request->session()->put(AssessmentController::SESION_ORIGEN, $evaluacion['origen_who5'] ?? 'programada');
+        } elseif ($evaluacion['abrir_mdi'] ?? false) {
+            $siguiente = 'bloque_2';
+        } elseif ($this->clinicalEngine->who5Programado($user)) {
+            // Nada lo pidió hoy, pero ya tocan los 14 días.
+            $siguiente = 'bloque_1';
+            $request->session()->put(AssessmentController::SESION_ORIGEN, 'programada');
+        }
+
+        // Revisión mensual repartida: sólo en días sin otras preguntas, un bloque corto a la vez.
+        $seccion = $siguiente === null ? app(PucholService::class)->ofrecerHoy($user) : null;
+        if ($seccion !== null) {
+            $siguiente = 'bloque_4';
+        }
+
         if ($request->wantsJson() || $request->ajax()) {
-            return response()->json([
+            return response()->json(array_filter([
                 'success' => true,
                 'message' => '¡Tu registro emocional ha sido guardado exitosamente!',
-                'log' => $moodLog,
-                'evaluacion' => $evaluacion,
-            ]);
+                'siguiente' => $siguiente,
+                'seccion' => $seccion,
+            ], fn ($v) => $v !== null));
         }
 
         return redirect()->route('dashboard')->with('success', '¡Tu registro de hoy ha sido guardado! Gracias por dedicar este tiempo a ti.');

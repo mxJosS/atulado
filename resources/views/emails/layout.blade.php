@@ -59,10 +59,8 @@
                 <table border="0" cellpadding="0" cellspacing="0">
                   <tr>
                     <td style="vertical-align: middle; padding-right: 10px;">
-                      <!-- Pixel Pine Tree Logo SVG (Safe for HTML emails) -->
-                      <div style="width: 32px; height: 32px; background-color: #2E5D4B; border-radius: 8px; display: inline-block; text-align: center; line-height: 32px; color: #FFFFFF; font-size: 18px;">
-                        🌲
-                      </div>
+                      {{-- Logo oficial en PNG: los clientes de correo no muestran SVG --}}
+                      <img src="{{ rtrim(config('app.url'), '/') }}/images/marca/logo-atulado-64.png" width="40" height="40" alt="A tu lado" style="display: block; border: 0; outline: none;">
                     </td>
                     <td style="vertical-align: middle;">
                       <span style="font-size: 24px; font-weight: 700; color: #2E5D4B; letter-spacing: -0.5px; font-family: 'Georgia', serif;">

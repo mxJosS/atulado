@@ -143,21 +143,19 @@
                       <span>{{ $user->name }}</span>
                       @if($user->is_admin)
                         <i class="fa-solid fa-shield-halved" style="color: #2E5D4B; font-size: 0.82rem;" title="Administrador"></i>
-                      @elseif($user->role === 'profesional')
+                      @elseif(in_array($user->role, ['profesional', 'clinico'], true))
                         <i class="fa-solid fa-circle-check" style="color: #0E7490; font-size: 0.82rem;" title="Profesional Acreditado"></i>
                       @endif
                     </div>
                     <div style="font-size: 0.78rem; color: #6E887E;">
                       {{ $user->email }}
                     </div>
-                    @if($user->institution)
-                      <div style="margin-top: 4px;">
-                        <a href="{{ route('admin.structure.index', ['inst' => $user->institution->slug, 'tab' => 'colaboradores']) }}" style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 7px; border-radius: 5px; background: #E8F5E9; color: #1B5E20; font-size: 0.72rem; font-weight: 600; text-decoration: none;" title="Ver en Padrón de {{ $user->institution->name }}">
-                          <i class="fa-solid fa-building" style="font-size: 0.68rem;"></i>
-                          <span>{{ $user->institution->short_name ?: $user->institution->name }}</span>
-                          @if($user->department)
-                            <span style="color: #6E887E; font-weight: 400;">• {{ $user->department }}</span>
-                          @endif
+                    @if($m = $user->membresiaActiva)
+                      <div style="margin-top: 3px;">
+                        <a href="{{ route('admin.instituciones.show', $m->institucion) }}#tab-padron" style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 7px; border-radius: 5px; background: #E8F5E9; color: #1B5E20; font-size: 0.72rem; font-weight: 600; text-decoration: none;" title="Ver en el padrón de {{ $m->institucion?->nombre_corto }}">
+                          <i class="fa-solid fa-building"></i>
+                          <span>{{ $m->institucion?->nombre_corto }}</span>
+                          @if($m->departamento)<span style="color: #6E887E; font-weight: 400;">• {{ $m->departamento->nombre }}</span>@endif
                         </a>
                       </div>
                     @endif
@@ -169,11 +167,11 @@
               <td style="padding: 1rem 1.25rem;">
                 @if($user->is_admin || $user->role === 'admin')
                   <span style="display: inline-flex; align-items: center; gap: 5px; padding: 0.25rem 0.65rem; border-radius: 6px; background: #1A2620; color: #A8E6C0; font-size: 0.72rem; font-weight: 700; font-family: 'IBM Plex Mono', monospace;">
-                    <i class="fa-solid fa-shield"></i> Administrador
+                    <i class="fa-solid fa-shield"></i> Administrador{{ $user->is_clinico_atulado ? ' · clínico' : '' }}
                   </span>
-                @elseif($user->role === 'profesional')
+                @elseif(in_array($user->role, ['profesional', 'clinico'], true))
                   <span style="display: inline-flex; align-items: center; gap: 5px; padding: 0.25rem 0.65rem; border-radius: 6px; background: #E0F2FE; color: #0369A1; font-size: 0.72rem; font-weight: 700;">
-                    <i class="fa-solid fa-user-doctor"></i> Profesional
+                    <i class="fa-solid fa-user-doctor"></i> {{ ['publica' => 'Profesional · publica', 'clinico' => 'Profesional · clínico', 'ambos' => 'Profesional · publica y clínico'][$user->perfil_profesional] ?? 'Profesional' }}
                   </span>
                 @else
                   <span style="display: inline-flex; align-items: center; gap: 5px; padding: 0.25rem 0.65rem; border-radius: 6px; background: #F1F5F9; color: #475569; font-size: 0.72rem; font-weight: 600;">
@@ -248,7 +246,9 @@
                                 'is_admin' => $user->is_admin,
                                 'status' => $user->email_verified_at ? 'activo' : 'pendiente',
                                 'license_number' => $user->license_number ?? '',
-                                'institution_id' => $user->institution_id,
+                                'institucion_id' => $user->membresiaActiva?->institucion_id,
+                                'perfil_profesional' => $user->perfil_profesional,
+                                'is_clinico' => (bool) $user->is_clinico_atulado,
                                 'institution_text' => (string) ($user->getRawOriginal('institution') ?? ''),
                                 'is_self' => $isSelf,
                                 'is_super_admin' => $isTargetSuperAdmin,
@@ -401,6 +401,16 @@
           </div>
         </div>
 
+        <div id="clinicoAdminBox" style="display: none; margin-bottom: 1.25rem; background: #FFF7ED; border: 1.5px solid #FDBA74; border-radius: 12px; padding: 0.9rem 1rem;">
+          <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer;">
+            <input type="hidden" name="clinico_admin" value="0">
+            <input type="checkbox" name="clinico_admin" value="1" {{ old('clinico_admin') ? 'checked' : '' }} style="margin-top: 3px;">
+            <span>
+              <b style="font-size: 0.86rem; color: #9A3412;">También tiene acreditación clínica</b>
+              <span style="display: block; font-size: 0.75rem; color: #9A3412;">Podrá abrir fichas individuales y atender la cola de crisis. Sin esto, administra pero no ve identidades ni puntajes.</span>
+            </span>
+          </label>
+        </div>
         <!-- CAMPOS DINÁMICOS PARA PROFESIONAL (VALIDACIÓN AUTOMÁTICA) -->
         <div id="proFieldsContainer" style="display: none; background: #F0FDF4; border: 1.5px solid #86EFAC; border-radius: 14px; padding: 1.35rem; margin-bottom: 1.5rem;">
           <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 1rem;">
@@ -412,6 +422,17 @@
           <p style="font-size: 0.78rem; color: #166534; margin: 0 0 1rem;">
             Al dar de alta este profesional, sus credenciales se validarán automáticamente en el sistema sin necesidad de trámites ni alertas posteriores.
           </p>
+          <div style="margin-bottom: 1rem;">
+            <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: #166534; margin-bottom: 0.4rem; display: block;">
+              ¿Qué hará este profesional? <span style="color: #DC2626;">*</span>
+            </label>
+            <select name="perfil_profesional" id="perfilProfesionalSelect" class="form-control" style="border-radius: 9px; background: white;">
+              <option value="publica" {{ old('perfil_profesional', 'publica') === 'publica' ? 'selected' : '' }}>Sólo publicar artículos en la revista</option>
+              <option value="clinico" {{ old('perfil_profesional', 'publica') === 'clinico' ? 'selected' : '' }}>Sólo profesional clínico (ve fichas y casos; no publica)</option>
+              <option value="ambos" {{ old('perfil_profesional', 'publica') === 'ambos' ? 'selected' : '' }}>Ambos: publica y es clínico</option>
+            </select>
+            <span style="font-size: 0.72rem; color: #166534; display: block; margin-top: 4px;">El acceso clínico permite ver información individual y queda registrado en la bitácora.</span>
+          </div>
 
           <!-- Especialidad o Enfoque Clínico (Opcional) -->
           <div style="margin-bottom: 1rem;">
@@ -457,11 +478,11 @@
           <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: #2D3748; margin-bottom: 0.4rem; display: block;">
             Vincular a Empresa / Institución del Sistema (Opcional)
           </label>
-          <select name="institution_id" class="form-control" style="border-radius: 9px; background: white;">
+          <select name="institucion_id" class="form-control" style="border-radius: 9px; background: white;">
             <option value="">-- Ninguna (Usuario Particular / Independiente) --</option>
             @foreach($institutions as $instOption)
-              <option value="{{ $instOption->id }}" {{ old('institution_id') == $instOption->id ? 'selected' : '' }}>
-                {{ $instOption->name }}
+              <option value="{{ $instOption->id }}" {{ old('institucion_id') == $instOption->id ? 'selected' : '' }}>
+                {{ $instOption->nombre_corto }}
               </option>
             @endforeach
           </select>
@@ -588,8 +609,29 @@
           </div>
         </div>
 
+        <div id="editClinicoAdminBox" style="display: none; margin-bottom: 1.25rem; background: #FFF7ED; border: 1.5px solid #FDBA74; border-radius: 12px; padding: 0.9rem 1rem;">
+          <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer;">
+            <input type="hidden" name="clinico_admin" value="0">
+            <input type="checkbox" name="clinico_admin" value="1" id="editClinicoAdmin"  style="margin-top: 3px;">
+            <span>
+              <b style="font-size: 0.86rem; color: #9A3412;">También tiene acreditación clínica</b>
+              <span style="display: block; font-size: 0.75rem; color: #9A3412;">Podrá abrir fichas individuales y atender la cola de crisis. Sin esto, administra pero no ve identidades ni puntajes.</span>
+            </span>
+          </label>
+        </div>
         <!-- Campos de Profesional (Cédula / Institución) -->
         <div id="editProFieldsContainer" style="display: none; margin-bottom: 1.25rem; background: #F0FDF4; padding: 1rem; border-radius: 10px; border: 1px solid #BBF7D0;">
+          <div style="margin-bottom: 1rem;">
+            <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: #166534; margin-bottom: 0.4rem; display: block;">
+              ¿Qué hará este profesional? <span style="color: #DC2626;">*</span>
+            </label>
+            <select name="perfil_profesional" id="editPerfilProfesional" class="form-control" style="border-radius: 9px; background: white;">
+              <option value="publica" >Sólo publicar artículos en la revista</option>
+              <option value="clinico" >Sólo profesional clínico (ve fichas y casos; no publica)</option>
+              <option value="ambos" >Ambos: publica y es clínico</option>
+            </select>
+            <span style="font-size: 0.72rem; color: #166534; display: block; margin-top: 4px;">El acceso clínico permite ver información individual y queda registrado en la bitácora.</span>
+          </div>
           <div style="margin-bottom: 0.85rem;">
             <label class="form-label" style="font-size: 0.8rem; font-weight: 700; color: #166534; margin-bottom: 0.35rem; display: block;">
               Número de Cédula Profesional
@@ -609,11 +651,11 @@
           <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: #2D3748; margin-bottom: 0.45rem; display: block;">
             Vincular a Empresa / Institución del Sistema (Opcional)
           </label>
-          <select name="institution_id" id="editUserInstitutionId" class="form-control" style="border-radius: 9px; background: white;">
+          <select name="institucion_id" id="editUserInstitutionId" class="form-control" style="border-radius: 9px; background: white;">
             <option value="">-- Ninguna (Usuario Particular / Independiente) --</option>
             @foreach($institutions as $instOption)
               <option value="{{ $instOption->id }}">
-                {{ $instOption->name }}
+                {{ $instOption->nombre_corto }}
               </option>
             @endforeach
           </select>
@@ -672,6 +714,7 @@
     const labelAdmin = document.getElementById('labelRoleAdmin');
     const labelPro = document.getElementById('labelRolePro');
     const labelUser = document.getElementById('labelRoleUser');
+    document.getElementById('clinicoAdminBox').style.display = isAdmin ? 'block' : 'none';
 
     if (isPro) {
       proContainer.style.display = 'block';
@@ -749,8 +792,11 @@
     document.getElementById('editUserInstitution').value = user.institution_text || user.institution || '';
     const instSelect = document.getElementById('editUserInstitutionId');
     if (instSelect) {
-      instSelect.value = user.institution_id || '';
+      instSelect.value = user.institucion_id || '';
     }
+
+    document.getElementById('editPerfilProfesional').value = user.perfil_profesional || 'publica';
+    document.getElementById('editClinicoAdmin').checked = !!user.is_clinico;
 
     toggleEditRoleFields();
     document.getElementById('editUserModal').style.display = 'flex';
@@ -768,6 +814,7 @@
     const labelAdmin = document.getElementById('editLabelRoleAdmin');
     const labelPro = document.getElementById('editLabelRolePro');
     const labelUser = document.getElementById('editLabelRoleUser');
+    document.getElementById('editClinicoAdminBox').style.display = isAdmin ? 'block' : 'none';
 
     proContainer.style.display = isPro ? 'block' : 'none';
 

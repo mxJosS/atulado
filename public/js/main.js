@@ -37,38 +37,98 @@ window.finishGrounding = function() {
   if (bar) bar.style.width = '100%';
 };
 
-/* ════ MOTOR CLÍNICO V1.0: FUNCIONES GLOBALES DE MODALES Y TRIAJE ════ */
+/* ════ BLOQUES DE PREGUNTAS Y PANTALLA DE APOYO ════ */
 window.closeClinicalModals = function() {
-  const modals = ['who5ModalOverlay', 'mdiModalOverlay', 'asqModalOverlay', 'containmentModalOverlay'];
+  const modals = ['preguntasBloque1', 'preguntasBloque2', 'preguntasBloque3', 'preguntasBloque4', 'apoyoInmediato'];
   modals.forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.display = 'none';
   });
 };
 
-window.openWho5Modal = function(origen = 'programada') {
+// El servidor sólo dice qué pantalla sigue; la decisión se toma allá.
+window.seguirPreguntas = function(data) {
+  const pasos = {
+    bloque_1: window.abrirBloque1,
+    bloque_2: window.abrirBloque2,
+    bloque_3: window.abrirBloque3,
+    bloque_4: () => window.abrirBloque4(data.seccion),
+    apoyo: window.abrirApoyo,
+    pregunta_extra: () => window.mostrarPreguntaExtra(true),
+  };
+  if (data.siguiente && pasos[data.siguiente]) {
+    pasos[data.siguiente]();
+    return;
+  }
   window.closeClinicalModals();
-  const modal = document.getElementById('who5ModalOverlay');
-  const inputOrigen = document.getElementById('who5OrigenInput');
-  if (inputOrigen) inputOrigen.value = origen;
+  if (data.mensaje) window.showZenToast(data.mensaje, 'success', 5000);
+};
+
+window.abrirBloque1 = function() {
+  window.closeClinicalModals();
+  const modal = document.getElementById('preguntasBloque1');
   if (modal) modal.style.display = 'flex';
 };
 
-window.openMdiModal = function() {
+window.abrirBloque2 = function() {
   window.closeClinicalModals();
-  const modal = document.getElementById('mdiModalOverlay');
+  const modal = document.getElementById('preguntasBloque2');
   if (modal) modal.style.display = 'flex';
 };
 
-window.openAsqModal = function() {
+window.abrirBloque3 = function() {
   window.closeClinicalModals();
-  const modal = document.getElementById('asqModalOverlay');
+  window.mostrarPreguntaExtra(false);
+  const modal = document.getElementById('preguntasBloque3');
   if (modal) modal.style.display = 'flex';
 };
 
-window.openContainmentModal = function() {
+// Bloque 4: sólo se muestra el grupo que el servidor pidió (A, B, C o D).
+window.abrirBloque4 = function(grupo) {
+  const form = document.getElementById('bloque4Form');
+  if (!form || !grupo) return;
   window.closeClinicalModals();
-  const modal = document.getElementById('containmentModalOverlay');
+  form.reset();
+  form.querySelectorAll('.clinical-radio-btn').forEach(b => b.classList.remove('selected'));
+  form.elements.bloque.value = grupo;
+  form.querySelectorAll('.grupo-bloque4').forEach(g => {
+    const visible = g.dataset.grupo === grupo;
+    g.style.display = visible ? 'block' : 'none';
+    g.querySelectorAll('input[type="radio"]').forEach(r => { r.required = visible; });
+  });
+  document.getElementById('preguntasBloque4').style.display = 'flex';
+};
+
+// Un solo manejador para el tablero y el plan de seguridad (sobrevive a la navegación sin recarga).
+document.addEventListener('submit', async (e) => {
+  if (e.target.id !== 'bloque4Form') return;
+  e.preventDefault();
+  const form = e.target;
+  const boton = document.getElementById('bloque4Enviar');
+  if (boton) boton.disabled = true;
+  try {
+    const res = await fetch('/preguntas/4', {
+      method: 'POST',
+      body: new FormData(form),
+      headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
+    });
+    if (!res.ok) throw new Error(res.status);
+    const data = await res.json();
+    window.seguirPreguntas(data);
+    // En el plan de seguridad, la lista de pendientes se actualiza al terminar.
+    if (!data.siguiente && document.getElementById('revisionMensual')) {
+      setTimeout(() => window.location.reload(), 1200);
+    }
+  } catch (err) {
+    window.showZenToast('Por favor responde todas las preguntas.', 'error', 4000);
+  } finally {
+    if (boton) boton.disabled = false;
+  }
+});
+
+window.abrirApoyo = function() {
+  window.closeClinicalModals();
+  const modal = document.getElementById('apoyoInmediato');
   if (modal) modal.style.display = 'flex';
 };
 
@@ -82,28 +142,23 @@ window.selectClinicalRadio = function(labelEl) {
   if (radio) radio.checked = true;
 };
 
-window.checkAsqP5Visibility = function() {
-  const p1 = document.querySelector('input[name="p1"]:checked')?.value;
-  const p2 = document.querySelector('input[name="p2"]:checked')?.value;
-  const p3 = document.querySelector('input[name="p3"]:checked')?.value;
-  const p4 = document.querySelector('input[name="p4"]:checked')?.value;
-
-  const esPositiva = (v) => v === 'si' || v === 'prefiero_no_contestar';
-  const container5 = document.getElementById('asqP5Container');
-
-  if (container5) {
-    if (esPositiva(p1) || esPositiva(p2) || esPositiva(p3) || esPositiva(p4)) {
-      container5.style.display = 'block';
-    } else {
-      container5.style.display = 'none';
-    }
-  }
+// El servidor pide la pregunta adicional del bloque 3 cuando corresponde.
+window.mostrarPreguntaExtra = function(mostrar = true) {
+  const extra = document.getElementById('preguntaExtra');
+  if (!extra) return;
+  extra.style.display = mostrar ? 'block' : 'none';
+  extra.querySelectorAll('input[type="radio"]').forEach(r => {
+    r.required = mostrar;
+    if (!mostrar) r.checked = false;
+  });
+  if (!mostrar) extra.querySelectorAll('.clinical-radio-btn').forEach(b => b.classList.remove('selected'));
+  if (mostrar) extra.scrollIntoView({ behavior: 'smooth', block: 'center' });
 };
 
 window.registrarCrisisAccion = async function(tipoAccion) {
   try {
     const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-    await fetch('/assessment/crisis/accion', {
+    await fetch('/apoyo/accion', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -565,7 +620,7 @@ class SpaRouter {
       }
 
       // If form has custom AJAX handler with stopImmediatePropagation or explicit ID, let it handle
-      if (form.id === 'moodCheckinForm' || form.id === 'who5Form' || form.id === 'mdiForm' || form.id === 'asqForm') {
+      if (form.id === 'moodCheckinForm' || form.id === 'bloque1Form' || form.id === 'bloque2Form' || form.id === 'bloque3Form' || form.id === 'bloque4Form') {
         return;
       }
 
@@ -1032,18 +1087,9 @@ function initAllComponents() {
             if (saveText) saveText.textContent = 'Actualizar registro de hoy';
           }, 2500);
 
-          // ════ Evaluador del Motor Clínico de 4 Capas ════
-          if (data.evaluacion) {
-            const ev = data.evaluacion;
-            if (ev.ruta === 'B' && ev.abrir_who5) {
-              setTimeout(() => {
-                window.openWho5Modal(ev.origen_who5 || 'programada');
-              }, 600);
-            } else if (ev.ruta === 'C' && ev.abrir_mdi) {
-              setTimeout(() => {
-                window.openMdiModal();
-              }, 600);
-            }
+          // Siguiente bloque de preguntas, si el servidor lo indica
+          if (data.siguiente) {
+            setTimeout(() => window.seguirPreguntas(data), 600);
           }
         } else {
           throw new Error('Error al guardar');
@@ -1056,17 +1102,17 @@ function initAllComponents() {
     };
   }
 
-  // G.1 WHO-5 Form Submission (Capa 1)
-  const who5Form = document.getElementById('who5Form');
-  if (who5Form) {
-    who5Form.onsubmit = async (e) => {
+  // G.1 Bloque 1
+  const bloque1Form = document.getElementById('bloque1Form');
+  if (bloque1Form) {
+    bloque1Form.onsubmit = async (e) => {
       e.preventDefault();
-      const submitBtn = document.getElementById('who5SubmitBtn');
+      const submitBtn = document.getElementById('bloque1Enviar');
       if (submitBtn) submitBtn.disabled = true;
 
       try {
-        const formData = new FormData(who5Form);
-        const res = await fetch('/assessment/who5', {
+        const formData = new FormData(bloque1Form);
+        const res = await fetch('/preguntas/1', {
           method: 'POST',
           body: formData,
           headers: {
@@ -1076,34 +1122,26 @@ function initAllComponents() {
         });
 
         const data = await res.json();
-        if (data.success) {
-          const resWho5 = data.resultado;
-          if (resWho5.abrir_mdi) {
-            window.openMdiModal();
-          } else {
-            window.closeClinicalModals();
-            window.showZenToast(resWho5.mensaje || 'Evaluación de bienestar completada.', 'success', 5000);
-          }
-        }
+        if (data.success) window.seguirPreguntas(data);
       } catch (err) {
-        window.showZenToast('Por favor responde todas las preguntas del cuestionario.', 'error', 4000);
+        window.showZenToast('Por favor responde todas las preguntas.', 'error', 4000);
       } finally {
         if (submitBtn) submitBtn.disabled = false;
       }
     };
   }
 
-  // G.2 MDI Form Submission (Capa 2)
-  const mdiForm = document.getElementById('mdiForm');
-  if (mdiForm) {
-    mdiForm.onsubmit = async (e) => {
+  // G.2 Bloque 2
+  const bloque2Form = document.getElementById('bloque2Form');
+  if (bloque2Form) {
+    bloque2Form.onsubmit = async (e) => {
       e.preventDefault();
-      const submitBtn = document.getElementById('mdiSubmitBtn');
+      const submitBtn = document.getElementById('bloque2Enviar');
       if (submitBtn) submitBtn.disabled = true;
 
       try {
-        const formData = new FormData(mdiForm);
-        const res = await fetch('/assessment/mdi', {
+        const formData = new FormData(bloque2Form);
+        const res = await fetch('/preguntas/2', {
           method: 'POST',
           body: formData,
           headers: {
@@ -1113,36 +1151,26 @@ function initAllComponents() {
         });
 
         const data = await res.json();
-        if (data.success) {
-          const resMdi = data.resultado;
-          if (resMdi.abrir_asq) {
-            window.openAsqModal();
-          } else if (resMdi.nivel === 'ROJO') {
-            window.openContainmentModal();
-          } else {
-            window.closeClinicalModals();
-            window.showZenToast('Respuestas registradas. Hemos adaptado tus sugerencias de bienestar.', 'success', 5000);
-          }
-        }
+        if (data.success) window.seguirPreguntas(data);
       } catch (err) {
-        window.showZenToast('Por favor completa todos los ítems para continuar.', 'error', 4000);
+        window.showZenToast('Por favor responde todas las preguntas.', 'error', 4000);
       } finally {
         if (submitBtn) submitBtn.disabled = false;
       }
     };
   }
 
-  // G.3 ASQ Form Submission (Capa 3)
-  const asqForm = document.getElementById('asqForm');
-  if (asqForm) {
-    asqForm.onsubmit = async (e) => {
+  // G.3 Bloque 3
+  const bloque3Form = document.getElementById('bloque3Form');
+  if (bloque3Form) {
+    bloque3Form.onsubmit = async (e) => {
       e.preventDefault();
-      const submitBtn = document.getElementById('asqSubmitBtn');
+      const submitBtn = document.getElementById('bloque3Enviar');
       if (submitBtn) submitBtn.disabled = true;
 
       try {
-        const formData = new FormData(asqForm);
-        const res = await fetch('/assessment/asq', {
+        const formData = new FormData(bloque3Form);
+        const res = await fetch('/preguntas/3', {
           method: 'POST',
           body: formData,
           headers: {
@@ -1152,15 +1180,7 @@ function initAllComponents() {
         });
 
         const data = await res.json();
-        if (data.success) {
-          const resAsq = data.resultado;
-          if (resAsq.nivel === 'ROJO' || resAsq.nivel === 'ROJO_AGUDO') {
-            window.openContainmentModal();
-          } else {
-            window.closeClinicalModals();
-            window.showZenToast('Gracias por tu honestidad. Cuentas con nosotros en todo momento.', 'success', 5000);
-          }
-        }
+        if (data.success) window.seguirPreguntas(data);
       } catch (err) {
         window.showZenToast('Por favor selecciona una opción en cada pregunta.', 'error', 4000);
       } finally {

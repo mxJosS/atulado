@@ -65,7 +65,11 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    // Hora de Mérida (UTC−6 todo el año). El registro diario, las rachas y las
+    // reglas de vigilancia dependen de en qué día local cae cada registro.
+    // Las horas guardadas antes del cambio se convirtieron en la migración
+    // 2026_09_22_000002_convertir_horas_utc_a_merida.
+    'timezone' => env('APP_TIMEZONE', 'America/Merida'),
 
     /*
     |--------------------------------------------------------------------------

@@ -95,18 +95,22 @@ Route::middleware('auth')->group(function () {
         Route::get('/plan-de-seguridad', [SafetyPlanController::class, 'show'])->name('safety-plan.show');
         Route::put('/plan-de-seguridad', [SafetyPlanController::class, 'update'])->name('safety-plan.update');
         Route::get('/plan-de-seguridad/imprimir', [SafetyPlanController::class, 'printView'])->name('safety-plan.print');
+        Route::post('/plan-de-seguridad/sugerencia', [SafetyPlanController::class, 'agregarSugerencia'])->name('safety-plan.sugerencia');
 
         // Favorites & Completed Resources
         Route::post('/recursos/{resource}/favorito', [ResourceController::class, 'toggleFavorite'])->name('recursos.favorite');
         Route::post('/recursos/{resource}/completar', [ResourceController::class, 'toggleCompleted'])->name('recursos.complete');
         Route::get('/mis-favoritos', [ResourceController::class, 'userFavorites'])->name('favorites.index');
 
-        // Clinical Risk Assessment Engine (v1.0)
-        Route::post('/assessment/who5', [AssessmentController::class, 'submitWho5'])->name('assessment.who5');
-        Route::post('/assessment/mdi', [AssessmentController::class, 'submitMdi'])->name('assessment.mdi');
-        Route::post('/assessment/asq', [AssessmentController::class, 'submitAsq'])->name('assessment.asq');
-        Route::post('/assessment/crisis/accion', [AssessmentController::class, 'registrarAccionCrisis'])->name('assessment.crisis.action');
-        Route::post('/assessment/crisis/{evento}/cerrar', [AssessmentController::class, 'cerrarCasoCrisis'])->name('assessment.crisis.close');
+        // Bloques de preguntas del motor clínico. Las URLs son neutras a propósito:
+        // el navegador no debe poder deducir qué instrumento hay detrás de cada una.
+        Route::post('/preguntas/1', [AssessmentController::class, 'submitWho5'])->name('preguntas.bloque1');
+        Route::post('/preguntas/2', [AssessmentController::class, 'submitMdi'])->name('preguntas.bloque2');
+        Route::post('/preguntas/3', [AssessmentController::class, 'submitAsq'])->name('preguntas.bloque3');
+        Route::post('/preguntas/4', [AssessmentController::class, 'submitRevision'])->name('preguntas.bloque4');
+        Route::post('/apoyo/texto', [AssessmentController::class, 'revisarTexto'])->name('apoyo.texto')->middleware('throttle:120,1');
+        Route::post('/apoyo/accion',[AssessmentController::class, 'registrarAccionCrisis'])->name('apoyo.accion');
+        Route::post('/apoyo/casos/{evento}/cerrar', [AssessmentController::class, 'cerrarCasoCrisis'])->name('apoyo.cerrar');
 
         // Profile Settings
         Route::get('/perfil', [AuthController::class, 'showProfile'])->name('profile.show');
@@ -120,12 +124,36 @@ Route::middleware('auth')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| Admin Portal Routes (Restricted to is_admin = true)
+| Panel compartido: administración y personal clínico acreditado
+|--------------------------------------------------------------------------
+| Un profesional sólo clínico entra aquí sin ser administrador. Cada acción
+| clínica vuelve a exigir la acreditación en su controlador.
+*/
+Route::middleware(['auth', 'panel'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/instituciones', [\App\Http\Controllers\Admin\InstitucionController::class, 'index'])->name('instituciones.index');
+    Route::get('/instituciones/{institucion}', [\App\Http\Controllers\Admin\InstitucionController::class, 'show'])->name('instituciones.show');
+
+    // Cola de atención de casos de crisis (se atiende de forma manual)
+    Route::get('/cola-atencion', [\App\Http\Controllers\Admin\ColaAtencionController::class, 'index'])->name('cola.index');
+    Route::post('/cola-atencion/{caso}/contacto', [\App\Http\Controllers\Admin\ColaAtencionController::class, 'contacto'])->name('cola.contacto');
+    Route::post('/cola-atencion/{caso}/cerrar', [\App\Http\Controllers\Admin\ColaAtencionController::class, 'cerrar'])->name('cola.cerrar');
+
+    // Ficha individual y protocolo
+    Route::post('/instituciones/{institucion}/colaboradores/{membresia}/ficha', [\App\Http\Controllers\Admin\ExpedienteController::class, 'ficha'])->name('instituciones.ficha');
+    Route::post('/instituciones/{institucion}/colaboradores/{membresia}/escalar', [\App\Http\Controllers\Admin\ExpedienteController::class, 'escalar'])->name('instituciones.ficha.escalar');
+    Route::post('/instituciones/{institucion}/colaboradores/{membresia}/resumen', [\App\Http\Controllers\Admin\ExpedienteController::class, 'resumen'])->name('instituciones.ficha.resumen');
+    Route::post('/instituciones/{institucion}/colaboradores/{membresia}/casos/{caso}/contacto', [\App\Http\Controllers\Admin\ExpedienteController::class, 'contacto'])->name('instituciones.caso.contacto');
+    Route::post('/instituciones/{institucion}/colaboradores/{membresia}/casos/{caso}/cerrar', [\App\Http\Controllers\Admin\ExpedienteController::class, 'cerrar'])->name('instituciones.caso.cerrar');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Sólo administración (is_admin = true)
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'index'])->name('dashboard');
-    
+
     // Acreditaciones
     Route::get('/solicitudes-profesionales', [ProfessionalVerificationController::class, 'index'])->name('verifications.index');
     Route::get('/solicitudes-profesionales/{verification}/documento', [ProfessionalVerificationController::class, 'document'])->name('verifications.document');
@@ -141,22 +169,35 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Foros & Revista
     Route::get('/foros', [\App\Http\Controllers\Admin\AdminForumController::class, 'index'])->name('forums.index');
 
-    // Operación Institucional B2B (Paneles A Tu Lado)
-    Route::get('/instituciones', [\App\Http\Controllers\Admin\AdminInstitutionController::class, 'index'])->name('institutions.index');
-    Route::post('/instituciones', [\App\Http\Controllers\Admin\AdminInstitutionController::class, 'store'])->name('institutions.store');
-    Route::get('/semaforo/{slug?}', [\App\Http\Controllers\Admin\AdminInstitutionController::class, 'show'])->name('institutions.show');
-    Route::get('/instituciones/{slug}', [\App\Http\Controllers\Admin\AdminInstitutionController::class, 'show'])->name('institutions.show.slug');
-    Route::get('/analitica', [\App\Http\Controllers\Admin\AdminInstitutionController::class, 'analytics'])->name('analytics.index');
-    Route::get('/altas-estructura', [\App\Http\Controllers\Admin\AdminInstitutionController::class, 'structure'])->name('structure.index');
-    Route::get('/altas-estructura/plantilla-csv', [\App\Http\Controllers\Admin\AdminInstitutionController::class, 'downloadCsvTemplate'])->name('structure.template');
-    Route::post('/altas-estructura/importar-csv', [\App\Http\Controllers\Admin\AdminInstitutionController::class, 'importCsv'])->name('structure.import');
-    Route::post('/altas-estructura/areas', [\App\Http\Controllers\Admin\AdminInstitutionController::class, 'storeArea'])->name('structure.area.store');
-    Route::post('/altas-estructura/areas/eliminar', [\App\Http\Controllers\Admin\AdminInstitutionController::class, 'destroyArea'])->name('structure.area.destroy');
-    Route::post('/altas-estructura/colaboradores', [\App\Http\Controllers\Admin\AdminInstitutionController::class, 'storeCollaborator'])->name('structure.collaborator.store');
-    Route::post('/altas-estructura/colaboradores/eliminar', [\App\Http\Controllers\Admin\AdminInstitutionController::class, 'destroyCollaborator'])->name('structure.collaborator.destroy');
-    Route::get('/vista-cliente', [\App\Http\Controllers\Admin\AdminInstitutionController::class, 'clientView'])->name('client-view.index');
+    // Instituciones: alta y edición
+    Route::post('/instituciones', [\App\Http\Controllers\Admin\InstitucionController::class, 'store'])->name('instituciones.store');
+    Route::put('/instituciones/{institucion}', [\App\Http\Controllers\Admin\InstitucionController::class, 'update'])->name('instituciones.update');
 
-    // Centro de Reportes & Visor PDF
-    Route::get('/reportes', [\App\Http\Controllers\Admin\AdminReportController::class, 'index'])->name('reports.index');
-    Route::get('/reportes/visor', [\App\Http\Controllers\Admin\AdminReportController::class, 'viewer'])->name('reports.viewer');
+    // Padrón por Excel
+    Route::get('/instituciones/{institucion}/padron/plantilla', [\App\Http\Controllers\Admin\PadronController::class, 'plantilla'])->name('instituciones.padron.plantilla');
+    Route::post('/instituciones/{institucion}/padron', [\App\Http\Controllers\Admin\PadronController::class, 'importar'])->name('instituciones.padron.importar');
+    Route::get('/instituciones/{institucion}/padron/{carga}/problemas', [\App\Http\Controllers\Admin\PadronController::class, 'problemas'])->name('instituciones.padron.problemas');
+
+    // Padrón: altas individuales, edición, baja y reactivación
+    Route::post('/instituciones/{institucion}/personas', [\App\Http\Controllers\Admin\ColaboradorController::class, 'store'])->name('instituciones.personas.store');
+    Route::put('/instituciones/{institucion}/personas/{membresia}', [\App\Http\Controllers\Admin\ColaboradorController::class, 'update'])->name('instituciones.personas.update');
+    Route::post('/instituciones/{institucion}/personas/{membresia}/baja', [\App\Http\Controllers\Admin\ColaboradorController::class, 'baja'])->name('instituciones.personas.baja');
+    Route::post('/instituciones/{institucion}/personas/{membresia}/reactivar', [\App\Http\Controllers\Admin\ColaboradorController::class, 'reactivar'])->name('instituciones.personas.reactivar');
+
+    // Invitaciones por correo
+    Route::post('/instituciones/{institucion}/invitaciones', [\App\Http\Controllers\Admin\InvitacionController::class, 'enviar'])->name('instituciones.invitaciones.enviar');
+
+    // El panel viejo de «Altas y Estructura» se integró a cada institución.
+    Route::redirect('/altas-estructura', '/admin/instituciones')->name('structure.index');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Enlaces firmados que llegan por correo
+|--------------------------------------------------------------------------
+*/
+Route::middleware('signed')->group(function () {
+    Route::get('/invitacion/{membresia}', [\App\Http\Controllers\InvitacionAceptarController::class, 'mostrar'])->name('invitacion.mostrar');
+    Route::post('/invitacion/{membresia}', [\App\Http\Controllers\InvitacionAceptarController::class, 'aceptar'])->name('invitacion.aceptar')->middleware('throttle:10,1');
+    Route::get('/resumen-clinico/{entrega}', [\App\Http\Controllers\ResumenEntregaController::class, 'ver'])->name('resumen.ver');
 });

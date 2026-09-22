@@ -1,0 +1,267 @@
+/* ==========================================================================
+   A TU LADO — Pulido visual de las páginas públicas del menú
+   (Inicio, ¿Cómo te sientes?, Respira Conmigo, Recursos, Revista, Líneas de Ayuda)
+
+   Sólo aplica con <body class="sitio-publico">, que layouts/guest pone en esas
+   rutas. No toca el tablero, el panel ni las pantallas de acceso.
+   Se carga después de style.css: sólo refina lo existente, no lo reemplaza.
+   ========================================================================== */
+
+:root {
+  --pub-radio: 20px;
+  --pub-radio-sm: 14px;
+  --pub-verde: #2E5D4B;
+  --pub-verde-hover: #24493B;
+  --pub-menta: #A8E6C0;
+  --pub-borde: rgba(26, 38, 32, 0.08);
+  --pub-sombra: 0 1px 2px rgba(16, 24, 20, 0.04), 0 6px 18px rgba(16, 24, 20, 0.06);
+  --pub-sombra-hover: 0 2px 6px rgba(16, 24, 20, 0.06), 0 18px 40px rgba(16, 24, 20, 0.11);
+  --pub-foco: rgba(168, 230, 192, 0.9);
+  --pub-trans: 200ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+/* ── 1. Base ─────────────────────────────────────────────────────────────── */
+html:has(body.sitio-publico) {
+  scroll-behavior: smooth;
+  scroll-padding-top: 84px; /* los anclas no quedan bajo el menú fijo */
+}
+
+body.sitio-publico {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body.sitio-publico ::selection {
+  background: rgba(168, 230, 192, 0.55);
+  color: #10231A;
+}
+
+/* Foco visible para teclado (accesibilidad), sin afectar clics con mouse */
+body.sitio-publico :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 3px solid var(--pub-foco);
+  outline-offset: 3px;
+}
+
+/* ── 2. Tipografía ───────────────────────────────────────────────────────── */
+body.sitio-publico :where(h1, h2, h3) {
+  text-wrap: balance;          /* títulos sin palabras huérfanas */
+  letter-spacing: -0.015em;
+}
+
+body.sitio-publico :where(p, li) {
+  text-wrap: pretty;
+}
+
+body.sitio-publico main :where(p) {
+  line-height: 1.65;
+}
+
+body.sitio-publico .mono-tag {
+  font-size: 0.74rem;
+  letter-spacing: 0.14em;
+}
+
+/* ── 3. Menú superior: vidrio esmerilado ─────────────────────────────────── */
+body.sitio-publico .site-navbar {
+  background: rgba(8, 12, 10, 0.82) !important;
+  -webkit-backdrop-filter: saturate(160%) blur(14px);
+  backdrop-filter: saturate(160%) blur(14px);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06), 0 10px 30px rgba(0, 0, 0, 0.18);
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  body.sitio-publico .site-navbar { background: #080C0A !important; }
+}
+
+body.sitio-publico .nav-brand {
+  gap: 0.6rem;
+  transition: opacity var(--pub-trans);
+}
+body.sitio-publico .nav-brand:hover { opacity: 0.88; }
+
+body.sitio-publico .nav-link {
+  border-radius: 999px;
+  padding: 0.5rem 0.95rem;
+  transition: background var(--pub-trans), color var(--pub-trans);
+}
+body.sitio-publico .nav-link:hover {
+  background: rgba(255, 255, 255, 0.07) !important;
+  color: #FFFFFF !important;
+}
+body.sitio-publico .nav-link.active {
+  background: rgba(46, 93, 75, 0.95) !important;
+  box-shadow: inset 0 0 0 1px rgba(168, 230, 192, 0.22);
+}
+
+body.sitio-publico .nav-crisis-pill,
+body.sitio-publico .nav-btn-access {
+  border-radius: 999px;
+  transition: transform var(--pub-trans), box-shadow var(--pub-trans), background var(--pub-trans);
+}
+body.sitio-publico .nav-crisis-pill {
+  box-shadow: 0 0 0 0 rgba(169, 50, 38, 0.55);
+  animation: pub-pulso-crisis 2.6s ease-out infinite;
+}
+body.sitio-publico .nav-crisis-pill:hover,
+body.sitio-publico .nav-btn-access:hover {
+  transform: translateY(-1px);
+}
+
+@keyframes pub-pulso-crisis {
+  0%   { box-shadow: 0 0 0 0 rgba(169, 50, 38, 0.5); }
+  70%  { box-shadow: 0 0 0 10px rgba(169, 50, 38, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(169, 50, 38, 0); }
+}
+
+/* Menú en celular */
+body.sitio-publico .nav-mobile-drawer {
+  gap: 0.35rem;
+}
+body.sitio-publico .nav-mobile-link {
+  border-radius: var(--pub-radio-sm);
+  padding: 0.95rem 1rem;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  transition: background var(--pub-trans);
+}
+body.sitio-publico .nav-mobile-link:hover,
+body.sitio-publico .nav-mobile-link:active {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* ── 4. Botones ──────────────────────────────────────────────────────────── */
+body.sitio-publico main .btn {
+  border-radius: 999px;
+  min-height: 44px;             /* área táctil mínima recomendada */
+  transition: transform var(--pub-trans), box-shadow var(--pub-trans),
+              background var(--pub-trans), border-color var(--pub-trans), color var(--pub-trans);
+}
+body.sitio-publico main .btn-sm { min-height: 38px; }
+body.sitio-publico main .btn-lg { min-height: 52px; padding-inline: 1.75rem; }
+
+body.sitio-publico main .btn:active { transform: translateY(0) scale(0.98); }
+
+body.sitio-publico main .btn-primary {
+  box-shadow: 0 6px 18px rgba(46, 93, 75, 0.22);
+}
+body.sitio-publico main .btn-secondary {
+  border: 1.5px solid var(--pub-borde);
+}
+
+@media (hover: hover) {
+  body.sitio-publico main .btn:hover { transform: translateY(-1px); }
+  body.sitio-publico main .btn-primary:hover { box-shadow: 0 10px 24px rgba(46, 93, 75, 0.3); }
+  body.sitio-publico main .btn-secondary:hover { border-color: rgba(46, 93, 75, 0.35); }
+}
+
+/* ── 5. Tarjetas ─────────────────────────────────────────────────────────── */
+body.sitio-publico main .card {
+  border-radius: var(--pub-radio);
+  border-color: var(--pub-borde);
+  box-shadow: var(--pub-sombra);
+  transition: transform var(--pub-trans), box-shadow var(--pub-trans), border-color var(--pub-trans);
+}
+
+/* Se elevan al pasar el mouse, salvo las que contienen formularios */
+@media (hover: hover) {
+  body.sitio-publico main .card:not(:has(input, textarea, select)):hover {
+    transform: translateY(-3px);
+    box-shadow: var(--pub-sombra-hover);
+    border-color: rgba(46, 93, 75, 0.2);
+  }
+}
+
+body.sitio-publico main .card-body {
+  padding: clamp(1.25rem, 2.2vw, 1.6rem);
+}
+
+/* Tarjetas de artículos de la revista */
+body.sitio-publico main .article-forum-card {
+  border-radius: var(--pub-radio);
+  transition: transform var(--pub-trans), box-shadow var(--pub-trans);
+}
+@media (hover: hover) {
+  body.sitio-publico main .article-forum-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--pub-sombra-hover);
+  }
+}
+
+/* ── 6. Chips, filtros y emociones ───────────────────────────────────────── */
+body.sitio-publico main .badge { border-radius: 999px; }
+
+body.sitio-publico main .home-emo-btn,
+body.sitio-publico main .breath-mode-btn {
+  border-radius: 999px;
+  min-height: 44px;
+  transition: transform var(--pub-trans), box-shadow var(--pub-trans), background var(--pub-trans), border-color var(--pub-trans);
+}
+@media (hover: hover) {
+  body.sitio-publico main .home-emo-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(16, 24, 20, 0.08);
+  }
+}
+
+/* ── 7. Formularios (buscador de recursos, filtros) ──────────────────────── */
+body.sitio-publico main .form-control {
+  border-radius: var(--pub-radio-sm);
+  min-height: 48px;
+  transition: border-color var(--pub-trans), box-shadow var(--pub-trans);
+}
+body.sitio-publico main .form-control:focus {
+  border-color: var(--pub-verde) !important;
+  box-shadow: 0 0 0 4px rgba(46, 93, 75, 0.14) !important;
+  outline: none;
+}
+
+/* ── 8. Pie de página ────────────────────────────────────────────────────── */
+body.sitio-publico .footer-links a {
+  transition: color var(--pub-trans), transform var(--pub-trans);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+body.sitio-publico .footer-links a:hover {
+  color: var(--pub-menta) !important;
+  transform: translateX(2px);
+}
+
+/* ── 9. Celular ──────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  body.sitio-publico .site-navbar { padding: 0.7rem 1rem; }
+
+  body.sitio-publico main .container { padding-inline: 1.1rem; }
+
+  body.sitio-publico main :where(h1) { line-height: 1.12; }
+
+  /* Botones principales a lo ancho: más fáciles de tocar con el pulgar */
+  body.sitio-publico main .btn-lg { width: 100%; }
+
+  body.sitio-publico main .card { border-radius: 18px; }
+
+  /* Pie: las tres columnas de enlaces en dos, en lugar de una larguísima */
+  body.sitio-publico .footer-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem 1.25rem;
+  }
+  body.sitio-publico .footer-grid > :first-child { grid-column: 1 / -1; }
+  body.sitio-publico .footer-links a { align-items: baseline; font-size: 0.9rem; }
+  body.sitio-publico .site-footer { padding-top: 3rem; }
+}
+
+/* ── 10. Movimiento reducido ─────────────────────────────────────────────── */
+/* Sólo se apagan los adornos de esta hoja; la guía de respiración sigue igual. */
+@media (prefers-reduced-motion: reduce) {
+  html:has(body.sitio-publico) { scroll-behavior: auto; }
+  body.sitio-publico .nav-crisis-pill { animation: none; }
+  body.sitio-publico main :where(.card, .btn, .home-emo-btn, .article-forum-card, .breath-mode-btn),
+  body.sitio-publico .footer-links a {
+    transition: none;
+  }
+  body.sitio-publico main :where(.card, .btn, .home-emo-btn, .article-forum-card):hover {
+    transform: none !important;
+  }
+}
