@@ -201,9 +201,15 @@
 
               <!-- Estado -->
               <td style="padding: 1rem 1.25rem; text-align: center;">
-                @if($user->email_verified_at)
+                @php $estadoCuenta = $user->estadoCuenta(); @endphp
+                @if($estadoCuenta === 'activo')
                   <span style="color: #059669; font-size: 0.78rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
                     <i class="fa-solid fa-circle" style="font-size: 0.45rem;"></i> Activo
+                  </span>
+                @elseif($estadoCuenta === 'sin_activar')
+                  {{-- Mismo criterio que el padrón: está dado de alta pero aún no entra por primera vez --}}
+                  <span style="color: #6E887E; font-size: 0.78rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;" title="Dado de alta en el padrón; se activa cuando entra por primera vez">
+                    <i class="fa-solid fa-circle" style="font-size: 0.45rem;"></i> Sin activar
                   </span>
                 @else
                   <span style="color: #D97706; font-size: 0.78rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
@@ -244,7 +250,7 @@
                                 'email' => $user->email,
                                 'role' => $user->role,
                                 'is_admin' => $user->is_admin,
-                                'status' => $user->email_verified_at ? 'activo' : 'pendiente',
+                                'status' => $estadoCuenta === 'activo' ? 'activo' : 'pendiente',
                                 'license_number' => $user->license_number ?? '',
                                 'institucion_id' => $user->membresiaActiva?->institucion_id,
                                 'perfil_profesional' => $user->perfil_profesional,

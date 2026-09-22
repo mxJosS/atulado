@@ -298,7 +298,8 @@ class ExpedienteClinicoTest extends TestCase
         $this->get($url)->assertOk()
             ->assertSee('Luis Manuel Chan Poot')
             ->assertSee($entrega->folio)
-            ->assertSee('Prohibido usar esta información');
+            ->assertSee('no puede utilizarse para evaluaciones de desempeño')
+            ->assertSee('Descargar PDF');
         $this->assertSame(1, $entrega->fresh()->aperturas);
 
         // Vencido, deja de abrir.

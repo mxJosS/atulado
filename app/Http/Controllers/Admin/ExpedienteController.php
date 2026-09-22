@@ -11,6 +11,7 @@ use App\Models\Institucion;
 use App\Models\Membresia;
 use App\Services\ClinicalEngineService;
 use App\Services\ExpedienteClinicoService;
+use App\Services\ResumenClinicoService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -110,10 +111,25 @@ class ExpedienteController extends Controller
             return $this->volver($institucion)->with('error', 'Ese caso ya está cerrado.');
         }
 
-        $this->motor->registrarContactoHumano($caso, $request->user(), $datos['nota'] ?? null);
+        if (!$this->motor->registrarContactoHumano($caso, $request->user(), $datos['nota'] ?? null)) {
+            return $this->volver($institucion)->with('error', 'Ese caso ya está cerrado.');
+        }
 
         return $this->volver($institucion)
             ->with('success', 'Contacto humano registrado en ' . ExpedienteClinicoService::codigoCaso($caso) . '.');
+    }
+
+    public function reabrir(Request $request, Institucion $institucion, Membresia $membresia, EventoCrisis $caso)
+    {
+        $this->exigirClinico($request, $institucion, $membresia);
+        abort_unless($caso->user_id === $membresia->user_id, 404);
+
+        $datos = $request->validate(...ColaAtencionController::reglasReapertura());
+
+        return $this->volver($institucion)->with(...ColaAtencionController::mensajeReapertura(
+            $this->motor->reabrirCaso($caso, $request->user(), trim($datos['motivo'])),
+            $caso
+        ));
     }
 
     public function cerrar(Request $request, Institucion $institucion, Membresia $membresia, EventoCrisis $caso)
@@ -145,7 +161,7 @@ class ExpedienteController extends Controller
      * institución) o a la guardia de A Tu Lado. El documento se guarda tal
      * como se generó: quien lo abre ve esa foto, con folio y marca de agua.
      */
-    public function resumen(Request $request, Institucion $institucion, Membresia $membresia)
+    public function resumen(Request $request, Institucion $institucion, Membresia $membresia, ResumenClinicoService $resumenes)
     {
         $this->exigirClinico($request, $institucion, $membresia);
 
@@ -153,17 +169,24 @@ class ExpedienteController extends Controller
             'destinatario' => ['required', 'in:profesional,guardia'],
             'motivo' => ['required', 'string', 'min:5', 'max:500'],
             'vigencia_horas' => ['required', 'in:24,72,168'],
+            'alcance' => ['nullable', 'array'],
+            'alcance.*' => ['string', 'in:' . implode(',', array_keys(ResumenClinicoService::ALCANCE))],
         ], [
             'destinatario.required' => 'Indica a quién se entrega el resumen.',
             'motivo.required' => 'Indica el motivo de la entrega.',
         ]);
+        $alcance = array_values(array_unique($datos['alcance'] ?? []));
 
         [$nombre, $email, $problema] = $this->destinatario($institucion, $datos['destinatario']);
         if ($problema) {
             return $this->volver($institucion)->with('error', $problema);
         }
 
-        $entrega = DB::transaction(function () use ($request, $institucion, $membresia, $datos, $nombre, $email) {
+        $detalle = $datos['destinatario'] === 'profesional' && $institucion->profesional_cedula
+            ? "{$nombre} · Céd. {$institucion->profesional_cedula}"
+            : $nombre;
+
+        $entrega = DB::transaction(function () use ($request, $institucion, $membresia, $datos, $nombre, $email, $detalle, $alcance, $resumenes) {
             $entrega = EntregaResumen::create([
                 'folio' => 'RC-' . Str::upper(Str::random(10)), // provisional hasta tener id
                 'membresia_id' => $membresia->id,
@@ -171,26 +194,32 @@ class ExpedienteController extends Controller
                 'destinatario_nombre' => $nombre,
                 'destinatario_email' => $email,
                 'motivo' => trim($datos['motivo']),
+                'alcance' => $alcance,
                 'contenido' => '',
                 'vence_en' => now()->addHours((int) $datos['vigencia_horas']),
             ]);
 
             $folio = 'RC-' . now()->format('Y') . '-' . str_pad((string) $membresia->id, 4, '0', STR_PAD_LEFT) . '-' . $entrega->id;
 
-            $entrega->update([
+            $documento = $resumenes->construir($membresia, $institucion, $alcance, [
                 'folio' => $folio,
-                'contenido' => view('admin.instituciones.resumen-clinico', $this->expediente->ficha($membresia) + [
-                    'institucion' => $institucion,
-                    'folio' => $folio,
-                    'destinatario' => $nombre,
-                    'motivo' => trim($datos['motivo']),
-                    'generadoPor' => $request->user(),
-                    'generadoEn' => now(),
-                ])->render(),
+                'destinatario' => $nombre,
+                'destinatario_detalle' => $detalle,
+                'motivo' => trim($datos['motivo']),
+                'generado_por' => $request->user(),
+                'generado_en' => now(),
+                'vence_en' => $entrega->vence_en,
             ]);
 
+            $entrega->update([
+                'folio' => $folio,
+                'paginas' => $documento['paginas'],
+                'contenido' => $documento['html'],
+            ]);
+
+            $secciones = implode(', ', array_map(fn ($c) => ResumenClinicoService::ALCANCE[$c], $alcance)) ?: 'sólo identificación, instrumentos y cronología';
             $this->registrar($request, $membresia, 'resumen_generado', trim($datos['motivo']),
-                "Resumen {$folio} enviado a {$nombre} <{$email}>; vence {$entrega->vence_en->format('d/m/Y H:i')}.");
+                "Resumen {$folio} ({$documento['paginas']} págs.) enviado a {$nombre} <{$email}>; vence {$entrega->vence_en->format('d/m/Y H:i')}. Alcance: {$secciones}.");
 
             return $entrega;
         });
@@ -199,8 +228,47 @@ class ExpedienteController extends Controller
             'resumen.ver', $entrega->vence_en, ['entrega' => $entrega->id]
         )));
 
-        return $this->volver($institucion)
+        // Se abre el documento para imprimirlo o guardarlo como PDF en el momento.
+        return redirect()->route('admin.resumenes.ver', $entrega)
             ->with('success', "Resumen {$entrega->folio} enviado a {$nombre}. El enlace vence el {$entrega->vence_en->format('d/m/Y H:i')}.");
+    }
+
+    /**
+     * Visor del resumen emitido, dentro del panel: el mismo documento que
+     * recibe el destinatario, con «Emitir otro» y «Descargar PDF».
+     */
+    public function verResumen(Request $request, EntregaResumen $entrega)
+    {
+        $entrega->loadMissing('membresia.institucion');
+        $membresia = $entrega->membresia;
+        abort_unless($membresia && $membresia->institucion, 404);
+        $this->exigirClinico($request, $membresia->institucion, $membresia);
+
+        $this->registrar($request, $membresia, 'resumen_consultado', 'Consulta del resumen emitido',
+            "Apertura en el panel del resumen {$entrega->folio}.");
+
+        $barra = view('admin.instituciones.resumen-visor-barra', [
+            'entrega' => $entrega,
+            'institucion' => $membresia->institucion->nombre_corto,
+            'periodo' => null,
+            'emitirOtro' => route('admin.instituciones.show', ['institucion' => $membresia->institucion, 'q' => $membresia->folio]) . '#colaboradores',
+        ])->render();
+
+        return response(self::conBarra($entrega->contenido, $barra))->withHeaders([
+            'Cache-Control' => 'no-store, private',
+            'X-Robots-Tag' => 'noindex, nofollow',
+            'Referrer-Policy' => 'no-referrer',
+        ]);
+    }
+
+    /** Inserta la barra del visor al inicio del <body> del documento guardado. */
+    public static function conBarra(string $html, string $barra): string
+    {
+        $posicion = stripos($html, '<body>');
+
+        return $posicion === false
+            ? $barra . $html
+            : substr_replace($html, '<body>' . $barra, $posicion, strlen('<body>'));
     }
 
     /**

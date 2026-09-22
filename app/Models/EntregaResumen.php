@@ -16,6 +16,8 @@ class EntregaResumen extends Model
         'destinatario_nombre',
         'destinatario_email',
         'motivo',
+        'alcance',
+        'paginas',
         'contenido',
         'vence_en',
         'abierto_en',
@@ -28,6 +30,8 @@ class EntregaResumen extends Model
             'vence_en' => 'datetime',
             'abierto_en' => 'datetime',
             'aperturas' => 'integer',
+            'alcance' => 'array',
+            'paginas' => 'integer',
         ];
     }
 

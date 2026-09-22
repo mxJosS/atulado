@@ -90,8 +90,9 @@ class PlataformaService
 
         $periodo = self::periodo($clave);
 
-        $instituciones = Institucion::withCount('departamentos')->orderBy('nombre_corto')->get();
-        $membresias = Membresia::query()->enPadron()
+        // Las instituciones archivadas no entran al tablero (sus casos de crisis sí: nunca se ocultan).
+        $instituciones = Institucion::vigentes()->withCount('departamentos')->orderBy('nombre_corto')->get();
+        $membresias = $this->membresiasQueCuentan()
             ->get(['id', 'institucion_id', 'user_id', 'estado', 'activado_en', 'created_at']);
         $porInstitucion = $membresias->groupBy('institucion_id');
 
@@ -135,10 +136,20 @@ class PlataformaService
 
     /* ──────────────────────────── Fuentes ──────────────────────────── */
 
+    /**
+     * Membresías que cuentan en el tablero: en padrón, sólo colaboradores
+     * (sin administración ni clínicos) y de instituciones no archivadas.
+     */
+    private function membresiasQueCuentan()
+    {
+        return Membresia::query()->enPadron()->soloColaboradores()
+            ->whereIn('institucion_id', Institucion::vigentes()->select('id'));
+    }
+
     /** Personas del padrón (subconsulta, sin límite de parámetros). */
     private function padronUsuarios()
     {
-        return Membresia::query()->enPadron()->select('user_id');
+        return $this->membresiasQueCuentan()->select('user_id');
     }
 
     /** @return array<int, array<string, true>> user_id → días con registro en los últimos 30 */

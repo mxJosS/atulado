@@ -27,6 +27,11 @@ class PadronController extends Controller
 
     public function importar(Request $request, Institucion $institucion)
     {
+        if ($institucion->estaArchivada()) {
+            return redirect()->to(route('admin.instituciones.show', $institucion) . '#tab-padron')
+                ->with('error', 'La institución está archivada: restáurala para cargar su padrón.');
+        }
+
         $request->validate([
             'archivo' => ['required', 'file', 'mimes:xlsx,xls', 'max:20480'],
         ], [

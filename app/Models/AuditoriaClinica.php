@@ -64,6 +64,8 @@ class AuditoriaClinica extends Model
             'registro_contacto' => 'Registro de contacto',
             'verificacion_asq' => 'Verificación ASQ',
             'resumen_generado' => 'Resumen clínico generado',
+            'resumen_consultado' => 'Resumen clínico consultado',
+            'reapertura_crisis' => 'Reapertura de caso',
             default => ucfirst(str_replace('_', ' ', (string) $this->accion)),
         };
     }

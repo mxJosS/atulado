@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
@@ -61,7 +63,29 @@ class Institucion extends Model
             'aporta_perfil_estadistico' => 'boolean',
             'guardia_nocturna' => 'boolean',
             'redondear_porcentajes' => 'boolean',
+            'archivada_en' => 'datetime',
         ];
+    }
+
+    /** Instituciones en operación (no archivadas). */
+    public function scopeVigentes(Builder $query): Builder
+    {
+        return $query->whereNull('archivada_en');
+    }
+
+    public function scopeArchivadas(Builder $query): Builder
+    {
+        return $query->whereNotNull('archivada_en');
+    }
+
+    public function estaArchivada(): bool
+    {
+        return $this->archivada_en !== null;
+    }
+
+    public function archivadaPor(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'archivada_por');
     }
 
     public function getRouteKeyName(): string

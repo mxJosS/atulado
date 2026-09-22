@@ -15,6 +15,9 @@
     .caso summary { cursor: pointer; font-size: 0.82rem; font-weight: 700; color: #2E5D4B; }
     .caso form { margin-top: 0.6rem; display: grid; gap: 0.5rem; max-width: 560px; }
     .espera-larga { color: #B02418; font-weight: 700; }
+    details.reabrir summary { list-style: none; display: inline-flex; }
+    details.reabrir summary::-webkit-details-marker { display: none; }
+    details.reabrir form { margin-top: 0.5rem; display: grid; gap: 0.5rem; min-width: 280px; text-align: left; }
   </style>
 @endpush
 
@@ -87,16 +90,16 @@
           </div>
         @endif
 
-        @if(!$caso->contactado_en)
-          <details>
-            <summary><i class="fa-solid fa-phone"></i> Registrar contacto humano</summary>
-            <form method="POST" action="{{ route('admin.cola.contacto', $caso) }}">
-              @csrf
-              <textarea class="form-input-styled" name="nota" rows="2" maxlength="1000" placeholder="Cómo fue el contacto (opcional)"></textarea>
-              <div><button class="btn-atl primario sm" type="submit"><i class="fa-solid fa-check"></i> Registrar contacto</button></div>
-            </form>
-          </details>
-        @else
+        {{-- Siempre se puede registrar contacto: el primero marca el caso; los demás quedan en la bitácora. --}}
+        <details>
+          <summary><i class="fa-solid fa-phone"></i> {{ $caso->contactado_en ? 'Registrar contacto adicional' : 'Registrar contacto humano' }}</summary>
+          <form method="POST" action="{{ route('admin.cola.contacto', $caso) }}">
+            @csrf
+            <textarea class="form-input-styled" name="nota" rows="2" maxlength="1000" placeholder="Cómo fue el contacto (opcional)"></textarea>
+            <div><button class="btn-atl primario sm" type="submit"><i class="fa-solid fa-check"></i> Registrar contacto</button></div>
+          </form>
+        </details>
+        @if($caso->contactado_en)
           <details>
             <summary><i class="fa-solid fa-lock"></i> Cerrar caso</summary>
             <form method="POST" action="{{ route('admin.cola.cerrar', $caso) }}">
@@ -119,7 +122,7 @@
     <div class="card-atl" style="margin-top: 1.5rem;">
       <div class="card-atl-head"><div><h3>Cerrados recientemente</h3></div></div>
       <table class="padron-tabla">
-        <thead><tr><th>Caso</th><th>Institución</th><th>Disparado</th><th>Cerrado por</th></tr></thead>
+        <thead><tr><th>Caso</th><th>Institución</th><th>Disparado</th><th>Cerrado por</th>@if($esClinico)<th></th>@endif</tr></thead>
         <tbody>
           @foreach($cerrados as $caso)
             <tr>
@@ -127,6 +130,20 @@
               <td>{{ $caso->institucion?->nombre_corto ?? 'Independiente' }}</td>
               <td>{{ $caso->disparado_en?->format('d/m/Y H:i') }}</td>
               <td>{{ $caso->verificadoPor?->name ?? '—' }} · {{ $caso->updated_at->format('d/m/Y H:i') }}</td>
+              @if($esClinico)
+                <td style="text-align: right;">
+                  @if(auth()->user()->puedeAtenderInstitucion($caso->institucion_id))
+                    <details class="reabrir">
+                      <summary class="btn-atl linea sm"><i class="fa-solid fa-rotate-left"></i> Reabrir</summary>
+                      <form method="POST" action="{{ route('admin.cola.reabrir', $caso) }}">
+                        @csrf
+                        <textarea class="form-input-styled" name="motivo" rows="2" minlength="10" maxlength="1000" required placeholder="Por qué se reabre el caso (queda en la bitácora)"></textarea>
+                        <div><button class="btn-atl primario sm" type="submit"><i class="fa-solid fa-rotate-left"></i> Reabrir caso</button></div>
+                      </form>
+                    </details>
+                  @endif
+                </td>
+              @endif
             </tr>
           @endforeach
         </tbody>

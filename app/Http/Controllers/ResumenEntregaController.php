@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Admin\ExpedienteController;
 use App\Models\EntregaResumen;
 
 /**
@@ -19,7 +20,14 @@ class ResumenEntregaController extends Controller
             'aperturas' => $entrega->aperturas + 1,
         ])->save();
 
-        return response($entrega->contenido)->withHeaders([
+        // El destinatario también puede guardarlo como PDF; la barra no se imprime.
+        $barra = view('admin.instituciones.resumen-visor-barra', [
+            'entrega' => $entrega,
+            'institucion' => $entrega->membresia?->institucion?->nombre_corto ?? 'A Tu Lado',
+            'periodo' => null,
+        ])->render();
+
+        return response(ExpedienteController::conBarra($entrega->contenido, $barra))->withHeaders([
             'Cache-Control' => 'no-store, private',
             'X-Robots-Tag' => 'noindex, nofollow',
             'Referrer-Policy' => 'no-referrer',

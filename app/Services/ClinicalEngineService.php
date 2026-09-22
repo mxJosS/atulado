@@ -14,6 +14,7 @@ use App\Models\SerieVigilancia;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class ClinicalEngineService
 {
@@ -299,7 +300,11 @@ class ClinicalEngineService
     }
 
     /**
-     * Guardar estado de vigilancia
+     * Guardar estado de vigilancia: una fila por persona y día.
+     *
+     * Reenviar el registro el mismo día actualiza la fila del día en vez de
+     * crear otra. Si esta vez no hubo señal, se conserva la que ya tenía el
+     * día (por ejemplo la R4 que dejó la tarea de las 06:00).
      */
     protected function guardarSerieVigilancia(User $user, array $serie, ?string $senal): SerieVigilancia
     {
@@ -310,12 +315,26 @@ class ClinicalEngineService
         $ultimos30 = array_slice($serie, 0, min(30, $n));
         $base30 = count($ultimos30) > 0 ? (array_sum($ultimos30) / count($ultimos30)) : 0;
 
-        return SerieVigilancia::create([
-            'user_id' => $user->id,
+        $delDia = SerieVigilancia::where('user_id', $user->id)
+            ->whereDate('fecha', Carbon::today())
+            ->orderByDesc('id')
+            ->first();
+
+        $datos = [
             'base30' => round($base30, 2),
             'movil7' => round($movil7, 2),
             'dias_silencio' => 0,
-            'ultima_senal' => $senal,
+            'ultima_senal' => $senal ?? $delDia?->ultima_senal,
+        ];
+
+        if ($delDia) {
+            $delDia->update($datos);
+
+            return $delDia;
+        }
+
+        return SerieVigilancia::create($datos + [
+            'user_id' => $user->id,
             'fecha' => Carbon::today(),
         ]);
     }
@@ -580,24 +599,61 @@ class ClinicalEngineService
      *
      * La institución se congela al momento del disparo: si la persona cambia
      * de organización después, el caso histórico no se mueve con ella.
+     *
+     * Una persona tiene como máximo un caso abierto. Si ya lo tiene, un nuevo
+     * disparo no abre otro (la cola se llenaría de repetidos): se devuelve el
+     * mismo caso y, si el nuevo nivel es más grave, el caso sube de nivel y
+     * vuelve a aparecer como no visto en la cola.
      */
     public function registrarEventoCrisis(User $user, array $datos = []): EventoCrisis
     {
-        return EventoCrisis::create([
-            'user_id' => $user->id,
-            'institucion_id' => $datos['institucion_id'] ?? $this->institucionDe($user),
-            'nivel' => $datos['nivel'] ?? 'ROJO',
-            'origen' => $datos['origen'] ?? null,
-            'disparado_en' => $datos['disparado_en'] ?? now(),
-            // Sin avisos automáticos: se marca cuando un clínico ve el caso en la cola de atención.
-            'notificado_en' => $datos['notificado_en'] ?? null,
-            'contactado_en' => null,
-            'salida_sin_contacto' => false,
-            'estoy_con_alguien' => false,
-            'cierre_verificado_por' => null,
-            'notas_cierre' => null,
-            'estado' => 'abierto',
-        ]);
+        $nivel = $datos['nivel'] ?? 'ROJO';
+
+        return DB::transaction(function () use ($user, $datos, $nivel) {
+            // Serializa los disparos simultáneos de la misma persona.
+            User::whereKey($user->id)->lockForUpdate()->first();
+
+            $abierto = EventoCrisis::where('user_id', $user->id)->abiertos()
+                ->lockForUpdate()
+                ->orderByRaw("case when nivel = 'ROJO_AGUDO' then 0 else 1 end")
+                ->orderBy('disparado_en')
+                ->first();
+
+            if ($abierto) {
+                if (self::gravedad($nivel) > self::gravedad($abierto->nivel)) {
+                    $abierto->update(['nivel' => $nivel, 'notificado_en' => null]);
+                }
+
+                return $abierto;
+            }
+
+            return EventoCrisis::create([
+                'user_id' => $user->id,
+                'institucion_id' => $datos['institucion_id'] ?? $this->institucionDe($user),
+                'nivel' => $nivel,
+                'origen' => $datos['origen'] ?? null,
+                'disparado_en' => $datos['disparado_en'] ?? now(),
+                // Sin avisos automáticos: se marca cuando un clínico ve el caso en la cola de atención.
+                'notificado_en' => $datos['notificado_en'] ?? null,
+                'contactado_en' => null,
+                'salida_sin_contacto' => false,
+                'estoy_con_alguien' => false,
+                'cierre_verificado_por' => null,
+                'notas_cierre' => null,
+                'estado' => 'abierto',
+            ]);
+        });
+    }
+
+    /** Orden de gravedad de un caso: sólo sirve para comparar niveles. */
+    private static function gravedad(?string $nivel): int
+    {
+        return match ($nivel) {
+            'ROJO_AGUDO' => 3,
+            'ROJO' => 2,
+            'NARANJA' => 1,
+            default => 0,
+        };
     }
 
     /**
@@ -622,27 +678,45 @@ class ClinicalEngineService
             return false;
         }
 
-        if ($evento->contactado_en !== null) {
-            return true; // ya había contacto; no se pisa la marca original
-        }
+        return DB::transaction(function () use ($evento, $profesional, $nota) {
+            // Dos clínicos pueden registrar a la vez: el caso se bloquea y se
+            // relee para no pisar la marca del primer contacto.
+            $caso = EventoCrisis::whereKey($evento->id)->lockForUpdate()->first();
+            if (!$caso || $caso->estaCerrado()) {
+                return false;
+            }
 
-        $evento->update([
-            'contactado_en' => now(),
-            'primer_contacto_por' => $profesional->id,
-            'estado' => 'en_atencion',
-        ]);
+            $codigo = ExpedienteClinicoService::codigoCaso($caso);
+            $sufijoNota = $nota ? " Nota: {$nota}" : '';
 
-        AuditoriaClinica::create([
-            'profesional_id' => $profesional->id,
-            'usuario_consultado_id' => $evento->user_id,
-            'institucion_id' => $evento->institucion_id,
-            'accion' => 'registro_contacto',
-            'motivo' => 'Contacto de protocolo',
-            'detalle' => "Contacto humano registrado en el caso {$evento->id}." . ($nota ? " Nota: {$nota}" : ''),
-            'ip' => request()?->ip(),
-        ]);
+            if ($caso->contactado_en === null) {
+                $caso->update([
+                    'contactado_en' => now(),
+                    'primer_contacto_por' => $profesional->id,
+                    'estado' => 'en_atencion',
+                ]);
+                $detalle = "Contacto humano registrado en el caso {$codigo}.{$sufijoNota}";
+            } else {
+                // Ya había contacto: no se pisa, pero éste también queda en la bitácora.
+                $primero = $caso->contactadoPor?->name ?? 'otro profesional';
+                $detalle = "Contacto adicional en el caso {$codigo}; el primer contacto lo registró {$primero} el "
+                    . $caso->contactado_en->format('d/m/Y H:i') . ".{$sufijoNota}";
+            }
 
-        return true;
+            AuditoriaClinica::create([
+                'profesional_id' => $profesional->id,
+                'usuario_consultado_id' => $caso->user_id,
+                'institucion_id' => $caso->institucion_id,
+                'accion' => 'registro_contacto',
+                'motivo' => 'Contacto de protocolo',
+                'detalle' => $detalle,
+                'ip' => request()?->ip(),
+            ]);
+
+            $evento->setRawAttributes($caso->getAttributes(), true);
+
+            return true;
+        });
     }
 
     /**
@@ -675,35 +749,114 @@ class ClinicalEngineService
             return false;
         }
 
-        // Sin contacto humano previo no hay cierre. Antes esta misma función
-        // escribía contactado_en = now() al cerrar, con lo cual el "contacto
-        // verificado" se daba por bueno solo, que es justo lo contrario.
-        if ($evento->contactado_en === null) {
-            return false;
+        return DB::transaction(function () use ($evento, $profesional, $notas) {
+            $caso = EventoCrisis::whereKey($evento->id)->lockForUpdate()->first();
+            if (!$caso) {
+                return false;
+            }
+
+            // Sin contacto humano previo no hay cierre. Antes esta misma función
+            // escribía contactado_en = now() al cerrar, con lo cual el "contacto
+            // verificado" se daba por bueno solo, que es justo lo contrario.
+            if ($caso->contactado_en === null) {
+                return false;
+            }
+
+            $codigo = ExpedienteClinicoService::codigoCaso($caso);
+
+            if ($caso->estado === 'cerrado') {
+                // Otro clínico lo cerró mientras tanto: el caso no cambia, pero
+                // la nota de este profesional también queda en la bitácora.
+                $cerro = $caso->verificadoPor?->name ?? 'otro profesional';
+                AuditoriaClinica::create([
+                    'profesional_id' => $profesional->id,
+                    'usuario_consultado_id' => $caso->user_id,
+                    'institucion_id' => $caso->institucion_id,
+                    'accion' => 'cierre_crisis',
+                    'motivo' => 'Nota de cierre adicional',
+                    'detalle' => "Nota de cierre adicional en el caso {$codigo}; ya lo había cerrado {$cerro}. Notas: {$notas}",
+                    'ip' => request()?->ip(),
+                ]);
+                $evento->setRawAttributes($caso->getAttributes(), true);
+
+                return true;
+            }
+
+            $caso->update([
+                'cierre_verificado_por' => $profesional->id,
+                'notas_cierre' => $notas,
+                'estado' => 'cerrado',
+            ]);
+
+            // Registro en auditoría clínica
+            AuditoriaClinica::create([
+                'profesional_id' => $profesional->id,
+                'usuario_consultado_id' => $caso->user_id,
+                'institucion_id' => $caso->institucion_id,
+                'accion' => 'cierre_crisis',
+                'motivo' => 'Cierre con contacto humano verificado',
+                'detalle' => "Caso de crisis {$codigo} verificado y cerrado con contacto humano. Notas: {$notas}",
+                'ip' => request()?->ip(),
+            ]);
+
+            $evento->setRawAttributes($caso->getAttributes(), true);
+
+            return true;
+        });
+    }
+
+    /**
+     * Reabrir un caso Rojo / Rojo agudo cerrado.
+     *
+     * Lo hace sólo un clínico acreditado, con motivo. La hora del primer
+     * contacto se conserva (es la métrica de respuesta); los contactos nuevos
+     * quedan en la bitácora como adicionales. Si la persona ya tiene otro caso
+     * abierto no se reabre, para no tener dos casos vivos de la misma persona.
+     *
+     * @return 'reabierto'|'no_autorizado'|'no_cerrado'|'otro_abierto'
+     */
+    public function reabrirCaso(EventoCrisis $evento, User $profesional, string $motivo): string
+    {
+        if (!$profesional->isClinicoAcreditado()) {
+            return 'no_autorizado';
         }
 
-        if ($evento->estado === 'cerrado') {
-            return false;
-        }
+        return DB::transaction(function () use ($evento, $profesional, $motivo) {
+            User::whereKey($evento->user_id)->lockForUpdate()->first();
 
-        $evento->update([
-            'cierre_verificado_por' => $profesional->id,
-            'notas_cierre' => $notas,
-            'estado' => 'cerrado',
-        ]);
+            $caso = EventoCrisis::whereKey($evento->id)->lockForUpdate()->first();
+            if (!$caso || !$caso->estaCerrado()) {
+                return 'no_cerrado';
+            }
 
-        // Registro en auditoría clínica
-        AuditoriaClinica::create([
-            'profesional_id' => $profesional->id,
-            'usuario_consultado_id' => $evento->user_id,
-            'institucion_id' => $evento->institucion_id,
-            'accion' => 'cierre_crisis',
-            'motivo' => 'Cierre con contacto humano verificado',
-            'detalle' => "Caso de crisis ID {$evento->id} verificado y cerrado con contacto humano. Notas: {$notas}",
-            'ip' => request()?->ip(),
-        ]);
+            if (EventoCrisis::where('user_id', $caso->user_id)->abiertos()->whereKeyNot($caso->id)->exists()) {
+                return 'otro_abierto';
+            }
 
-        return true;
+            $cerro = $caso->verificadoPor?->name ?? 'sin registro';
+            $notaAnterior = $caso->notas_cierre;
+
+            $caso->update([
+                'estado' => $caso->contactado_en ? 'en_atencion' : 'abierto',
+                'cierre_verificado_por' => null,
+                'notas_cierre' => null,
+            ]);
+
+            AuditoriaClinica::create([
+                'profesional_id' => $profesional->id,
+                'usuario_consultado_id' => $caso->user_id,
+                'institucion_id' => $caso->institucion_id,
+                'accion' => 'reapertura_crisis',
+                'motivo' => $motivo,
+                'detalle' => 'Caso ' . ExpedienteClinicoService::codigoCaso($caso) . " reabierto. Lo había cerrado {$cerro}."
+                    . ($notaAnterior ? " Nota de cierre anterior: {$notaAnterior}" : ''),
+                'ip' => request()?->ip(),
+            ]);
+
+            $evento->setRawAttributes($caso->getAttributes(), true);
+
+            return 'reabierto';
+        });
     }
 
     /**

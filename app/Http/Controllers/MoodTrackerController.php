@@ -6,6 +6,7 @@ use App\Models\MoodLog;
 use App\Services\ClinicalEngineService;
 use App\Services\PucholService;
 use Carbon\Carbon;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -38,25 +39,36 @@ class MoodTrackerController extends Controller
             $validated['journal_entry'] ?? null
         );
 
-        // Check if log already exists for today -> update or create
-        $moodLog = MoodLog::updateOrCreate(
-            [
-                'user_id' => $user->id,
-                'logged_date' => $today,
-            ],
-            [
-                'score' => $validated['score'],
-                'valor_invertido' => $evaluacion['valor_invertido'],
-                'primary_emotion' => $validated['primary_emotion'],
-                'tags' => $validated['tags'] ?? [],
-                'journal_entry' => $validated['journal_entry'] ?? null,
-                'bandera_lexica' => $evaluacion['filtro_lexico']['bandera_lexica'],
-                'terminos_detectados' => $evaluacion['filtro_lexico']['terminos_detectados'],
-                'gratitude_note' => $validated['gratitude_note'] ?? null,
-                'energy_level' => $validated['energy_level'] ?? 3,
-                'sleep_hours' => $validated['sleep_hours'] ?? null,
-            ]
-        );
+        // Un registro por día (índice único user_id + logged_date): reenviarlo lo actualiza.
+        $clave = [
+            'user_id' => $user->id,
+            'logged_date' => $today,
+        ];
+        $valores = [
+            'score' => $validated['score'],
+            'valor_invertido' => $evaluacion['valor_invertido'],
+            'primary_emotion' => $validated['primary_emotion'],
+            'tags' => $validated['tags'] ?? [],
+            'journal_entry' => $validated['journal_entry'] ?? null,
+            'bandera_lexica' => $evaluacion['filtro_lexico']['bandera_lexica'],
+            'terminos_detectados' => $evaluacion['filtro_lexico']['terminos_detectados'],
+            'gratitude_note' => $validated['gratitude_note'] ?? null,
+            'energy_level' => $validated['energy_level'] ?? 3,
+            'sleep_hours' => $validated['sleep_hours'] ?? null,
+        ];
+
+        $delDia = fn () => MoodLog::where('user_id', $user->id)->whereDate('logged_date', $today)->first();
+
+        if ($registro = $delDia()) {
+            $registro->update($valores);
+        } else {
+            try {
+                MoodLog::create($clave + $valores);
+            } catch (UniqueConstraintViolationException $e) {
+                // Doble clic: la otra petición insertó el día un instante antes. Se actualiza esa fila.
+                ($delDia() ?? throw $e)->update($valores);
+            }
+        }
 
         // Qué bloque de preguntas sigue. La ruta, la señal y el filtro léxico
         // no salen del servidor; el origen del bloque 1 se queda en la sesión.

@@ -18,6 +18,11 @@ class InvitacionController extends Controller
      */
     public function enviar(Request $request, Institucion $institucion)
     {
+        if ($institucion->estaArchivada()) {
+            return redirect()->to(route('admin.instituciones.show', $institucion) . '#tab-invitaciones')
+                ->with('error', 'La institución está archivada: restáurala para enviar invitaciones.');
+        }
+
         // El botón «Enviar» de una fila manda sólo a esa persona, aunque haya casillas marcadas.
         if ($request->filled('solo')) {
             $request->merge(['alcance' => 'seleccion', 'personas' => [(int) $request->input('solo')]]);

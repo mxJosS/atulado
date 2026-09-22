@@ -147,4 +147,31 @@ return [
         'ya no puedo mas',
         'ya no aguanto',
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Categorías de los términos críticos (sólo para mostrar)
+    |--------------------------------------------------------------------------
+    | Las cuatro categorías de la especificación. No cambian la detección:
+    | sirven para que el resumen clínico diga qué tipo de término apareció.
+    | Un término que no esté aquí se muestra como «Término crítico».
+    */
+    'categorias_terminos' => [
+        'Autolesión o muerte autoinfligida' => [
+            'suicid', 'suicida', 'suicidio', 'suicidios', 'suicidarme', 'suicidarse', 'suicidarte', 'suicidar',
+            'matarme', 'matarse', 'matarte', 'mataria', 'quitarme la vida', 'quitarse la vida', 'quitarte la vida',
+            'morirme', 'morirse', 'deseo morir', 'quiero morir', 'desearia estar muerto', 'desearia estar muerta',
+            'ojala no despertara', 'no quiero vivir', 'dejar de vivir', 'acabar con mi vida', 'terminar con mi vida',
+            'hacerme daño', 'autolesion', 'autolesionarme', 'autolesionarse', 'autolesiones', 'cortarme',
+        ],
+        'Métodos o medios letales' => [
+            'cortarme las venas', 'ahorcar', 'ahorcarme', 'ahorcarse', 'pastillas para dormir todas', 'sobredosis',
+            'envenenarme', 'pistola', 'arma', 'dispararme',
+        ],
+        'Desesperanza' => [
+            'acabar con todo', 'no encuentro salida', 'sin salida', 'sin esperanza', 'nadie me va a extrañar',
+            'seria mejor si no existiera', 'ya no puedo mas', 'ya no aguanto',
+        ],
+        'Violencia sufrida o ejercida' => [],
+    ],
 ];

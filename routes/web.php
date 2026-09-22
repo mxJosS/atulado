@@ -137,6 +137,7 @@ Route::middleware(['auth', 'panel'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/cola-atencion', [\App\Http\Controllers\Admin\ColaAtencionController::class, 'index'])->name('cola.index');
     Route::post('/cola-atencion/{caso}/contacto', [\App\Http\Controllers\Admin\ColaAtencionController::class, 'contacto'])->name('cola.contacto');
     Route::post('/cola-atencion/{caso}/cerrar', [\App\Http\Controllers\Admin\ColaAtencionController::class, 'cerrar'])->name('cola.cerrar');
+    Route::post('/cola-atencion/{caso}/reabrir', [\App\Http\Controllers\Admin\ColaAtencionController::class, 'reabrir'])->name('cola.reabrir');
 
     // Ficha individual y protocolo
     Route::post('/instituciones/{institucion}/colaboradores/{membresia}/ficha', [\App\Http\Controllers\Admin\ExpedienteController::class, 'ficha'])->name('instituciones.ficha');
@@ -144,6 +145,10 @@ Route::middleware(['auth', 'panel'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/instituciones/{institucion}/colaboradores/{membresia}/resumen', [\App\Http\Controllers\Admin\ExpedienteController::class, 'resumen'])->name('instituciones.ficha.resumen');
     Route::post('/instituciones/{institucion}/colaboradores/{membresia}/casos/{caso}/contacto', [\App\Http\Controllers\Admin\ExpedienteController::class, 'contacto'])->name('instituciones.caso.contacto');
     Route::post('/instituciones/{institucion}/colaboradores/{membresia}/casos/{caso}/cerrar', [\App\Http\Controllers\Admin\ExpedienteController::class, 'cerrar'])->name('instituciones.caso.cerrar');
+    Route::post('/instituciones/{institucion}/colaboradores/{membresia}/casos/{caso}/reabrir', [\App\Http\Controllers\Admin\ExpedienteController::class, 'reabrir'])->name('instituciones.caso.reabrir');
+
+    // Resumen clínico emitido: visor para imprimir o guardar como PDF
+    Route::get('/resumenes/{entrega}', [\App\Http\Controllers\Admin\ExpedienteController::class, 'verResumen'])->name('resumenes.ver');
 });
 
 /*
@@ -173,6 +178,11 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Instituciones: alta y edición
     Route::post('/instituciones', [\App\Http\Controllers\Admin\InstitucionController::class, 'store'])->name('instituciones.store');
     Route::put('/instituciones/{institucion}', [\App\Http\Controllers\Admin\InstitucionController::class, 'update'])->name('instituciones.update');
+
+    // «Eliminar» archiva; desde Archivadas se restaura o se elimina para siempre.
+    Route::post('/instituciones/{institucion}/archivar', [\App\Http\Controllers\Admin\InstitucionController::class, 'archivar'])->name('instituciones.archivar');
+    Route::post('/instituciones/{institucion}/restaurar', [\App\Http\Controllers\Admin\InstitucionController::class, 'restaurar'])->name('instituciones.restaurar');
+    Route::delete('/instituciones/{institucion}', [\App\Http\Controllers\Admin\InstitucionController::class, 'destroy'])->name('instituciones.destroy');
 
     // Padrón por Excel
     Route::get('/instituciones/{institucion}/padron/plantilla', [\App\Http\Controllers\Admin\PadronController::class, 'plantilla'])->name('instituciones.padron.plantilla');

@@ -56,6 +56,10 @@ class ColaboradorController extends Controller
 
     public function store(Request $request, Institucion $institucion)
     {
+        if ($institucion->estaArchivada()) {
+            return $this->volver($institucion)->with('error', 'La institución está archivada: restáurala para dar de alta personas.');
+        }
+
         $datos = $request->validate($this->reglas($institucion), $this->mensajes());
         $correo = Str::lower(trim($datos['correo']));
 

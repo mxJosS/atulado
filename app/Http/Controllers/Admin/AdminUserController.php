@@ -195,14 +195,18 @@ class AdminUserController extends Controller
         $user->email = trim($request->email);
         $user->asignarRol($role, $request->perfil_profesional, $request->boolean('clinico_admin'));
 
-        // Gestión del Estado (Activo vs Pendiente)
+        // Gestión del Estado (Activo vs Pendiente). Es el mismo estado que ve el
+        // padrón: «Activo» también activa su lugar en el padrón y «Pendiente»
+        // lo regresa a «Sin activar».
+        $enPadron = Membresia::where('user_id', $user->id)->whereIn('estado', ['invitado', 'activo'])->exists();
         if ($request->status === 'activo') {
             if (!$user->email_verified_at) {
                 $user->email_verified_at = now();
             }
         } elseif ($request->status === 'pendiente') {
-            // No permitir suspenderse al admin actual
-            if ($user->id !== Auth::id()) {
+            // No permitir suspenderse al admin actual. A quien está en un padrón no
+            // se le quita la verificación del correo: sólo vuelve a «Sin activar».
+            if ($user->id !== Auth::id() && !$enPadron) {
                 $user->email_verified_at = null;
             }
         }
@@ -228,6 +232,14 @@ class AdminUserController extends Controller
         DB::transaction(function () use ($user, $request) {
             $user->save();
             $this->vincular($user, $request);
+
+            if ($request->status === 'activo') {
+                Membresia::where('user_id', $user->id)->where('estado', 'invitado')
+                    ->update(['estado' => 'activo', 'activado_en' => now()]);
+            } elseif ($request->status === 'pendiente' && $user->id !== Auth::id()) {
+                Membresia::where('user_id', $user->id)->where('estado', 'activo')
+                    ->update(['estado' => 'invitado', 'activado_en' => null]);
+            }
         });
 
         return redirect()->route('admin.users.index')

@@ -93,6 +93,7 @@ class ExpedienteClinicoService
         $consulta = Membresia::query()
             ->where('institucion_id', $institucion->id)
             ->enPadron()
+            ->soloColaboradores()
             ->with(['user:id,name,email', 'departamento:id,nombre,parent_id'])
             ->addSelect([
                 'membresias.*',
@@ -353,6 +354,8 @@ class ExpedienteClinicoService
             'clasificacion' => $clasificacion,
             'casos' => $casos,
             'caso_abierto' => $casoAbierto,
+            // Último caso cerrado, para poder reabrirlo cuando no hay uno abierto.
+            'caso_cerrado' => $casoAbierto ? null : $casos->first(fn ($c) => $c->estaCerrado()),
             'reglas' => $reglas,
             'contactos' => ContactoEmergencia::where('user_id', $user->id)->orderByDesc('es_principal')->orderBy('id')->get(),
             'plan' => $user->safetyPlan,
@@ -424,7 +427,11 @@ class ExpedienteClinicoService
                 'cuando' => $a->created_at,
                 'que' => $a->accion_legible . ($a->profesional ? ' — ' . $a->profesional->name : ''),
                 'detalle' => $a->motivo ? 'Motivo: «' . $a->motivo . '»' : $a->detalle,
-                'tono' => $a->accion === 'cierre_crisis' ? 'green' : '',
+                'tono' => match ($a->accion) {
+                    'cierre_crisis' => 'green',
+                    'reapertura_crisis' => 'red',
+                    default => '',
+                },
             ]));
 
         return $eventos->sortByDesc('cuando')->values();

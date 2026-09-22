@@ -198,6 +198,34 @@ class User extends Authenticatable
         ]);
     }
 
+    /**
+     * Personal de la plataforma (administración o clínicos). Puede estar en
+     * un padrón, pero no cuenta en padrón, activaciones ni adopción.
+     */
+    public function esPersonalDePlataforma(): bool
+    {
+        return (bool) $this->is_admin
+            || in_array($this->role, ['admin', 'clinico'], true)
+            || (bool) $this->is_clinico_atulado;
+    }
+
+    /**
+     * Estado de la cuenta, igual en el menú de Usuarios y en el padrón:
+     *   pendiente   → correo sin verificar
+     *   sin_activar → está en un padrón y todavía no entra por primera vez
+     *   activo      → ya entró (o no pertenece a ningún padrón y está verificada)
+     *
+     * @return 'activo'|'sin_activar'|'pendiente'
+     */
+    public function estadoCuenta(): string
+    {
+        if (!$this->email_verified_at) {
+            return 'pendiente';
+        }
+
+        return $this->membresiaActiva?->estado === 'invitado' ? 'sin_activar' : 'activo';
+    }
+
     /** Entra al panel: administración u operación clínica. */
     public function puedeUsarPanel(): bool
     {

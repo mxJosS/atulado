@@ -91,6 +91,19 @@ class Membresia extends Model
         return $query->whereIn('estado', ['invitado', 'activo', 'suspendido']);
     }
 
+    /**
+     * Sólo colaboradores: deja fuera al personal de la plataforma
+     * (administración y clínicos), que puede estar en un padrón pero no
+     * cuenta en padrón, activaciones ni adopción.
+     */
+    public function scopeSoloColaboradores(Builder $query): Builder
+    {
+        return $query->whereHas('user', fn (Builder $u) => $u
+            ->where(fn ($q) => $q->where('is_admin', false)->orWhereNull('is_admin'))
+            ->where(fn ($q) => $q->where('is_clinico_atulado', false)->orWhereNull('is_clinico_atulado'))
+            ->where(fn ($q) => $q->whereNotIn('role', ['admin', 'clinico'])->orWhereNull('role')));
+    }
+
     public function scopePendientesDeInvitar(Builder $query): Builder
     {
         return $query->where('estado', 'invitado')->whereNull('invitado_en');

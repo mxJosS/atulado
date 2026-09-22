@@ -12,7 +12,7 @@
   <div class="card-atl-head">
     <div>
       <h3>Personas en el padrón</h3>
-      <p>{{ $personas->where('estado', '!=', 'baja')->count() }} en padrón · {{ $personas->where('estado', 'baja')->count() }} de baja. Las bajas conservan su historial.@unless($esAdmin) <b>Sólo lectura.</b>@endunless</p>
+      <p>{{ $colaboradoresPadron->where('estado', '!=', 'baja')->count() }} en padrón · {{ $colaboradoresPadron->where('estado', 'baja')->count() }} de baja. Las bajas conservan su historial. Administración y clínicos aparecen marcados y no cuentan.@unless($esAdmin) <b>Sólo lectura.</b>@endunless</p>
     </div>
 @if($esAdmin)
     <button type="button" class="btn-atl primario sm" data-open="m-persona-nueva" @disabled($opcionesArea->isEmpty()) title="{{ $opcionesArea->isEmpty() ? 'Primero crea las áreas en «Áreas y Macro-Grupos»' : '' }}">
@@ -35,6 +35,9 @@
             <tr style="{{ $p->estado === 'baja' ? 'opacity: .6;' : '' }}">
               <td>
                 <b>{{ $p->user?->name }}</b>
+                @if($p->user?->esPersonalDePlataforma())
+                  <span class="chip-atl gris" title="Personal de A Tu Lado: no cuenta en el padrón ni en las activaciones">{{ $p->user->is_admin || $p->user->role === 'admin' ? 'Administración' : 'Clínico' }} · no cuenta</span>
+                @endif
                 <div class="mono" style="font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; color: #6E887E;">{{ $p->folio }} · {{ $p->user?->email }}</div>
               </td>
               <td class="mono">{{ $p->numero_empleado ?: '—' }}</td>

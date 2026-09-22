@@ -60,6 +60,20 @@
     </div>
   </div>
 
+  @if($institucion->estaArchivada())
+    <div class="nota-protocolo" style="margin-bottom: 1.25rem; border-color: #E9B7B0; background: #FCEEEC; align-items: center;">
+      <i class="fa-solid fa-box-archive" style="color: #B02418;"></i>
+      <span style="flex: 1;"><b>Institución archivada</b> el {{ $institucion->archivada_en->format('d/m/Y H:i') }}{{ $institucion->archivadaPor ? ' por ' . $institucion->archivadaPor->name : '' }}.
+        No opera ni cuenta en el tablero; su información se conserva completa. Mientras esté archivada no se pueden cargar padrones, dar altas ni enviar invitaciones.</span>
+      @if($esAdmin)
+        <form method="POST" action="{{ route('admin.instituciones.restaurar', $institucion) }}">
+          @csrf
+          <button type="submit" class="btn-atl primario sm"><i class="fa-solid fa-rotate-left"></i> Restaurar</button>
+        </form>
+      @endif
+    </div>
+  @endif
+
   {{-- Resumen --}}
   <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
     <div class="kpi">
@@ -168,7 +182,7 @@
   <div class="tabs" data-tabs="inst" id="tabs-inst" style="margin-bottom: 1.25rem;">
     <button class="tab on" type="button" data-pane="estructura"><i class="fa-solid fa-sitemap"></i> Áreas y Macro-Grupos</button>
     @if($vePadron)
-      <button class="tab" type="button" data-pane="padron"><i class="fa-solid fa-users"></i> Padrón de Colaboradores ({{ $personas->where('estado', '!=', 'baja')->count() }})</button>
+      <button class="tab" type="button" data-pane="padron"><i class="fa-solid fa-users"></i> Padrón de Colaboradores ({{ $colaboradoresPadron->where('estado', '!=', 'baja')->count() }})</button>
       <button class="tab" type="button" data-pane="invitaciones"><i class="fa-solid fa-paper-plane"></i> Invitaciones</button>
     @endif
     <button class="tab" type="button" data-pane="clinico"><i class="fa-solid fa-user-doctor"></i> Plano clínico</button>
@@ -375,6 +389,7 @@
             </tr>
           </thead>
           <tbody>
+            @php $grupoAnterior = null; @endphp
             @forelse($colaboradores as $fila)
               @php
                 $m = $fila['membresia'];
@@ -383,6 +398,16 @@
                 $iniciales = \App\Models\Institucion::calcularIniciales($m->user?->name ?? '?');
                 $ultimo = $fila['ultimo_registro'];
               @endphp
+              {{-- Separador por nivel: la lista va por prioridad clínica (Rojo agudo › … › Sin datos). --}}
+              @if($nivel !== $grupoAnterior)
+                @php $grupoAnterior = $nivel; @endphp
+                <tr class="grupo-nivel">
+                  <td colspan="13" style="background: #F4F8F6; font-size: .72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: {{ \App\Services\ExpedienteClinicoService::COLOR_NIVEL[$nivel] }}; padding: .45rem .75rem;">
+                    <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: {{ \App\Services\ExpedienteClinicoService::COLOR_NIVEL[$nivel] }}; margin-right: .4rem;"></span>
+                    {{ \App\Services\ExpedienteClinicoService::ETIQUETA_NIVEL[$nivel] }}
+                  </td>
+                </tr>
+              @endif
               <tr class="{{ $nivel === 'ROJO_AGUDO' ? 'row-critical' : ($nivel === 'ROJO' ? 'row-red' : '') }}">
                 <td>
                   <div class="who-cell">

@@ -101,8 +101,16 @@
               @if(!$caso_abierto->contactado_en)
                 <button type="button" class="btn btn-sm btn-danger" data-open="m-caso-contacto"><i class="fa-solid fa-phone"></i> Registrar contacto humano</button>
               @else
+                <button type="button" class="btn btn-sm" data-open="m-caso-contacto"><i class="fa-solid fa-phone"></i> Contacto adicional</button>
                 <button type="button" class="btn btn-sm" data-open="m-caso-cierre"><i class="fa-solid fa-lock"></i> Cerrar caso</button>
               @endif
+            </div>
+          @elseif($caso_cerrado)
+            <div class="small muted mt-2">
+              Último caso: <span class="mono">{{ E::codigoCaso($caso_cerrado) }}</span>, cerrado{{ $caso_cerrado->verificadoPor ? ' por ' . $caso_cerrado->verificadoPor->name : '' }} el {{ $caso_cerrado->updated_at->format('d/m/Y H:i') }}.
+            </div>
+            <div class="row mt-2">
+              <button type="button" class="btn btn-sm" data-open="m-caso-reabrir"><i class="fa-solid fa-rotate-left"></i> Reabrir caso</button>
             </div>
           @endif
         </div>
@@ -479,7 +487,7 @@
   @endphp
   <div class="modal narrow">
     <div class="modal-head">
-      <div><h2>Entregar resumen clínico</h2><div class="sub">Se envía por correo como enlace que vence · folio y marca de agua</div></div>
+      <div><h2>Entregar resumen clínico</h2><div class="sub">Se envía por correo como enlace que vence y se abre aquí para imprimir · folio y marca de agua</div></div>
       <button class="x" type="button" data-close="m-entrega" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <form method="POST" action="{{ route('admin.instituciones.ficha.resumen', [$institucion, $membresia]) }}">
@@ -507,6 +515,17 @@
           </select>
           <span class="hint">Fuera de un protocolo activo, la entrega de información individual no está permitida por contrato.</span>
         </div>
+        <div class="field mb-2"><label>Alcance del documento</label>
+          <div class="col" style="gap: .35rem;">
+            @foreach(\App\Services\ResumenClinicoService::ALCANCE as $clave => $texto)
+              <label class="row small" style="gap: .45rem; align-items: flex-start; font-weight: 500;">
+                <input type="checkbox" name="alcance[]" value="{{ $clave }}" @checked(in_array($clave, \App\Services\ResumenClinicoService::ALCANCE_PREDETERMINADO, true)) style="margin-top: 3px;">
+                <span>{{ $texto }}@if($clave === 'historial') <span class="muted">— amplía el documento a ~14 páginas</span>@endif</span>
+              </label>
+            @endforeach
+          </div>
+          <span class="hint">Siempre incluye identificación, instrumentos aplicados, cronología y las leyendas del contrato.</span>
+        </div>
         <div class="field mb-2"><label>Vigencia del enlace</label>
           <select class="select" name="vigencia_horas" required>
             <option value="72" selected>72 horas (recomendado)</option>
@@ -523,7 +542,7 @@
       <div class="modal-foot">
         <div class="spacer"></div>
         <button class="btn" type="button" data-close="m-entrega">Cancelar</button>
-        <button class="btn btn-primary" type="submit" @disabled(!$profesionalListo && !$guardiaLista)><i class="fa-solid fa-paper-plane"></i> Generar y enviar</button>
+        <button class="btn btn-primary" type="submit" @disabled(!$profesionalListo && !$guardiaLista)><i class="fa-solid fa-paper-plane"></i> Generar, enviar y abrir</button>
       </div>
     </form>
   </div>
@@ -566,7 +585,7 @@
   <div class="modal-backdrop" id="m-caso-contacto" data-ficha-modal>
     <div class="modal narrow">
       <div class="modal-head">
-        <div><h2>Registrar contacto humano</h2><div class="sub">{{ E::codigoCaso($caso_abierto) }} · disparado {{ $caso_abierto->disparado_en?->format('d/m/Y H:i') }}</div></div>
+        <div><h2>{{ $caso_abierto->contactado_en ? 'Registrar contacto adicional' : 'Registrar contacto humano' }}</h2><div class="sub">{{ E::codigoCaso($caso_abierto) }} · disparado {{ $caso_abierto->disparado_en?->format('d/m/Y H:i') }}</div></div>
         <button class="x" type="button" data-close="m-caso-contacto" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <form method="POST" action="{{ route('admin.instituciones.caso.contacto', [$institucion, $membresia, $caso_abierto]) }}">
@@ -604,6 +623,29 @@
           <div class="spacer"></div>
           <button class="btn" type="button" data-close="m-caso-cierre">Cancelar</button>
           <button class="btn btn-primary" type="submit"><i class="fa-solid fa-lock"></i> Cerrar caso</button>
+        </div>
+      </form>
+    </div>
+  </div>
+@elseif($caso_cerrado)
+  <div class="modal-backdrop" id="m-caso-reabrir" data-ficha-modal>
+    <div class="modal narrow">
+      <div class="modal-head" style="background: #6E140C;">
+        <div><h2>Reabrir caso</h2><div class="sub">{{ E::codigoCaso($caso_cerrado) }} · {{ $caso_cerrado->nivel === 'ROJO_AGUDO' ? 'Rojo agudo' : 'Rojo' }} · disparado {{ $caso_cerrado->disparado_en?->format('d/m/Y H:i') }}</div></div>
+        <button class="x" type="button" data-close="m-caso-reabrir" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form method="POST" action="{{ route('admin.instituciones.caso.reabrir', [$institucion, $membresia, $caso_cerrado]) }}">
+        @csrf
+        <div class="modal-body">
+          <div class="field"><label>Motivo de la reapertura</label>
+            <textarea class="input" name="motivo" rows="3" minlength="10" maxlength="1000" required placeholder="Ej. la persona volvió a presentar señales tras el cierre"></textarea>
+            <span class="hint">El caso vuelve a la cola de atención y queda en la bitácora con tu nombre, la hora y la nota del cierre anterior.</span>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <div class="spacer"></div>
+          <button class="btn" type="button" data-close="m-caso-reabrir">Cancelar</button>
+          <button class="btn btn-danger" type="submit"><i class="fa-solid fa-rotate-left"></i> Reabrir caso</button>
         </div>
       </form>
     </div>
