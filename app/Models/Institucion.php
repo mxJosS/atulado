@@ -26,6 +26,7 @@ class Institucion extends Model
         'estado_republica',
         'zona_horaria',
         'padron_estimado',
+        'meta_adopcion',
         'contacto_nombre',
         'contacto_puesto',
         'contacto_email',
@@ -56,6 +57,7 @@ class Institucion extends Model
             'profesional_nda_hasta' => 'date',
             'umbral_anonimato' => 'integer',
             'padron_estimado' => 'integer',
+            'meta_adopcion' => 'integer',
             'aporta_perfil_estadistico' => 'boolean',
             'guardia_nocturna' => 'boolean',
             'redondear_porcentajes' => 'boolean',
@@ -70,6 +72,12 @@ class Institucion extends Model
     public function departamentos(): HasMany
     {
         return $this->hasMany(Departamento::class)->orderBy('nombre');
+    }
+
+    /** Profesionales clínicos que la atienden (no son parte del padrón). */
+    public function profesionalesAsignados(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'asignaciones_clinicas')->withTimestamps();
     }
 
     public function membresias(): HasMany

@@ -167,7 +167,7 @@
   {{-- ══════════ PESTAÑAS ══════════ --}}
   <div class="tabs" data-tabs="inst" id="tabs-inst" style="margin-bottom: 1.25rem;">
     <button class="tab on" type="button" data-pane="estructura"><i class="fa-solid fa-sitemap"></i> Áreas y Macro-Grupos</button>
-    @if($esAdmin)
+    @if($vePadron)
       <button class="tab" type="button" data-pane="padron"><i class="fa-solid fa-users"></i> Padrón de Colaboradores ({{ $personas->where('estado', '!=', 'baja')->count() }})</button>
       <button class="tab" type="button" data-pane="invitaciones"><i class="fa-solid fa-paper-plane"></i> Invitaciones</button>
     @endif
@@ -205,8 +205,9 @@
 
   </div>
 
-  @if($esAdmin)
+  @if($vePadron)
   <div class="tabpane" data-tabpane="inst" data-pane="padron" id="tab-padron">
+  @if($esAdmin)
   {{-- Padrón por Excel --}}
   <div class="card-atl" id="padron" style="margin-bottom: 1.5rem;">
     <div class="card-atl-head">
@@ -304,6 +305,7 @@
     @endif
   </div>
 
+  @endif
   @include('admin.instituciones.partials.padron-personas')
   </div>
 

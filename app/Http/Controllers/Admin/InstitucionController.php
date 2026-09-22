@@ -20,7 +20,11 @@ class InstitucionController extends Controller
      */
     public function index()
     {
+        // Un clínico sólo ve las instituciones que tiene asignadas.
+        $visibles = request()->user()->institucionesVisiblesIds();
+
         $instituciones = Institucion::query()
+            ->when($visibles !== null, fn ($q) => $q->whereIn('id', $visibles))
             ->withCount([
                 'departamentos',
                 'membresias as padron_count' => fn ($q) => $q->enPadron(),
@@ -30,19 +34,7 @@ class InstitucionController extends Controller
             ->orderBy('nombre_corto')
             ->get();
 
-        $padron = (int) $instituciones->sum('padron_count');
-        $activas = (int) $instituciones->sum('activas_count');
-
-        $metricas = [
-            'instituciones' => $instituciones->count(),
-            'instituciones_activas' => $instituciones->where('estado', 'activa')->count(),
-            'padron' => $padron,
-            'activas' => $activas,
-            'adopcion' => $padron > 0 ? round($activas / $padron * 100) : null,
-            'casos_abiertos' => (int) $instituciones->sum('casos_abiertos_count'),
-        ];
-
-        return view('admin.instituciones.index', compact('instituciones', 'metricas'));
+        return view('admin.instituciones.index', compact('instituciones'));
     }
 
     public function store(GuardarInstitucionRequest $request)
@@ -72,6 +64,8 @@ class InstitucionController extends Controller
 
     public function show(Institucion $institucion)
     {
+        abort_unless(request()->user()->puedeVerInstitucion($institucion->id), 404);
+
         $arbol = $this->estructura->arbol($institucion);
 
         $resumen = [
@@ -86,7 +80,10 @@ class InstitucionController extends Controller
             ? round($resumen['activas'] / $resumen['padron'] * 100)
             : null;
 
-        $otras = Institucion::orderBy('nombre_corto')->get(['id', 'slug', 'nombre_corto']);
+        $visibles = request()->user()->institucionesVisiblesIds();
+        $otras = Institucion::query()
+            ->when($visibles !== null, fn ($q) => $q->whereIn('id', $visibles))
+            ->orderBy('nombre_corto')->get(['id', 'slug', 'nombre_corto']);
 
         $ultimaCarga = $institucion->cargas()->with('autor:id,name')->latest('id')->first();
         $filasConProblema = $ultimaCarga
@@ -109,7 +106,9 @@ class InstitucionController extends Controller
 
         // Padrón e invitaciones: operación de administración, sin datos clínicos.
         $esAdmin = (bool) request()->user()?->is_admin;
-        $personas = $esAdmin
+        // El clínico asignado ve padrón e invitaciones en modo lectura; sólo la administración los modifica.
+        $vePadron = $esAdmin || $esClinico;
+        $personas = $vePadron
             ? $institucion->membresias()
                 ->with(['user:id,name,email', 'departamento:id,nombre,parent_id'])
                 ->get()
@@ -127,7 +126,7 @@ class InstitucionController extends Controller
 
         return view('admin.instituciones.show', compact(
             'institucion', 'arbol', 'resumen', 'otras', 'ultimaCarga', 'filasConProblema',
-            'esClinico', 'esAdmin', 'filtros', 'colaboradores', 'opcionesArea', 'personas', 'invitaciones'
+            'esClinico', 'esAdmin', 'vePadron', 'filtros', 'colaboradores', 'opcionesArea', 'personas', 'invitaciones'
         ));
     }
 

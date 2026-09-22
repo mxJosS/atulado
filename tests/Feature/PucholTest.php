@@ -191,6 +191,7 @@ class PucholTest extends TestCase
         $this->responder('C', 2)->assertOk();
 
         $clinico = User::factory()->create(['role' => 'clinico', 'is_clinico_atulado' => true]);
+        $clinico->institucionesAsignadas()->attach($institucion);
         $this->actingAs($clinico)
             ->postJson(route('admin.instituciones.ficha', [$institucion, $membresia]), ['motivo' => 'Seguimiento clínico programado'])
             ->assertOk()

@@ -205,6 +205,57 @@ class User extends Authenticatable
     }
 
     /**
+     * Instituciones que atiende un profesional clínico. No es el padrón:
+     * ver asignaciones_clinicas.
+     */
+    public function institucionesAsignadas(): BelongsToMany
+    {
+        return $this->belongsToMany(Institucion::class, 'asignaciones_clinicas')->withTimestamps();
+    }
+
+    /**
+     * Ids de las instituciones que puede ver en el panel, o null si ve todas.
+     * La administración ve todas; un clínico sólo las que tiene asignadas
+     * (sin asignación, ninguna).
+     *
+     * @return list<int>|null
+     */
+    public function institucionesVisiblesIds(): ?array
+    {
+        if ($this->is_admin) {
+            return null;
+        }
+
+        return $this->isClinicoAcreditado()
+            ? $this->institucionesAsignadas()->pluck('instituciones.id')->map(fn ($id) => (int) $id)->all()
+            : [];
+    }
+
+    public function puedeVerInstitucion(int $institucionId): bool
+    {
+        $ids = $this->institucionesVisiblesIds();
+
+        return $ids === null || in_array($institucionId, $ids, true);
+    }
+
+    /**
+     * ¿Puede actuar clínicamente sobre algo de esta institución (ficha, casos)?
+     * Los casos de personas sin institución ($institucionId null) sólo los
+     * atiende la administración con acreditación clínica.
+     */
+    public function puedeAtenderInstitucion(?int $institucionId): bool
+    {
+        if (!$this->isClinicoAcreditado()) {
+            return false;
+        }
+        if ($this->is_admin) {
+            return true;
+        }
+
+        return $institucionId !== null && $this->puedeVerInstitucion($institucionId);
+    }
+
+    /**
      * Determina si el usuario es una cuenta administradora principal protegida
      */
     public function isSuperAdmin(): bool

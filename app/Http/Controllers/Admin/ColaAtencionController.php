@@ -25,7 +25,7 @@ class ColaAtencionController extends Controller
     {
         $esClinico = $request->user()->isClinicoAcreditado();
 
-        $abiertos = EventoCrisis::abiertos()->porPrioridad()
+        $abiertos = EventoCrisis::visiblesPara($request->user())->abiertos()->porPrioridad()
             ->with(['user:id,name,email', 'user.contactosEmergencia', 'institucion:id,slug,nombre_corto', 'contactadoPor:id,name'])
             ->get();
 
@@ -39,7 +39,7 @@ class ColaAtencionController extends Controller
             ->whereIn('estado', ['invitado', 'activo', 'suspendido'])
             ->get()->keyBy(fn ($m) => $m->user_id . '-' . $m->institucion_id);
 
-        $cerrados = EventoCrisis::where('estado', 'cerrado')
+        $cerrados = EventoCrisis::visiblesPara($request->user())->where('estado', 'cerrado')
             ->with(['institucion:id,nombre_corto', 'verificadoPor:id,name'])
             ->latest('updated_at')->take(15)->get();
 
@@ -49,6 +49,7 @@ class ColaAtencionController extends Controller
     public function contacto(Request $request, EventoCrisis $caso)
     {
         abort_unless($request->user()->isClinicoAcreditado(), 403, 'Se requiere acreditación clínica.');
+        abort_unless($request->user()->puedeAtenderInstitucion($caso->institucion_id), 404);
         $datos = $request->validate(['nota' => ['nullable', 'string', 'max:1000']]);
 
         if ($caso->estaCerrado()) {
@@ -63,6 +64,7 @@ class ColaAtencionController extends Controller
     public function cerrar(Request $request, EventoCrisis $caso)
     {
         abort_unless($request->user()->isClinicoAcreditado(), 403, 'Se requiere acreditación clínica.');
+        abort_unless($request->user()->puedeAtenderInstitucion($caso->institucion_id), 404);
         $datos = $request->validate([
             'notas' => ['required', 'string', 'min:10', 'max:2000'],
         ], [

@@ -18,7 +18,7 @@ class AdminUserController extends Controller
 {
     public function index(Request $request)
     {
-        $query = User::query()->with('membresiaActiva.institucion:id,slug,nombre_corto', 'membresiaActiva.departamento:id,nombre');
+        $query = User::query()->with('membresiaActiva.institucion:id,slug,nombre_corto', 'membresiaActiva.departamento:id,nombre', 'institucionesAsignadas:id');
 
         if ($request->filled('rol')) {
             if ($request->rol === 'admin') {
@@ -73,6 +73,8 @@ class AdminUserController extends Controller
             'specialty' => ['nullable', 'string', 'max:150'],
             'institution' => ['nullable', 'string', 'max:150'],
             'institucion_id' => ['nullable', 'exists:instituciones,id'],
+            'instituciones_asignadas' => ['nullable', 'array'],
+            'instituciones_asignadas.*' => ['integer', 'exists:instituciones,id'],
         ], [
             'first_name.required' => 'El o los nombres son obligatorios.',
             'last_name.required' => 'Los apellidos son obligatorios.',
@@ -101,7 +103,7 @@ class AdminUserController extends Controller
             $user->asignarRol($role, $request->perfil_profesional, $request->boolean('clinico_admin'));
             $user->save();
 
-            $this->vincularInstitucion($user, $request->filled('institucion_id') ? (int) $request->institucion_id : null);
+            $this->vincular($user, $request);
 
             if ($role === 'profesional') {
                 $degrees = [
@@ -146,6 +148,8 @@ class AdminUserController extends Controller
             'license_number' => ['nullable', 'string', 'max:50'],
             'institution' => ['nullable', 'string', 'max:150'],
             'institucion_id' => ['nullable', 'exists:instituciones,id'],
+            'instituciones_asignadas' => ['nullable', 'array'],
+            'instituciones_asignadas.*' => ['integer', 'exists:instituciones,id'],
         ], [
             'name.required' => 'El nombre es obligatorio.',
             'email.required' => 'El correo electrónico es obligatorio.',
@@ -223,11 +227,29 @@ class AdminUserController extends Controller
 
         DB::transaction(function () use ($user, $request) {
             $user->save();
-            $this->vincularInstitucion($user, $request->filled('institucion_id') ? (int) $request->institucion_id : null);
+            $this->vincular($user, $request);
         });
 
         return redirect()->route('admin.users.index')
             ->with('success', 'Usuario "' . $user->name . '" actualizado exitosamente.');
+    }
+
+    /**
+     * Un profesional clínico (perfil «clínico» o «ambos») queda asignado a las
+     * instituciones que atiende, sin entrar a su padrón. Cualquier otra cuenta
+     * se vincula como hasta ahora: al padrón de la institución elegida.
+     */
+    private function vincular(User $user, Request $request): void
+    {
+        if ($user->isClinicoAcreditado() && !$user->is_admin) {
+            $user->institucionesAsignadas()->sync(array_map('intval', (array) $request->input('instituciones_asignadas', [])));
+
+            return;
+        }
+
+        // Deja de ser clínico (o es administración, que ve todo): sin asignaciones.
+        $user->institucionesAsignadas()->detach();
+        $this->vincularInstitucion($user, $request->filled('institucion_id') ? (int) $request->institucion_id : null);
     }
 
     /**

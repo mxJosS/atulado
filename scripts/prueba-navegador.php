@@ -179,6 +179,19 @@ erroresJs($p, 'la institución y la ficha');
 abrir($p, "{$base}/admin/cola-atencion");
 paso('Cola de atención muestra el caso abierto', (bool) js($p, "document.body.textContent.includes('Luis Manuel Chan Poot') && document.body.textContent.includes('CR-')"));
 erroresJs($p, 'la cola de atención');
+abrir($p, "{$base}/admin/dashboard");
+paso('Dashboard: «Estado de la plataforma» carga', (bool) js($p, "document.querySelector('.titulo-atl')?.textContent.includes('Estado de la plataforma')"));
+paso('Dashboard: las dos tendencias se dibujan', js($p, "document.querySelectorAll('.kpi-spark svg').length") === 2);
+paso('Dashboard: evolución del semáforo dibujada', (bool) js($p, "!!document.querySelector('#ch-evolucion svg')"));
+paso('Dashboard: alerta del caso rojo agudo', (bool) js($p, "document.getElementById('alertas').textContent.includes('ROJO AGUDO')"));
+js($p, "document.querySelector('[data-vista=tabla]').click()");
+paso('«Tabla» cambia al comparativo', js($p, "getComputedStyle(document.getElementById('vista-tabla')).display !== 'none' && getComputedStyle(document.getElementById('vista-tarjetas')).display === 'none'") === true);
+js($p, "document.querySelector('[data-vista=tarjetas]').click()");
+js($p, "const q = document.getElementById('f-q'); q.value = 'zzz-no-existe'; q.dispatchEvent(new Event('input'))");
+paso('El buscador filtra y desactiva la exportación vacía', js($p, "getComputedStyle(document.getElementById('sin-resultados')).display !== 'none' && document.getElementById('exportar-padron').getAttribute('aria-disabled') === 'true'") === true);
+js($p, "const q = document.getElementById('f-q'); q.value = 'constructora'; q.dispatchEvent(new Event('input'))");
+paso('La exportación toma las instituciones visibles', (bool) js($p, "/instituciones=\d+$/.test(document.getElementById('exportar-padron').href)"));
+erroresJs($p, 'el dashboard');
 $navegador->close();
 
 // ═════════════ 2. Persona usuaria: registro diario y preguntas ═════════════

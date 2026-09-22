@@ -344,4 +344,20 @@ class InstitucionAltaTest extends TestCase
 
         $this->assertSame(3, $institucion->departamentos()->count());
     }
+
+    public function test_adoption_goal_is_editable_and_validated(): void
+    {
+        $institucion = $this->crearInstitucion();
+        $this->assertSame(75, $institucion->fresh()->meta_adopcion, 'La meta contractual por defecto es 75%');
+
+        $this->actingAs($this->admin)
+            ->put(route('admin.instituciones.update', $institucion), $this->datosEdicion($institucion, ['meta_adopcion' => 90]))
+            ->assertSessionHasNoErrors();
+        $this->assertSame(90, $institucion->fresh()->meta_adopcion);
+
+        $this->actingAs($this->admin)
+            ->put(route('admin.instituciones.update', $institucion), $this->datosEdicion($institucion, ['meta_adopcion' => 150]))
+            ->assertSessionHasErrors('meta_adopcion');
+        $this->assertSame(90, $institucion->fresh()->meta_adopcion);
+    }
 }

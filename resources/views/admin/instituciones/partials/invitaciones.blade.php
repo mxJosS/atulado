@@ -17,6 +17,7 @@
         <span class="chip-atl ambar">{{ $invitaciones['sin_enviar'] }} sin invitación</span>
       </div>
     </div>
+@if($esAdmin)
     <form method="POST" action="{{ route('admin.instituciones.invitaciones.enviar', $institucion) }}"
           onsubmit="return confirm('¿Enviar la invitación a las {{ $pendientes }} personas que aún no activan su cuenta?')">
       @csrf
@@ -25,8 +26,10 @@
         <i class="fa-solid fa-paper-plane"></i> Enviar invitación a todos ({{ $pendientes }})
       </button>
     </form>
+@endif
   </div>
 
+@if($esAdmin)
   @if($invitaciones['sin_enviar'] > 0 && $invitaciones['enviadas'] > 0)
     <form method="POST" action="{{ route('admin.instituciones.invitaciones.enviar', $institucion) }}" style="margin-bottom: 0.9rem;">
       @csrf
@@ -34,6 +37,7 @@
       <button type="submit" class="btn-atl suave sm"><i class="fa-solid fa-envelope"></i> Enviar sólo a quienes nunca la recibieron ({{ $invitaciones['sin_enviar'] }})</button>
     </form>
   @endif
+@endif
 
   @if($personas->isEmpty())
     <p style="color: #6E887E; font-size: 0.88rem; margin: 0;">Primero agrega personas en «Padrón de Colaboradores».</p>
@@ -43,15 +47,17 @@
       <input type="hidden" name="alcance" value="seleccion">
       <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; margin-bottom: 0.75rem;">
         <input type="search" class="form-input-styled" placeholder="Buscar persona…" style="flex: 1; min-width: 200px;" oninput="filtrarTabla(this, 'tabla-invitaciones')">
+@if($esAdmin)
         <button type="submit" class="btn-atl linea sm" id="btn-invitar-seleccion" disabled>
           <i class="fa-solid fa-paper-plane"></i> Enviar a seleccionadas (<span id="n-seleccion">0</span>)
         </button>
+@endif
       </div>
       <div style="overflow-x: auto; max-height: 560px; overflow-y: auto; border: 1px solid #EEF4F0; border-radius: 10px;">
         <table class="padron-tabla" id="tabla-invitaciones">
           <thead>
             <tr>
-              <th style="width: 32px;"><input type="checkbox" aria-label="Seleccionar todas" onchange="document.querySelectorAll('.chk-invitar').forEach(c => { if (c.closest('tr').style.display !== 'none') c.checked = this.checked; }); contarSeleccion();"></th>
+              <th style="width: 32px;">@if($esAdmin)<input type="checkbox" aria-label="Seleccionar todas" onchange="document.querySelectorAll('.chk-invitar').forEach(c => { if (c.closest('tr').style.display !== 'none') c.checked = this.checked; }); contarSeleccion();">@endif</th>
               <th>Persona</th><th>Área</th><th>Estado</th><th></th>
             </tr>
           </thead>
@@ -59,7 +65,7 @@
             @foreach($personas->where('estado', '!=', 'baja') as $p)
               @php $puede = $invitables->contains('id', $p->id); @endphp
               <tr>
-                <td>@if($puede)<input type="checkbox" class="chk-invitar" name="personas[]" value="{{ $p->id }}" onchange="contarSeleccion()">@endif</td>
+                <td>@if($puede && $esAdmin)<input type="checkbox" class="chk-invitar" name="personas[]" value="{{ $p->id }}" onchange="contarSeleccion()">@endif</td>
                 <td><b>{{ $p->user?->name }}</b><div style="font-size: 0.74rem; color: #6E887E;">{{ $p->user?->email }}</div></td>
                 <td>{{ $p->departamento?->nombre ?: '—' }}</td>
                 <td>
@@ -72,7 +78,7 @@
                   @endif
                 </td>
                 <td style="text-align: right;">
-                  @if($puede)
+                  @if($puede && $esAdmin)
                     <button type="submit" class="btn-atl linea sm" name="solo" value="{{ $p->id }}">
                       <i class="fa-solid fa-paper-plane"></i> {{ $p->invitado_en ? 'Reenviar' : 'Enviar' }}
                     </button>

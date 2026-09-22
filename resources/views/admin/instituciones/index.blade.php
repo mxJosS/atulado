@@ -15,39 +15,11 @@
       <h1 class="titulo-atl">Instituciones</h1>
       <p class="sub-atl">Empresas y colegios contratantes, su contacto de enlace y su profesional clínico designado.</p>
     </div>
+    @if(auth()->user()->is_admin)
     <button type="button" class="btn-atl primario" data-open="m-alta-institucion">
       <i class="fa-solid fa-plus"></i> Nueva Institución
     </button>
-  </div>
-
-  {{-- Pulso operativo --}}
-  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
-    <div class="kpi">
-      <div class="kpi-label"><i class="fa-solid fa-building-shield"></i> Instituciones</div>
-      <div class="kpi-value">{{ $metricas['instituciones'] }}</div>
-      <div class="kpi-foot">{{ $metricas['instituciones_activas'] }} activas · {{ $metricas['instituciones'] - $metricas['instituciones_activas'] }} en alta u otro estado</div>
-    </div>
-    <div class="kpi">
-      <div class="kpi-label"><i class="fa-solid fa-users"></i> Personas en padrón</div>
-      <div class="kpi-value">{{ number_format($metricas['padron']) }}</div>
-      <div class="kpi-foot">Sin contar bajas</div>
-    </div>
-    <div class="kpi">
-      <div class="kpi-label"><i class="fa-solid fa-user-check"></i> Cuentas activadas</div>
-      <div class="kpi-value">
-        @if($metricas['adopcion'] !== null)
-          {{ $metricas['adopcion'] }} <span class="unit">%</span>
-        @else
-          --
-        @endif
-      </div>
-      <div class="kpi-foot">{{ number_format($metricas['activas']) }} personas ya entraron a la app</div>
-    </div>
-    <div class="kpi {{ $metricas['casos_abiertos'] > 0 ? 'accent-red' : '' }}">
-      <div class="kpi-label"><i class="fa-solid fa-life-ring"></i> Casos de crisis abiertos</div>
-      <div class="kpi-value">{{ $metricas['casos_abiertos'] }}</div>
-      <div class="kpi-foot">Se cierran sólo con contacto humano verificado</div>
-    </div>
+    @endif
   </div>
 
   {{-- Listado --}}
@@ -122,6 +94,7 @@
                 <div style="width: 56px; height: 56px; border-radius: 50%; background: #EEF4F0; color: #2E5D4B; display: inline-flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 1rem;">
                   <i class="fa-solid fa-building-circle-check"></i>
                 </div>
+                @if(auth()->user()->is_admin)
                 <h4 style="font-family: 'Fraunces', serif; font-size: 1.15rem; color: #1A2620; margin: 0 0 0.5rem;">No hay instituciones registradas aún</h4>
                 <p style="color: #6E887E; font-size: 0.88rem; max-width: 480px; margin: 0 auto 1.25rem;">
                   Da de alta la primera empresa u organización con su contacto de enlace, su profesional designado y sus macro-áreas.
@@ -129,6 +102,10 @@
                 <button type="button" class="btn-atl primario" data-open="m-alta-institucion">
                   <i class="fa-solid fa-plus"></i> Registrar primera institución
                 </button>
+                @else
+                <h4 style="font-family: 'Fraunces', serif; font-size: 1.15rem; margin: 0 0 0.4rem; color: #1A2620;">Aún no tienes instituciones asignadas</h4>
+                <p style="color: #6E887E; font-size: 0.88rem; margin: 0;">La administración te asigna las instituciones que atiendes desde «Usuarios». Mientras tanto no verás colaboradores ni casos.</p>
+                @endif
               </td>
             </tr>
           @endforelse
@@ -188,7 +165,7 @@
 
 @push('scripts')
 <script src="{{ asset('vendor/paneles/panel.js') }}?v={{ filemtime(public_path('vendor/paneles/panel.js')) }}"></script>
-@if($errors->any() && old('_form') === 'alta')
+@if(($errors->any() && old('_form') === 'alta') || request()->boolean('alta'))
 <script>
   document.addEventListener('DOMContentLoaded', () => openModal('m-alta-institucion'));
 </script>

@@ -60,6 +60,17 @@ class EventoCrisis extends Model
         return $this->belongsTo(User::class, 'primer_contacto_por');
     }
 
+    /**
+     * Casos que ve una cuenta del panel: la administración, todos; un clínico,
+     * sólo los de sus instituciones asignadas (no los de personas sin institución).
+     */
+    public function scopeVisiblesPara(Builder $query, User $user): Builder
+    {
+        $ids = $user->institucionesVisiblesIds();
+
+        return $ids === null ? $query : $query->whereIn('institucion_id', $ids);
+    }
+
     public function scopeAbiertos(Builder $query): Builder
     {
         return $query->where('estado', '!=', 'cerrado');

@@ -248,6 +248,7 @@
                                 'license_number' => $user->license_number ?? '',
                                 'institucion_id' => $user->membresiaActiva?->institucion_id,
                                 'perfil_profesional' => $user->perfil_profesional,
+                                'asignadas' => $user->institucionesAsignadas->pluck('id')->all(),
                                 'is_clinico' => (bool) $user->is_clinico_atulado,
                                 'institution_text' => (string) ($user->getRawOriginal('institution') ?? ''),
                                 'is_self' => $isSelf,
@@ -426,7 +427,7 @@
             <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: #166534; margin-bottom: 0.4rem; display: block;">
               ¿Qué hará este profesional? <span style="color: #DC2626;">*</span>
             </label>
-            <select name="perfil_profesional" id="perfilProfesionalSelect" class="form-control" style="border-radius: 9px; background: white;">
+            <select name="perfil_profesional" id="perfilProfesionalSelect" onchange="toggleRoleFields()" class="form-control" style="border-radius: 9px; background: white;">
               <option value="publica" {{ old('perfil_profesional', 'publica') === 'publica' ? 'selected' : '' }}>Sólo publicar artículos en la revista</option>
               <option value="clinico" {{ old('perfil_profesional', 'publica') === 'clinico' ? 'selected' : '' }}>Sólo profesional clínico (ve fichas y casos; no publica)</option>
               <option value="ambos" {{ old('perfil_profesional', 'publica') === 'ambos' ? 'selected' : '' }}>Ambos: publica y es clínico</option>
@@ -473,8 +474,27 @@
           </div>
         </div>
 
+        <!-- Instituciones que atiende (sólo profesional clínico o ambos) -->
+        <div id="bloqueAsignadas" style="display: none; margin-bottom: 1.25rem; background: #F0F7F4; border: 1.5px solid #B8D8C8; border-radius: 12px; padding: 0.95rem 1rem;">
+          <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: #1E4A25; margin-bottom: 0.3rem; display: block;">
+            Instituciones que atiende como profesional clínico
+          </label>
+          <span style="font-size: 0.74rem; color: #3D6B55; display: block; margin-bottom: 0.6rem;">
+            Sólo verá estas instituciones: su plano clínico con todos los permisos, su cola de atención y el resto en modo lectura. No entra al padrón. Sin ninguna marcada, no ve ninguna.
+          </span>
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 0.35rem 0.75rem; max-height: 190px; overflow-y: auto;">
+            @forelse($institutions as $instOption)
+              <label style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: #1A2620; cursor: pointer;">
+                <input type="checkbox" name="instituciones_asignadas[]" value="{{ $instOption->id }}" class="alta-chk-asignada" @checked(in_array($instOption->id, array_map('intval', (array) old('instituciones_asignadas', [])), true))>
+                <span>{{ $instOption->nombre_corto }}</span>
+              </label>
+            @empty
+              <span style="font-size: 0.8rem; color: #6E887E;">Aún no hay instituciones registradas.</span>
+            @endforelse
+          </div>
+        </div>
         <!-- Institución Corporativa Vinculada (Opcional) -->
-        <div style="margin-bottom: 1.25rem;">
+        <div id="bloqueVincular" style="margin-bottom: 1.25rem;">
           <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: #2D3748; margin-bottom: 0.4rem; display: block;">
             Vincular a Empresa / Institución del Sistema (Opcional)
           </label>
@@ -625,7 +645,7 @@
             <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: #166534; margin-bottom: 0.4rem; display: block;">
               ¿Qué hará este profesional? <span style="color: #DC2626;">*</span>
             </label>
-            <select name="perfil_profesional" id="editPerfilProfesional" class="form-control" style="border-radius: 9px; background: white;">
+            <select name="perfil_profesional" id="editPerfilProfesional" onchange="toggleEditRoleFields()" class="form-control" style="border-radius: 9px; background: white;">
               <option value="publica" >Sólo publicar artículos en la revista</option>
               <option value="clinico" >Sólo profesional clínico (ve fichas y casos; no publica)</option>
               <option value="ambos" >Ambos: publica y es clínico</option>
@@ -646,8 +666,27 @@
           </div>
         </div>
 
+        <!-- Instituciones que atiende (sólo profesional clínico o ambos) -->
+        <div id="editBloqueAsignadas" style="display: none; margin-bottom: 1.25rem; background: #F0F7F4; border: 1.5px solid #B8D8C8; border-radius: 12px; padding: 0.95rem 1rem;">
+          <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: #1E4A25; margin-bottom: 0.3rem; display: block;">
+            Instituciones que atiende como profesional clínico
+          </label>
+          <span style="font-size: 0.74rem; color: #3D6B55; display: block; margin-bottom: 0.6rem;">
+            Sólo verá estas instituciones: su plano clínico con todos los permisos, su cola de atención y el resto en modo lectura. No entra al padrón. Sin ninguna marcada, no ve ninguna.
+          </span>
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 0.35rem 0.75rem; max-height: 190px; overflow-y: auto;">
+            @forelse($institutions as $instOption)
+              <label style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: #1A2620; cursor: pointer;">
+                <input type="checkbox" name="instituciones_asignadas[]" value="{{ $instOption->id }}" class="edit-chk-asignada" >
+                <span>{{ $instOption->nombre_corto }}</span>
+              </label>
+            @empty
+              <span style="font-size: 0.8rem; color: #6E887E;">Aún no hay instituciones registradas.</span>
+            @endforelse
+          </div>
+        </div>
         <!-- Institución Corporativa Vinculada (Opcional) -->
-        <div style="margin-bottom: 1.25rem;">
+        <div id="editBloqueVincular" style="margin-bottom: 1.25rem;">
           <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: #2D3748; margin-bottom: 0.45rem; display: block;">
             Vincular a Empresa / Institución del Sistema (Opcional)
           </label>
@@ -714,6 +753,11 @@
     const labelAdmin = document.getElementById('labelRoleAdmin');
     const labelPro = document.getElementById('labelRolePro');
     const labelUser = document.getElementById('labelRoleUser');
+    {
+      const clinico = document.querySelector('input[name="role"][value="profesional"]').checked && ['clinico', 'ambos'].includes(document.getElementById('perfilProfesionalSelect').value);
+      document.getElementById('bloqueAsignadas').style.display = clinico ? 'block' : 'none';
+      document.getElementById('bloqueVincular').style.display = clinico ? 'none' : 'block';
+    }
     document.getElementById('clinicoAdminBox').style.display = isAdmin ? 'block' : 'none';
 
     if (isPro) {
@@ -796,6 +840,7 @@
     }
 
     document.getElementById('editPerfilProfesional').value = user.perfil_profesional || 'publica';
+    document.querySelectorAll('.edit-chk-asignada').forEach(c => { c.checked = (user.asignadas || []).includes(Number(c.value)); });
     document.getElementById('editClinicoAdmin').checked = !!user.is_clinico;
 
     toggleEditRoleFields();
@@ -814,6 +859,11 @@
     const labelAdmin = document.getElementById('editLabelRoleAdmin');
     const labelPro = document.getElementById('editLabelRolePro');
     const labelUser = document.getElementById('editLabelRoleUser');
+    {
+      const clinico = document.getElementById('editRolePro').checked && ['clinico', 'ambos'].includes(document.getElementById('editPerfilProfesional').value);
+      document.getElementById('editBloqueAsignadas').style.display = clinico ? 'block' : 'none';
+      document.getElementById('editBloqueVincular').style.display = clinico ? 'none' : 'block';
+    }
     document.getElementById('editClinicoAdminBox').style.display = isAdmin ? 'block' : 'none';
 
     proContainer.style.display = isPro ? 'block' : 'none';

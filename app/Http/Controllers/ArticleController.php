@@ -7,6 +7,7 @@ use App\Models\Resource;
 use App\Models\TopicArea;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class ArticleController extends Controller
@@ -66,9 +67,34 @@ class ArticleController extends Controller
         return view('revista.index', compact('articles', 'featuredArticle', 'topicAreas', 'categories'));
     }
 
+    /**
+     * Una lectura por visitante, por artículo y por día (para «Revistas leídas»).
+     * Con sesión iniciada cuenta la cuenta; sin ella, una huella anónima de la
+     * sesión del navegador (no se guarda la IP). Los robots no cuentan.
+     */
+    private function registrarLectura(Article $article): void
+    {
+        if (preg_match('/bot|crawl|spider|slurp|preview|facebookexternalhit|whatsapp/i', (string) request()->userAgent())) {
+            return;
+        }
+
+        $visitante = Auth::id()
+            ? 'u:' . Auth::id()
+            : 's:' . substr(hash('sha256', session()->getId() . config('app.key')), 0, 40);
+
+        DB::table('lecturas_articulos')->insertOrIgnore([
+            'article_id' => $article->id,
+            'visitante' => $visitante,
+            'fecha' => now()->toDateString(),
+            'created_at' => now(),
+        ]);
+    }
+
     public function show(string $slug)
     {
         $article = Article::with(['topicArea', 'user'])->where('slug', $slug)->firstOrFail();
+
+        $this->registrarLectura($article);
 
         $relatedArticles = Article::with(['topicArea', 'user'])
             ->where('id', '!=', $article->id)
