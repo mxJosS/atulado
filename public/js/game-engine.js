@@ -204,6 +204,21 @@
 
     if (fillElem) fillElem.style.width = percent + '%';
     if (textElem) textElem.innerText = percent + '%';
+
+    actualizarPildoraNivel();
+  }
+
+  /**
+   * La píldora de la barra superior («Nvl») muestra el nivel real de la planta
+   * activa del juego. El servidor sólo pinta un valor inicial; aquí se corrige
+   * al cargar cada página y cada vez que la planta sube de nivel.
+   */
+  function actualizarPildoraNivel() {
+    const activeKey = (typeof zenInventory !== 'undefined' && zenInventory.activePlant) || 'tree';
+    const pData = plantLevels[activeKey] || { level: 1, xp: 0 };
+    document.querySelectorAll('.tree-level-label').forEach(el => {
+      el.textContent = pData.level >= 100 ? 'Nvl 100' : `Nvl ${pData.level}`;
+    });
   }
 
   // Persistent Inventory
@@ -1186,6 +1201,9 @@
 
   // Auto-open game check
   document.addEventListener('DOMContentLoaded', () => {
+    // Nivel real del árbol en la píldora superior, en cualquier página.
+    try { actualizarPildoraNivel(); } catch(e) {}
+
     try {
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.get('open_game') === '1' || window.location.hash === '#tree-game') {

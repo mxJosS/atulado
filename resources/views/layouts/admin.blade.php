@@ -209,6 +209,37 @@
             </span>
           @endif
         </a>
+
+        {{-- 7. Interruptor: acceso con Google (sólo administración) --}}
+        @if(auth()->user()?->is_admin)
+          @php $googleActivo = \App\Models\Ajuste::googleHabilitado(); @endphp
+          <form method="POST" action="{{ route('admin.ajustes.google') }}" class="interruptor-google" title="{{ $googleActivo ? 'Visible en el inicio de sesión y el registro' : 'Oculto: sólo se entra con correo' }}">
+            @csrf
+            <input type="hidden" name="habilitado" value="{{ $googleActivo ? '0' : '1' }}">
+            <div class="nav-icon"><i class="fa-brands fa-google"></i></div>
+            <div class="interruptor-texto">
+              <span>Acceso con Google</span>
+              <small>{{ $googleActivo ? 'Activado' : 'Desactivado' }}</small>
+            </div>
+            <button type="submit" role="switch" aria-checked="{{ $googleActivo ? 'true' : 'false' }}"
+                    aria-label="{{ $googleActivo ? 'Desactivar' : 'Activar' }} el acceso con Google"
+                    class="interruptor {{ $googleActivo ? 'encendido' : '' }}"
+                    @if($googleActivo) onclick="return confirm('¿Desactivar el acceso con Google? El botón desaparecerá del inicio de sesión y del registro para todos.')" @endif>
+              <span class="perilla"></span>
+            </button>
+          </form>
+          <style>
+            .interruptor-google { display: flex; align-items: center; gap: 10px; margin-top: 0.85rem; padding: 0.6rem 0.75rem; border: 1px solid rgba(168, 230, 192, 0.18); border-radius: 12px; color: #C9D8D0; }
+            .interruptor-google .nav-icon { color: #A8E6C0; }
+            .interruptor-google .interruptor-texto { display: flex; flex-direction: column; line-height: 1.2; font-size: 0.86rem; flex: 1; }
+            .interruptor-google small { font-family: 'IBM Plex Mono', monospace; font-size: 0.66rem; color: #8EADA4; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; }
+            .interruptor { position: relative; width: 42px; height: 24px; border-radius: 999px; border: none; background: #3C5247; cursor: pointer; flex-shrink: 0; transition: background .2s; padding: 0; }
+            .interruptor .perilla { position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #FFFFFF; transition: left .2s; }
+            .interruptor.encendido { background: #2E9E6A; }
+            .interruptor.encendido .perilla { left: 21px; }
+            .interruptor:focus-visible { outline: 2px solid #A8E6C0; outline-offset: 2px; }
+          </style>
+        @endif
       </nav>
 
       <!-- Pinned Profile Footer & Logout (Cleaned & Aligned to theme) -->

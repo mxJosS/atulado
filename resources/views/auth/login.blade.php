@@ -35,6 +35,8 @@
         </p>
       </div>
 
+      {{-- Acceso con Google: la administración puede ocultarlo (p. ej. mientras un salón se registra con correo institucional) --}}
+      @if(\App\Models\Ajuste::googleHabilitado())
       <!-- GOOGLE SIGN IN BUTTON (CON LOGO OFICIAL A COLOR) -->
       <a 
         href="{{ route('auth.google') }}" 
@@ -59,6 +61,7 @@
         <span style="padding: 0 0.75rem;">o con tu correo</span>
         <div style="flex: 1; height: 1px; background: #DCE8E0;"></div>
       </div>
+      @endif
 
       <!-- Login Form -->
       <form id="mainLoginForm" method="POST" action="{{ route('login') }}" novalidate>

@@ -52,10 +52,10 @@ Route::redirect('/terminos.html', '/terminos');
 */
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-    Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:6,1');
+    Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:100,1');
 
     Route::get('/registro', [AuthController::class, 'showRegister'])->name('register');
-    Route::post('/registro', [AuthController::class, 'register'])->middleware('throttle:6,1');
+    Route::post('/registro', [AuthController::class, 'register'])->middleware('throttle:100,1');
 
     // Google OAuth Authentication
     Route::get('/auth/google', [AuthController::class, 'redirectToGoogle'])->name('auth.google');
@@ -63,9 +63,9 @@ Route::middleware('guest')->group(function () {
 
     // Password Reset
     Route::get('/olvide-contrasena', [AuthController::class, 'showForgotPassword'])->name('password.request');
-    Route::post('/olvide-contrasena', [AuthController::class, 'sendResetLinkEmail'])->name('password.email')->middleware('throttle:5,1');
+    Route::post('/olvide-contrasena', [AuthController::class, 'sendResetLinkEmail'])->name('password.email')->middleware('throttle:100,1');
     Route::get('/restablecer-contrasena/{token}', [AuthController::class, 'showResetPassword'])->name('password.reset');
-    Route::post('/restablecer-contrasena', [AuthController::class, 'resetPassword'])->name('password.update')->middleware('throttle:5,1');
+    Route::post('/restablecer-contrasena', [AuthController::class, 'resetPassword'])->name('password.update')->middleware('throttle:100,1');
 });
 
 /*
@@ -78,8 +78,8 @@ Route::middleware('auth')->group(function () {
 
     // Email 6-Digit Code Verification
     Route::get('/verificar-codigo', [AuthController::class, 'showVerifyCode'])->name('verification.code.notice');
-    Route::post('/verificar-codigo', [AuthController::class, 'verifyCode'])->name('verification.code.verify')->middleware('throttle:10,1');
-    Route::post('/verificar-codigo/reenviar', [AuthController::class, 'resendVerificationCode'])->name('verification.code.resend')->middleware('throttle:3,1');
+    Route::post('/verificar-codigo', [AuthController::class, 'verifyCode'])->name('verification.code.verify')->middleware('throttle:100,1');
+    Route::post('/verificar-codigo/reenviar', [AuthController::class, 'resendVerificationCode'])->name('verification.code.resend')->middleware('throttle:100,1');
 
     // Verified Users Only
     Route::middleware('verified.code')->group(function () {
@@ -179,6 +179,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/instituciones', [\App\Http\Controllers\Admin\InstitucionController::class, 'store'])->name('instituciones.store');
     Route::put('/instituciones/{institucion}', [\App\Http\Controllers\Admin\InstitucionController::class, 'update'])->name('instituciones.update');
 
+    // Interruptores de la plataforma
+    Route::post('/ajustes/google', [\App\Http\Controllers\Admin\AjusteController::class, 'google'])->name('ajustes.google');
+
     // «Eliminar» archiva; desde Archivadas se restaura o se elimina para siempre.
     Route::post('/instituciones/{institucion}/archivar', [\App\Http\Controllers\Admin\InstitucionController::class, 'archivar'])->name('instituciones.archivar');
     Route::post('/instituciones/{institucion}/restaurar', [\App\Http\Controllers\Admin\InstitucionController::class, 'restaurar'])->name('instituciones.restaurar');
@@ -204,11 +207,27 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
 /*
 |--------------------------------------------------------------------------
+| Monitor del servidor (ruta secreta)
+|--------------------------------------------------------------------------
+| Sólo existe si ATULADO_MONITOR_RUTA está en el .env. No hay enlaces a ella:
+| se entra escribiendo la ruta exacta, y además hay que ser administrador.
+| Sin sesión lleva al login (y de regreso al monitor); con sesión y sin ser
+| administrador responde 404, como si no existiera.
+*/
+if ($rutaMonitor = config('atulado.monitor.ruta')) {
+    Route::middleware('auth')->group(function () use ($rutaMonitor) {
+        Route::get($rutaMonitor, [\App\Http\Controllers\MonitorController::class, 'panel'])->middleware('throttle:60,1');
+        Route::get($rutaMonitor . '/datos', [\App\Http\Controllers\MonitorController::class, 'datos'])->middleware('throttle:240,1');
+    });
+}
+
+/*
+|--------------------------------------------------------------------------
 | Enlaces firmados que llegan por correo
 |--------------------------------------------------------------------------
 */
 Route::middleware('signed')->group(function () {
     Route::get('/invitacion/{membresia}', [\App\Http\Controllers\InvitacionAceptarController::class, 'mostrar'])->name('invitacion.mostrar');
-    Route::post('/invitacion/{membresia}', [\App\Http\Controllers\InvitacionAceptarController::class, 'aceptar'])->name('invitacion.aceptar')->middleware('throttle:10,1');
+    Route::post('/invitacion/{membresia}', [\App\Http\Controllers\InvitacionAceptarController::class, 'aceptar'])->name('invitacion.aceptar')->middleware('throttle:100,1');
     Route::get('/resumen-clinico/{entrega}', [\App\Http\Controllers\ResumenEntregaController::class, 'ver'])->name('resumen.ver');
 });

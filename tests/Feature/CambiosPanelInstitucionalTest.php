@@ -324,6 +324,78 @@ class CambiosPanelInstitucionalTest extends TestCase
         $this->assertDatabaseHas('users', ['id' => $this->clinico->id]);
     }
 
+    /* ─────────── Interruptor del acceso con Google ─────────── */
+
+    public function test_admin_can_hide_google_sign_in_for_everyone(): void
+    {
+        $this->get(route('login'))->assertSee('Acceder con Google');
+
+        // Un clínico sin ser administrador no lo cambia.
+        $this->actingAs($this->clinico)->post(route('admin.ajustes.google'), ['habilitado' => '0'])->assertRedirect(route('dashboard'));
+        $this->assertTrue(\App\Models\Ajuste::googleHabilitado());
+
+        $this->actingAs($this->admin)->post(route('admin.ajustes.google'), ['habilitado' => '0'])->assertSessionHas('success');
+        $this->assertFalse(\App\Models\Ajuste::googleHabilitado());
+        auth()->logout();
+
+        $this->get(route('login'))->assertOk()->assertDontSee('Acceder con Google');
+        $this->get(route('register'))->assertOk()->assertDontSee('Registrarse con Google');
+        $this->get(route('auth.google'))->assertRedirect(route('login'))->assertSessionHas('error');
+
+        $this->actingAs($this->admin)->post(route('admin.ajustes.google'), ['habilitado' => '1']);
+        auth()->logout();
+        $this->get(route('login'))->assertSee('Acceder con Google');
+    }
+
+    /* ─────────── Monitor del servidor ─────────── */
+
+    public function test_only_admins_with_the_exact_link_can_see_the_monitor(): void
+    {
+        \Illuminate\Support\Facades\Http::fake(['*' => \Illuminate\Support\Facades\Http::response('', 404)]);
+        $ruta = '/' . config('atulado.monitor.ruta'); // en pruebas: /monitor-de-prueba (phpunit.xml)
+
+        // Cualquier otra ruta no existe.
+        $this->get('/monitor')->assertNotFound();
+        $this->actingAs($this->admin)->get('/25425252542414141monitor')->assertNotFound();
+        auth()->logout();
+
+        // Sin sesión: al login, y de ahí de regreso al monitor.
+        $this->get($ruta)->assertRedirect(route('login'));
+        $this->getJson($ruta . '/datos')->assertUnauthorized();
+
+        // Con sesión pero sin ser administración: para esa persona no existe.
+        $usuario = User::factory()->create();
+        $this->actingAs($usuario)->get($ruta)->assertNotFound();
+        $this->actingAs($usuario)->getJson($ruta . '/datos')->assertNotFound();
+        $this->actingAs($this->clinico)->get($ruta)->assertNotFound();
+        $this->actingAs($this->clinico)->getJson($ruta . '/datos')->assertNotFound();
+
+        // Administración: sí.
+        $this->actingAs($this->admin)->get($ruta)->assertOk()
+            ->assertSee('Monitor del servidor')
+            ->assertHeader('X-Robots-Tag', 'noindex, nofollow, noarchive');
+        $this->actingAs($this->admin)->getJson($ruta . '/datos')->assertOk()
+            ->assertJsonStructure(['cpu', 'memoria', 'discos', 'red', 'procesos', 'nginx', 'fpm', 'mysql', 'app', 'alertas']);
+    }
+
+    public function test_the_monitor_sample_never_fails_even_without_proc_or_status_pages(): void
+    {
+        \Illuminate\Support\Facades\Http::fake(['*' => \Illuminate\Support\Facades\Http::response('', 404)]);
+
+        $datos = app(\App\Services\MonitorServidorService::class)->muestra();
+
+        foreach (['host', 'cpu', 'carga', 'memoria', 'discos', 'io', 'red', 'conexiones', 'temperaturas', 'procesos', 'nginx', 'fpm', 'mysql', 'app', 'alertas'] as $clave) {
+            $this->assertArrayHasKey($clave, $datos);
+        }
+        $this->assertFalse($datos['nginx']['disponible']);
+        $this->assertFalse($datos['fpm']['disponible']);
+
+        // Nunca expone líneas de comando: cada proceso son sólo 6 datos.
+        foreach ($datos['procesos']['lista'] as $proceso) {
+            $this->assertCount(6, $proceso);
+        }
+    }
+
     /* ─────────── Resumen clínico imprimible ─────────── */
 
     public function test_summary_scope_changes_the_document_and_opens_the_printable_viewer(): void

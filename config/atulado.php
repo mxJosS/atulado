@@ -73,4 +73,24 @@ return [
     'ficha' => [
         'minutos_concesion' => env('ATULADO_FICHA_MINUTOS', 30),
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Monitor del servidor
+    |--------------------------------------------------------------------------
+    | Panel en tiempo real (CPU, RAM, disco, red, procesos, Nginx, PHP-FPM,
+    | MySQL…). Sólo existe si ATULADO_MONITOR_RUTA tiene valor, sólo se llega
+    | escribiendo esa ruta exacta (no hay enlaces a ella en ninguna parte) y
+    | sólo lo ve una cuenta de administración con sesión iniciada; para
+    | cualquier otra cuenta responde 404. La ruta vive en el .env del
+    | servidor, nunca en el repositorio.
+    |
+    | nginx_status y fpm_status son las páginas de estado internas (sólo
+    | 127.0.0.1); ver deploy/nginx-monitor.conf.
+    */
+    'monitor' => [
+        'ruta' => trim((string) env('ATULADO_MONITOR_RUTA', ''), '/'),
+        'nginx_status' => env('ATULADO_MONITOR_NGINX', 'http://127.0.0.1:8089/nginx_status'),
+        'fpm_status' => env('ATULADO_MONITOR_FPM', 'http://127.0.0.1:8089/fpm-status?json'),
+    ],
 ];

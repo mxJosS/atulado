@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Mail\EmailVerificationCodeMail;
+use App\Models\Ajuste;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -26,6 +27,10 @@ class AuthController extends Controller
 
     public function redirectToGoogle()
     {
+        if (!Ajuste::googleHabilitado()) {
+            return $this->googleDesactivado();
+        }
+
         if (empty(config('services.google.client_id')) || empty(config('services.google.client_secret'))) {
             return redirect()->route('login')->with('error', 'El inicio de sesión con Google requiere configurar GOOGLE_CLIENT_ID y GOOGLE_CLIENT_SECRET en el archivo .env.');
         }
@@ -37,8 +42,20 @@ class AuthController extends Controller
         }
     }
 
+    /** Acceso con Google apagado desde el panel: sólo con correo. */
+    private function googleDesactivado()
+    {
+        return redirect()->route('login')
+            ->with('error', 'El acceso con Google no está disponible en este momento. Entra o regístrate con tu correo institucional.');
+    }
+
     public function handleGoogleCallback(Request $request)
     {
+        // Si se apagó mientras la persona estaba en la pantalla de Google, tampoco entra por aquí.
+        if (!Ajuste::googleHabilitado()) {
+            return $this->googleDesactivado();
+        }
+
         // 1. Manejo de errores devueltos directamente por Google en la URL
         if ($request->has('error')) {
             $errorCode = $request->get('error');
