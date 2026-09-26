@@ -1,6 +1,7 @@
 @extends('layouts.guest')
 
-@section('title', 'Verificación de Correo — A tu lado')
+@php $acceso = ($modo ?? null) === 'acceso'; @endphp
+@section('title', $acceso ? 'Código de acceso — A tu lado' : 'Verificación de Correo — A tu lado')
 
 @section('content')
 <div class="auth-page-wrapper" style="min-height: 90vh; background: #080C0A !important; color: #FFFFFF !important; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2.5rem 1.5rem; position: relative; overflow: hidden;">
@@ -22,15 +23,15 @@
         </a>
 
         <div style="width: 52px; height: 52px; background: #E8F5E9; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 0.75rem; color: #2E5D4B; font-size: 1.5rem;">
-          <i class="fa-solid fa-envelope-circle-check"></i>
+          <i class="fa-solid {{ $acceso ? 'fa-shield-halved' : 'fa-envelope-circle-check' }}"></i>
         </div>
 
         <h1 style="font-family: var(--font-display); font-size: 1.65rem; font-weight: 700; color: #1A2620; line-height: 1.25; margin-bottom: 0.5rem;">
-          Verifica tu correo electrónico
+          {{ $acceso ? 'Confirma que eres tú' : 'Verifica tu correo electrónico' }}
         </h1>
         <p style="font-size: 0.9rem; color: #556860; line-height: 1.5;">
           Hemos enviado un código de 6 dígitos a:<br>
-          <strong style="color: #1A2620; font-weight: 600;">{{ auth()->user()->email }}</strong>
+          <strong style="color: #1A2620; font-weight: 600;">{{ $acceso ? $correo : auth()->user()->email }}</strong>
         </p>
       </div>
 
@@ -57,7 +58,7 @@
       @endif
 
       <!-- Verification Form -->
-      <form method="POST" action="{{ route('verification.code.verify') }}" id="verifyCodeForm" style="margin-bottom: 1.5rem;">
+      <form method="POST" action="{{ $acceso ? route('acceso.codigo.verificar') : route('verification.code.verify') }}" id="verifyCodeForm" style="margin-bottom: 1.5rem;">
         @csrf
 
         <label style="display: block; font-size: 0.82rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #4A5B53; margin-bottom: 0.75rem; text-align: center;">
@@ -104,7 +105,7 @@
           ¿No recibiste el correo o ya expiró?
         </p>
 
-        <form method="POST" action="{{ route('verification.code.resend') }}" id="resendCodeForm" style="display: inline-block;">
+        <form method="POST" action="{{ $acceso ? route('acceso.codigo.reenviar') : route('verification.code.resend') }}" id="resendCodeForm" style="display: inline-block;">
           @csrf
           <button 
             type="submit" 
@@ -119,11 +120,11 @@
         </form>
 
         <div style="margin-top: 1.25rem; font-size: 0.82rem; color: #7B8F85;">
-          ¿El correo está mal escrito? 
-          <form method="POST" action="{{ route('logout') }}" style="display: inline;">
+          {{ $acceso ? '¿No eres tú o quieres entrar con otra cuenta?' : '¿El correo está mal escrito?' }}
+          <form method="POST" action="{{ $acceso ? route('acceso.codigo.cancelar') : route('logout') }}" style="display: inline;">
             @csrf
             <button type="submit" style="background: none; border: none; color: #C0392B; text-decoration: underline; font-size: 0.82rem; cursor: pointer; padding: 0; font-weight: 500;">
-              Cerrar sesión e intentar con otro
+              {{ $acceso ? 'Cancelar y volver al inicio de sesión' : 'Cerrar sesión e intentar con otro' }}
             </button>
           </form>
         </div>

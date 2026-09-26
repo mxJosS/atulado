@@ -45,6 +45,11 @@ Route::view('/terminos', 'terminos')->name('terminos');
 Route::redirect('/privacidad.html', '/privacidad');
 Route::redirect('/terminos.html', '/terminos');
 
+// «Invitar por link»: enlace público de cada institución para registrarse y quedar en su padrón.
+Route::get('/unirse/{token}', [\App\Http\Controllers\UnirseController::class, 'mostrar'])->name('unirse.mostrar')->middleware('throttle:60,1');
+Route::get('/unirse/{token}/google', [\App\Http\Controllers\UnirseController::class, 'google'])->name('unirse.google')->middleware(['guest', 'throttle:20,1']);
+Route::post('/unirse/{token}', [\App\Http\Controllers\UnirseController::class, 'unir'])->name('unirse.unir')->middleware(['auth', 'throttle:10,1']);
+
 /*
 |--------------------------------------------------------------------------
 | Authentication Routes (Guest Only)
@@ -52,10 +57,10 @@ Route::redirect('/terminos.html', '/terminos');
 */
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-    Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:100,1');
+    Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:acceso');
 
     Route::get('/registro', [AuthController::class, 'showRegister'])->name('register');
-    Route::post('/registro', [AuthController::class, 'register'])->middleware('throttle:100,1');
+    Route::post('/registro', [AuthController::class, 'register'])->middleware('throttle:registro');
 
     // Google OAuth Authentication
     Route::get('/auth/google', [AuthController::class, 'redirectToGoogle'])->name('auth.google');
@@ -63,9 +68,15 @@ Route::middleware('guest')->group(function () {
 
     // Password Reset
     Route::get('/olvide-contrasena', [AuthController::class, 'showForgotPassword'])->name('password.request');
-    Route::post('/olvide-contrasena', [AuthController::class, 'sendResetLinkEmail'])->name('password.email')->middleware('throttle:100,1');
+    Route::post('/olvide-contrasena', [AuthController::class, 'sendResetLinkEmail'])->name('password.email')->middleware('throttle:recuperar');
     Route::get('/restablecer-contrasena/{token}', [AuthController::class, 'showResetPassword'])->name('password.reset');
-    Route::post('/restablecer-contrasena', [AuthController::class, 'resetPassword'])->name('password.update')->middleware('throttle:100,1');
+    Route::post('/restablecer-contrasena', [AuthController::class, 'resetPassword'])->name('password.update')->middleware('throttle:recuperar');
+
+    // Segundo factor por correo (administración y equipo clínico)
+    Route::get('/acceso/codigo', [AuthController::class, 'showCodigoAcceso'])->name('acceso.codigo');
+    Route::post('/acceso/codigo', [AuthController::class, 'verificarCodigoAcceso'])->name('acceso.codigo.verificar')->middleware('throttle:codigo');
+    Route::post('/acceso/codigo/reenviar', [AuthController::class, 'reenviarCodigoAcceso'])->name('acceso.codigo.reenviar')->middleware('throttle:reenviar-codigo');
+    Route::post('/acceso/codigo/cancelar', [AuthController::class, 'cancelarCodigoAcceso'])->name('acceso.codigo.cancelar');
 });
 
 /*
@@ -78,11 +89,18 @@ Route::middleware('auth')->group(function () {
 
     // Email 6-Digit Code Verification
     Route::get('/verificar-codigo', [AuthController::class, 'showVerifyCode'])->name('verification.code.notice');
-    Route::post('/verificar-codigo', [AuthController::class, 'verifyCode'])->name('verification.code.verify')->middleware('throttle:100,1');
-    Route::post('/verificar-codigo/reenviar', [AuthController::class, 'resendVerificationCode'])->name('verification.code.resend')->middleware('throttle:100,1');
+    Route::post('/verificar-codigo', [AuthController::class, 'verifyCode'])->name('verification.code.verify')->middleware('throttle:codigo');
+    Route::post('/verificar-codigo/reenviar', [AuthController::class, 'resendVerificationCode'])->name('verification.code.resend')->middleware('throttle:reenviar-codigo');
+
+    // Consentimiento expreso (quien llegó por Google, por alta de administración
+    // o tenía cuenta antes de que se pidiera) y baja de la cuenta. Quedan fuera
+    // del grupo con consentimiento: se puede eliminar la cuenta sin aceptar nada.
+    Route::get('/consentimiento', [AuthController::class, 'showConsentimiento'])->name('consentimiento.show');
+    Route::post('/consentimiento', [AuthController::class, 'guardarConsentimiento'])->name('consentimiento.guardar');
+    Route::delete('/perfil', [\App\Http\Controllers\CuentaController::class, 'eliminar'])->name('profile.destroy')->middleware('throttle:5,1');
 
     // Verified Users Only
-    Route::middleware('verified.code')->group(function () {
+    Route::middleware(['verified.code', 'consentimiento'])->group(function () {
         // Dashboard Hub
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -116,6 +134,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/perfil', [AuthController::class, 'showProfile'])->name('profile.show');
         Route::put('/perfil', [AuthController::class, 'updateProfile'])->name('profile.update');
         Route::put('/perfil/password', [AuthController::class, 'updatePassword'])->name('profile.password');
+        Route::put('/perfil/datos', [AuthController::class, 'updatePreferenciasDatos'])->name('profile.datos');
 
         // Professional Healthcare Accreditation (Client Submission)
         Route::post('/perfil/solicitud-profesional', [ProfessionalVerificationController::class, 'store'])->name('profile.verification.store');
@@ -160,6 +179,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/dashboard', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard/exportar-padron', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'exportarPadron'])->name('dashboard.exportar-padron');
 
+    // Analítica e índices (IBI, IRC, IRO y uso de la app)
+    Route::get('/analitica', [\App\Http\Controllers\Admin\AnaliticaController::class, 'index'])->name('analitica');
+
     // Acreditaciones
     Route::get('/solicitudes-profesionales', [ProfessionalVerificationController::class, 'index'])->name('verifications.index');
     Route::get('/solicitudes-profesionales/{verification}/documento', [ProfessionalVerificationController::class, 'document'])->name('verifications.document');
@@ -201,6 +223,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Invitaciones por correo
     Route::post('/instituciones/{institucion}/invitaciones', [\App\Http\Controllers\Admin\InvitacionController::class, 'enviar'])->name('instituciones.invitaciones.enviar');
 
+    // Invitar por link
+    Route::post('/instituciones/{institucion}/enlace', [\App\Http\Controllers\Admin\EnlaceController::class, 'generar'])->name('instituciones.enlace.generar');
+    Route::put('/instituciones/{institucion}/enlace', [\App\Http\Controllers\Admin\EnlaceController::class, 'actualizar'])->name('instituciones.enlace.actualizar');
+
     // El panel viejo de «Altas y Estructura» se integró a cada institución.
     Route::redirect('/altas-estructura', '/admin/instituciones')->name('structure.index');
 });
@@ -218,6 +244,7 @@ if ($rutaMonitor = config('atulado.monitor.ruta')) {
     Route::middleware('auth')->group(function () use ($rutaMonitor) {
         Route::get($rutaMonitor, [\App\Http\Controllers\MonitorController::class, 'panel'])->middleware('throttle:60,1');
         Route::get($rutaMonitor . '/datos', [\App\Http\Controllers\MonitorController::class, 'datos'])->middleware('throttle:240,1');
+        Route::post($rutaMonitor . '/reiniciar', [\App\Http\Controllers\MonitorController::class, 'reiniciar'])->middleware('throttle:5,10');
     });
 }
 
@@ -228,6 +255,6 @@ if ($rutaMonitor = config('atulado.monitor.ruta')) {
 */
 Route::middleware('signed')->group(function () {
     Route::get('/invitacion/{membresia}', [\App\Http\Controllers\InvitacionAceptarController::class, 'mostrar'])->name('invitacion.mostrar');
-    Route::post('/invitacion/{membresia}', [\App\Http\Controllers\InvitacionAceptarController::class, 'aceptar'])->name('invitacion.aceptar')->middleware('throttle:100,1');
+    Route::post('/invitacion/{membresia}', [\App\Http\Controllers\InvitacionAceptarController::class, 'aceptar'])->name('invitacion.aceptar')->middleware('throttle:invitacion');
     Route::get('/resumen-clinico/{entrega}', [\App\Http\Controllers\ResumenEntregaController::class, 'ver'])->name('resumen.ver');
 });

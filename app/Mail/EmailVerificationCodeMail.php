@@ -9,13 +9,19 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
+/**
+ * Código de 6 dígitos por correo. Dos usos:
+ *   verificacion  confirmar el correo al crear la cuenta
+ *   acceso        segundo factor de administración y equipo clínico
+ */
 class EmailVerificationCodeMail extends Mailable
 {
     use Queueable, SerializesModels;
 
     public function __construct(
         public string $code,
-        public string $name
+        public string $name,
+        public string $proposito = 'verificacion',
     ) {}
 
     /**
@@ -25,7 +31,9 @@ class EmailVerificationCodeMail extends Mailable
     {
         return new Envelope(
             from: new Address(config('mail.from.address', 'hola@atulado.com.mx'), config('mail.from.name', 'A Tu Lado')),
-            subject: 'Tu código de verificación de A Tu Lado: ' . $this->code,
+            subject: $this->proposito === 'acceso'
+                ? 'Tu código para entrar a A Tu Lado: ' . $this->code
+                : 'Tu código de verificación de A Tu Lado: ' . $this->code,
         );
     }
 
@@ -40,6 +48,7 @@ class EmailVerificationCodeMail extends Mailable
             with: [
                 'code' => $this->code,
                 'name' => $this->name,
+                'acceso' => $this->proposito === 'acceso',
             ],
         );
     }

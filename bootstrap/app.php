@@ -12,12 +12,17 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->trustProxies(at: '*');
+        // Los proxies de confianza salen de config/trustedproxy.php (TRUSTED_PROXIES).
+        $middleware->web(append: [
+            \App\Http\Middleware\NormalizarCorreos::class,
+            \App\Http\Middleware\CabecerasSeguridad::class,
+        ]);
         $middleware->alias([
             'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
             'panel' => \App\Http\Middleware\EnsureUserCanUsePanel::class,
             'professional' => \App\Http\Middleware\EnsureUserIsProfessional::class,
             'verified.code' => \App\Http\Middleware\EnsureEmailIsVerified::class,
+            'consentimiento' => \App\Http\Middleware\EnsureConsentimiento::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

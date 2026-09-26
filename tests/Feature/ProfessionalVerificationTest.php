@@ -40,6 +40,7 @@ class ProfessionalVerificationTest extends TestCase
      */
     public function test_regular_user_can_submit_professional_verification_request(): void
     {
+        Storage::fake('local');
         Storage::fake('public');
 
         $this->actingAs($this->user);
@@ -67,7 +68,9 @@ class ProfessionalVerificationTest extends TestCase
         // Verificar que el archivo se guardó
         $verification = ProfessionalVerification::where('user_id', $this->user->id)->first();
         $this->assertNotNull($verification->document_path);
-        Storage::disk('public')->assertExists($verification->document_path);
+        // Disco privado: el documento nunca queda en la carpeta pública.
+        Storage::disk('local')->assertExists($verification->document_path);
+        Storage::disk('public')->assertMissing($verification->document_path);
     }
 
     /**

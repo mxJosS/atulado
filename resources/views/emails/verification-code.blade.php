@@ -9,15 +9,23 @@
       🛡️
     </div>
     <h1 style="font-size: 22px; font-weight: 700; color: #1A2620; margin: 0 0 8px 0; font-family: 'Georgia', serif;">
-      Confirma tu correo electrónico
+      {{ ($acceso ?? false) ? 'Tu código para entrar' : 'Confirma tu correo electrónico' }}
     </h1>
     <p style="font-size: 15px; color: #4A5B53; margin: 0; line-height: 1.5;">
-      Hola, <strong>{{ $name }}</strong>. Gracias por dar este paso hacia tu bienestar emocional con nosotros.
+      @if($acceso ?? false)
+        Hola, <strong>{{ $name }}</strong>. Alguien escribió tu contraseña para entrar a la consola de A Tu Lado.
+      @else
+        Hola, <strong>{{ $name }}</strong>. Gracias por dar este paso hacia tu bienestar emocional con nosotros.
+      @endif
     </p>
   </div>
 
   <p style="font-size: 14px; color: #4A5B53; line-height: 1.6; margin: 0 0 20px 0; text-align: center;">
-    Para activar tu cuenta y acceder a tu espacio seguro, ingresa el siguiente código de 6 dígitos en la pantalla de verificación:
+    @if($acceso ?? false)
+      Si fuiste tú, escribe este código de 6 dígitos en la pantalla de acceso:
+    @else
+      Para activar tu cuenta y acceder a tu espacio seguro, ingresa el siguiente código de 6 dígitos en la pantalla de verificación:
+    @endif
   </p>
 
   <!-- Highlighted Code Box -->
@@ -41,14 +49,22 @@
           ⏱️
         </td>
         <td style="font-size: 13px; color: #8A6D1C; line-height: 1.4;">
-          <strong>Vigencia:</strong> Este código es válido durante los próximos <strong>15 minutos</strong>. Si expira, podrás solicitar uno nuevo directamente desde la pantalla de registro.
+          @if($acceso ?? false)
+            <strong>Vigencia:</strong> Este código es válido durante <strong>10 minutos</strong> y sirve una sola vez.
+          @else
+            <strong>Vigencia:</strong> Este código es válido durante los próximos <strong>15 minutos</strong>. Si expira, podrás solicitar uno nuevo directamente desde la pantalla de registro.
+          @endif
         </td>
       </tr>
     </table>
   </div>
 
   <!-- Safety Advice -->
-  <p style="font-size: 12px; color: #7B8F85; line-height: 1.5; margin: 0; border-top: 1px solid #EEF3F0; padding-top: 16px; text-align: center;">
-    Si no solicitaste crear una cuenta en <strong>A Tu Lado</strong>, puedes ignorar este correo con total tranquilidad; ninguna cuenta será activada sin este código.
+  <p style="font-size: 12px; color: #556860; line-height: 1.5; margin: 0; border-top: 1px solid #EEF3F0; padding-top: 16px; text-align: center;">
+    @if($acceso ?? false)
+      <strong>Si no fuiste tú, alguien conoce tu contraseña.</strong> No compartas este código con nadie y cambia tu contraseña de inmediato desde tu perfil.
+    @else
+      Si no solicitaste crear una cuenta en <strong>A Tu Lado</strong>, puedes ignorar este correo con total tranquilidad; ninguna cuenta será activada sin este código.
+    @endif
   </p>
 @endsection

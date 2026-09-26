@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\CrisisLine;
+use App\Models\Interaccion;
 use App\Models\Resource;
 use App\Models\UserResourceFavorite;
 use Carbon\Carbon;
@@ -38,6 +39,7 @@ class ResourceController extends Controller
     public function show(string $slug)
     {
         $resource = Resource::where('slug', $slug)->firstOrFail();
+        Interaccion::registrar('recurso');
         $relatedResources = Resource::where('category', $resource->category)
             ->where('id', '!=', $resource->id)
             ->take(3)

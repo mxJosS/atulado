@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Models\BitacoraAdmin;
 use App\Http\Controllers\Controller;
 use App\Models\Departamento;
 use App\Models\Institucion;
@@ -114,6 +115,8 @@ class AdminDashboardController extends Controller
         $nombre = $instituciones->count() === 1
             ? 'padron_' . Str::slug($instituciones->first()->nombre_corto) . '.xlsx'
             : 'padron_instituciones_' . now()->format('Y-m-d') . '.xlsx';
+
+        BitacoraAdmin::registrar('padron_exportado', null, 'Exportación del padrón de: ' . $instituciones->pluck('nombre_corto')->implode(', ') . '.');
 
         return response()->streamDownload(function () use ($libro) {
             (new Xlsx($libro))->save('php://output');

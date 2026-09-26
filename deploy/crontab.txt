@@ -3,3 +3,8 @@
 #   sudo crontab -u www-data -e
 # y se pega esta línea (ajusta la ruta si no es /var/www/atulado):
 * * * * * cd /var/www/atulado && /usr/bin/php8.5 artisan schedule:run >> /dev/null 2>&1
+
+# Respaldo cifrado diario de la base de datos (ver deploy/respaldo.sh; requiere
+# /etc/atulado/respaldo.key). Con el usuario que despliega, no con www-data:
+#   crontab -e
+30 3 * * * APP_DIR=/var/www/atulado bash /var/www/atulado/deploy/respaldo.sh >> $HOME/respaldo.log 2>&1

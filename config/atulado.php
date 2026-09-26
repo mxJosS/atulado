@@ -62,6 +62,8 @@ return [
         explode(',', (string) env('ATULADO_ALERTAS_ERRORES', ''))
     ))),
     'alertas_minutos' => (int) env('ATULADO_ALERTAS_MINUTOS', 30),
+    // Avisa a los mismos correos si hay este número de 401/403/419/429 en 10 minutos (0 = apagado).
+    'alertas_rechazos' => (int) env('ATULADO_ALERTAS_RECHAZOS', 60),
 
     /*
     |--------------------------------------------------------------------------
@@ -87,10 +89,32 @@ return [
     |
     | nginx_status y fpm_status son las páginas de estado internas (sólo
     | 127.0.0.1); ver deploy/nginx-monitor.conf.
+    |
+    | reinicio es el script que reinicia los servicios o la máquina; la app lo
+    | llama con «sudo -n». Ver deploy/atulado-reiniciar.sh.
     */
+    /*
+    |--------------------------------------------------------------------------
+    | Content-Security-Policy
+    |--------------------------------------------------------------------------
+    | enforce (por defecto) · report (sólo avisa en la consola del navegador)
+    | · off. Ver app/Http/Middleware/CabecerasSeguridad.php.
+    */
+    'csp' => env('ATULADO_CSP', 'enforce'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Segundo factor
+    |--------------------------------------------------------------------------
+    | Administración y equipo clínico reciben un código por correo al entrar
+    | con contraseña. Sólo apágalo en local si no tienes correo configurado.
+    */
+    'segundo_factor' => (bool) env('ATULADO_SEGUNDO_FACTOR', true),
+
     'monitor' => [
         'ruta' => trim((string) env('ATULADO_MONITOR_RUTA', ''), '/'),
         'nginx_status' => env('ATULADO_MONITOR_NGINX', 'http://127.0.0.1:8089/nginx_status'),
         'fpm_status' => env('ATULADO_MONITOR_FPM', 'http://127.0.0.1:8089/fpm-status?json'),
+        'reinicio' => env('ATULADO_MONITOR_REINICIO', '/usr/local/sbin/atulado-reiniciar'),
     ],
 ];

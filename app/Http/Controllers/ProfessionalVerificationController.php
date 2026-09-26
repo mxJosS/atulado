@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BitacoraAdmin;
 use App\Http\Requests\StoreProfessionalVerificationRequest;
 use App\Models\ProfessionalVerification;
 use Illuminate\Http\Request;
@@ -51,11 +52,15 @@ class ProfessionalVerificationController extends Controller
             abort(403, 'No tienes autorización para consultar este documento.');
         }
 
-        if (!$verification->document_path || !Storage::disk('public')->exists($verification->document_path)) {
+        if (!$verification->document_path || !Storage::disk('local')->exists($verification->document_path)) {
             abort(404, 'El documento probatorio no fue encontrado en el servidor.');
         }
 
-        return Storage::disk('public')->response($verification->document_path);
+        // Disco privado: sólo se entrega por aquí, con sesión y permiso; nunca por /storage.
+        return Storage::disk('local')->response($verification->document_path, null, [
+            'Cache-Control' => 'no-store, private',
+            'X-Content-Type-Options' => 'nosniff',
+        ]);
     }
 
     /**
@@ -74,7 +79,7 @@ class ProfessionalVerificationController extends Controller
 
         $documentPath = null;
         if ($request->hasFile('document')) {
-            $documentPath = $request->file('document')->store('verifications/' . $user->id, 'public');
+            $documentPath = $request->file('document')->store('verifications/' . $user->id, 'local');
         }
 
         $data = [
@@ -123,6 +128,8 @@ class ProfessionalVerificationController extends Controller
             }
         });
 
+        BitacoraAdmin::registrar('acreditacion_aprobada', $verification, "Acreditación aprobada: {$verification->full_name} (cédula {$verification->license_number}).");
+
         return back()->with('success', "La solicitud de {$verification->full_name} ha sido aprobada. El usuario ahora cuenta con la insignia de Profesional Verificado.");
     }
 
@@ -145,6 +152,8 @@ class ProfessionalVerificationController extends Controller
             'reviewed_by' => $request->user()->id,
             'reviewed_at' => now(),
         ]);
+
+        BitacoraAdmin::registrar('acreditacion_rechazada', $verification, "Acreditación rechazada: {$verification->full_name}.");
 
         return back()->with('info', "La solicitud de {$verification->full_name} ha sido rechazada.");
     }

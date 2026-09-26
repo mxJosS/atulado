@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\BitacoraAdmin;
 use App\Models\Institucion;
+use App\Services\EliminacionCuentaService;
 use App\Models\Membresia;
 use App\Models\ProfessionalVerification;
 use App\Models\User;
@@ -64,7 +66,7 @@ class AdminUserController extends Controller
             'first_name' => ['required', 'string', 'max:100'],
             'last_name' => ['required', 'string', 'max:100'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
-            'password' => ['required', 'confirmed', Password::min(6)],
+            'password' => ['required', 'confirmed', Password::min(8)],
             'role' => ['required', 'in:admin,profesional,usuario'],
             'perfil_profesional' => ['nullable', 'in:publica,clinico,ambos'], // sin valor: sólo publica, como antes
             'clinico_admin' => ['nullable', 'boolean'],
@@ -82,7 +84,7 @@ class AdminUserController extends Controller
             'email.unique' => 'Este correo electrónico ya está registrado.',
             'password.required' => 'La contraseña es obligatoria.',
             'password.confirmed' => 'La confirmación de contraseña no coincide.',
-            'password.min' => 'La contraseña debe tener al menos 6 caracteres.',
+            'password.min' => 'La contraseña debe tener al menos 8 caracteres.',
             'education_level.required_if' => 'El grado escolar es obligatorio para un profesional.',
             'license_number.required_if' => 'El número de cédula es obligatorio para un profesional.',
         ]);
@@ -90,7 +92,7 @@ class AdminUserController extends Controller
         $fullName = trim($request->first_name . ' ' . $request->last_name);
         $role = $request->role;
 
-        DB::transaction(function () use ($request, $fullName, $role) {
+        $creado = DB::transaction(function () use ($request, $fullName, $role) {
             $user = new User([
                 'name' => $fullName,
                 'email' => $request->email,
@@ -129,7 +131,11 @@ class AdminUserController extends Controller
                     'reviewed_at' => now(),
                 ]);
             }
+
+            return $user;
         });
+
+        BitacoraAdmin::registrar('usuario_creado', $creado, "Alta de {$creado->email} con permisos: " . self::permisos($creado) . '.');
 
         return redirect()->route('admin.users.index')
             ->with('success', 'Usuario creado Exitosamente');
@@ -144,7 +150,8 @@ class AdminUserController extends Controller
             'perfil_profesional' => ['nullable', 'in:publica,clinico,ambos'], // sin valor: sólo publica, como antes
             'clinico_admin' => ['nullable', 'boolean'],
             'status' => ['required', 'in:activo,pendiente'],
-            'password' => ['nullable', 'string', 'min:6'],
+            'cambiar_password' => ['nullable', 'boolean'],
+            'password' => ['exclude_unless:cambiar_password,1,true', 'required', 'string', 'min:8'],
             'license_number' => ['nullable', 'string', 'max:50'],
             'institution' => ['nullable', 'string', 'max:150'],
             'institucion_id' => ['nullable', 'exists:instituciones,id'],
@@ -154,7 +161,8 @@ class AdminUserController extends Controller
             'name.required' => 'El nombre es obligatorio.',
             'email.required' => 'El correo electrónico es obligatorio.',
             'email.unique' => 'Este correo electrónico ya está registrado por otro usuario.',
-            'password.min' => 'La nueva contraseña debe tener al menos 6 caracteres.',
+            'password.required' => 'Escribe la nueva contraseña o desmarca «Cambiar la contraseña».',
+            'password.min' => 'La nueva contraseña debe tener al menos 8 caracteres.',
             'role.required' => 'El rol del usuario es obligatorio.',
             'status.required' => 'El estado de la cuenta es obligatorio.',
         ]);
@@ -190,6 +198,7 @@ class AdminUserController extends Controller
         }
 
         $role = $request->role;
+        $antes = ['permisos' => self::permisos($user), 'email' => $user->email, 'verificado' => (bool) $user->email_verified_at];
 
         $user->name = trim($request->name);
         $user->email = trim($request->email);
@@ -211,8 +220,9 @@ class AdminUserController extends Controller
             }
         }
 
-        // Cambio de contraseña opcional
-        if (!empty($request->password)) {
+        // La contraseña sólo cambia si se pidió expresamente: un valor que llegue
+        // sin la casilla (p. ej. el autocompletado del navegador) se ignora.
+        if ($request->boolean('cambiar_password') && filled($request->password)) {
             $user->password = Hash::make($request->password);
         }
 
@@ -242,8 +252,27 @@ class AdminUserController extends Controller
             }
         });
 
+        $cambios = array_filter([
+            $antes['permisos'] !== self::permisos($user) ? "permisos {$antes['permisos']} → " . self::permisos($user) : null,
+            $antes['email'] !== $user->email ? "correo {$antes['email']} → {$user->email}" : null,
+            $antes['verificado'] !== (bool) $user->email_verified_at ? 'estado → ' . $request->status : null,
+            $request->boolean('cambiar_password') ? 'contraseña cambiada por administración' : null,
+        ]);
+        BitacoraAdmin::registrar($cambios === [] ? 'usuario_editado' : 'usuario_permisos', $user,
+            "Edición de {$user->email}" . ($cambios ? ': ' . implode('; ', $cambios) : ' sin cambios de permisos') . '.');
+
         return redirect()->route('admin.users.index')
             ->with('success', 'Usuario "' . $user->name . '" actualizado exitosamente.');
+    }
+
+    /** Resumen legible de los permisos de una cuenta, para la bitácora. */
+    private static function permisos(User $user): string
+    {
+        return implode('+', array_filter([
+            $user->role ?: 'usuario',
+            $user->is_admin ? 'admin' : null,
+            $user->is_clinico_atulado ? 'clínico' : null,
+        ]));
     }
 
     /**
@@ -324,12 +353,10 @@ class AdminUserController extends Controller
         }
 
         $userName = $user->name;
+        BitacoraAdmin::registrar('usuario_eliminado', $user, "Eliminación de la cuenta {$user->email} (" . self::permisos($user) . ').');
 
-        DB::transaction(function () use ($user) {
-            // Purgar sesiones activas del usuario
-            DB::table('sessions')->where('user_id', $user->id)->delete();
-            $user->delete();
-        });
+        // Borra cuenta, sesiones y archivos; casos y bitácora clínica quedan seudonimizados.
+        app(EliminacionCuentaService::class)->eliminar($user);
 
         return redirect()->route('admin.users.index')
             ->with('success', 'Usuario "' . $userName . '" eliminado exitosamente.');

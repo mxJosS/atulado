@@ -58,7 +58,7 @@
             @else
               {{ $membresia?->folio ?? 'Usuario #' . $caso->user_id }}
             @endif
-            <span style="font-weight: 400; color: #6E887E;">· {{ $caso->institucion?->nombre_corto ?? 'Usuario independiente' }}</span>
+            <span style="font-weight: 400; color: #5B7369;">· {{ $caso->institucion?->nombre_corto ?? 'Usuario independiente' }}</span>
           </div>
         </div>
         @if($esClinico && $membresia && $caso->institucion)
@@ -112,7 +112,7 @@
       @endif
     </div>
   @empty
-    <div class="card-atl" style="text-align: center; color: #6E887E; padding: 2rem;">
+    <div class="card-atl" style="text-align: center; color: #5B7369; padding: 2rem;">
       <i class="fa-solid fa-circle-check" style="font-size: 1.6rem; color: #1E8449; display: block; margin-bottom: 0.5rem;"></i>
       No hay casos abiertos.
     </div>

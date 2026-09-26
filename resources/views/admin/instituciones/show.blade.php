@@ -53,6 +53,9 @@
         </select>
       @endif
       @if($esAdmin)
+      <a href="{{ route('admin.analitica', ['institucion' => $institucion->slug]) }}" class="btn-atl linea">
+        <i class="fa-solid fa-chart-line"></i> Analítica
+      </a>
       <button type="button" class="btn-atl primario" data-open="m-editar-institucion">
         <i class="fa-solid fa-pen-to-square"></i> Editar empresa
       </button>
@@ -101,6 +104,132 @@
       <div class="kpi-label"><i class="fa-solid fa-life-ring"></i> Casos de crisis abiertos</div>
       <div class="kpi-value">{{ $resumen['casos_abiertos'] }}</div>
       <div class="kpi-foot">Se cierran sólo con contacto humano verificado</div>
+    </div>
+  </div>
+
+  {{-- ══════════ SEMÁFORO, COLA Y PROTOCOLO ══════════ --}}
+  @php
+    $dep = $indicadores['departamentos'];
+    $cola = $indicadores['cola'];
+    $pro = $indicadores['protocolo'];
+  @endphp
+  <div class="grid g-3-2 indicadores-inst" style="margin-bottom: 1.5rem;">
+    @if(!$dep)
+    <div class="card">
+      <div class="card-head"><h3>Semáforo por departamento y cola de atención</h3>
+        <span class="spacer locked"><i class="fa-solid fa-lock"></i> Plano clínico acreditado</span></div>
+      <div class="card-body">
+        <div class="nota-protocolo">
+          <i class="fa-solid fa-user-lock"></i>
+          <span>El semáforo por área y la cola de casos son información clínica: sólo los ve una cuenta con <b>acreditación clínica</b>.
+            La acreditación se otorga con <code>php artisan atulado:superadmin correo --clinico</code>.
+            Los índices agregados de todas las instituciones están en <a href="{{ route('admin.analitica') }}">Analítica e índices</a>.</span>
+        </div>
+      </div>
+    </div>
+    @else
+    <div class="card">
+      <div class="card-head"><h3>Semáforo por departamento</h3>
+        <span class="spacer section-note">Proporción del padrón activo de cada área</span></div>
+      <div class="card-body">
+        @include('admin.partials.barra-semaforo', ['conteos' => $dep['general']['conteos'], 'base' => $dep['general']['base'], 'grande' => true])
+        @if(count($dep['filas']) > 0)
+          <div class="table-wrap">
+            <table class="data" style="margin-top: 1rem;">
+              <thead><tr><th>Departamento</th><th class="num">Activos</th><th style="min-width: 160px;">Distribución</th><th class="num">WHO-5</th><th class="num">Adherencia</th><th class="num">Alertas</th></tr></thead>
+              <tbody>
+                @foreach($dep['filas'] as $fila)
+                  <tr @class(['row-red' => $fila['nivel_alerta'] === 'rojo'])>
+                    <td><b>{{ $fila['nombre'] }}</b></td>
+                    <td class="num" title="{{ $fila['padron'] }} en padrón">{{ $fila['activos'] }}</td>
+                    <td>@include('admin.partials.barra-semaforo', ['conteos' => $fila['barra']['conteos'], 'base' => $fila['barra']['base']])</td>
+                    <td class="num">{{ $fila['who5'] ?? '—' }}</td>
+                    <td class="num">{{ $fila['adherencia'] !== null ? $fila['adherencia'] . '%' : '—' }}</td>
+                    <td class="num">
+                      @if($fila['alertas'] > 0)
+                        <span class="sem sem-{{ $fila['nivel_alerta'] }}"><span class="dot"></span> {{ $fila['alertas'] }}</span>
+                      @else
+                        0
+                      @endif
+                    </td>
+                  </tr>
+                @endforeach
+              </tbody>
+            </table>
+          </div>
+        @else
+          <p class="section-note" style="margin: 1rem 0 0;">Aún no hay personas en el padrón.</p>
+        @endif
+      </div>
+      <div class="card-foot">
+        {{ $dep['hallazgo'] ?? '' }}
+        La barra incluye a quien tiene clasificación de los últimos 30 días o un caso abierto; en gris, cuentas activas aún sin clasificar.
+      </div>
+    </div>
+    @endif
+
+    <div class="col" style="gap: 1rem;">
+      @if($cola)
+      <div class="card">
+        <div class="card-head"><h3>Cola de atención clínica</h3>
+          <span @class(['chip', 'spacer', 'red' => $cola['abiertos'] > 0, 'green' => $cola['abiertos'] === 0])>{{ $cola['abiertos'] }} {{ $cola['abiertos'] === 1 ? 'abierto' : 'abiertos' }}</span></div>
+        <div class="card-body col" style="gap: 0.6rem;">
+          @foreach(array_slice($cola['casos'], 0, 5) as $caso)
+            <a class="alert {{ $caso['tono'] }}" href="{{ route('admin.cola.index') }}" style="text-decoration: none; color: inherit;">
+              <div class="ico"><i class="fa-solid {{ $caso['icono'] }}"></i></div>
+              <div class="txt"><b>{{ $caso['codigo'] }} · {{ $caso['titulo'] }}</b>
+                <span>@if($caso['persona']){{ $caso['persona'] }}. @endif{{ $caso['detalle'] }}</span></div>
+              <div class="when">{{ $caso['cuando'] }}</div>
+            </a>
+          @endforeach
+          @if(count($cola['casos']) > 5)
+            <a href="{{ route('admin.cola.index') }}" class="section-note">Ver los {{ count($cola['casos']) }} casos en la cola de atención</a>
+          @endif
+          @if($cola['silencio'] > 0)
+            <div class="alert warn">
+              <div class="ico"><i class="fa-solid fa-volume-xmark"></i></div>
+              <div class="txt"><b>{{ $cola['silencio'] }} {{ $cola['silencio'] === 1 ? 'persona' : 'personas' }} en silencio R4</b>
+                <span>Sin registro diario en {{ \App\Services\PlataformaService::DIAS_SILENCIO }} días o más.</span></div>
+              <div class="when">continuo</div>
+            </div>
+          @endif
+          @if($cola['abiertos'] === 0 && $cola['silencio'] === 0)
+            <div class="alert ok">
+              <div class="ico"><i class="fa-solid fa-circle-check"></i></div>
+              <div class="txt"><b>Sin casos abiertos</b><span>No hay casos de crisis ni silencios prolongados en esta institución.</span></div>
+            </div>
+          @endif
+        </div>
+      </div>
+      @endif
+
+      <div class="card">
+        <div class="card-head"><h3>Cumplimiento del protocolo</h3><span class="spacer section-note">Últimos {{ $pro['dias'] }} días</span></div>
+        <div class="card-body">
+          <dl class="dl">
+            <dt>Casos del periodo</dt><dd>{{ $pro['casos'] }}</dd>
+            <dt>Contacto &lt; {{ \App\Services\IndicadoresInstitucionService::SLA_CONTACTO_MIN }} min</dt>
+            <dd>
+              {{ $pro['contacto_a_tiempo'] }} / {{ $pro['casos'] }}
+              @if($pro['contacto_pct'] !== null)
+                <span @class(['chip', 'green' => $pro['contacto_pct'] === 100, 'amber' => $pro['contacto_pct'] < 100 && $pro['contacto_pct'] >= 80, 'red' => $pro['contacto_pct'] < 80])>{{ $pro['contacto_pct'] }}%</span>
+              @endif
+            </dd>
+            <dt>Cierre verificado</dt>
+            <dd>
+              {{ $pro['cierre_verificado'] }} / {{ $pro['casos'] }}
+              @if($pro['en_curso'] > 0)· <span class="chip red">{{ $pro['en_curso'] }} en curso</span>@endif
+            </dd>
+            <dt>Salidas sin contacto</dt>
+            <dd>{{ $pro['salidas_sin_contacto'] }} @if($pro['salidas_sin_contacto'] === 0)<span class="chip green">regla respetada</span>@else<span class="chip amber">revisar</span>@endif</dd>
+            <dt>Entregas al profesional</dt>
+            <dd>{{ $pro['entregas'] }} {{ $pro['entregas'] === 1 ? 'resumen' : 'resúmenes' }} · <span @class(['chip', 'green' => $pro['nda_vigente'], 'red' => !$pro['nda_vigente']])>{{ $pro['nda'] }}</span></dd>
+            <dt>Accesos a ficha</dt>
+            <dd>{{ $pro['accesos'] }} · {{ $pro['accesos_sin_motivo'] === 0 ? 'todos con motivo' : $pro['accesos_sin_motivo'] . ' sin motivo' }}</dd>
+          </dl>
+        </div>
+        <div class="card-foot">Un caso rojo sólo se cierra con contacto humano verificado por un profesional. El sistema no permite cierre automático por tiempo.</div>
+      </div>
     </div>
   </div>
 
@@ -185,6 +314,9 @@
       <button class="tab" type="button" data-pane="padron"><i class="fa-solid fa-users"></i> Padrón de Colaboradores ({{ $colaboradoresPadron->where('estado', '!=', 'baja')->count() }})</button>
       <button class="tab" type="button" data-pane="invitaciones"><i class="fa-solid fa-paper-plane"></i> Invitaciones</button>
     @endif
+    @if($esAdmin)
+      <button class="tab" type="button" data-pane="enlace"><i class="fa-solid fa-link"></i> Invitar por link</button>
+    @endif
     <button class="tab" type="button" data-pane="clinico"><i class="fa-solid fa-user-doctor"></i> Plano clínico</button>
   </div>
 
@@ -213,7 +345,7 @@
         @endforeach
       </div>
     @empty
-      <p style="color: #6E887E; font-size: 0.88rem; margin: 0;">Esta institución aún no tiene áreas. Agrégalas desde «Editar estructura».</p>
+      <p style="color: #5B7369; font-size: 0.88rem; margin: 0;">Esta institución aún no tiene áreas. Agrégalas desde «Editar estructura».</p>
     @endforelse
   </div>
 
@@ -284,7 +416,7 @@
         </div>
 
         @if(!empty($ultimaCarga->mapeo['columnas_ignoradas']))
-          <p style="font-size: 0.76rem; color: #6E887E; margin: 0 0 0.6rem;">
+          <p style="font-size: 0.76rem; color: #5B7369; margin: 0 0 0.6rem;">
             <i class="fa-solid fa-eye-slash"></i> Columnas ignoradas (no se guardaron): {{ implode(', ', $ultimaCarga->mapeo['columnas_ignoradas']) }}
           </p>
         @endif
@@ -325,6 +457,12 @@
 
   <div class="tabpane" data-tabpane="inst" data-pane="invitaciones" id="tab-invitaciones">
   @include('admin.instituciones.partials.invitaciones')
+  </div>
+  @endif
+
+  @if($esAdmin)
+  <div class="tabpane" data-tabpane="inst" data-pane="enlace" id="tab-enlace">
+  @include('admin.instituciones.partials.enlace')
   </div>
   @endif
 
@@ -461,7 +599,7 @@
               </tr>
             @empty
               <tr>
-                <td colspan="13" style="text-align: center; padding: 2rem 1rem; color: #6E887E;">
+                <td colspan="13" style="text-align: center; padding: 2rem 1rem; color: #5B7369;">
                   @if(array_filter($filtros))
                     Nadie coincide con los filtros. <a href="{{ route('admin.instituciones.show', $institucion) }}#colaboradores" style="color: #2E5D4B;">Quitar filtros</a>
                   @else
@@ -619,7 +757,7 @@
       </div>
 
       <div class="modal-foot">
-        <span style="font-size: 0.76rem; color: #6E887E;"><i class="fa-solid fa-clock-rotate-left"></i> Los cambios se aplican al guardar</span>
+        <span style="font-size: 0.76rem; color: #5B7369;"><i class="fa-solid fa-clock-rotate-left"></i> Los cambios se aplican al guardar</span>
         <div style="display: flex; gap: 8px;">
           <button type="button" class="btn-atl linea" data-close="m-editar-institucion">Cancelar</button>
           <button type="submit" class="btn-atl primario"><i class="fa-solid fa-check"></i> Guardar cambios</button>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\CrisisLine;
+use App\Models\Interaccion;
 use App\Models\SafetyPlan;
 use App\Services\PucholService;
 use Illuminate\Http\Request;
@@ -13,6 +14,7 @@ class SafetyPlanController extends Controller
     public function show()
     {
         $user = Auth::user();
+        Interaccion::registrar('plan');
         $safetyPlan = $user->safetyPlan ?? new SafetyPlan(['user_id' => $user->id]);
         $crisisLines = CrisisLine::where('is_featured', true)->take(4)->get();
 

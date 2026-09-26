@@ -147,7 +147,7 @@
                         <i class="fa-solid fa-circle-check" style="color: #0E7490; font-size: 0.82rem;" title="Profesional Acreditado"></i>
                       @endif
                     </div>
-                    <div style="font-size: 0.78rem; color: #6E887E;">
+                    <div style="font-size: 0.78rem; color: #5B7369;">
                       {{ $user->email }}
                     </div>
                     @if($m = $user->membresiaActiva)
@@ -155,7 +155,7 @@
                         <a href="{{ route('admin.instituciones.show', $m->institucion) }}#tab-padron" style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 7px; border-radius: 5px; background: #E8F5E9; color: #1B5E20; font-size: 0.72rem; font-weight: 600; text-decoration: none;" title="Ver en el padrón de {{ $m->institucion?->nombre_corto }}">
                           <i class="fa-solid fa-building"></i>
                           <span>{{ $m->institucion?->nombre_corto }}</span>
-                          @if($m->departamento)<span style="color: #6E887E; font-weight: 400;">• {{ $m->departamento->nombre }}</span>@endif
+                          @if($m->departamento)<span style="color: #5B7369; font-weight: 400;">• {{ $m->departamento->nombre }}</span>@endif
                         </a>
                       </div>
                     @endif
@@ -186,7 +186,7 @@
                   <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.82rem; font-weight: 600; color: #1A2620;">
                     {{ $user->license_number }}
                   </div>
-                  <div style="font-size: 0.74rem; color: #6E887E;">
+                  <div style="font-size: 0.74rem; color: #5B7369;">
                     {{ $user->professional_title ?? 'Especialista' }}
                   </div>
                 @else
@@ -208,7 +208,7 @@
                   </span>
                 @elseif($estadoCuenta === 'sin_activar')
                   {{-- Mismo criterio que el padrón: está dado de alta pero aún no entra por primera vez --}}
-                  <span style="color: #6E887E; font-size: 0.78rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;" title="Dado de alta en el padrón; se activa cuando entra por primera vez">
+                  <span style="color: #5B7369; font-size: 0.78rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;" title="Dado de alta en el padrón; se activa cuando entra por primera vez">
                     <i class="fa-solid fa-circle" style="font-size: 0.45rem;"></i> Sin activar
                   </span>
                 @else
@@ -288,7 +288,7 @@
             </tr>
           @empty
             <tr>
-              <td colspan="6" style="text-align: center; padding: 3rem; color: #6E887E;">
+              <td colspan="6" style="text-align: center; padding: 3rem; color: #5B7369;">
                 <i class="fa-solid fa-magnifying-glass" style="font-size: 2rem; color: #CBD5E1; margin-bottom: 0.75rem; display: block;"></i>
                 No se encontraron usuarios con los criterios de búsqueda especificados.
               </td>
@@ -318,7 +318,7 @@
         <h3 style="margin: 0; font-size: 1.25rem; font-weight: 700; color: #1A2620; font-family: 'Fraunces', serif;">
           Dar de Alta Usuario
         </h3>
-        <p style="margin: 3px 0 0; font-size: 0.82rem; color: #6E887E;">
+        <p style="margin: 3px 0 0; font-size: 0.82rem; color: #5B7369;">
           Crea una cuenta oficial para miembros del equipo o especialistas de salud.
         </p>
       </div>
@@ -353,7 +353,7 @@
           <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: #2D3748; margin-bottom: 0.4rem; display: block;">
             Correo Electrónico <span style="color: #DC2626;">*</span>
           </label>
-          <input type="email" name="email" required value="{{ old('email') }}" class="form-control" placeholder="usuario@atulado.com.mx" style="border-radius: 9px;">
+          <input type="email" name="email" required value="{{ old('email') }}" class="form-control" placeholder="usuario@atulado.com.mx" style="border-radius: 9px;" autocomplete="off" autocapitalize="none" spellcheck="false">
         </div>
 
         <!-- Contraseña y Confirmación -->
@@ -362,13 +362,13 @@
             <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: #2D3748; margin-bottom: 0.4rem; display: block;">
               Contraseña <span style="color: #DC2626;">*</span>
             </label>
-            <input type="password" name="password" required class="form-control" placeholder="Mínimo 6 caracteres" style="border-radius: 9px;">
+            <input type="password" name="password" required class="form-control" placeholder="Mínimo 8 caracteres" style="border-radius: 9px;" autocomplete="new-password">
           </div>
           <div>
             <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: #2D3748; margin-bottom: 0.4rem; display: block;">
               Confirmar Contraseña <span style="color: #DC2626;">*</span>
             </label>
-            <input type="password" name="password_confirmation" required class="form-control" placeholder="Repite la contraseña" style="border-radius: 9px;">
+            <input type="password" name="password_confirmation" required class="form-control" placeholder="Repite la contraseña" style="border-radius: 9px;" autocomplete="new-password">
           </div>
         </div>
 
@@ -384,7 +384,7 @@
               <input type="radio" name="role" value="admin" {{ old('role') === 'admin' ? 'checked' : '' }} onchange="toggleRoleFields()" style="margin-top: 3px;">
               <div>
                 <div style="font-weight: 700; font-size: 0.88rem; color: #1A2620;">Administrador</div>
-                <div style="font-size: 0.75rem; color: #6E887E; margin-top: 2px;">Acceso a la consola gerencial y auditoría.</div>
+                <div style="font-size: 0.75rem; color: #5B7369; margin-top: 2px;">Acceso a la consola gerencial y auditoría.</div>
               </div>
             </label>
 
@@ -393,7 +393,7 @@
               <input type="radio" name="role" value="profesional" {{ old('role') === 'profesional' ? 'checked' : '' }} onchange="toggleRoleFields()" style="margin-top: 3px;">
               <div>
                 <div style="font-weight: 700; font-size: 0.88rem; color: #1A2620;">Profesional</div>
-                <div style="font-size: 0.75rem; color: #6E887E; margin-top: 2px;">Especialista de salud acreditado.</div>
+                <div style="font-size: 0.75rem; color: #5B7369; margin-top: 2px;">Especialista de salud acreditado.</div>
               </div>
             </label>
 
@@ -402,7 +402,7 @@
               <input type="radio" name="role" value="usuario" {{ (!old('role') || old('role') === 'usuario') ? 'checked' : '' }} onchange="toggleRoleFields()" style="margin-top: 3px;">
               <div>
                 <div style="font-weight: 700; font-size: 0.88rem; color: #1A2620;">Usuario / Paciente</div>
-                <div style="font-size: 0.75rem; color: #6E887E; margin-top: 2px;">Cuenta regular con acceso a Mi Espacio.</div>
+                <div style="font-size: 0.75rem; color: #5B7369; margin-top: 2px;">Cuenta regular con acceso a Mi Espacio.</div>
               </div>
             </label>
           </div>
@@ -495,7 +495,7 @@
                 <span>{{ $instOption->nombre_corto }}</span>
               </label>
             @empty
-              <span style="font-size: 0.8rem; color: #6E887E;">Aún no hay instituciones registradas.</span>
+              <span style="font-size: 0.8rem; color: #5B7369;">Aún no hay instituciones registradas.</span>
             @endforelse
           </div>
         </div>
@@ -512,7 +512,7 @@
               </option>
             @endforeach
           </select>
-          <span style="font-size: 0.74rem; color: #6E887E; margin-top: 4px; display: block;">
+          <span style="font-size: 0.74rem; color: #5B7369; margin-top: 4px; display: block;">
             Si se asigna una empresa, el usuario se integrará a su padrón y semáforo institucional.
           </span>
         </div>
@@ -544,7 +544,7 @@
         <h3 style="margin: 0; font-size: 1.25rem; font-weight: 700; color: #1A2620; font-family: 'Fraunces', serif;">
           Editar Usuario
         </h3>
-        <p style="margin: 3px 0 0; font-size: 0.82rem; color: #6E887E;">
+        <p style="margin: 3px 0 0; font-size: 0.82rem; color: #5B7369;">
           Modifica los accesos, rol y estado de la cuenta en el sistema.
         </p>
       </div>
@@ -572,7 +572,7 @@
           <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: #2D3748; margin-bottom: 0.4rem; display: block;">
             Correo Electrónico <span style="color: #DC2626;">*</span>
           </label>
-          <input type="email" name="email" id="editUserEmail" required class="form-control" style="border-radius: 9px;">
+          <input type="email" name="email" id="editUserEmail" required class="form-control" style="border-radius: 9px;" autocomplete="off" autocapitalize="none" spellcheck="false">
         </div>
 
         <!-- Selector de Rol (Usuario | Profesional | Administrador) -->
@@ -588,7 +588,7 @@
                 <div style="font-weight: 700; font-size: 0.85rem; color: #1A2620; display: flex; align-items: center; gap: 4px;">
                   <i class="fa-solid fa-user" style="color: #475569;"></i> Usuario
                 </div>
-                <div style="font-size: 0.72rem; color: #6E887E; margin-top: 2px;">Cuenta estándar.</div>
+                <div style="font-size: 0.72rem; color: #5B7369; margin-top: 2px;">Cuenta estándar.</div>
               </div>
             </label>
 
@@ -599,7 +599,7 @@
                 <div style="font-weight: 700; font-size: 0.85rem; color: #1A2620; display: flex; align-items: center; gap: 4px;">
                   <i class="fa-solid fa-user-doctor" style="color: #0E7490;"></i> Profesional
                 </div>
-                <div style="font-size: 0.72rem; color: #6E887E; margin-top: 2px;">Acreditado.</div>
+                <div style="font-size: 0.72rem; color: #5B7369; margin-top: 2px;">Acreditado.</div>
               </div>
             </label>
 
@@ -610,7 +610,7 @@
                 <div style="font-weight: 700; font-size: 0.85rem; color: #1A2620; display: flex; align-items: center; gap: 4px;">
                   <i class="fa-solid fa-shield-halved" style="color: #2E5D4B;"></i> Admin
                 </div>
-                <div style="font-size: 0.72rem; color: #6E887E; margin-top: 2px;">Control total.</div>
+                <div style="font-size: 0.72rem; color: #5B7369; margin-top: 2px;">Control total.</div>
               </div>
             </label>
           </div>
@@ -687,7 +687,7 @@
                 <span>{{ $instOption->nombre_corto }}</span>
               </label>
             @empty
-              <span style="font-size: 0.8rem; color: #6E887E;">Aún no hay instituciones registradas.</span>
+              <span style="font-size: 0.8rem; color: #5B7369;">Aún no hay instituciones registradas.</span>
             @endforelse
           </div>
         </div>
@@ -706,13 +706,16 @@
           </select>
         </div>
 
-        <!-- Nueva Contraseña (Opcional) -->
+        <!-- Nueva Contraseña (Opcional). Desactivada hasta marcar la casilla: el
+             navegador rellenaba este campo solo con la contraseña guardada del
+             administrador y cualquier cambio de rol o institución la reemplazaba. -->
         <div style="margin-bottom: 1.5rem;">
-          <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: #2D3748; margin-bottom: 0.4rem; display: block;">
-            Restablecer Contraseña (Opcional)
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.82rem; font-weight: 700; color: #2D3748; margin-bottom: 0.45rem;">
+            <input type="checkbox" name="cambiar_password" value="1" id="editCambiarPassword" onchange="toggleEditPassword()">
+            <span>Cambiar la contraseña</span>
           </label>
-          <input type="password" name="password" placeholder="Dejar en blanco para conservar la actual" class="form-control" style="border-radius: 9px;">
-          <span style="font-size: 0.74rem; color: #6E887E; margin-top: 3px; display: block;">Si escribes una nueva contraseña, debe tener al menos 6 caracteres.</span>
+          <input type="password" name="password" id="editUserPassword" placeholder="Nueva contraseña" class="form-control" style="border-radius: 9px;" autocomplete="new-password" disabled>
+          <span style="font-size: 0.74rem; color: #5B7369; margin-top: 3px; display: block;">Si no marcas la casilla, la persona conserva su contraseña actual. La nueva debe tener al menos 8 caracteres.</span>
         </div>
 
         <!-- Botones de Acción -->
@@ -849,12 +852,26 @@
     document.querySelectorAll('.edit-chk-asignada').forEach(c => { c.checked = (user.asignadas || []).includes(Number(c.value)); });
     document.getElementById('editClinicoAdmin').checked = !!user.is_clinico;
 
+    // La contraseña nunca viaja salvo que se pida cambiarla expresamente.
+    document.getElementById('editCambiarPassword').checked = false;
+    toggleEditPassword();
+
     toggleEditRoleFields();
     document.getElementById('editUserModal').style.display = 'flex';
   }
 
+  function toggleEditPassword() {
+    const cambiar = document.getElementById('editCambiarPassword').checked;
+    const campo = document.getElementById('editUserPassword');
+    campo.value = '';
+    campo.disabled = !cambiar;
+    campo.required = cambiar;
+    if (cambiar) campo.focus();
+  }
+
   function closeEditUserModal() {
     document.getElementById('editUserModal').style.display = 'none';
+    document.getElementById('editUserPassword').value = '';
   }
 
   function toggleEditRoleFields() {

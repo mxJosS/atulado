@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Models\BitacoraAdmin;
 use App\Http\Controllers\Controller;
 use App\Models\Ajuste;
 use Illuminate\Http\Request;
@@ -22,6 +23,7 @@ class AjusteController extends Controller
         $habilitado = $request->boolean('habilitado');
 
         Ajuste::guardar(Ajuste::GOOGLE_HABILITADO, $habilitado ? '1' : '0', $request->user());
+        BitacoraAdmin::registrar('ajuste_google', null, 'Acceso con Google ' . ($habilitado ? 'activado' : 'desactivado') . '.');
         Log::info('Acceso con Google ' . ($habilitado ? 'activado' : 'desactivado') . '.', ['por' => $request->user()->id]);
 
         return back()->with('success', $habilitado

@@ -56,7 +56,7 @@
       </a>
 
       <!-- Divider -->
-      <div style="display: flex; align-items: center; margin-bottom: 1.25rem; color: #8EADA4; font-size: 0.75rem; text-transform: uppercase; font-family: var(--font-mono); letter-spacing: 0.08em;">
+      <div style="display: flex; align-items: center; margin-bottom: 1.25rem; color: #5B7369; font-size: 0.75rem; text-transform: uppercase; font-family: var(--font-mono); letter-spacing: 0.08em;">
         <div style="flex: 1; height: 1px; background: #DCE8E0;"></div>
         <span style="padding: 0 0.75rem;">o con tu correo</span>
         <div style="flex: 1; height: 1px; background: #DCE8E0;"></div>
@@ -74,7 +74,9 @@
           <input 
             type="email" 
             name="email" 
-            id="email" 
+            id="email"
+            autocapitalize="none"
+            spellcheck="false"
             class="form-control @error('email') is-invalid @enderror" 
             value="{{ old('email') }}" 
             placeholder="tu@correo.com" 

@@ -3,7 +3,7 @@
   .admin-content-canvas { padding: 1.75rem 2rem; max-width: 1400px; margin: 0 auto; }
   @media (max-width: 768px) { .admin-content-canvas { padding: 1rem; } }
 
-  .crumbs-atl { font-family: 'IBM Plex Mono', monospace; font-size: 0.76rem; color: #6E887E; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.25rem; }
+  .crumbs-atl { font-family: 'IBM Plex Mono', monospace; font-size: 0.76rem; color: #5B7369; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.25rem; }
   .crumbs-atl a { color: inherit; text-decoration: none; }
   .crumbs-atl a:hover { color: #2E5D4B; }
   .titulo-atl { font-family: 'Fraunces', serif; font-size: 1.85rem; font-weight: 700; color: #1A2620; margin: 0; }
@@ -20,10 +20,10 @@
   .card-atl { background: #FFFFFF; border-radius: 16px; border: 1.5px solid #DCE8E0; padding: 1.35rem 1.5rem; }
   .card-atl-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem; margin-bottom: 0.9rem; }
   .card-atl-head h3 { font-family: 'Fraunces', serif; font-size: 1.12rem; font-weight: 700; color: #1A2620; margin: 0; }
-  .card-atl-head p { font-size: 0.8rem; color: #6E887E; margin: 0.15rem 0 0; }
+  .card-atl-head p { font-size: 0.8rem; color: #5B7369; margin: 0.15rem 0 0; }
 
   .kv-atl { display: grid; grid-template-columns: minmax(120px, 38%) 1fr; gap: 0.5rem 1rem; margin: 0; font-size: 0.88rem; }
-  .kv-atl dt { color: #6E887E; font-size: 0.8rem; }
+  .kv-atl dt { color: #5B7369; font-size: 0.8rem; }
   .kv-atl dd { margin: 0; color: #1A2620; font-weight: 500; word-break: break-word; }
   .kv-atl dd.vacio { color: #A5B8B0; font-weight: 400; font-style: italic; }
 
@@ -40,7 +40,7 @@
   .form-input-styled { width: 100%; padding: 0.55rem 0.8rem; border: 1.5px solid #DCE8E0; border-radius: 8px; font-size: 0.86rem; color: #1A2620; background: #FFFFFF; box-sizing: border-box; transition: border-color 0.2s; font-family: inherit; }
   .form-input-styled:focus { border-color: #2E5D4B; outline: none; box-shadow: 0 0 0 3px rgba(46, 93, 75, 0.12); }
   .form-input-styled.con-error { border-color: #B02418; }
-  .form-hint-styled { display: block; font-size: 0.73rem; color: #6E887E; margin-top: 0.3rem; line-height: 1.35; }
+  .form-hint-styled { display: block; font-size: 0.73rem; color: #5B7369; margin-top: 0.3rem; line-height: 1.35; }
   .form-error { display: block; font-size: 0.74rem; color: #B02418; margin-top: 0.3rem; font-weight: 600; }
   .form-bloque { margin-bottom: 1.35rem; padding-bottom: 1.15rem; border-bottom: 1px solid #EEF4F0; }
   .form-bloque:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
@@ -71,7 +71,7 @@
   .area-fila.hija::before { content: ''; position: absolute; left: 0.55rem; top: -0.45rem; bottom: 50%; width: 0.6rem; border-left: 1.5px solid #C2D6CA; border-bottom: 1.5px solid #C2D6CA; border-bottom-left-radius: 4px; }
   .area-fila .form-input-styled { flex: 1; padding: 0.42rem 0.65rem; font-size: 0.84rem; }
   .area-fila .icono { color: #2E5D4B; width: 16px; text-align: center; }
-  .area-personas { font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; color: #6E887E; white-space: nowrap; min-width: 82px; text-align: right; }
+  .area-personas { font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; color: #5B7369; white-space: nowrap; min-width: 82px; text-align: right; }
   .area-quitar { display: inline-flex; align-items: center; gap: 4px; font-size: 0.75rem; color: #B02418; cursor: pointer; white-space: nowrap; }
   .area-quitar.bloqueado { color: #A5B8B0; cursor: not-allowed; }
   .area-agregar { margin-top: 0.5rem; padding-left: 1.4rem; }
@@ -83,17 +83,17 @@
   .arbol-linea { display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; font-size: 0.9rem; }
   .arbol-linea.macro { font-weight: 700; color: #1A2620; }
   .arbol-linea.hija { padding: 0.3rem 0 0 1.5rem; color: #556860; font-size: 0.85rem; }
-  .arbol-conteo { font-family: 'IBM Plex Mono', monospace; font-size: 0.76rem; color: #6E887E; white-space: nowrap; }
+  .arbol-conteo { font-family: 'IBM Plex Mono', monospace; font-size: 0.76rem; color: #5B7369; white-space: nowrap; }
 
   /* Padrón por Excel */
   .padron-pasos { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
   .padron-paso { display: flex; gap: 0.8rem; align-items: flex-start; background: #FBFDFC; border: 1.5px solid #DCE8E0; border-radius: 12px; padding: 0.9rem 1rem; }
   .padron-num { width: 28px; height: 28px; border-radius: 50%; background: #2E5D4B; color: #FFFFFF; font-weight: 700; font-size: 0.85rem; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .padron-titulo { font-weight: 700; color: #1A2620; font-size: 0.9rem; margin-bottom: 0.2rem; }
-  .padron-texto { font-size: 0.78rem; color: #6E887E; margin: 0 0 0.6rem; line-height: 1.4; }
+  .padron-texto { font-size: 0.78rem; color: #5B7369; margin: 0 0 0.6rem; line-height: 1.4; }
   .padron-resultado { margin-top: 1.1rem; padding-top: 1rem; border-top: 1px solid #EEF4F0; }
   .padron-tabla { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
-  .padron-tabla th { position: sticky; top: 0; background: #F8FAF9; text-align: left; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; color: #6E887E; padding: 0.5rem 0.7rem; border-bottom: 1px solid #EEF4F0; }
+  .padron-tabla th { position: sticky; top: 0; background: #F8FAF9; text-align: left; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; color: #5B7369; padding: 0.5rem 0.7rem; border-bottom: 1px solid #EEF4F0; }
   .padron-tabla td { padding: 0.5rem 0.7rem; border-bottom: 1px solid #F1F5F3; vertical-align: top; color: #1A2620; }
   .padron-tabla td.mono { font-family: 'IBM Plex Mono', monospace; font-size: 0.76rem; }
 

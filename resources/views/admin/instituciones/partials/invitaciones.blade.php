@@ -8,7 +8,7 @@
   <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; padding-bottom: 1rem; margin-bottom: 1rem; border-bottom: 1px solid #EEF4F0;">
     <div>
       <h3 style="font-family: 'Fraunces', serif; font-size: 1.12rem; margin: 0;">Invitaciones por correo</h3>
-      <p style="font-size: 0.8rem; color: #6E887E; margin: 0.2rem 0 0;">
+      <p style="font-size: 0.8rem; color: #5B7369; margin: 0.2rem 0 0;">
         Cada persona recibe un enlace personal para crear su contraseña. Vence en {{ \App\Services\InvitacionService::DIAS_VIGENCIA }} días y sirve una sola vez; reenviar genera uno nuevo.
       </p>
       <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 0.6rem;">
@@ -40,7 +40,7 @@
 @endif
 
   @if($personas->isEmpty())
-    <p style="color: #6E887E; font-size: 0.88rem; margin: 0;">Primero agrega personas en «Padrón de Colaboradores».</p>
+    <p style="color: #5B7369; font-size: 0.88rem; margin: 0;">Primero agrega personas en «Padrón de Colaboradores».</p>
   @else
     <form method="POST" action="{{ route('admin.instituciones.invitaciones.enviar', $institucion) }}" id="form-invitar">
       @csrf
@@ -66,7 +66,7 @@
               @php $puede = $invitables->contains('id', $p->id); @endphp
               <tr>
                 <td>@if($puede && $esAdmin)<input type="checkbox" class="chk-invitar" name="personas[]" value="{{ $p->id }}" onchange="contarSeleccion()">@endif</td>
-                <td><b>{{ $p->user?->name }}</b><div style="font-size: 0.74rem; color: #6E887E;">{{ $p->user?->email }}</div></td>
+                <td><b>{{ $p->user?->name }}</b><div style="font-size: 0.74rem; color: #5B7369;">{{ $p->user?->email }}</div></td>
                 <td>{{ $p->departamento?->nombre ?: '—' }}</td>
                 <td>
                   @if($p->estado === 'activo')

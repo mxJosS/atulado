@@ -26,15 +26,18 @@ class SafetyPlan extends Model
 
     protected function casts(): array
     {
+        // Todo el plan va cifrado en reposo (APP_KEY).
         return [
-            'warning_signs' => 'array',
-            'internal_coping' => 'array',
-            'distraction_activities' => 'array',
-            'social_distractions' => 'array',
-            'safe_places' => 'array',
-            'trusted_contacts' => 'array',
-            'professional_contacts' => 'array',
-            'reasons_to_live' => 'array',
+            'warning_signs' => 'encrypted:array',
+            'internal_coping' => 'encrypted:array',
+            'distraction_activities' => 'encrypted:array',
+            'social_distractions' => 'encrypted:array',
+            'safe_places' => 'encrypted:array',
+            'trusted_contacts' => 'encrypted:array',
+            'professional_contacts' => 'encrypted:array',
+            'reasons_to_live' => 'encrypted:array',
+            'safe_environment_steps' => 'encrypted',
+            'reasons_for_living' => 'encrypted',
         ];
     }
 

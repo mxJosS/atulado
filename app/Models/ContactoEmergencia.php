@@ -24,6 +24,10 @@ class ContactoEmergencia extends Model
     {
         return [
             'es_principal' => 'boolean',
+            // Cifrados en reposo (APP_KEY).
+            'nombre' => 'encrypted',
+            'telefono' => 'encrypted',
+            'relacion' => 'encrypted',
         ];
     }
 

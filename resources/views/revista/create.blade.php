@@ -137,7 +137,7 @@
                   required
                   style="border-radius: 10px;"
                 >
-                <small style="color: #6E887E; font-size: 0.74rem; display: block; margin-top: 0.35rem;">
+                <small style="color: #5B7369; font-size: 0.74rem; display: block; margin-top: 0.35rem;">
                   Abierto a especialistas de psicología, psiquiatría, nutrición, medicina y disciplinas de bienestar integral.
                 </small>
                 @error('author_credentials')

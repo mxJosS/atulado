@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\EventoCrisis;
+use App\Models\Interaccion;
 use App\Services\ClinicalEngineService;
 use App\Services\PucholService;
 use Illuminate\Http\JsonResponse;
@@ -186,6 +187,7 @@ class AssessmentController extends Controller
         ]);
 
         $user = Auth::user();
+        Interaccion::registrar('crisis');
         $evento = $validated['evento_id']
             ? EventoCrisis::where('id', $validated['evento_id'])->where('user_id', $user->id)->first()
             : $user->active_crisis_event;
@@ -217,6 +219,8 @@ class AssessmentController extends Controller
         if (!$profesional->isClinicoAcreditado()) {
             return response()->json(['error' => 'No autorizado. Solo un profesional acreditado puede verificar el cierre.'], 403);
         }
+        // Igual que en el panel: un clínico sólo cierra casos de las instituciones que atiende.
+        abort_unless($profesional->puedeAtenderInstitucion($evento->institucion_id), 404);
 
         if ($evento->contactado_en === null) {
             return response()->json([

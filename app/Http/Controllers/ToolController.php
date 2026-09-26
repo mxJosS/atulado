@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\CrisisLine;
+use App\Models\Interaccion;
 use App\Models\Resource;
 use Illuminate\Http\Request;
 
@@ -16,21 +17,29 @@ class ToolController extends Controller
 
     public function respiracion()
     {
+        Interaccion::registrar('herramienta');
+
         return view('tools.respiracion');
     }
 
     public function grounding()
     {
+        Interaccion::registrar('herramienta');
+
         return view('tools.grounding');
     }
 
     public function stop()
     {
+        Interaccion::registrar('herramienta');
+
         return view('tools.stop');
     }
 
     public function crisis(Request $request)
     {
+        Interaccion::registrar('crisis');
+
         $query = CrisisLine::query();
 
         if ($request->filled('country') && $request->country !== 'todos') {

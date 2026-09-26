@@ -55,4 +55,54 @@ class AvisoErrores
             // El aviso nunca debe tumbar la petición ni generar otro error.
         }
     }
+
+    /**
+     * Picos de accesos rechazados (401, 403, 419, 429): suele ser alguien
+     * probando contraseñas, códigos o rutas ajenas. Cuenta por ventanas de 10
+     * minutos y avisa una vez por ventana al pasar el umbral.
+     */
+    public static function contarRechazo(int $estado, string $ip, string $ruta): void
+    {
+        $umbral = (int) config('atulado.alertas_rechazos', 60);
+        if ($umbral <= 0) {
+            return;
+        }
+
+        $ventana = 'rechazos:' . intdiv(now()->timestamp, 600);
+        try {
+            Cache::add($ventana, 0, now()->addMinutes(20));
+            $total = Cache::increment($ventana);
+            Cache::add($ventana . ':ip:' . $ip, 0, now()->addMinutes(20));
+            Cache::increment($ventana . ':ip:' . $ip);
+
+            if ($total !== $umbral) {
+                return;
+            }
+        } catch (Throwable) {
+            return;
+        }
+
+        \Illuminate\Support\Facades\Log::warning("Pico de accesos rechazados: {$umbral} en menos de 10 minutos (último: {$estado} {$ruta} desde {$ip}).");
+
+        $destinatarios = config('atulado.alertas_errores', []);
+        if ($destinatarios === [] || !app()->isProduction()) {
+            return;
+        }
+
+        $cuerpo = implode("\n", [
+            "La app A Tu Lado respondió {$umbral} accesos rechazados (401/403/419/429) en menos de 10 minutos.",
+            'Puede ser alguien probando contraseñas, códigos de acceso o rutas de otras personas.',
+            '',
+            "Último: {$estado} {$ruta}",
+            "Desde:  {$ip}",
+            'Cuándo: ' . now()->format('d/m/Y H:i:s'),
+            '',
+            'Revisa storage/logs/laravel.log y el access.log de Nginx.',
+        ]);
+
+        try {
+            Mail::to($destinatarios)->send(new AvisoErrorMail('pico de accesos rechazados', $cuerpo));
+        } catch (Throwable) {
+        }
+    }
 }

@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow, noarchive">
   <meta name="referrer" content="no-referrer">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>Monitor del servidor</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
@@ -73,6 +74,22 @@
     .no-disp { color: var(--suave); font-size: 12px; padding: 6px 0; }
     .leyenda { display: flex; gap: 12px; font-size: 11px; color: var(--suave); margin-top: 6px; flex-wrap: wrap; }
     .leyenda i { display: inline-block; width: 10px; height: 3px; border-radius: 2px; margin-right: 4px; vertical-align: middle; }
+    .controles button.reinicio-servicios { border-color: rgba(224,163,58,.55); color: var(--ambar); }
+    .controles button.reinicio-maquina { border-color: rgba(224,90,74,.55); color: var(--rojo); }
+    .velo { position: fixed; inset: 0; z-index: 20; background: rgba(0,0,0,.62); display: none; align-items: center; justify-content: center; padding: 16px; }
+    .velo.abierto { display: flex; }
+    .dialogo { background: var(--tarjeta); border: 1px solid var(--linea); border-radius: 14px; width: 100%; max-width: 460px; padding: 18px; }
+    .dialogo h3 { margin: 0 0 6px; font-size: 16px; }
+    .dialogo p { margin: 0 0 12px; color: var(--suave); font-size: 12.5px; }
+    .dialogo label { display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--suave); margin: 10px 0 4px; }
+    .dialogo input { width: 100%; background: var(--tarjeta2); color: var(--texto); border: 1px solid var(--linea); border-radius: 8px; padding: 8px 10px; font: inherit; }
+    .dialogo .acciones { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+    .dialogo .acciones button { background: var(--tarjeta2); color: var(--texto); border: 1px solid var(--linea); border-radius: 8px; padding: 7px 14px; font: inherit; cursor: pointer; }
+    .dialogo .acciones button.peligro { background: var(--rojo); border-color: var(--rojo); color: #fff; font-weight: 700; }
+    .dialogo .acciones button:disabled { opacity: .5; cursor: default; }
+    .dialogo .aviso { font-size: 12.5px; margin-top: 10px; min-height: 1em; }
+    .dialogo .aviso.error { color: var(--rojo); }
+    .dialogo .aviso.ok { color: var(--verde); }
     @media (max-width: 640px) {
       main { padding: 12px; }
       .dos, .tres { grid-template-columns: 1fr; }
@@ -94,6 +111,8 @@
         <option value="10000">10 s</option>
       </select>
       <button type="button" id="pausa">Pausar</button>
+      <button type="button" class="reinicio-servicios" data-reinicio="servicios" title="Reinicia MySQL, PHP-FPM, Nginx y la cola">Reiniciar servicios</button>
+      <button type="button" class="reinicio-maquina" data-reinicio="maquina" title="Reinicia la máquina completa">Reiniciar servidor</button>
     </div>
   </div>
 </header>
@@ -221,6 +240,81 @@
     </div>
   </section>
 </main>
+
+{{-- Confirmación de reinicio --}}
+<div class="velo" id="veloReinicio" role="dialog" aria-modal="true" aria-labelledby="tituloReinicio">
+  <form class="dialogo" id="formReinicio" autocomplete="off">
+    <h3 id="tituloReinicio"></h3>
+    <p id="textoReinicio"></p>
+    <label for="passReinicio">Tu contraseña</label>
+    <input type="password" id="passReinicio" autocomplete="current-password" required>
+    <label for="confReinicio">Escribe REINICIAR para confirmar</label>
+    <input type="text" id="confReinicio" autocapitalize="characters" spellcheck="false" required>
+    <div class="aviso" id="avisoReinicio" aria-live="polite"></div>
+    <div class="acciones">
+      <button type="button" id="cancelarReinicio">Cancelar</button>
+      <button type="submit" class="peligro" id="enviarReinicio" disabled>Reiniciar</button>
+    </div>
+  </form>
+</div>
+
+<script>
+(() => {
+  const RUTA = @json($rutaReinicio);
+  const TEXTOS = {
+    servicios: ['Reiniciar servicios', 'Se reinician MySQL, PHP-FPM, Nginx y la cola de correos. La máquina sigue encendida; la página deja de responder unos segundos y las peticiones en curso se pierden.'],
+    maquina: ['Reiniciar el servidor completo', 'Se reinicia la máquina. A Tu Lado queda fuera de línea uno o dos minutos para todas las personas, incluido quien esté registrando o en el botón de crisis. Úsalo sólo si reiniciar los servicios no bastó.'],
+  };
+  const $ = (id) => document.getElementById(id);
+  const velo = $('veloReinicio');
+  let tipo = null;
+
+  const cerrar = () => { velo.classList.remove('abierto'); $('passReinicio').value = ''; $('confReinicio').value = ''; };
+  const validar = () => { $('enviarReinicio').disabled = !$('passReinicio').value || $('confReinicio').value.trim() !== 'REINICIAR'; };
+  const aviso = (texto, clase) => { const a = $('avisoReinicio'); a.textContent = texto; a.className = 'aviso ' + (clase || ''); };
+
+  document.querySelectorAll('[data-reinicio]').forEach((b) => b.addEventListener('click', () => {
+    tipo = b.dataset.reinicio;
+    [$('tituloReinicio').textContent, $('textoReinicio').textContent] = TEXTOS[tipo];
+    $('enviarReinicio').textContent = TEXTOS[tipo][0];
+    aviso('');
+    validar();
+    velo.classList.add('abierto');
+    $('passReinicio').focus();
+  }));
+  $('cancelarReinicio').addEventListener('click', cerrar);
+  velo.addEventListener('click', (e) => { if (e.target === velo) cerrar(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && velo.classList.contains('abierto')) cerrar(); });
+  ['passReinicio', 'confReinicio'].forEach((id) => $(id).addEventListener('input', validar));
+
+  $('formReinicio').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    $('enviarReinicio').disabled = true;
+    aviso('Enviando…');
+    try {
+      const r = await fetch(RUTA, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+        },
+        body: JSON.stringify({ tipo, password: $('passReinicio').value, confirmacion: $('confReinicio').value.trim() }),
+      });
+      const d = await r.json().catch(() => ({}));
+      if (r.status === 429) throw new Error('Demasiados intentos. Espera unos minutos.');
+      if (!r.ok || !d.ok) throw new Error(d.mensaje || ('Error ' + r.status));
+      aviso(d.mensaje, 'ok');
+      $('actualizado').textContent = tipo === 'maquina' ? 'reiniciando el servidor…' : 'reiniciando servicios…';
+      setTimeout(cerrar, 3500);
+    } catch (err) {
+      aviso(err.message, 'error');
+      validar();
+    }
+  });
+})();
+</script>
 
 <script>
 (() => {

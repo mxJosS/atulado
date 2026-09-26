@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Article;
+use App\Models\Interaccion;
 use App\Models\Resource;
 use App\Models\TopicArea;
 use Illuminate\Http\Request;
@@ -95,6 +96,7 @@ class ArticleController extends Controller
         $article = Article::with(['topicArea', 'user'])->where('slug', $slug)->firstOrFail();
 
         $this->registrarLectura($article);
+        Interaccion::registrar('revista');
 
         $relatedArticles = Article::with(['topicArea', 'user'])
             ->where('id', '!=', $article->id)
@@ -208,9 +210,10 @@ class ArticleController extends Controller
         // Handle cover image upload or URL
         $coverImagePath = null;
         if ($request->hasFile('cover_image')) {
-            $file = $request->file('cover_image');
-            $filename = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
-            $path = $file->storeAs('articles', $filename, 'public');
+            // El nombre y la extensión salen del contenido real del archivo, nunca
+            // de lo que manda el navegador: una imagen con HTML o código dentro no
+            // puede quedar guardada como «.html» o «.svg» en la carpeta pública.
+            $path = $request->file('cover_image')->store('articles', 'public');
             $coverImagePath = '/storage/' . $path;
         } elseif ($request->filled('cover_image_path')) {
             $coverImagePath = $request->input('cover_image_path');

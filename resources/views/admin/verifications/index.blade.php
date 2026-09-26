@@ -206,7 +206,7 @@
                           <span>Ver Comprobante</span>
                         </a>
                       @else
-                        <span style="font-size: 0.8rem; color: #8EADA4; font-style: italic;">Sin archivo adjunto</span>
+                        <span style="font-size: 0.8rem; color: #5B7369; font-style: italic;">Sin archivo adjunto</span>
                       @endif
                     </div>
                   </div>
@@ -262,7 +262,7 @@
                     </form>
                   </div>
                 @else
-                  <div style="font-size: 0.8rem; color: #8EADA4; font-style: italic; text-align: right;">
+                  <div style="font-size: 0.8rem; color: #5B7369; font-style: italic; text-align: right;">
                     Caso dictaminado
                   </div>
                 @endif

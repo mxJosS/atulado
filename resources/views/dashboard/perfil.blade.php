@@ -124,7 +124,7 @@
 
         <div class="form-group">
           <label for="email" class="form-label">Correo electrónico</label>
-          <input type="email" name="email" id="email" value="{{ old('email', $user->email) }}" class="form-control" required>
+          <input type="email" name="email" id="email" value="{{ old('email', $user->email) }}" class="form-control" required autocapitalize="none" spellcheck="false">
           @error('email') <div class="form-error">{{ $message }}</div> @enderror
         </div>
 
@@ -374,6 +374,48 @@
       </div>
     @endif
   @endif
+
+  <!-- TUS DATOS: finalidades secundarias y eliminación de la cuenta -->
+  <div class="card" style="margin-top: 1.75rem;" id="tus-datos">
+    <div class="card-body" style="padding: 1.5rem;">
+      <h2 style="font-size: 1.25rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; color: var(--text-near-black);">
+        <i class="fa-solid fa-user-shield" style="color: var(--sage-base);"></i>
+        <span>Tus datos</span>
+      </h2>
+      <p style="font-size: 0.86rem; color: #556860; margin: 0 0 1rem;">
+        @if($user->consentimiento_en)
+          Diste tu consentimiento el {{ $user->consentimiento_en->format('d/m/Y') }}.
+        @endif
+        Estos usos son opcionales: marcarlos o no, no cambia nada de lo que puedes hacer en A tu lado.
+        <a href="{{ route('privacidad') }}" style="color: #2E5D4B;">Aviso de privacidad</a>.
+      </p>
+
+      <form method="POST" action="{{ route('profile.datos') }}">
+        @csrf
+        @method('PUT')
+        <label style="display: flex; gap: 9px; align-items: flex-start; font-size: 0.88rem; margin-bottom: 0.6rem; cursor: pointer;">
+          <input type="hidden" name="acepta_investigacion" value="0">
+          <input type="checkbox" name="acepta_investigacion" value="1" @checked($user->acepta_investigacion) style="margin-top: 3px; accent-color: #2E5D4B;">
+          <span>Usar mi información, <b>anonimizada</b>, para mejorar la plataforma y para investigación académica.</span>
+        </label>
+        <label style="display: flex; gap: 9px; align-items: flex-start; font-size: 0.88rem; margin-bottom: 0.6rem; cursor: pointer;">
+          <input type="hidden" name="acepta_boletin" value="0">
+          <input type="checkbox" name="acepta_boletin" value="1" @checked($user->acepta_boletin) style="margin-top: 3px; accent-color: #2E5D4B;">
+          <span>Recibir por correo contenido informativo sobre salud emocional.</span>
+        </label>
+        <div style="text-align: right;">
+          <button type="submit" class="btn btn-secondary" style="gap: 6px;"><i class="fa-solid fa-floppy-disk"></i> <span>Guardar preferencias</span></button>
+        </div>
+      </form>
+
+      @unless($user->is_admin)
+        <div style="border-top: 1px solid #EEF4F0; margin-top: 1.25rem; padding-top: 1.25rem;">
+          <h3 style="font-size: 1rem; margin: 0 0 0.4rem; color: #B02418;"><i class="fa-solid fa-trash-can"></i> Eliminar mi cuenta</h3>
+          @include('dashboard.partials.eliminar-cuenta')
+        </div>
+      @endunless
+    </div>
+  </div>
 
 </div>
 @endsection

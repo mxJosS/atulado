@@ -164,7 +164,7 @@
           <div class="nav-icon"><i class="fa-solid fa-id-card-clip"></i></div>
           <span>Acreditación</span>
           @if($pendingCount > 0)
-            <span style="margin-left: auto; background: #D97706; color: white; border-radius: 999px; padding: 2px 7px; font-size: 0.68rem; font-weight: 700;">
+            <span style="margin-left: auto; background: #B45309; color: white; border-radius: 999px; padding: 2px 7px; font-size: 0.68rem; font-weight: 700;">
               {{ $pendingCount }}
             </span>
           @endif
@@ -195,6 +195,14 @@
           <span>Instituciones</span>
         </a>
 
+        @if(auth()->user()?->is_admin)
+        <!-- Analítica e índices (sólo administración) -->
+        <a href="{{ route('admin.analitica') }}" class="admin-nav-item {{ request()->routeIs('admin.analitica') ? 'active' : '' }}">
+          <div class="nav-icon"><i class="fa-solid fa-chart-line"></i></div>
+          <span>Analítica e índices</span>
+        </a>
+        @endif
+
         <!-- 6. Cola de atención (casos de crisis, atención manual) -->
         @php
           $casosAbiertos = \App\Models\EventoCrisis::visiblesPara(auth()->user())->abiertos()->count();
@@ -204,7 +212,7 @@
           <div class="nav-icon"><i class="fa-solid fa-life-ring"></i></div>
           <span>Cola de atención</span>
           @if($casosAbiertos > 0)
-            <span style="margin-left: auto; background: {{ $sinAtender > 0 ? '#B02418' : '#D97706' }}; color: white; border-radius: 999px; padding: 2px 7px; font-size: 0.68rem; font-weight: 700;" title="{{ $sinAtender }} sin contacto de {{ $casosAbiertos }} abiertos">
+            <span style="margin-left: auto; background: {{ $sinAtender > 0 ? '#B02418' : '#B45309' }}; color: white; border-radius: 999px; padding: 2px 7px; font-size: 0.68rem; font-weight: 700;" title="{{ $sinAtender }} sin contacto de {{ $casosAbiertos }} abiertos">
               {{ $casosAbiertos }}
             </span>
           @endif
@@ -425,8 +433,10 @@
       }
 
       toast.innerHTML = '<i class="fa-solid ' + iconClass + '" style="font-size: 1.15rem; color: ' + iconColor + ';"></i>' +
-                        '<span>' + message + '</span>' +
+                        '<span></span>' +
                         '<div class="toast-fill-bar"></div>';
+      // El mensaje va como texto, nunca como HTML: puede traer nombres escritos por usuarios.
+      toast.querySelector('span').textContent = message;
 
       container.appendChild(toast);
       initToastAutoDismiss();

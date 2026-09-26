@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Database\Factories\UserFactory;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -48,6 +49,14 @@ class User extends Authenticatable
         return $this->belongsTo(Institution::class);
     }
 
+    /** El correo se guarda siempre en minúsculas: no distingue mayúsculas. */
+    protected function email(): Attribute
+    {
+        return Attribute::make(
+            set: fn (?string $valor) => $valor === null ? null : mb_strtolower(trim($valor)),
+        );
+    }
+
     public function getAvatarUrlAttribute(): ?string
     {
         if ($this->avatar) {
@@ -59,6 +68,8 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'verification_code',
+        'dos_pasos_codigo',
     ];
 
     protected function casts(): array
@@ -66,10 +77,44 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'verification_code_expires_at' => 'datetime',
+            'dos_pasos_expira_en' => 'datetime',
+            'consentimiento_en' => 'datetime',
+            'crisis_contact_name' => 'encrypted',
+            'crisis_contact_phone' => 'encrypted',
+            'acepta_investigacion' => 'boolean',
+            'acepta_boletin' => 'boolean',
             'password' => 'hashed',
             'is_admin' => 'boolean',
             'is_clinico_atulado' => 'boolean',
         ];
+    }
+
+    /** Administración y equipo clínico entran con contraseña + código por correo. */
+    public function requiereSegundoFactor(): bool
+    {
+        return $this->esPersonalDePlataforma();
+    }
+
+    /** Versión vigente del aviso de privacidad; cambiarla vuelve a pedir el consentimiento. */
+    public const VERSION_AVISO = '2026-09-26';
+
+    public function tieneConsentimiento(): bool
+    {
+        return $this->consentimiento_en !== null;
+    }
+
+    /**
+     * Registra el consentimiento expreso (aviso, términos y datos sensibles) y
+     * las finalidades secundarias que la persona eligió.
+     */
+    public function registrarConsentimiento(bool $investigacion = false, bool $boletin = false): void
+    {
+        $this->forceFill([
+            'consentimiento_en' => now(),
+            'consentimiento_version' => self::VERSION_AVISO,
+            'acepta_investigacion' => $investigacion,
+            'acepta_boletin' => $boletin,
+        ])->save();
     }
 
     /**

@@ -78,12 +78,25 @@ class AdminDashboardAndUserTest extends TestCase
             'is_admin' => true,
         ]);
 
-        $response = $this->post('/login', [
+        \Illuminate\Support\Facades\Mail::fake();
+
+        // La contraseña correcta no basta: pide el código que llega al correo.
+        $this->post('/login', [
             'email' => 'admin@atulado.com.mx',
             'password' => 'Atulado_2026',
-        ]);
+        ])->assertRedirect(route('acceso.codigo'));
+        $this->assertGuest();
 
-        $response->assertRedirect(route('admin.dashboard'));
+        $codigo = null;
+        \Illuminate\Support\Facades\Mail::assertSent(\App\Mail\EmailVerificationCodeMail::class, function ($mail) use (&$codigo) {
+            $codigo = $mail->code;
+
+            return $mail->proposito === 'acceso';
+        });
+
+        $this->post(route('acceso.codigo.verificar'), ['code' => $codigo])
+            ->assertRedirect(route('admin.dashboard'));
+        $this->assertAuthenticatedAs($admin);
     }
 
     public function test_admin_can_create_another_admin_user(): void

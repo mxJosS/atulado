@@ -55,7 +55,7 @@
       </a>
 
       <!-- Divider -->
-      <div style="display: flex; align-items: center; margin-bottom: 1.25rem; color: #8EADA4; font-size: 0.75rem; text-transform: uppercase; font-family: var(--font-mono); letter-spacing: 0.08em;">
+      <div style="display: flex; align-items: center; margin-bottom: 1.25rem; color: #5B7369; font-size: 0.75rem; text-transform: uppercase; font-family: var(--font-mono); letter-spacing: 0.08em;">
         <div style="flex: 1; height: 1px; background: #DCE8E0;"></div>
         <span style="padding: 0 0.75rem;">o con tu correo</span>
         <div style="flex: 1; height: 1px; background: #DCE8E0;"></div>
@@ -113,7 +113,9 @@
           <input 
             type="email" 
             name="email" 
-            id="email" 
+            id="email"
+            autocapitalize="none"
+            spellcheck="false"
             class="form-control @error('email') is-invalid @enderror" 
             value="{{ old('email') }}" 
             placeholder="tu@correo.com" 
@@ -126,7 +128,7 @@
 
         <div class="form-group" style="margin-bottom: 1.1rem;">
           <label for="password" style="font-size: 0.86rem; font-weight: 600; color: #1A2620; margin-bottom: 0.35rem; display: block;">
-            Contraseña (mínimo 6 caracteres)
+            Contraseña (mínimo 8 caracteres)
           </label>
           <input 
             type="password" 
@@ -185,6 +187,8 @@
           </div>
           @error('avatar_color') <div class="form-error" style="color: #C0392B; font-size: 0.8rem; margin-top: 0.3rem;">{{ $message }}</div> @enderror
         </div>
+
+        @include('auth.partials.consentimiento')
 
         <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 0.85rem; font-size: 0.95rem; border-radius: 12px; background: #2E5D4B !important; color: #FFFFFF !important; box-shadow: 0 4px 14px rgba(46, 93, 75, 0.35); gap: 8px;">
           <span>Crear mi cuenta gratis</span>

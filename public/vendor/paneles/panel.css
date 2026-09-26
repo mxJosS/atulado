@@ -33,7 +33,7 @@
   --text-light-gray: #8EADA4;
   --text-medium-gray: #556860;
   --text-near-black: #1A2620;
-  --ink-muted: #7C908A;
+  --ink-muted: #5B7369; /* 4.9:1 sobre el fondo claro (antes #7C908A, 3.4:1) */
 
   /* ── Acentos ── */
   --violet-base: #5B4A8A;

@@ -30,6 +30,7 @@ class Membresia extends Model
         'lugar_origen',
         'idioma',
         'rol_institucional',
+        'origen',
         'estado',
         'codigo_acceso',
         'invitado_en',

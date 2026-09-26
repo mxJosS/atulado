@@ -47,7 +47,9 @@
           <input 
             type="email" 
             name="email" 
-            id="email" 
+            id="email"
+            autocapitalize="none"
+            spellcheck="false"
             class="form-control @error('email') is-invalid @enderror" 
             value="{{ old('email', $email) }}" 
             placeholder="tu@correo.com" 
@@ -70,7 +72,7 @@
             name="password" 
             id="password" 
             class="form-control @error('password') is-invalid @enderror" 
-            placeholder="Al menos 6 caracteres" 
+            placeholder="Al menos 8 caracteres" 
             required 
             autocomplete="new-password"
             autofocus

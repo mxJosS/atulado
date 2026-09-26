@@ -1,0 +1,5 @@
+# Permite a la app de A Tu Lado (www-data) ejecutar SÓLO el script de reinicio
+# del monitor, con uno de sus dos argumentos. Ver deploy/atulado-reiniciar.sh.
+#   sudo install -o root -g root -m 0440 deploy/atulado-reiniciar.sudoers /etc/sudoers.d/atulado-reiniciar
+#   sudo visudo -cf /etc/sudoers.d/atulado-reiniciar
+www-data ALL=(root) NOPASSWD: /usr/local/sbin/atulado-reiniciar servicios, /usr/local/sbin/atulado-reiniciar maquina

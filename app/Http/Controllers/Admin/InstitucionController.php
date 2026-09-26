@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Models\BitacoraAdmin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\GuardarInstitucionRequest;
 use App\Models\Institucion;
 use App\Services\EliminacionInstitucionService;
 use App\Services\EstructuraInstitucionalService;
 use App\Services\ExpedienteClinicoService;
+use App\Services\IndicadoresInstitucionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -51,6 +53,7 @@ class InstitucionController extends Controller
     {
         if (!$institucion->estaArchivada()) {
             $servicio->archivar($institucion, $request->user());
+            BitacoraAdmin::registrar('institucion_archivada', $institucion, "Institución «{$institucion->nombre_corto}» archivada.");
         }
 
         return redirect()->route('admin.instituciones.index')->with('success',
@@ -60,6 +63,7 @@ class InstitucionController extends Controller
     public function restaurar(Institucion $institucion, EliminacionInstitucionService $servicio)
     {
         $servicio->restaurar($institucion);
+        BitacoraAdmin::registrar('institucion_restaurada', $institucion, "Institución «{$institucion->nombre_corto}» restaurada.");
 
         return redirect()->route('admin.instituciones.show', $institucion)
             ->with('success', "«{$institucion->nombre_corto}» se restauró y vuelve a operar.");
@@ -90,6 +94,7 @@ class InstitucionController extends Controller
         }
 
         $nombre = $institucion->nombre_corto;
+        BitacoraAdmin::registrar('institucion_eliminada', $institucion, "Institución «{$nombre}» eliminada para siempre.");
         $resultado = $servicio->eliminar($institucion, $request->user());
 
         return $volver->with('success', "«{$nombre}» se eliminó para siempre junto con {$resultado['cuentas']} "
@@ -185,10 +190,13 @@ class InstitucionController extends Controller
             'sin_enviar' => $colaboradoresPadron->whereIn('estado', ['invitado', 'suspendido'])->whereNull('invitado_en')->count(),
         ];
 
+        // Semáforo por departamento y cola: sólo plano clínico acreditado. El protocolo lo ve todo el panel.
+        $indicadores = app(IndicadoresInstitucionService::class)->resumen($institucion, $esClinico);
+
         return view('admin.instituciones.show', compact(
             'institucion', 'arbol', 'resumen', 'otras', 'ultimaCarga', 'filasConProblema',
             'esClinico', 'esAdmin', 'vePadron', 'filtros', 'colaboradores', 'opcionesArea', 'personas', 'invitaciones',
-            'colaboradoresPadron'
+            'colaboradoresPadron', 'indicadores'
         ));
     }
 

@@ -15,7 +15,7 @@
       </div>
 
       @if($recentVerifications->isEmpty())
-        <div style="text-align: center; padding: 2rem; color: #6E887E; font-size: 0.9rem;">
+        <div style="text-align: center; padding: 2rem; color: #5B7369; font-size: 0.9rem;">
           <i class="fa-solid fa-circle-check" style="font-size: 2rem; color: #A8E6C0; margin-bottom: 0.5rem; display: block;"></i>
           No hay solicitudes de verificación registradas en este momento.
         </div>
@@ -80,7 +80,7 @@
                 <div style="font-weight: 700; font-size: 0.88rem; color: #1A2620; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                   {{ $usr->name }}
                 </div>
-                <div style="font-size: 0.74rem; color: #6E887E; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                <div style="font-size: 0.74rem; color: #5B7369; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                   {{ $usr->email }}
                 </div>
               </div>

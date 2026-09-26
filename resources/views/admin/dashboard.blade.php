@@ -31,9 +31,9 @@
   $clase = fn ($n) => $n > 0 ? 'up' : ($n < 0 ? 'down' : 'flat');
   $colorNivel = [
       'VERDE' => 'var(--sem-verde)', 'AMARILLO' => 'var(--sem-amarillo)', 'NARANJA' => 'var(--sem-naranja)',
-      'ROJO' => 'var(--sem-rojo)', 'ROJO_AGUDO' => 'var(--sem-rojo-agudo)',
+      'ROJO' => 'var(--sem-rojo)', 'ROJO_AGUDO' => 'var(--sem-rojo-agudo)', 'SIN_CLASIFICAR' => '#C9D6CF',
   ];
-  $etiquetaNivel = ['VERDE' => 'Verde', 'AMARILLO' => 'Amarillo', 'NARANJA' => 'Naranja', 'ROJO' => 'Rojo', 'ROJO_AGUDO' => 'Rojo agudo'];
+  $etiquetaNivel = ['VERDE' => 'Verde', 'AMARILLO' => 'Amarillo', 'NARANJA' => 'Naranja', 'ROJO' => 'Rojo', 'ROJO_AGUDO' => 'Rojo agudo', 'SIN_CLASIFICAR' => 'Sin clasificar'];
   $instActual = array_sum($k['instrumentos']['actual']);
   $instAnterior = array_sum($k['instrumentos']['anterior']);
   $etiquetaPeriodo = $periodo['clave'] === 'ciclo' ? 'ciclo de 14 días' : mb_strtolower($periodo['etiqueta']);
@@ -156,7 +156,7 @@
     <div>
       <div class="section-head" style="margin-top: 0;">
         <h2 class="section-title">Semáforo consolidado de la plataforma</h2>
-        <span class="section-note">{{ number_format($semaforo['total']) }} {{ $semaforo['total'] === 1 ? 'persona' : 'personas' }} del padrón con una clasificación en los últimos 30 días</span>
+        <span class="section-note">{{ number_format($semaforo['total']) }} {{ $semaforo['total'] === 1 ? 'persona' : 'personas' }} del padrón con nivel vigente (clasificación de los últimos 30 días o caso abierto)</span>
       </div>
       <div class="card card-pad">
         @if($semaforo['total'] > 0)
@@ -273,16 +273,7 @@
             <span class="{{ $i['badge']['clase'] }}"><span class="dot"></span> {{ $i['badge']['texto'] }}</span>
           @endif
         </div>
-        <div class="bar-track" style="height: 10px;" title="{{ $i['semaforo_visible'] ? 'Semáforo actual de ' . $i['clasificados'] . ' personas' : 'Sin datos suficientes' }}">
-          @if($i['semaforo_visible'])
-            @foreach($i['semaforo'] as $nivel => $n)
-              @continue($n === 0)
-              <div class="seg" style="background: {{ $colorNivel[$nivel] }}; width: {{ round($n / $i['clasificados'] * 100, 1) }}%;"></div>
-            @endforeach
-          @else
-            <div class="seg" style="background: var(--bg-subtle); width: 100%;"></div>
-          @endif
-        </div>
+        @include('admin.partials.barra-semaforo', ['conteos' => $i['semaforo'], 'base' => $i['semaforo_base'], 'alto' => 10])
         <div class="inst-stats">
           <div class="inst-stat"><div class="v">{{ number_format($i['padron']) }}</div><div class="l">{{ $i['etiqueta_personas'] }}</div></div>
           <div class="inst-stat"><div class="v">{{ $i['adopcion'] !== null ? $i['adopcion'] . '%' : '—' }}</div><div class="l">Adopción</div></div>
@@ -325,14 +316,9 @@
                 <td class="num">{{ $i['adopcion'] !== null ? $i['adopcion'] . '%' : '—' }}</td>
                 <td>
                   @if($i['semaforo_visible'])
-                    <div class="bar-track" title="Semáforo actual de {{ $i['clasificados'] }} personas">
-                      @foreach($i['semaforo'] as $nivel => $n)
-                        @continue($n === 0)
-                        <div class="seg" style="background: {{ $colorNivel[$nivel] }}; width: {{ round($n / $i['clasificados'] * 100, 1) }}%;"></div>
-                      @endforeach
-                    </div>
+                    @include('admin.partials.barra-semaforo', ['conteos' => $i['semaforo'], 'base' => $i['semaforo_base']])
                   @else
-                    <span class="locked"><i class="fa-solid fa-hourglass-half"></i> Sin datos suficientes</span>
+                    <span class="locked"><i class="fa-solid fa-hourglass-half"></i> Aún sin cuentas activas</span>
                   @endif
                 </td>
                 <td class="num">

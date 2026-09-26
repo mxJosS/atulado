@@ -22,7 +22,7 @@
   </div>
 
   @if($personas->isEmpty())
-    <p style="color: #6E887E; font-size: 0.88rem; margin: 0;">Aún no hay nadie. Sube el padrón en Excel arriba o agrega personas una por una.</p>
+    <p style="color: #5B7369; font-size: 0.88rem; margin: 0;">Aún no hay nadie. Sube el padrón en Excel arriba o agrega personas una por una.</p>
   @else
     <input type="search" class="form-input-styled" placeholder="Buscar por nombre, correo, número de empleado o área…" style="margin-bottom: 0.75rem;"
            oninput="filtrarTabla(this, 'tabla-padron')">
@@ -38,7 +38,7 @@
                 @if($p->user?->esPersonalDePlataforma())
                   <span class="chip-atl gris" title="Personal de A Tu Lado: no cuenta en el padrón ni en las activaciones">{{ $p->user->is_admin || $p->user->role === 'admin' ? 'Administración' : 'Clínico' }} · no cuenta</span>
                 @endif
-                <div class="mono" style="font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; color: #6E887E;">{{ $p->folio }} · {{ $p->user?->email }}</div>
+                <div class="mono" style="font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; color: #5B7369;">{{ $p->folio }} · {{ $p->user?->email }}</div>
               </td>
               <td class="mono">{{ $p->numero_empleado ?: '—' }}</td>
               <td>{{ $p->departamento?->nombre ?: '—' }}</td>
@@ -66,7 +66,7 @@
                   <form method="POST" action="{{ route('admin.instituciones.personas.baja', [$institucion, $p]) }}" style="display: inline;"
                         onsubmit="return confirm('¿Dar de baja a {{ addslashes($p->user?->name ?? '') }}? Deja de contar en el padrón; su historial se conserva.')">
                     @csrf
-                    <button class="btn-atl linea sm" type="submit" style="color: #B02418;" title="Dar de baja"><i class="fa-solid fa-user-minus"></i></button>
+                    <button class="btn-atl linea sm" type="submit" style="color: #B02418;" title="Dar de baja" aria-label="Dar de baja"><i class="fa-solid fa-user-minus" aria-hidden="true"></i></button>
                   </form>
                 @endif
                 @endif

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Models\BitacoraAdmin;
 use App\Http\Controllers\Controller;
 use App\Models\CargaPadron;
 use App\Models\Institucion;
@@ -51,6 +52,7 @@ class PadronController extends Controller
         );
 
         $altas = $carga->filas_lista + $carga->filas_advertencia;
+        BitacoraAdmin::registrar('padron_cargado', $institucion, "Carga de padrón «{$archivo->getClientOriginalName()}»: {$altas} altas.");
         $mensaje = "Padrón procesado: {$altas} " . ($altas === 1 ? 'persona dada de alta' : 'personas dadas de alta');
         if ($carga->filas_duplicado > 0) {
             $mensaje .= " y {$carga->filas_duplicado} " . ($carga->filas_duplicado === 1 ? 'actualizada' : 'actualizadas');

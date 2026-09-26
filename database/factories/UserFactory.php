@@ -30,7 +30,18 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
+            'consentimiento_en' => now(),
+            'consentimiento_version' => \App\Models\User::VERSION_AVISO,
         ];
+    }
+
+    /** Cuenta que todavía no ha dado su consentimiento (p. ej. recién llegada por Google). */
+    public function sinConsentimiento(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'consentimiento_en' => null,
+            'consentimiento_version' => null,
+        ]);
     }
 
     /**

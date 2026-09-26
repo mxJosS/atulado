@@ -64,6 +64,8 @@ class Institucion extends Model
             'guardia_nocturna' => 'boolean',
             'redondear_porcentajes' => 'boolean',
             'archivada_en' => 'datetime',
+            'enlace_activo' => 'boolean',
+            'enlace_generado_en' => 'datetime',
         ];
     }
 
@@ -91,6 +93,18 @@ class Institucion extends Model
     public function getRouteKeyName(): string
     {
         return 'slug';
+    }
+
+    /** Área a la que entra quien se une con el enlace de invitación (opcional). */
+    public function enlaceDepartamento(): BelongsTo
+    {
+        return $this->belongsTo(Departamento::class, 'enlace_departamento_id');
+    }
+
+    /** El enlace de «Invitar por link» funciona: existe, está activo y la institución opera. */
+    public function enlaceVigente(): bool
+    {
+        return $this->enlace_token !== null && $this->enlace_activo && !$this->estaArchivada();
     }
 
     public function departamentos(): HasMany

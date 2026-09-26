@@ -30,6 +30,9 @@ class PlataformaService
 
     public const NIVELES = ['VERDE', 'AMARILLO', 'NARANJA', 'ROJO', 'ROJO_AGUDO'];
 
+    /** Segmento gris de la barra: cuenta activa sin nivel vigente. */
+    public const SIN_CLASIFICAR = 'SIN_CLASIFICAR';
+
     /** Silencio R4 del tablero: sin registro diario en 14 días o más. */
     public const DIAS_SILENCIO = 14;
 
@@ -101,7 +104,8 @@ class PlataformaService
         $who5 = $this->ultimaWho5();
         [$nivelActual, $evolucion] = $this->semaforo();
 
-        $abiertos = EventoCrisis::abiertos()->get(['id', 'institucion_id', 'nivel', 'disparado_en']);
+        $abiertos = EventoCrisis::abiertos()->get(['id', 'user_id', 'institucion_id', 'nivel', 'disparado_en']);
+        $nivelActual = self::conCasosAbiertos($nivelActual, $abiertos, $membresias->pluck('user_id')->all());
         $contactos = EventoCrisis::query()
             ->whereNotNull('contactado_en')
             ->where('disparado_en', '>=', $this->hoy->copy()->subDays(90))
@@ -255,6 +259,70 @@ class PlataformaService
         return [$actual, $evolucion];
     }
 
+    /**
+     * Nivel vigente = el más grave entre la última clasificación (30 días) y el
+     * caso de crisis abierto. Un caso que nació del botón de crisis o del filtro
+     * léxico no siempre deja clasificación, pero esa persona está en rojo.
+     *
+     * @param  array<int, string>  $niveles  user_id → nivel
+     * @param  iterable<object{user_id:int, nivel:string}>  $abiertos
+     * @param  array<int>  $padron  sólo cuentan las personas del padrón
+     * @return array<int, string>
+     */
+    public static function conCasosAbiertos(array $niveles, iterable $abiertos, array $padron): array
+    {
+        $enPadron = array_flip(array_map('intval', $padron));
+        $orden = array_flip(self::NIVELES);
+
+        foreach ($abiertos as $caso) {
+            $u = (int) $caso->user_id;
+            if (!isset($enPadron[$u], $orden[$caso->nivel])) {
+                continue;
+            }
+            if (!isset($niveles[$u]) || $orden[$caso->nivel] > ($orden[$niveles[$u]] ?? -1)) {
+                $niveles[$u] = $caso->nivel;
+            }
+        }
+
+        return $niveles;
+    }
+
+    /**
+     * Barra del semáforo sobre el padrón activo: cada nivel más «Sin
+     * clasificar» (cuenta activa sin nivel vigente), para que la barra muestre
+     * la proporción real y no sólo a quienes ya tienen clasificación.
+     *
+     * @param  iterable<int>  $activos  user_id con cuenta activa
+     * @param  iterable<int>  $otros  user_id del padrón sin activar (cuentan sólo si ya tienen nivel)
+     * @param  array<int, string>  $niveles  user_id → nivel vigente
+     * @return array{conteos: array<string,int>, base: int, clasificados: int}
+     */
+    public static function barraSemaforo(iterable $activos, iterable $otros, array $niveles): array
+    {
+        $conteos = array_fill_keys([...self::NIVELES, self::SIN_CLASIFICAR], 0);
+        $vistos = [];
+
+        foreach ($activos as $u) {
+            $u = (int) $u;
+            if (isset($vistos[$u])) {
+                continue;
+            }
+            $vistos[$u] = true;
+            $conteos[$niveles[$u] ?? self::SIN_CLASIFICAR]++;
+        }
+        foreach ($otros as $u) {
+            $u = (int) $u;
+            if (!isset($vistos[$u]) && isset($niveles[$u])) {
+                $vistos[$u] = true;
+                $conteos[$niveles[$u]]++;
+            }
+        }
+
+        $base = array_sum($conteos);
+
+        return ['conteos' => $conteos, 'base' => $base, 'clasificados' => $base - $conteos[self::SIN_CLASIFICAR]];
+    }
+
     /* ──────────────────────────── Instituciones ──────────────────────────── */
 
     private function institucion(
@@ -327,15 +395,16 @@ class PlataformaService
         $silencio = $activos->filter(fn ($m) => ($ultimoRegistro[(int) $m->user_id] ?? '9999') <= $limite)->count();
         $silencioPct = $padron > 0 ? $silencio / $padron * 100 : 0;
 
-        // Semáforo actual (respeta el mínimo de personas por reporte)
-        $sem = array_fill_keys(self::NIVELES, 0);
-        foreach ($usuarios as $u) {
-            if (isset($nivelActual[$u])) {
-                $sem[$nivelActual[$u]]++;
-            }
-        }
-        $clasificados = array_sum($sem);
-        $semVisible = $clasificados > 0 && $clasificados >= $umbral;
+        // Semáforo actual sobre el padrón activo. Es la consola interna de A Tu
+        // Lado: aquí no se oculta por el mínimo de personas por reporte.
+        $barra = self::barraSemaforo(
+            $activos->pluck('user_id'),
+            $miembros->where('estado', '!=', 'activo')->pluck('user_id'),
+            $nivelActual,
+        );
+        $sem = $barra['conteos'];
+        $clasificados = $barra['clasificados'];
+        $semVisible = $barra['base'] > 0;
 
         // WHO-5 institucional: promedio de la última aplicación de cada persona
         $escalas = $usuarios->map(fn ($u) => $who5[$u]['escala'] ?? null)->filter(fn ($v) => $v !== null);
@@ -430,6 +499,7 @@ class PlataformaService
             'activos_semana' => $s0,
             'semaforo' => $sem,
             'clasificados' => $clasificados,
+            'semaforo_base' => $barra['base'],
             'semaforo_visible' => $semVisible,
             'casos' => $casos,
             'agudos' => $agudos,

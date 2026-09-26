@@ -87,7 +87,7 @@
                     {{ $art->title }}
                   </a>
                 </div>
-                <div style="font-size: 0.78rem; color: #6E887E; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;">
+                <div style="font-size: 0.78rem; color: #5B7369; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;">
                   {{ $art->summary }}
                 </div>
               </td>
@@ -105,7 +105,7 @@
                 <div style="font-weight: 600; color: #1A2620; font-size: 0.85rem;">
                   {{ $art->author_name }}
                 </div>
-                <div style="font-size: 0.72rem; color: #6E887E;">
+                <div style="font-size: 0.72rem; color: #5B7369;">
                   {{ $art->author_credentials ? Str::limit($art->author_credentials, 32) : 'Especialista' }}
                 </div>
               </td>
@@ -132,7 +132,7 @@
             </tr>
           @empty
             <tr>
-              <td colspan="5" style="text-align: center; padding: 3rem; color: #6E887E;">
+              <td colspan="5" style="text-align: center; padding: 3rem; color: #5B7369;">
                 No se encontraron artículos en este filtro.
               </td>
             </tr>

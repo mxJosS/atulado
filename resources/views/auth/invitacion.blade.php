@@ -33,7 +33,7 @@
           <div style="margin-bottom: 1rem;">
             <label style="font-size: 0.86rem; font-weight: 600; margin-bottom: 0.35rem; display: block;">Correo electrónico</label>
             <input type="email" value="{{ $membresia->user->email }}" readonly class="form-control" style="background: #F8FAF9; border: 1.5px solid #DCE8E0; border-radius: 12px; padding: 0.75rem 1rem; width: 100%; box-sizing: border-box; color: #556860;">
-            <span style="font-size: 0.75rem; color: #6E887E;">Con este correo iniciarás sesión.</span>
+            <span style="font-size: 0.75rem; color: #5B7369;">Con este correo iniciarás sesión.</span>
           </div>
           <div style="margin-bottom: 1rem;">
             <label for="password" style="font-size: 0.86rem; font-weight: 600; margin-bottom: 0.35rem; display: block;">Contraseña</label>

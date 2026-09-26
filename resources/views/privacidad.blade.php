@@ -228,10 +228,10 @@ p.entrada{color:var(--text-medium-gray); font-size:1rem; margin:0}
   <div class="container-narrow pagina">
     <a href="{{ route('home') }}" class="volver">&larr; Inicio</a>
     <h1 class="titulo">Aviso de Privacidad</h1>
-    <p class="entrada">Aviso de privacidad integral de <strong>A tu lado</strong>, conforme a la Ley Federal de Protección de Datos Personales en Posesión de los Particulares y su Reglamento.</p>
+    <p class="entrada">Aviso de privacidad integral de <strong>A tu lado</strong>, conforme a la Ley Federal de Protección de Datos Personales en Posesión de los Particulares y la normativa aplicable.</p>
     <div class="meta">
-      <span>Última actualización: 15 de septiembre de 2026</span>
-      <span>·</span><span>Versión 1.0</span>
+      <span>Última actualización: 26 de septiembre de 2026</span>
+      <span>·</span><span>Versión 1.1</span>
       <span>·</span><span>Vigente desde su publicación</span>
     </div>
     <div class="legal">
@@ -264,8 +264,9 @@ p.entrada{color:var(--text-medium-gray); font-size:1rem; margin:0}
       </div>
 
       <h2 id="responsable">1 · Quién es responsable de tus datos</h2>
-      <p><span class="pend">A TU LADO</span>, en adelante «A tu lado»,
-      con domicilio en <span class="pend">v. Tecnológico km. 4.5 S/N, Colonia Plan de Ayala, C.P. 97118, Mérida, Yucatán.</span>, Mérida, Yucatán, México,
+      <p>A TU LADO, en adelante «A tu lado»,
+      con domicilio en Av. Tecnológico km 4.5 S/N, Col. Plan de Ayala, C.P. 97118, Mérida, Yucatán, México,
+
       es responsable del tratamiento de tus datos personales y del resguardo de este aviso de privacidad.</p>
       <p>Puedes contactarnos en cualquier momento en
       <a href="mailto:privacidad@atulado.com.mx">privacidad@atulado.com.mx</a> o a través de
@@ -274,8 +275,25 @@ p.entrada{color:var(--text-medium-gray); font-size:1rem; margin:0}
       <h2 id="datos">2 · Qué datos recabamos</h2>
 
       <h3>Datos de identificación y contacto</h3>
-      <p>Nombre, correo electrónico, fotografía de perfil si decides ponerla, y los contactos de
-      emergencia que tú mismo registres (nombre, teléfono y parentesco de esa persona).</p>
+      <p>Nombre, correo electrónico, contraseña (guardada con hash: nadie puede leerla), fotografía de
+      perfil y biografía si decides ponerlas, y los contactos de emergencia que tú mismo registres (nombre,
+      teléfono y parentesco de esa persona).</p>
+
+      <h3>Datos que nos entrega tu organización</h3>
+      <p>Si llegaste por tu empresa o escuela, <strong>estos datos no nos los diste tú: los recibimos de
+      tu organización</strong> al darte de alta en su padrón. Son tu nombre, tu correo, tu número de
+      empleado o matrícula, tu puesto, tu área, tu turno y horario, tu fecha de ingreso, tu sexo y tu rango
+      de edad. Sirven para enviarte la invitación y para los reportes agregados de tu organización
+      (sección 6). Este aviso te llega con la invitación, antes de que uses el servicio.</p>
+      <p>Si llegaste con el <strong>enlace de invitación</strong> de tu organización, esos datos no vienen de
+      ella: tú nos das tu nombre y tu correo al registrarte (o Google, si eliges entrar con Google), y quedas
+      en su padrón sin número de empleado ni puesto.</p>
+
+      <h3>Si eres profesional de la salud</h3>
+      <p>Para acreditarte pedimos tu nombre completo, tu número de cédula profesional, tu grado, tu
+      especialidad y, si decides subirlo, el documento de tu cédula. Ese documento se guarda en un
+      almacenamiento privado que no es accesible desde internet, y sólo lo consulta la administración de
+      A tu lado para verificarte.</p>
 
       <h3>Datos personales sensibles</h3>
       <p>La naturaleza del servicio implica que registres información sobre tu estado emocional: tu
@@ -283,21 +301,25 @@ p.entrada{color:var(--text-medium-gray); font-size:1rem; margin:0}
       plataforma y tu plan de seguridad personal. La ley clasifica esta información como
       <strong>datos personales sensibles</strong>.</p>
       <div class="destacado">
-        <p><strong>Consentimiento expreso.</strong> Al crear tu cuenta y marcar la casilla
-        correspondiente otorgas tu consentimiento expreso para que A tu lado trate estos datos sensibles
-        con las finalidades que se describen en este aviso. Sin ese consentimiento no podemos prestarte
-        el servicio, porque el servicio consiste precisamente en acompañarte a partir de lo que tú
-        registras.</p>
+        <p><strong>Consentimiento expreso.</strong> Al crear tu cuenta marcas las casillas en las que
+        aceptas este aviso y otorgas tu consentimiento expreso para que A tu lado trate estos datos
+        sensibles con las finalidades que se describen aquí. Si entras con Google, por invitación de tu
+        organización o tenías cuenta desde antes, te lo pedimos en una pantalla antes de usar el servicio.
+        Guardamos la fecha y la versión del aviso que aceptaste. Sin ese consentimiento no podemos
+        prestarte el servicio, porque el servicio consiste precisamente en acompañarte a partir de lo que
+        tú registras.</p>
       </div>
 
       <h3>Datos de uso de la plataforma</h3>
-      <p>Fecha y hora de tus sesiones, qué secciones de la aplicación usas, desde qué tipo de
+      <p>Fecha y hora de tus sesiones, qué secciones de la aplicación usas (por ejemplo, si abriste una
+      herramienta de respiración o un recurso; nunca lo que escribiste en ellas), desde qué tipo de
       dispositivo y tu dirección IP. Esta información nos sirve para operar el servicio, detectar fallas
       y protegerlo de accesos indebidos.</p>
 
       <h3>Datos que <em>no</em> te pedimos</h3>
       <p>A tu lado <strong>no solicita ni almacena</strong> tu CURP, tu RFC, tu número de seguridad
-      social, tu domicilio particular, datos de tarjetas bancarias ni documentos oficiales de identidad.
+      social, tu domicilio particular, datos de tarjetas bancarias ni documentos oficiales de identidad
+      (la única excepción es la cédula profesional de quien pide acreditarse como profesional de la salud).
       Si alguien te los pide a nombre de A tu lado, no los entregues y repórtalo a
       <a href="mailto:privacidad@atulado.com.mx">privacidad@atulado.com.mx</a>.</p>
 
@@ -335,16 +357,18 @@ p.entrada{color:var(--text-medium-gray); font-size:1rem; margin:0}
       </ul>
 
       <h3>Finalidades secundarias</h3>
-      <p>Las siguientes no son necesarias para prestarte el servicio y <strong>puedes oponerte a ellas
-      sin perder el acceso</strong>, escribiéndonos a
-      <a href="mailto:privacidad@atulado.com.mx">privacidad@atulado.com.mx</a>:</p>
+      <p>Las siguientes no son necesarias para prestarte el servicio. <strong>Sólo se usan si las
+      aceptas</strong>: al crear tu cuenta aparecen como casillas opcionales sin marcar, y puedes cambiarlas
+      cuando quieras en <strong>Mi perfil › Tus datos</strong> o escribiéndonos a
+      <a href="mailto:privacidad@atulado.com.mx">privacidad@atulado.com.mx</a>. Negarte no cambia nada de
+      lo que puedes hacer en A tu lado:</p>
       <ul>
         <li>Mejorar la plataforma mediante análisis estadísticos <strong>anonimizados</strong>.</li>
         <li>Fines de investigación académica, siempre con información anonimizada.</li>
         <li>Enviarte contenido informativo de salud emocional por correo.</li>
       </ul>
       <div class="destacado">
-        <p><strong>Qué significa «anonimizado» aquí.</strong> Para estos fines usamos una tabla separada
+        <p><strong>Qué significa «anonimizado» aquí.</strong> Para estos fines sólo se usa información
         que guarda únicamente resultados agregados junto a variables de contexto (puesto, sexo, rango de
         edad, escolaridad, antigüedad, tipo de jornada, lugar de origen y tipo de interacción).
         <strong>Esa tabla no contiene tu nombre, tu correo, tu fecha de nacimiento ni ninguna llave que
@@ -413,7 +437,10 @@ p.entrada{color:var(--text-medium-gray); font-size:1rem; margin:0}
         <thead><tr><th>Con quién</th><th>Qué se comparte y por qué</th><th>¿Requiere tu consentimiento?</th></tr></thead>
         <tbody>
           <tr><td>Profesional de la salud designado</td><td>Tu resumen individual, sólo con un protocolo de crisis activo, para poder contactarte.</td><td>Sí, otorgado al aceptar este aviso</td></tr>
-          <tr><td>Proveedores de infraestructura</td><td>Alojamiento, base de datos y envío de correo. Actúan como encargados: procesan por cuenta nuestra y no pueden usar tu información para fines propios.</td><td>No lo requiere la ley</td></tr>
+          <tr><td>Proveedores de infraestructura</td><td>Alojamiento del servidor y de la base de datos. Actúan como encargados: procesan por cuenta nuestra y no pueden usar tu información para fines propios.</td><td>No lo requiere la ley</td></tr>
+          <tr><td>Resend (Estados Unidos)</td><td>Envío de los correos del servicio: tu correo, tu nombre y el contenido del mensaje (códigos de acceso, invitaciones, recuperación de contraseña). Es una <strong>transferencia internacional</strong> a un encargado que procesa por cuenta nuestra.</td><td>No lo requiere la ley</td></tr>
+          <tr><td>Google (Estados Unidos)</td><td>Si eliges entrar con Google, la autenticación (ver sección 3). Además, las tipografías del sitio se descargan de Google Fonts, que recibe tu dirección IP y los datos de tu navegador, sin cookies.</td><td>No lo requiere la ley</td></tr>
+          <tr><td>Fonticons · Font Awesome (Estados Unidos)</td><td>Los íconos del sitio se descargan de sus servidores, que reciben tu dirección IP y los datos de tu navegador, sin cookies.</td><td>No lo requiere la ley</td></tr>
           <tr><td>Autoridad competente</td><td>Lo que exija una orden fundada y motivada.</td><td>No lo requiere la ley</td></tr>
         </tbody>
       </table>
@@ -423,24 +450,32 @@ p.entrada{color:var(--text-medium-gray); font-size:1rem; margin:0}
         <thead><tr><th>Información</th><th>Conservación</th></tr></thead>
         <tbody>
           <tr><td>Datos de tu cuenta y tu historial</td><td>Mientras tu cuenta exista. Al eliminarla, se borran.</td></tr>
-          <tr><td>Registros de eventos de crisis</td><td>5 años, en forma seudonimizada, por trazabilidad.</td></tr>
-          <tr><td>Bitácora de accesos</td><td>5 años. Es inmutable por diseño.</td></tr>
+          <tr><td>Registros de eventos de crisis</td><td>5 años, por trazabilidad. Si eliminas tu cuenta se conservan sin tu nombre ni ningún dato que te identifique (seudonimizados) y se borran al cumplir los 5 años.</td></tr>
+          <tr><td>Bitácora de accesos</td><td>5 años. Nadie puede editarla ni borrarla antes; si eliminas tu cuenta se conserva sin tu identidad.</td></tr>
+          <tr><td>Bitácora de acciones de administración</td><td>5 años.</td></tr>
           <tr><td>Registros técnicos y de seguridad</td><td>12 meses.</td></tr>
           <tr><td>Información anonimizada</td><td>Indefinida. Ya no te identifica, por lo que no hay nada que eliminar.</td></tr>
         </tbody>
       </table>
-      <p>Puedes eliminar tu cuenta y tu información cuando quieras desde tu perfil, o escribiéndonos. La
-      eliminación es efectiva en un plazo máximo de 30 días naturales.</p>
+      <p>Puedes eliminar tu cuenta y tu información cuando quieras desde <strong>Mi perfil › Tus datos ›
+      Eliminar mi cuenta</strong>, y la eliminación es inmediata. Si tienes un caso de crisis abierto, primero
+      lo cierra el equipo clínico. También puedes pedirlo por correo; en ese caso es efectiva en un plazo
+      máximo de 30 días naturales.</p>
 
       <h2 id="seguridad">9 · Cómo protegemos tu información</h2>
       <ul>
         <li>Todo el tráfico viaja cifrado con HTTPS.</li>
         <li>Las contraseñas se almacenan con funciones de hash irreversibles: nadie en A tu lado puede leerlas.</li>
+        <li>Lo que escribes en tu registro diario, tu plan de seguridad y tus contactos de emergencia se
+        guardan <strong>cifrados</strong> en la base de datos.</li>
+        <li>Las cuentas de administración y del equipo clínico entran con un <strong>segundo factor</strong>:
+        además de su contraseña, un código que llega a su correo.</li>
+        <li>Los documentos de cédula profesional se guardan en un almacenamiento privado, no accesible desde internet.</li>
         <li>El acceso a información individual exige un motivo declarado y queda asentado en una bitácora inmutable.</li>
         <li>La separación entre lo que ve una organización y lo que ve el plano clínico está implementada
         en la capa de datos, no sólo en la pantalla.</li>
-        <li>Los accesos del profesional designado caducan de forma automática al vencer su contrato de
-        confidencialidad.</li>
+        <li>Al vencer el contrato de confidencialidad del profesional designado, ya no se le puede enviar
+        ningún resumen.</li>
       </ul>
       <p>Ningún sistema es infalible. Si detectamos una vulneración que afecte de forma significativa tus
       derechos, te lo informaremos sin demora y te diremos qué hacer.</p>
@@ -459,22 +494,39 @@ p.entrada{color:var(--text-medium-gray); font-size:1rem; margin:0}
       </ol>
       <p>Responderemos en un plazo máximo de <strong>20 días hábiles</strong> y, si procede, lo haremos
       efectivo dentro de los <strong>15 días hábiles</strong> siguientes. El trámite es gratuito.</p>
-      <p>Si consideras que tu derecho no fue atendido, puedes acudir al Instituto Nacional de
-      Transparencia, Acceso a la Información y Protección de Datos Personales.</p>
+      <p>Si consideras que tu derecho no fue atendido, puedes acudir a la autoridad en materia de
+      protección de datos personales, que desde 2025 es la <strong>Secretaría Anticorrupción y Buen
+      Gobierno</strong>.</p>
 
       <h2 id="revocacion">11 · Revocar tu consentimiento</h2>
       <p>Puedes revocar en cualquier momento el consentimiento que nos diste para tratar tus datos, con
-      el mismo procedimiento del punto anterior. Ten en cuenta que revocar el consentimiento sobre los
+      el mismo procedimiento del punto anterior o eliminando tu cuenta desde tu perfil. Las finalidades
+      secundarias las activas o desactivas tú en <strong>Mi perfil › Tus datos</strong>. Ten en cuenta que revocar el consentimiento sobre los
       datos sensibles implica dar de baja tu cuenta, porque sin ellos el servicio no puede operar.</p>
       <p>También puedes desvincular tu cuenta de Google en cualquier momento desde
       <a href="https://myaccount.google.com/permissions" target="_blank" rel="noopener">los permisos de
       tu cuenta de Google</a>, sin que eso elimine tu cuenta de A tu lado.</p>
 
       <h2 id="cookies">12 · Cookies y tecnologías similares</h2>
-      <p>Usamos cookies estrictamente necesarias para mantener tu sesión iniciada y proteger los
-      formularios contra falsificación de peticiones. No usamos cookies de publicidad ni vendemos
-      información a redes publicitarias. Puedes bloquearlas desde tu navegador, pero entonces no podrás
-      iniciar sesión.</p>
+      <p>A tu lado usa <strong>sólo cookies estrictamente necesarias</strong>: sin ellas no se puede
+      iniciar sesión ni enviar formularios de forma segura. <strong>No usamos cookies de analítica, de
+      publicidad ni de redes sociales</strong>, y no vendemos información a redes publicitarias. Por eso no
+      te mostramos un aviso para aceptarlas: no hay ninguna opcional que puedas rechazar.</p>
+      <table>
+        <thead><tr><th>Nombre</th><th>Para qué sirve</th><th>Duración</th></tr></thead>
+        <tbody>
+          <tr><td><code>a-tu-lado-session</code></td><td>Mantener tu sesión iniciada mientras navegas.</td><td>2 horas sin actividad</td></tr>
+          <tr><td><code>XSRF-TOKEN</code></td><td>Proteger los formularios contra falsificación de peticiones (CSRF).</td><td>2 horas</td></tr>
+          <tr><td><code>remember_web_…</code></td><td>Sólo si marcas «Recordarme» al iniciar sesión: mantenerte dentro sin volver a escribir tu contraseña.</td><td>Hasta que cierres sesión (máximo unos 400 días)</td></tr>
+        </tbody>
+      </table>
+      <p>En la consola de administración, el navegador recuerda en su almacenamiento local si prefieres ver
+      las instituciones como tarjetas o como tabla. Es una preferencia de pantalla y nunca sale de tu equipo.</p>
+      <p><strong>Servicios de terceros que se cargan en el sitio.</strong> Las tipografías (Google Fonts) y
+      los íconos (Font Awesome) se descargan de los servidores de esas empresas, que reciben tu dirección IP
+      y los datos de tu navegador; no colocan cookies. No hay videos, mapas, botones de redes sociales ni
+      herramientas de analítica incrustadas.</p>
+      <p>Puedes bloquear o borrar las cookies desde tu navegador, pero entonces no podrás iniciar sesión.</p>
 
       <h2 id="menores">13 · Menores de edad</h2>
       <p>A tu lado está dirigido a personas mayores de edad. Cuando una institución educativa contrata el
@@ -494,7 +546,7 @@ p.entrada{color:var(--text-medium-gray); font-size:1rem; margin:0}
       <p>Para cualquier duda sobre este aviso o sobre el tratamiento de tus datos:<br>
       <strong>Correo:</strong> <a href="mailto:privacidad@atulado.com.mx">privacidad@atulado.com.mx</a><br>
       <strong>Sitio:</strong> <a href="{{ route('home') }}">atulado.com.mx</a><br>
-      <strong>Domicilio:</strong> <a class="pend">v. Tecnológico km. 4.5 S/N, Colonia Plan de Ayala, C.P. 97118, Mérida, Yucatán.</a>, Mérida, Yucatán, México</p>
+      <strong>Domicilio:</strong> Av. Tecnológico km 4.5 S/N, Col. Plan de Ayala, C.P. 97118, Mérida, Yucatán, México</p>
 
       <div class="destacado alerta" style="margin-top:2.5rem">
         <p><strong>Recordatorio.</strong> A tu lado no diagnostica, no da tratamiento y no sustituye la
@@ -538,6 +590,7 @@ p.entrada{color:var(--text-medium-gray); font-size:1rem; margin:0}
       <ul class="footer-links">
         <li><a href="{{ route('privacidad') }}"><span class="ch">&rsaquo;</span> Aviso de Privacidad</a></li>
         <li><a href="{{ route('terminos') }}"><span class="ch">&rsaquo;</span> Condiciones del Servicio</a></li>
+        <li><a href="{{ route('privacidad') }}#cookies"><span class="ch">&rsaquo;</span> Política de cookies</a></li>
         <li><a href="mailto:privacidad@atulado.com.mx"><span class="ch">&rsaquo;</span> Contacto de privacidad</a></li>
       </ul>
     </div>
@@ -547,6 +600,7 @@ p.entrada{color:var(--text-medium-gray); font-size:1rem; margin:0}
     <p class="footer-legales">
       <a href="{{ route('privacidad') }}">Aviso de Privacidad</a><span class="sep">&middot;</span>
       <a href="{{ route('terminos') }}">Condiciones del Servicio</a><span class="sep">&middot;</span>
+      <a href="{{ route('privacidad') }}#cookies">Cookies</a><span class="sep">&middot;</span>
       <a href="mailto:privacidad@atulado.com.mx">privacidad@atulado.com.mx</a>
     </p>
     <p class="footer-nota">*Este servicio es de acompa&ntilde;amiento emocional: no diagnostica, no da tratamiento y no sustituye la atenci&oacute;n de un profesional de la salud. En una emergencia, comun&iacute;cate de inmediato a la L&iacute;nea de la Vida: 800 911 2000.</p>

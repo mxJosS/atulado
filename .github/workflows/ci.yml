@@ -1,0 +1,76 @@
+# Integración continua de A Tu Lado: pruebas, dependencias vulnerables,
+# secretos filtrados y análisis estático. Corre en cada push y pull request
+# a main, y cada lunes (para enterarse de vulnerabilidades nuevas aunque no
+# haya cambios).
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '0 13 * * 1'
+
+permissions:
+  contents: read
+
+jobs:
+  pruebas:
+    name: Pruebas
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, intl, pdo_sqlite, sqlite3, zip, gd, sockets, fileinfo
+          coverage: none
+      - name: Dependencias de PHP
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Entorno de pruebas
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+      - name: Pruebas
+        run: php artisan test
+
+  dependencias:
+    name: Dependencias vulnerables
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: sockets
+          coverage: none
+      - name: composer audit
+        run: composer audit --locked --no-interaction
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: npm audit
+        run: npm audit --omit=dev --audit-level=high
+
+  secretos:
+    name: Secretos filtrados
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: gitleaks
+        run: |
+          docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:latest detect --source /repo --redact --no-banner
+
+  sast:
+    name: Análisis estático (Semgrep)
+    runs-on: ubuntu-latest
+    container:
+      image: semgrep/semgrep
+    steps:
+      - uses: actions/checkout@v4
+      # Reporta sin romper el build: revisar los hallazgos en la salida del job.
+      - name: semgrep
+        run: semgrep scan --config p/php --config p/owasp-top-ten --config p/secrets --exclude vendor --exclude node_modules --exclude paneles-atulado

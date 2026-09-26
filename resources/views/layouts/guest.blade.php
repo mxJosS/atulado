@@ -183,6 +183,7 @@
       <p style="font-size: 0.82rem; margin: 0.4rem 0;">
         <a href="{{ route('privacidad') }}" style="color: #A8E6C0; text-decoration: none; margin: 0 0.5rem;">Aviso de Privacidad</a> ·
         <a href="{{ route('terminos') }}" style="color: #A8E6C0; text-decoration: none; margin: 0 0.5rem;">Condiciones del Servicio</a> ·
+        <a href="{{ route('privacidad') }}#cookies" style="color: #A8E6C0; text-decoration: none; margin: 0 0.5rem;">Política de cookies</a> ·
         <a href="mailto:privacidad@atulado.com.mx" style="color: #A8E6C0; text-decoration: none; margin: 0 0.5rem;">Contacto Legal</a>
       </p>
       <p style="font-size: 0.76rem; opacity: 0.75; max-width: 600px;">

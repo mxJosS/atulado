@@ -24,6 +24,7 @@ class EmailVerificationCodeTest extends TestCase
             'password' => 'secreto123',
             'password_confirmation' => 'secreto123',
             'avatar_color' => 'sage',
+            'acepto_aviso' => '1', 'acepto_sensibles' => '1', 'mayor_de_edad' => '1',
         ]);
 
         $response->assertRedirect('/verificar-codigo');
@@ -53,6 +54,7 @@ class EmailVerificationCodeTest extends TestCase
             'password' => 'secreto123',
             'password_confirmation' => 'secreto123',
             'avatar_color' => 'mint',
+            'acepto_aviso' => '1', 'acepto_sensibles' => '1', 'mayor_de_edad' => '1',
         ]);
 
         $response->assertRedirect('/verificar-codigo');

@@ -18,3 +18,6 @@ Schedule::command('atulado:vigilancia-silencio')
 
 // Trabajos de la cola que fallaron hace más de una semana.
 Schedule::command('queue:prune-failed --hours=168')->weekly();
+
+// Plazos del aviso de privacidad: lo seudonimizado y las bitácoras, 5 años.
+Schedule::command('atulado:purgar-seudonimizados')->monthlyOn(1, '04:00')->timezone('America/Merida')->withoutOverlapping();

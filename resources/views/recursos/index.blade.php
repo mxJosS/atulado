@@ -105,7 +105,7 @@
 
               @auth
                 <button type="button" class="btn btn-sm btn-secondary favorite-toggle-btn {{ auth()->user()->favoriteResources->contains($res->id) ? 'is-fav' : '' }}" data-id="{{ $res->id }}" style="padding: 0.4rem 0.65rem;" title="Guardar en favoritos">
-                  <i class="fa-solid fa-star" style="color: {{ auth()->user()->favoriteResources->contains($res->id) ? '#C8B87A' : '#8EADA4' }};"></i>
+                  <i class="fa-solid fa-star" style="color: {{ auth()->user()->favoriteResources->contains($res->id) ? '#C8B87A' : '#5B7369' }};"></i>
                 </button>
               @endauth
             </div>

@@ -58,7 +58,14 @@ class InvitacionAceptarController extends Controller
             ])->save();
 
             $membresia->forceFill(['estado' => 'activo', 'activado_en' => now()])->save();
+            // La casilla «acepto» de la invitación es el consentimiento expreso.
+            $membresia->user->registrarConsentimiento();
         });
+
+        // Una cuenta del equipo no entra sin su segundo factor.
+        if ($membresia->user->requiereSegundoFactor()) {
+            return redirect()->route('login')->with('success', 'Tu contraseña quedó guardada. Entra con ella; te enviaremos un código a tu correo.');
+        }
 
         Auth::login($membresia->user);
         $request->session()->regenerate();

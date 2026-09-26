@@ -555,7 +555,7 @@
             </div>
 
             <div class="pvz-carousel-wrapper">
-              <button type="button" class="pvz-carousel-btn prev" onclick="scrollPvzCarousel('plantsCarouselTrack', -1)" title="Anterior"><i class="fa-solid fa-chevron-left"></i></button>
+              <button type="button" class="pvz-carousel-btn prev" onclick="scrollPvzCarousel('plantsCarouselTrack', -1)" title="Anterior" aria-label="Plantas anteriores"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></button>
 
               <div class="pvz-carousel-track" id="plantsCarouselTrack">
                 <!-- Planta 1: Árbol Sabiduría -->
@@ -849,7 +849,7 @@
                 </div>
               </div>
 
-              <button type="button" class="pvz-carousel-btn next" onclick="scrollPvzCarousel('plantsCarouselTrack', 1)" title="Siguiente"><i class="fa-solid fa-chevron-right"></i></button>
+              <button type="button" class="pvz-carousel-btn next" onclick="scrollPvzCarousel('plantsCarouselTrack', 1)" title="Siguiente" aria-label="Plantas siguientes"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>
             </div>
           </div>
 
@@ -864,7 +864,7 @@
             </div>
 
             <div class="pvz-carousel-wrapper">
-              <button type="button" class="pvz-carousel-btn prev" onclick="scrollPvzCarousel('potsCarouselTrack', -1)" title="Anterior"><i class="fa-solid fa-chevron-left"></i></button>
+              <button type="button" class="pvz-carousel-btn prev" onclick="scrollPvzCarousel('potsCarouselTrack', -1)" title="Anterior" aria-label="Macetas anteriores"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></button>
 
               <div class="pvz-carousel-track" id="potsCarouselTrack">
                 <!-- Maceta 1: Terracota -->
@@ -1001,7 +1001,7 @@
                 </div>
               </div>
 
-              <button type="button" class="pvz-carousel-btn next" onclick="scrollPvzCarousel('potsCarouselTrack', 1)" title="Siguiente"><i class="fa-solid fa-chevron-right"></i></button>
+              <button type="button" class="pvz-carousel-btn next" onclick="scrollPvzCarousel('potsCarouselTrack', 1)" title="Siguiente" aria-label="Macetas siguientes"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>
             </div>
           </div>
         </div>

@@ -94,6 +94,7 @@ class AppFlowTest extends TestCase
             'password' => 'password123',
             'password_confirmation' => 'password123',
             'avatar_color' => 'sage',
+            'acepto_aviso' => '1', 'acepto_sensibles' => '1', 'mayor_de_edad' => '1',
         ]);
 
         $response->assertRedirect('/verificar-codigo');
@@ -154,10 +155,10 @@ class AppFlowTest extends TestCase
         ]);
 
         $response->assertSessionHas('success');
-        $this->assertDatabaseHas('safety_plans', [
-            'user_id' => $user->id,
-            'reasons_for_living' => 'Mi familia y mis proyectos',
-        ]);
+        $plan = SafetyPlan::where('user_id', $user->id)->firstOrFail();
+        $this->assertSame('Mi familia y mis proyectos', $plan->reasons_for_living);
+        // En la base de datos queda cifrado, no en texto plano.
+        $this->assertDatabaseMissing('safety_plans', ['user_id' => $user->id, 'reasons_for_living' => 'Mi familia y mis proyectos']);
 
         // Test Print View
         $this->actingAs($user)->get('/plan-de-seguridad/imprimir')

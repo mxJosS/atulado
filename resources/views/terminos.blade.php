@@ -230,8 +230,8 @@ p.entrada{color:var(--text-medium-gray); font-size:1rem; margin:0}
     <h1 class="titulo">Condiciones del Servicio</h1>
     <p class="entrada">Términos bajo los cuales puedes usar <strong>A tu lado</strong>. Léelos antes de crear tu cuenta.</p>
     <div class="meta">
-      <span>Última actualización: 15 de septiembre de 2026</span>
-      <span>·</span><span>Versión 1.0</span>
+      <span>Última actualización: 26 de septiembre de 2026</span>
+      <span>·</span><span>Versión 1.1</span>
       <span>·</span><span>Vigente desde su publicación</span>
     </div>
     <div class="legal">
@@ -263,6 +263,10 @@ p.entrada{color:var(--text-medium-gray); font-size:1rem; margin:0}
       registrar cómo te sientes, darle seguimiento en el tiempo, acceder a contenido y herramientas de
       regulación emocional, construir un plan de seguridad personal y encontrar líneas de ayuda. Las
       organizaciones pueden contratarla para ponerla a disposición de las personas que las integran.</p>
+      <p><strong>Es gratuito para las personas usuarias.</strong> A tu lado no cobra nada dentro de la
+      aplicación ni pide datos de pago. Las organizaciones que lo contratan para su comunidad lo pagan
+      conforme a su propio contrato, que es el que regula cancelaciones y reembolsos entre A tu lado y
+      esa organización.</p>
 
       <h2 id="que-no-es">2 · Qué no es, y qué hacer en una emergencia</h2>
       <div class="destacado alerta">
@@ -354,7 +358,10 @@ p.entrada{color:var(--text-medium-gray); font-size:1rem; margin:0}
       expresamente</strong> que:</p>
       <ul>
         <li>Se muestre en pantalla información de líneas de ayuda y contención inmediata.</li>
-        <li>Se notifique al profesional designado, quien podrá comunicarse contigo.</li>
+        <li>El caso entre a la cola de atención que revisa el equipo clínico acreditado de A tu lado, y que
+        ese equipo o el profesional designado se comuniquen contigo. La revisión la hacen personas: el
+        sistema no garantiza un aviso inmediato, por eso ante un peligro inmediato debes llamar al 911 o a la
+        Línea de la Vida.</li>
         <li>Se comparta con ese profesional el resumen de tu información necesario para acompañarte,
         dentro de ese protocolo y sólo mientras esté activo.</li>
         <li>En una situación de riesgo inminente para tu vida, se contacte a la persona que registraste
@@ -366,8 +373,8 @@ p.entrada{color:var(--text-medium-gray); font-size:1rem; margin:0}
       <h2 id="profesionales">11 · Profesionales de la salud en la plataforma</h2>
       <p>Quienes participan como profesionales deben acreditar cédula profesional vigente, que A tu lado
       verifica antes de otorgar cualquier acceso, y firmar un contrato de confidencialidad. Cada consulta
-      que realizan a información individual queda registrada con motivo declarado. Al vencer su contrato,
-      su acceso se revoca de forma automática.</p>
+      que realizan a información individual queda registrada con motivo declarado. Al vencer su contrato de
+      confidencialidad, ya no se le puede enviar ningún resumen.</p>
       <p>La relación profesional-paciente, en caso de establecerse, es entre esa persona profesional y
       tú. A tu lado facilita el contacto; no presta el servicio clínico ni interviene en él.</p>
 
@@ -395,7 +402,8 @@ p.entrada{color:var(--text-medium-gray); font-size:1rem; margin:0}
       </div>
 
       <h2 id="terminacion">15 · Terminación de la cuenta</h2>
-      <p>Puedes eliminar tu cuenta cuando quieras desde tu perfil o escribiéndonos. Al hacerlo se elimina
+      <p>Puedes eliminar tu cuenta cuando quieras desde <strong>Mi perfil › Tus datos › Eliminar mi
+      cuenta</strong>, o escribiéndonos. Al hacerlo se elimina
       tu información conforme a los plazos del
       <a href="{{ route('privacidad') }}#conservacion">Aviso de Privacidad</a>; sólo se conserva,
       de forma seudonimizada, lo que una obligación legal nos exija.</p>
@@ -409,8 +417,8 @@ p.entrada{color:var(--text-medium-gray); font-size:1rem; margin:0}
       <strong>Mérida, Yucatán</strong>, renunciando a cualquier otro fuero.</p>
 
       <h2 id="contacto">17 · Contacto</h2>
-      <p><strong>Titular:</strong> <span class="pend">A TU LADO</span><br>
-      <strong>Domicilio:</strong> <span class="pend">v. Tecnológico km. 4.5 S/N, Colonia Plan de Ayala, C.P. 97118, Mérida, Yucatán.</span>, Mérida, Yucatán, México<br>
+      <p><strong>Titular:</strong> A TU LADO<br>
+      <strong>Domicilio:</strong> Av. Tecnológico km 4.5 S/N, Col. Plan de Ayala, C.P. 97118, Mérida, Yucatán, México<br>
       <strong>Correo:</strong> <a href="mailto:hola@atulado.com.mx">hola@atulado.com.mx</a><br>
       <strong>Privacidad:</strong> <a href="mailto:privacidad@atulado.com.mx">privacidad@atulado.com.mx</a></p>
 
@@ -456,6 +464,7 @@ p.entrada{color:var(--text-medium-gray); font-size:1rem; margin:0}
       <ul class="footer-links">
         <li><a href="{{ route('privacidad') }}"><span class="ch">&rsaquo;</span> Aviso de Privacidad</a></li>
         <li><a href="{{ route('terminos') }}"><span class="ch">&rsaquo;</span> Condiciones del Servicio</a></li>
+        <li><a href="{{ route('privacidad') }}#cookies"><span class="ch">&rsaquo;</span> Política de cookies</a></li>
         <li><a href="mailto:privacidad@atulado.com.mx"><span class="ch">&rsaquo;</span> Contacto de privacidad</a></li>
       </ul>
     </div>
@@ -465,6 +474,7 @@ p.entrada{color:var(--text-medium-gray); font-size:1rem; margin:0}
     <p class="footer-legales">
       <a href="{{ route('privacidad') }}">Aviso de Privacidad</a><span class="sep">&middot;</span>
       <a href="{{ route('terminos') }}">Condiciones del Servicio</a><span class="sep">&middot;</span>
+      <a href="{{ route('privacidad') }}#cookies">Cookies</a><span class="sep">&middot;</span>
       <a href="mailto:privacidad@atulado.com.mx">privacidad@atulado.com.mx</a>
     </p>
     <p class="footer-nota">*Este servicio es de acompa&ntilde;amiento emocional: no diagnostica, no da tratamiento y no sustituye la atenci&oacute;n de un profesional de la salud. En una emergencia, comun&iacute;cate de inmediato a la L&iacute;nea de la Vida: 800 911 2000.</p>

@@ -32,7 +32,10 @@ class MoodLog extends Model
             'score' => 'integer',
             'valor_invertido' => 'integer',
             'bandera_lexica' => 'boolean',
-            'terminos_detectados' => 'array',
+            // Cifrados en reposo (APP_KEY): lo que la persona escribe y lo que el filtro detectó.
+            'journal_entry' => 'encrypted',
+            'gratitude_note' => 'encrypted',
+            'terminos_detectados' => 'encrypted:array',
             'energy_level' => 'integer',
             'sleep_hours' => 'integer',
             'tags' => 'array',

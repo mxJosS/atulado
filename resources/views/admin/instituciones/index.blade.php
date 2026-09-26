@@ -34,7 +34,7 @@
     <div class="table-wrap" style="overflow-x: auto;">
       <table class="data" style="width: 100%; border-collapse: collapse; text-align: left;">
         <thead>
-          <tr style="border-bottom: 1.5px solid #DCE8E0; font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; color: #6E887E; text-transform: uppercase;">
+          <tr style="border-bottom: 1.5px solid #DCE8E0; font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; color: #5B7369; text-transform: uppercase;">
             <th style="padding: 0.75rem 1rem;">Organización</th>
             <th style="padding: 0.75rem 1rem;">Contacto de enlace</th>
             <th style="padding: 0.75rem 1rem;">Profesional designado</th>
@@ -51,7 +51,7 @@
                   <span class="logo-inst" style="background: {{ $inst->color ?: '#2E5D4B' }};">{{ $inst->iniciales }}</span>
                   <div>
                     <a href="{{ route('admin.instituciones.show', $inst) }}" style="font-weight: 700; color: #1A2620; text-decoration: none;">{{ $inst->nombre_corto }}</a>
-                    <div style="font-size: 0.76rem; color: #6E887E;">
+                    <div style="font-size: 0.76rem; color: #5B7369;">
                       {{ $inst->sector ?: 'Sin sector' }} · {{ $inst->ciudad ?: 'Sin ciudad' }} · {{ $inst->departamentos_count }} {{ $inst->departamentos_count === 1 ? 'área' : 'áreas' }}
                     </div>
                   </div>
@@ -59,18 +59,18 @@
               </td>
               <td style="padding: 0.9rem 1rem;">
                 <div style="font-weight: 500; color: #1A2620;">{{ $inst->contacto_nombre ?: '—' }}</div>
-                <div style="font-size: 0.76rem; color: #6E887E;">{{ $inst->contacto_email }}</div>
+                <div style="font-size: 0.76rem; color: #5B7369;">{{ $inst->contacto_email }}</div>
               </td>
               <td style="padding: 0.9rem 1rem;">
                 @if($inst->profesional_nombre)
                   <div style="font-weight: 500; color: #1A2620;">{{ $inst->profesional_nombre }}</div>
-                  <div style="font-size: 0.76rem; color: #6E887E;">Céd. {{ $inst->profesional_cedula ?: 'sin registrar' }}</div>
+                  <div style="font-size: 0.76rem; color: #5B7369;">Céd. {{ $inst->profesional_cedula ?: 'sin registrar' }}</div>
                 @else
                   <span class="chip-atl ambar"><i class="fa-solid fa-triangle-exclamation"></i> Falta designar</span>
                 @endif
               </td>
               <td style="padding: 0.9rem 1rem; text-align: right; font-family: 'IBM Plex Mono', monospace;">
-                <b>{{ $inst->activas_count }}</b><span style="color: #8EADA4;"> / {{ $inst->padron_count }}</span>
+                <b>{{ $inst->activas_count }}</b><span style="color: #5B7369;"> / {{ $inst->padron_count }}</span>
                 @if($inst->casos_abiertos_count > 0)
                   <div><span class="chip-atl rojo" style="margin-top: 4px;">{{ $inst->casos_abiertos_count }} {{ $inst->casos_abiertos_count === 1 ? 'caso abierto' : 'casos abiertos' }}</span></div>
                 @endif
@@ -78,7 +78,7 @@
               <td style="padding: 0.9rem 1rem;">
                 <span class="chip-atl {{ $inst->estado === 'activa' ? '' : ($inst->estado === 'onboarding' ? 'gris' : 'ambar') }}">{{ $inst->estado_legible }}</span>
                 @if($inst->vigencia_fin)
-                  <div style="font-size: 0.74rem; color: #6E887E; margin-top: 4px;">Renueva {{ $inst->vigencia_fin->format('d/m/Y') }}</div>
+                  <div style="font-size: 0.74rem; color: #5B7369; margin-top: 4px;">Renueva {{ $inst->vigencia_fin->format('d/m/Y') }}</div>
                 @endif
               </td>
               <td style="padding: 0.9rem 1rem; text-align: right;">
@@ -105,7 +105,7 @@
                 </div>
                 @if(auth()->user()->is_admin)
                 <h4 style="font-family: 'Fraunces', serif; font-size: 1.15rem; color: #1A2620; margin: 0 0 0.5rem;">No hay instituciones registradas aún</h4>
-                <p style="color: #6E887E; font-size: 0.88rem; max-width: 480px; margin: 0 auto 1.25rem;">
+                <p style="color: #5B7369; font-size: 0.88rem; max-width: 480px; margin: 0 auto 1.25rem;">
                   Da de alta la primera empresa u organización con su contacto de enlace, su profesional designado y sus macro-áreas.
                 </p>
                 <button type="button" class="btn-atl primario" data-open="m-alta-institucion">
@@ -113,7 +113,7 @@
                 </button>
                 @else
                 <h4 style="font-family: 'Fraunces', serif; font-size: 1.15rem; margin: 0 0 0.4rem; color: #1A2620;">Aún no tienes instituciones asignadas</h4>
-                <p style="color: #6E887E; font-size: 0.88rem; margin: 0;">La administración te asigna las instituciones que atiendes desde «Usuarios». Mientras tanto no verás colaboradores ni casos.</p>
+                <p style="color: #5B7369; font-size: 0.88rem; margin: 0;">La administración te asigna las instituciones que atiendes desde «Usuarios». Mientras tanto no verás colaboradores ni casos.</p>
                 @endif
               </td>
             </tr>
@@ -136,7 +136,7 @@
     <div class="table-wrap" style="overflow-x: auto;">
       <table class="data" style="width: 100%; border-collapse: collapse; text-align: left;">
         <thead>
-          <tr style="border-bottom: 1.5px solid #DCE8E0; font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; color: #6E887E; text-transform: uppercase;">
+          <tr style="border-bottom: 1.5px solid #DCE8E0; font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; color: #5B7369; text-transform: uppercase;">
             <th style="padding: 0.75rem 1rem;">Organización</th>
             <th style="padding: 0.75rem 1rem;">Archivada</th>
             <th style="padding: 0.75rem 1rem; text-align: right;">Padrón</th>
@@ -151,7 +151,7 @@
                   <span class="logo-inst" style="background: #8EADA4;">{{ $inst->iniciales }}</span>
                   <div>
                     <a href="{{ route('admin.instituciones.show', $inst) }}" style="font-weight: 700; color: #1A2620; text-decoration: none;">{{ $inst->nombre_corto }}</a>
-                    <div style="font-size: 0.76rem; color: #6E887E;">{{ $inst->sector ?: 'Sin sector' }} · {{ $inst->ciudad ?: 'Sin ciudad' }}</div>
+                    <div style="font-size: 0.76rem; color: #5B7369;">{{ $inst->sector ?: 'Sin sector' }} · {{ $inst->ciudad ?: 'Sin ciudad' }}</div>
                   </div>
                 </div>
               </td>
@@ -159,7 +159,7 @@
                 {{ $inst->archivada_en->format('d/m/Y H:i') }}{{ $inst->archivadaPor ? ' · ' . $inst->archivadaPor->name : '' }}
               </td>
               <td style="padding: 0.9rem 1rem; text-align: right; font-family: 'IBM Plex Mono', monospace;">
-                <b>{{ $inst->activas_count }}</b><span style="color: #8EADA4;"> / {{ $inst->padron_count }}</span>
+                <b>{{ $inst->activas_count }}</b><span style="color: #5B7369;"> / {{ $inst->padron_count }}</span>
                 @if($inst->casos_abiertos_count > 0)
                   <div><span class="chip-atl rojo" style="margin-top: 4px;">{{ $inst->casos_abiertos_count }} {{ $inst->casos_abiertos_count === 1 ? 'caso abierto' : 'casos abiertos' }}</span></div>
                 @endif
@@ -205,7 +205,7 @@
       <div class="modal-body">
         <p style="margin: 0 0 0.75rem; font-size: 0.9rem;">La institución pasa a <b>Archivadas</b>: deja de operar y sale del tablero, pero <b>no se borra nada</b>.
           Su información, su padrón (<span data-archivar-padron></span> personas) y su historial se siguen viendo y puedes restaurarla en cualquier momento.</p>
-        <p style="margin: 0; font-size: 0.82rem; color: #6E887E;">Para borrarla para siempre, elimínala después desde «Archivadas».</p>
+        <p style="margin: 0; font-size: 0.82rem; color: #5B7369;">Para borrarla para siempre, elimínala después desde «Archivadas».</p>
       </div>
       <div class="modal-foot">
         <span></span>
@@ -291,7 +291,7 @@
       </div>
 
       <div class="modal-foot">
-        <span style="font-size: 0.76rem; color: #6E887E;"><i class="fa-solid fa-shield-halved"></i> Todos los datos se pueden editar después</span>
+        <span style="font-size: 0.76rem; color: #5B7369;"><i class="fa-solid fa-shield-halved"></i> Todos los datos se pueden editar después</span>
         <div style="display: flex; gap: 8px;">
           <button type="button" class="btn-atl linea" data-close="m-alta-institucion">Cancelar</button>
           <button type="submit" class="btn-atl primario"><i class="fa-solid fa-check"></i> Guardar Institución</button>

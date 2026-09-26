@@ -13,14 +13,15 @@ RESPALDOS="${RESPALDOS:-$HOME/respaldos-atulado}"
 
 cd "$APP_DIR"
 
-echo "==> Respaldo de la base de datos"
-mkdir -p "$RESPALDOS"
-DB_DATABASE=$(grep -E '^DB_DATABASE=' .env | cut -d= -f2-)
-DB_USERNAME=$(grep -E '^DB_USERNAME=' .env | cut -d= -f2-)
-DB_PASSWORD=$(grep -E '^DB_PASSWORD=' .env | cut -d= -f2-)
-ARCHIVO="$RESPALDOS/atulado-$(date +%Y%m%d-%H%M%S).sql.gz"
-MYSQL_PWD="$DB_PASSWORD" mysqldump --single-transaction --routines -u "$DB_USERNAME" "$DB_DATABASE" | gzip > "$ARCHIVO"
-echo "    $ARCHIVO"
+echo "==> Revisión del .env de producción"
+if ! grep -qE '^APP_ENV=production$' .env || ! grep -qE '^APP_DEBUG=false$' .env; then
+  echo "ERROR: el .env del servidor debe tener APP_ENV=production y APP_DEBUG=false." >&2
+  echo "       Con APP_DEBUG=true un error muestra código, rutas y variables a cualquiera." >&2
+  exit 1
+fi
+
+echo "==> Respaldo cifrado de la base de datos"
+APP_DIR="$APP_DIR" RESPALDOS="$RESPALDOS" bash "$APP_DIR/deploy/respaldo.sh"
 
 echo "==> Modo mantenimiento"
 $PHP artisan down --retry=30 || true
