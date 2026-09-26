@@ -17,7 +17,7 @@
         "@laravel/multiplex": "^0.4.1"
     },
     "dependencies": {
-        "@iconify-icon/react": "^3.0.3",
+        "@iconify-icon/react": "^3.0.4",
         "@iconify-json/game-icons": "^1.2.4",
         "@iconify/json": "^2.2.519",
         "iconify-icon": "^3.0.3",
