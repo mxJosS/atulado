@@ -20,7 +20,7 @@ jobs:
     name: Pruebas
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.4'
@@ -39,7 +39,7 @@ jobs:
     name: Dependencias vulnerables
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.4'
@@ -57,7 +57,7 @@ jobs:
     name: Secretos filtrados
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: gitleaks
@@ -70,7 +70,7 @@ jobs:
     container:
       image: semgrep/semgrep
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       # Reporta sin romper el build: revisar los hallazgos en la salida del job.
       - name: semgrep
         run: semgrep scan --config p/php --config p/owasp-top-ten --config p/secrets --exclude vendor --exclude node_modules --exclude paneles-atulado
