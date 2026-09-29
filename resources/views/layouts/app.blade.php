@@ -132,8 +132,8 @@
               @endif
             </div>
             <div class="user-info-text">
-              <div class="user-name-text" style="display: flex; align-items: center; gap: 4px;">
-                <span>{{ auth()->user()?->name ?? 'Usuario' }}</span>
+              <div class="user-name-text">
+                <span class="user-name-label">{{ auth()->user()?->name ?? 'Usuario' }}</span>
                 @if(auth()->user()?->isProfessional())
                   <x-verified-badge size="14" :popover="false" />
                 @endif

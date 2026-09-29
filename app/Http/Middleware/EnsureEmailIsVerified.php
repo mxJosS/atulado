@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Support\Suplantacion;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,6 +16,12 @@ class EnsureEmailIsVerified
      */
     public function handle(Request $request, Closure $next): Response
     {
+        // «Entrar como» pasa sin el código (llega al correo de la persona) y
+        // sin marcar la cuenta como verificada.
+        if (Suplantacion::activa()) {
+            return $next($request);
+        }
+
         $user = $request->user();
 
         if ($user && !$user->is_admin && !$user->hasVerifiedEmail()) {

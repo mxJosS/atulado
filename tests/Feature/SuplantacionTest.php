@@ -109,7 +109,7 @@ class SuplantacionTest extends TestCase
         $this->assertDatabaseCount('interacciones', 0);
     }
 
-    public function test_consent_data_choices_and_account_deletion_stay_with_the_owner(): void
+    public function test_consent_and_account_deletion_stay_with_the_owner(): void
     {
         $sinConsentimiento = User::factory()->sinConsentimiento()->create();
         $persona = User::factory()->create();
@@ -122,9 +122,39 @@ class SuplantacionTest extends TestCase
         $this->post(route('logout'));
 
         $this->post(route('admin.users.entrar', $persona));
-        $this->put(route('profile.datos'), ['acepta_boletin' => '1'])->assertSessionHas('error');
-        $this->assertFalse($persona->fresh()->acepta_boletin);
         $this->delete(route('profile.destroy'), ['confirmacion' => 'ELIMINAR', 'password_eliminar' => 'password'])->assertSessionHas('error');
         $this->assertModelExists($persona);
+    }
+
+    public function test_a_main_account_uses_an_account_without_consent_or_verified_email(): void
+    {
+        $sinConsentimiento = User::factory()->sinConsentimiento()->create();
+        $sinVerificar = User::factory()->unverified()->create();
+
+        $this->actingAs($this->principal)->post(route('admin.users.entrar', $sinConsentimiento));
+        $this->get(route('dashboard'))->assertOk();
+        $this->get(route('profile.show'))->assertOk();
+        $this->post(route('logout'));
+        $this->assertNull($sinConsentimiento->fresh()->consentimiento_en);
+
+        $this->post(route('admin.users.entrar', $sinVerificar));
+        $this->get(route('dashboard'))->assertOk();
+        $this->post(route('logout'));
+        $this->assertNull($sinVerificar->fresh()->email_verified_at);
+    }
+
+    public function test_a_main_account_changes_data_choices_and_it_is_logged(): void
+    {
+        $persona = User::factory()->create();
+
+        $this->actingAs($this->principal)->post(route('admin.users.entrar', $persona));
+        $this->put(route('profile.datos'), ['acepta_boletin' => '1'])->assertSessionHas('success');
+
+        $this->assertTrue($persona->fresh()->acepta_boletin);
+        $this->assertDatabaseHas('bitacora_admin', [
+            'accion' => 'suplantacion_preferencias_datos',
+            'actor_id' => $this->principal->id,
+            'objeto_id' => $persona->id,
+        ]);
     }
 }

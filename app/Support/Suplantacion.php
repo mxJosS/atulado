@@ -13,6 +13,10 @@ use Illuminate\Support\Facades\Auth;
  *
  * Mientras dura no cuenta como uso real de la persona: no activa su lugar en
  * el padrón ni suma visitas a la analítica.
+ *
+ * Se recorre toda la cuenta aunque la persona no haya dado su consentimiento
+ * ni verificado su correo (sin registrar ninguno de los dos). Dar el
+ * consentimiento y eliminar la cuenta quedan sólo para su dueño.
  */
 class Suplantacion
 {

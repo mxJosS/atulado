@@ -95,6 +95,7 @@ Route::middleware('auth')->group(function () {
     // Consentimiento expreso (quien llegó por Google, por alta de administración
     // o tenía cuenta antes de que se pidiera) y baja de la cuenta. Quedan fuera
     // del grupo con consentimiento: se puede eliminar la cuenta sin aceptar nada.
+    // Con «Entrar como» ni se da el consentimiento ni se elimina la cuenta.
     Route::get('/consentimiento', [AuthController::class, 'showConsentimiento'])->name('consentimiento.show');
     Route::post('/consentimiento', [AuthController::class, 'guardarConsentimiento'])->name('consentimiento.guardar')->middleware('sin.suplantacion');
     Route::delete('/perfil', [\App\Http\Controllers\CuentaController::class, 'eliminar'])->name('profile.destroy')->middleware(['throttle:5,1', 'sin.suplantacion']);
@@ -137,7 +138,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/perfil', [AuthController::class, 'showProfile'])->name('profile.show');
         Route::put('/perfil', [AuthController::class, 'updateProfile'])->name('profile.update');
         Route::put('/perfil/password', [AuthController::class, 'updatePassword'])->name('profile.password');
-        Route::put('/perfil/datos', [AuthController::class, 'updatePreferenciasDatos'])->name('profile.datos')->middleware('sin.suplantacion');
+        Route::put('/perfil/datos', [AuthController::class, 'updatePreferenciasDatos'])->name('profile.datos');
 
         // Professional Healthcare Accreditation (Client Submission)
         Route::post('/perfil/solicitud-profesional', [ProfessionalVerificationController::class, 'store'])->name('profile.verification.store');

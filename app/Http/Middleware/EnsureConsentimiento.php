@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Support\Suplantacion;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -11,11 +12,18 @@ use Symfony\Component\HttpFoundation\Response;
  * seguridad…) sin haber dado su consentimiento expreso para el tratamiento de
  * datos sensibles. Quien llegó por Google, por alta de administración o tenía
  * cuenta antes de que se pidiera, lo da una vez en /consentimiento.
+ *
+ * Con «Entrar como» la cuenta principal pasa para probar la plataforma, pero
+ * el consentimiento no se registra: sólo lo da la persona dueña de la cuenta.
  */
 class EnsureConsentimiento
 {
     public function handle(Request $request, Closure $next): Response
     {
+        if (Suplantacion::activa()) {
+            return $next($request);
+        }
+
         $user = $request->user();
 
         if ($user && !$user->tieneConsentimiento()) {

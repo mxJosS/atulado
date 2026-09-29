@@ -1238,12 +1238,26 @@ em, .editorial-italic {
 }
 
 .user-name-text {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  /* Aire para la sombra de la insignia cuando queda pegada al borde */
+  padding-right: 4px;
   font-size: 0.88rem;
   font-weight: 600;
   color: #FFFFFF;
   white-space: nowrap;
+}
+
+/* Un nombre largo se corta con «…»; la insignia de al lado siempre se ve entera. */
+.user-name-label {
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.user-name-text > :not(.user-name-label) {
+  flex-shrink: 0;
 }
 
 .user-role-text {

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Mail\EmailVerificationCodeMail;
 use App\Models\Ajuste;
+use App\Models\BitacoraAdmin;
 use App\Models\DispositivoConfiable;
 use App\Models\User;
 use App\Support\Navegador;
@@ -408,10 +409,19 @@ class AuthController extends Controller
             'acepta_boletin' => ['nullable', 'boolean'],
         ]);
 
-        $request->user()->forceFill([
+        $user = $request->user();
+        $user->forceFill([
             'acepta_investigacion' => (bool) ($datos['acepta_investigacion'] ?? false),
             'acepta_boletin' => (bool) ($datos['acepta_boletin'] ?? false),
         ])->save();
+
+        // Con «Entrar como» el cambio no lo hizo la persona: queda en la bitácora.
+        if (Suplantacion::activa()) {
+            $investigacion = $user->acepta_investigacion ? 'sí' : 'no';
+            $boletin = $user->acepta_boletin ? 'sí' : 'no';
+            BitacoraAdmin::registrar('suplantacion_preferencias_datos', $user,
+                "Cambió con «Entrar como» las preferencias de datos de {$user->email}: investigación {$investigacion}, boletín {$boletin}.");
+        }
 
         return back()->with('success', 'Tus preferencias sobre el uso de tus datos se guardaron.');
     }

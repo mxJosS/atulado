@@ -266,8 +266,8 @@
               @endif
             </div>
             <div class="user-info-text">
-              <div class="user-name-text" style="display: flex; align-items: center; gap: 4px;">
-                <span>{{ auth()->user()?->name ?? 'Admin' }}</span>
+              <div class="user-name-text">
+                <span class="user-name-label">{{ auth()->user()?->name ?? 'Admin' }}</span>
                 <i class="fa-solid fa-shield-halved" style="color: #A8E6C0; font-size: 0.72rem;"></i>
               </div>
               <div class="user-role-text" style="color: #A8E6C0;">

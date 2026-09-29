@@ -21,7 +21,8 @@ class BitacoraAdmin extends Model
 
     public static function registrar(string $accion, ?Model $objeto = null, ?string $detalle = null): void
     {
-        $actor = Auth::user();
+        // Con «Entrar como» actúa la cuenta principal, no la persona.
+        $actor = \App\Support\Suplantacion::adminOriginal() ?? Auth::user();
 
         try {
             self::create([
