@@ -176,13 +176,66 @@ class InvitarPorLinkTest extends TestCase
         $this->get(route('unirse.google', $nuevo))->assertNotFound();
     }
 
-    public function test_only_administration_manages_the_link(): void
+    public function test_a_clinician_without_the_permission_does_not_invite(): void
     {
         $clinico = User::factory()->create(['role' => 'clinico', 'is_clinico_atulado' => true]);
         $clinico->institucionesAsignadas()->attach($this->inst);
 
-        $this->actingAs($clinico)->get(route('admin.instituciones.show', $this->inst))->assertOk()->assertDontSee('Generar link de invitación');
-        $this->actingAs($clinico)->post(route('admin.instituciones.enlace.generar', $this->inst))->assertRedirect(route('dashboard'));
+        $this->actingAs($clinico)->get(route('admin.instituciones.show', $this->inst))->assertOk()
+            ->assertDontSee('Invitar por link')->assertDontSee('Generar link de invitación');
+        $this->actingAs($clinico)->post(route('admin.instituciones.enlace.generar', $this->inst))->assertForbidden();
         $this->assertNull($this->inst->fresh()->enlace_token);
+    }
+
+    public function test_a_clinician_with_the_permission_generates_and_shares_the_link_only_there(): void
+    {
+        $otra = Institucion::factory()->create();
+        $clinico = User::factory()->create(['role' => 'clinico', 'is_clinico_atulado' => true]);
+        $clinico->institucionesAsignadas()->attach($this->inst, ['puede_invitar_por_link' => true]);
+        $clinico->institucionesAsignadas()->attach($otra);
+
+        $this->actingAs($clinico)->get(route('admin.instituciones.show', $this->inst))->assertOk()
+            ->assertSee('Invitar por link')->assertSee('Generar link de invitación');
+        $this->actingAs($clinico)->post(route('admin.instituciones.enlace.generar', $this->inst))
+            ->assertRedirect(route('admin.instituciones.show', $this->inst) . '#tab-enlace');
+        $token = $this->inst->fresh()->enlace_token;
+        $this->assertNotNull($token);
+        $this->assertDatabaseHas('bitacora_admin', ['accion' => 'enlace_generado', 'actor_id' => $clinico->id, 'objeto_id' => $this->inst->id]);
+
+        // Comparte el link, pero cambiarlo, desactivarlo o elegir el área es de la administración.
+        $this->actingAs($clinico)->get(route('admin.instituciones.show', $this->inst))
+            ->assertSee(route('unirse.mostrar', $token))->assertSee('Copiar link')->assertDontSee('Cambiar por un link nuevo');
+        $this->actingAs($clinico)->post(route('admin.instituciones.enlace.generar', $this->inst))->assertSessionHas('error');
+        $this->actingAs($clinico)->put(route('admin.instituciones.enlace.actualizar', $this->inst), ['activo' => '0']);
+        $this->assertSame($token, $this->inst->fresh()->enlace_token);
+        $this->assertTrue($this->inst->fresh()->enlace_activo);
+
+        // En la otra institución que atiende no tiene el permiso.
+        $this->actingAs($clinico)->get(route('admin.instituciones.show', $otra))->assertOk()->assertDontSee('Invitar por link');
+        $this->actingAs($clinico)->post(route('admin.instituciones.enlace.generar', $otra))->assertForbidden();
+        $this->assertNull($otra->fresh()->enlace_token);
+    }
+
+    public function test_the_users_form_gives_the_permission_per_institution(): void
+    {
+        $otra = Institucion::factory()->create(['nombre_corto' => 'GS']);
+        $sinAsignar = Institucion::factory()->create();
+        $clinico = User::factory()->create(['email' => 'efrain@prueba.mx', 'role' => 'profesional', 'is_clinico_atulado' => true]);
+
+        $this->actingAs($this->admin)->put(route('admin.users.update', $clinico), [
+            'name' => 'Efrain Herrera', 'email' => 'efrain@prueba.mx', 'role' => 'profesional', 'perfil_profesional' => 'ambos',
+            'status' => 'activo', 'license_number' => '1234567',
+            'instituciones_asignadas' => [$this->inst->id, $otra->id],
+            // Una institución que no atiende no recibe el permiso.
+            'invitar_por_link' => [$this->inst->id, $sinAsignar->id],
+        ])->assertSessionHasNoErrors();
+
+        $clinico->refresh();
+        $this->assertTrue($clinico->puedeInvitarPorLink($this->inst));
+        $this->assertFalse($clinico->puedeInvitarPorLink($otra));
+        $this->assertFalse($clinico->puedeInvitarPorLink($sinAsignar));
+        $this->assertFalse($clinico->institucionesAsignadas()->where('instituciones.id', $sinAsignar->id)->exists());
+        $this->assertDatabaseHas('bitacora_admin', ['accion' => 'usuario_permisos', 'objeto_id' => $clinico->id]);
+        $this->assertStringContainsString('invita por link en ninguna → ITM', \App\Models\BitacoraAdmin::where('objeto_id', $clinico->id)->latest('id')->value('detalle'));
     }
 }

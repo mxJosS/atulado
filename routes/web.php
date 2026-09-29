@@ -172,6 +172,9 @@ Route::middleware(['auth', 'panel'])->prefix('admin')->name('admin.')->group(fun
 
     // Resumen clínico emitido: visor para imprimir o guardar como PDF
     Route::get('/resumenes/{entrega}', [\App\Http\Controllers\Admin\ExpedienteController::class, 'verResumen'])->name('resumenes.ver');
+
+    // Invitar por link: también el clínico con permiso en esa institución (lo revisa el controlador)
+    Route::post('/instituciones/{institucion}/enlace', [\App\Http\Controllers\Admin\EnlaceController::class, 'generar'])->name('instituciones.enlace.generar');
 });
 
 /*
@@ -229,8 +232,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Invitaciones por correo
     Route::post('/instituciones/{institucion}/invitaciones', [\App\Http\Controllers\Admin\InvitacionController::class, 'enviar'])->name('instituciones.invitaciones.enviar');
 
-    // Invitar por link
-    Route::post('/instituciones/{institucion}/enlace', [\App\Http\Controllers\Admin\EnlaceController::class, 'generar'])->name('instituciones.enlace.generar');
+    // Invitar por link: área de entrada y activar o desactivar (generarlo está en el panel compartido)
     Route::put('/instituciones/{institucion}/enlace', [\App\Http\Controllers\Admin\EnlaceController::class, 'actualizar'])->name('instituciones.enlace.actualizar');
 
     // El panel viejo de «Altas y Estructura» se integró a cada institución.

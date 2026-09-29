@@ -289,7 +289,26 @@ class User extends Authenticatable
      */
     public function institucionesAsignadas(): BelongsToMany
     {
-        return $this->belongsToMany(Institucion::class, 'asignaciones_clinicas')->withTimestamps();
+        return $this->belongsToMany(Institucion::class, 'asignaciones_clinicas')
+            ->withPivot('puede_invitar_por_link')
+            ->withTimestamps();
+    }
+
+    /**
+     * «Invitar por link»: la administración en todas; un profesional clínico
+     * sólo en las instituciones que atiende donde se le dio el permiso.
+     */
+    public function puedeInvitarPorLink(Institucion $institucion): bool
+    {
+        if ($this->is_admin) {
+            return true;
+        }
+
+        return $this->isClinicoAcreditado()
+            && $this->institucionesAsignadas()
+                ->where('instituciones.id', $institucion->id)
+                ->wherePivot('puede_invitar_por_link', true)
+                ->exists();
     }
 
     /**

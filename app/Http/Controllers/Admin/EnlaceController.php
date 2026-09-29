@@ -12,6 +12,9 @@ use Illuminate\Validation\Rule;
 /**
  * «Invitar por link» de una institución: generarlo, cambiarlo por uno nuevo,
  * activarlo o desactivarlo y elegir a qué área entra quien lo usa.
+ *
+ * Un profesional clínico con el permiso en esa institución (se da en Usuarios)
+ * genera el link si aún no existe y lo comparte; lo demás es de la administración.
  */
 class EnlaceController extends Controller
 {
@@ -25,8 +28,16 @@ class EnlaceController extends Controller
     }
 
     /** Genera el enlace o lo reemplaza (el anterior deja de funcionar). */
-    public function generar(Institucion $institucion)
+    public function generar(Request $request, Institucion $institucion)
     {
+        $user = $request->user();
+        abort_unless($user->puedeInvitarPorLink($institucion), 403);
+
+        // Cambiarlo por uno nuevo corta el link que ya se compartió: lo decide la administración.
+        if ($institucion->enlace_token !== null && !$user->is_admin) {
+            return $this->volver($institucion)->with('error', 'Sólo la administración puede cambiar el link por uno nuevo.');
+        }
+
         if ($institucion->estaArchivada()) {
             return $this->volver($institucion)->with('error', 'La institución está archivada: restáurala para invitar por link.');
         }

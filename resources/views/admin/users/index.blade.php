@@ -55,6 +55,39 @@
     transform: translateY(-1px);
     box-shadow: 0 2px 6px rgba(153, 27, 27, 0.12);
   }
+
+  /* Instituciones que atiende un clínico, cada una con su permiso «Invita por link» */
+  .fila-asignada {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.3rem 0.5rem;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.6);
+  }
+  .chk-invita {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    padding: 0.2rem 0.55rem;
+    border-radius: 9999px;
+    border: 1px solid #B8D8C8;
+    background: white;
+    font-size: 0.74rem;
+    font-weight: 600;
+    color: #1E4A25;
+    cursor: pointer;
+  }
+  .chk-invita:has(input:checked) {
+    background: #DDF3E6;
+    border-color: #2E5D4B;
+  }
+  .chk-invita:has(input:disabled) {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
 </style>
 @endpush
 
@@ -281,6 +314,7 @@
                                 'institucion_id' => $user->membresiaActiva?->institucion_id,
                                 'perfil_profesional' => $user->perfil_profesional,
                                 'asignadas' => $user->institucionesAsignadas->pluck('id')->all(),
+                                'invita_por_link' => $user->institucionesAsignadas->filter(fn ($i) => (bool) $i->pivot->puede_invitar_por_link)->pluck('id')->values()->all(),
                                 'is_clinico' => (bool) $user->is_clinico_atulado,
                                 'institution_text' => (string) ($user->getRawOriginal('institution') ?? ''),
                                 'is_self' => $isSelf,
@@ -513,13 +547,20 @@
           </label>
           <span style="font-size: 0.74rem; color: #3D6B55; display: block; margin-bottom: 0.6rem;">
             Sólo verá estas instituciones: su plano clínico con todos los permisos, su cola de atención y el resto en modo lectura. No entra al padrón. Sin ninguna marcada, no ve ninguna.
+            Con <b>«Invita por link»</b> además puede compartir el link de invitación de esa institución.
           </span>
-          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 0.35rem 0.75rem; max-height: 190px; overflow-y: auto;">
+          <div style="display: grid; gap: 0.3rem; max-height: 210px; overflow-y: auto;">
             @forelse($institutions as $instOption)
-              <label style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: #1A2620; cursor: pointer;">
-                <input type="checkbox" name="instituciones_asignadas[]" value="{{ $instOption->id }}" class="alta-chk-asignada" @checked(in_array($instOption->id, array_map('intval', (array) old('instituciones_asignadas', [])), true))>
-                <span>{{ $instOption->nombre_corto }}</span>
-              </label>
+              <div class="fila-asignada">
+                <label style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: #1A2620; cursor: pointer; min-width: 0;">
+                  <input type="checkbox" name="instituciones_asignadas[]" value="{{ $instOption->id }}" class="alta-chk-asignada" onchange="syncInvitaPorLink(this)" @checked(in_array($instOption->id, array_map('intval', (array) old('instituciones_asignadas', [])), true))>
+                  <span>{{ $instOption->nombre_corto }}</span>
+                </label>
+                <label class="chk-invita" title="Puede compartir el link de invitación de {{ $instOption->nombre_corto }}">
+                  <input type="checkbox" name="invitar_por_link[]" value="{{ $instOption->id }}" @checked(in_array($instOption->id, array_map('intval', (array) old('invitar_por_link', [])), true))>
+                  <i class="fa-solid fa-link"></i> Invita por link
+                </label>
+              </div>
             @empty
               <span style="font-size: 0.8rem; color: #5B7369;">Aún no hay instituciones registradas.</span>
             @endforelse
@@ -705,13 +746,20 @@
           </label>
           <span style="font-size: 0.74rem; color: #3D6B55; display: block; margin-bottom: 0.6rem;">
             Sólo verá estas instituciones: su plano clínico con todos los permisos, su cola de atención y el resto en modo lectura. No entra al padrón. Sin ninguna marcada, no ve ninguna.
+            Con <b>«Invita por link»</b> además puede compartir el link de invitación de esa institución.
           </span>
-          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 0.35rem 0.75rem; max-height: 190px; overflow-y: auto;">
+          <div style="display: grid; gap: 0.3rem; max-height: 210px; overflow-y: auto;">
             @forelse($institutions as $instOption)
-              <label style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: #1A2620; cursor: pointer;">
-                <input type="checkbox" name="instituciones_asignadas[]" value="{{ $instOption->id }}" class="edit-chk-asignada" >
-                <span>{{ $instOption->nombre_corto }}</span>
-              </label>
+              <div class="fila-asignada">
+                <label style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: #1A2620; cursor: pointer; min-width: 0;">
+                  <input type="checkbox" name="instituciones_asignadas[]" value="{{ $instOption->id }}" class="edit-chk-asignada" onchange="syncInvitaPorLink(this)">
+                  <span>{{ $instOption->nombre_corto }}</span>
+                </label>
+                <label class="chk-invita" title="Puede compartir el link de invitación de {{ $instOption->nombre_corto }}">
+                  <input type="checkbox" name="invitar_por_link[]" value="{{ $instOption->id }}" class="edit-chk-invita">
+                  <i class="fa-solid fa-link"></i> Invita por link
+                </label>
+              </div>
             @empty
               <span style="font-size: 0.8rem; color: #5B7369;">Aún no hay instituciones registradas.</span>
             @endforelse
@@ -772,7 +820,15 @@
   // ── Modal Crear Usuario ──────────────────────────────
   function openUserModal() {
     document.getElementById('userModal').style.display = 'flex';
+    document.querySelectorAll('.alta-chk-asignada').forEach(syncInvitaPorLink);
     toggleRoleFields();
+  }
+
+  // «Invita por link» sólo vale en una institución que atiende: sin ella se apaga.
+  function syncInvitaPorLink(chkInstitucion) {
+    const invita = chkInstitucion.closest('.fila-asignada').querySelector('input[name="invitar_por_link[]"]');
+    invita.disabled = !chkInstitucion.checked;
+    if (!chkInstitucion.checked) invita.checked = false;
   }
 
   function closeUserModal() {
@@ -876,6 +932,8 @@
 
     document.getElementById('editPerfilProfesional').value = user.perfil_profesional || 'publica';
     document.querySelectorAll('.edit-chk-asignada').forEach(c => { c.checked = (user.asignadas || []).includes(Number(c.value)); });
+    document.querySelectorAll('.edit-chk-invita').forEach(c => { c.checked = (user.invita_por_link || []).includes(Number(c.value)); });
+    document.querySelectorAll('.edit-chk-asignada').forEach(syncInvitaPorLink);
     document.getElementById('editClinicoAdmin').checked = !!user.is_clinico;
 
     // La contraseña nunca viaja salvo que se pida cambiarla expresamente.

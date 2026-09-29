@@ -314,7 +314,7 @@
       <button class="tab" type="button" data-pane="padron"><i class="fa-solid fa-users"></i> Padrón de Colaboradores ({{ $colaboradoresPadron->where('estado', '!=', 'baja')->count() }})</button>
       <button class="tab" type="button" data-pane="invitaciones"><i class="fa-solid fa-paper-plane"></i> Invitaciones</button>
     @endif
-    @if($esAdmin)
+    @if($puedeInvitar)
       <button class="tab" type="button" data-pane="enlace"><i class="fa-solid fa-link"></i> Invitar por link</button>
     @endif
     <button class="tab" type="button" data-pane="clinico"><i class="fa-solid fa-user-doctor"></i> Plano clínico</button>
@@ -460,7 +460,7 @@
   </div>
   @endif
 
-  @if($esAdmin)
+  @if($puedeInvitar)
   <div class="tabpane" data-tabpane="inst" data-pane="enlace" id="tab-enlace">
   @include('admin.instituciones.partials.enlace')
   </div>

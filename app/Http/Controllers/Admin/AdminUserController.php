@@ -79,6 +79,8 @@ class AdminUserController extends Controller
             'institucion_id' => ['nullable', 'exists:instituciones,id'],
             'instituciones_asignadas' => ['nullable', 'array'],
             'instituciones_asignadas.*' => ['integer', 'exists:instituciones,id'],
+            'invitar_por_link' => ['nullable', 'array'],
+            'invitar_por_link.*' => ['integer'],
         ], [
             'first_name.required' => 'El o los nombres son obligatorios.',
             'last_name.required' => 'Los apellidos son obligatorios.',
@@ -137,7 +139,9 @@ class AdminUserController extends Controller
             return $user;
         });
 
-        BitacoraAdmin::registrar('usuario_creado', $creado, "Alta de {$creado->email} con permisos: " . self::permisos($creado) . '.');
+        $invita = self::invitaPorLink($creado);
+        BitacoraAdmin::registrar('usuario_creado', $creado, "Alta de {$creado->email} con permisos: " . self::permisos($creado)
+            . ($invita !== 'ninguna' ? "; invita por link en {$invita}" : '') . '.');
 
         return redirect()->route('admin.users.index')
             ->with('success', 'Usuario creado Exitosamente');
@@ -159,6 +163,8 @@ class AdminUserController extends Controller
             'institucion_id' => ['nullable', 'exists:instituciones,id'],
             'instituciones_asignadas' => ['nullable', 'array'],
             'instituciones_asignadas.*' => ['integer', 'exists:instituciones,id'],
+            'invitar_por_link' => ['nullable', 'array'],
+            'invitar_por_link.*' => ['integer'],
         ], [
             'name.required' => 'El nombre es obligatorio.',
             'email.required' => 'El correo electrónico es obligatorio.',
@@ -200,7 +206,7 @@ class AdminUserController extends Controller
         }
 
         $role = $request->role;
-        $antes = ['permisos' => self::permisos($user), 'email' => $user->email, 'verificado' => (bool) $user->email_verified_at];
+        $antes = ['permisos' => self::permisos($user), 'invita' => self::invitaPorLink($user), 'email' => $user->email, 'verificado' => (bool) $user->email_verified_at];
 
         $user->name = trim($request->name);
         $user->email = trim($request->email);
@@ -257,6 +263,7 @@ class AdminUserController extends Controller
 
         $cambios = array_filter([
             $antes['permisos'] !== self::permisos($user) ? "permisos {$antes['permisos']} → " . self::permisos($user) : null,
+            $antes['invita'] !== self::invitaPorLink($user) ? "invita por link en {$antes['invita']} → " . self::invitaPorLink($user) : null,
             $antes['email'] !== $user->email ? "correo {$antes['email']} → {$user->email}" : null,
             $antes['verificado'] !== (bool) $user->email_verified_at ? 'estado → ' . $request->status : null,
             $request->boolean('cambiar_password') ? 'contraseña cambiada por administración' : null,
@@ -278,15 +285,30 @@ class AdminUserController extends Controller
         ]));
     }
 
+    /** Instituciones donde una cuenta clínica puede invitar por link, para la bitácora. */
+    private static function invitaPorLink(User $user): string
+    {
+        $nombres = $user->institucionesAsignadas()->wherePivot('puede_invitar_por_link', true)
+            ->orderBy('nombre_corto')->pluck('nombre_corto')->all();
+
+        return $nombres ? implode(', ', $nombres) : 'ninguna';
+    }
+
     /**
      * Un profesional clínico (perfil «clínico» o «ambos») queda asignado a las
-     * instituciones que atiende, sin entrar a su padrón. Cualquier otra cuenta
-     * se vincula como hasta ahora: al padrón de la institución elegida.
+     * instituciones que atiende, sin entrar a su padrón, y en cada una puede
+     * tener permiso de invitar por link. Cualquier otra cuenta se vincula como
+     * hasta ahora: al padrón de la institución elegida.
      */
     private function vincular(User $user, Request $request): void
     {
         if ($user->isClinicoAcreditado() && !$user->is_admin) {
-            $user->institucionesAsignadas()->sync(array_map('intval', (array) $request->input('instituciones_asignadas', [])));
+            // El permiso sólo cuenta en instituciones que atiende.
+            $invita = array_map('intval', (array) $request->input('invitar_por_link', []));
+            $asignaciones = collect((array) $request->input('instituciones_asignadas', []))
+                ->mapWithKeys(fn ($id) => [(int) $id => ['puede_invitar_por_link' => in_array((int) $id, $invita, true)]])
+                ->all();
+            $user->institucionesAsignadas()->sync($asignaciones);
 
             return;
         }

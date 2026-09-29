@@ -1,4 +1,5 @@
-{{-- Invitar por link: un enlace para compartir; quien lo abre crea su cuenta y queda en el padrón. --}}
+{{-- Invitar por link: un enlace para compartir; quien lo abre crea su cuenta y queda en el padrón.
+     Un clínico con permiso lo genera y lo comparte; área, estado y reemplazo son de la administración. --}}
 @php
   $url = $institucion->enlace_token ? route('unirse.mostrar', $institucion->enlace_token) : null;
   $porEnlace = $personas->where('origen', 'enlace')->where('estado', '!=', 'baja')->count();
@@ -38,6 +39,7 @@
          target="_blank" rel="noopener" class="btn-atl linea"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>
     </div>
 
+    @if($esAdmin)
     <form method="POST" action="{{ route('admin.instituciones.enlace.actualizar', $institucion) }}"
           style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.9rem; align-items: end; margin-bottom: 1rem;">
       @csrf
@@ -70,6 +72,14 @@
       <button type="submit" class="btn-atl linea sm" style="color: #B02418;"><i class="fa-solid fa-rotate"></i> Cambiar por un link nuevo</button>
       <span style="font-size: 0.76rem; color: #5B7369; margin-left: 0.4rem;">Úsalo si el link se compartió donde no debía.</span>
     </form>
+    @elseif(!$institucion->enlace_activo)
+      <div class="nota-protocolo" style="margin-bottom: 0.4rem;">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <span>Este link está desactivado: nadie puede unirse con él. Pide a la administración de A tu lado que lo active.</span>
+      </div>
+    @else
+      <p style="font-size: 0.78rem; color: #5B7369; margin: 0;">El área de entrada, el estado del link y cambiarlo por uno nuevo los ajusta la administración de A tu lado.</p>
+    @endif
   @endif
 
   <div class="nota-protocolo" style="margin-top: 1.1rem;">

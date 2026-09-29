@@ -173,6 +173,8 @@ class InstitucionController extends Controller
         $esAdmin = (bool) request()->user()?->is_admin;
         // El clínico asignado ve padrón e invitaciones en modo lectura; sólo la administración los modifica.
         $vePadron = $esAdmin || $esClinico;
+        // «Invitar por link»: la administración, o el clínico al que se le dio el permiso aquí.
+        $puedeInvitar = request()->user()->puedeInvitarPorLink($institucion);
         $personas = $vePadron
             ? $institucion->membresias()
                 ->with(['user:id,name,email,role,is_admin,is_clinico_atulado', 'departamento:id,nombre,parent_id'])
@@ -195,7 +197,7 @@ class InstitucionController extends Controller
 
         return view('admin.instituciones.show', compact(
             'institucion', 'arbol', 'resumen', 'otras', 'ultimaCarga', 'filasConProblema',
-            'esClinico', 'esAdmin', 'vePadron', 'filtros', 'colaboradores', 'opcionesArea', 'personas', 'invitaciones',
+            'esClinico', 'esAdmin', 'vePadron', 'puedeInvitar', 'filtros', 'colaboradores', 'opcionesArea', 'personas', 'invitaciones',
             'colaboradoresPadron', 'indicadores'
         ));
     }
