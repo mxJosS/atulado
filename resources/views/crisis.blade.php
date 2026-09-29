@@ -3,30 +3,17 @@
 @section('title', 'Líneas de Crisis y Ayuda 24 Horas — A tu lado')
 
 @section('content')
-<div style="background: #080C0A !important; color: #FFFFFF !important; padding: 4.5rem 1.5rem; border-bottom: 3px solid #A93226; position: relative; overflow: hidden;">
-  <div style="position: absolute; width: 500px; height: 500px; border-radius: 50%; background: radial-gradient(circle, rgba(169,50,38,0.28) 0%, transparent 70%); top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none;"></div>
-
-  <div style="max-width: 900px; margin: 0 auto; text-align: center; position: relative; z-index: 2;">
-    <div class="badge badge-crisis" style="margin-bottom: 1rem; gap: 6px; padding: 0.45rem 1rem; background: rgba(169,50,38,0.2) !important; color: #FFA59C !important; border: 1px solid rgba(169,50,38,0.4);">
-      <i class="fa-solid fa-phone-volume"></i>
-      <span>Apoyo Inmediato 24/7</span>
-    </div>
-    <h1 style="color: #FFFFFF !important; font-size: clamp(2rem, 4.5vw, 3.2rem); margin-bottom: 1rem; font-weight: 700;">
-      Si necesitas hablar con alguien <em class="editorial-italic" style="color: #A8E6C0 !important;">ahora</em>
-    </h1>
-    <p style="color: #C8DDD1 !important; max-width: 600px; margin: 0 auto; font-size: 1.05rem; line-height: 1.7; font-weight: 300;">
-      Gratuitas. Confidenciales. Disponibles las 24 horas del día, los 365 días del año. No tienes que estar "suficientemente mal" para pedir ayuda.
-    </p>
-
-    <div style="margin-top: 2rem;">
-      <a href="tel:8009112000" class="btn btn-crisis btn-lg" style="font-size: 1.05rem; padding: 1rem 2.25rem; border-radius: 9999px; gap: 8px;">
-        <i class="fa-solid fa-phone"></i>
-        <span>México: 800 911 2000 (Línea de la Vida)</span>
-      </a>
-    </div>
+{{-- Sólo se animan los textos: el botón de llamada y las líneas se ven desde el primer instante. --}}
+<x-marca.hero eyebrow="Apoyo inmediato 24/7" icono="fa-solid fa-phone-volume" :crisis="true">
+  <h1 class="m-titulo" data-aparecer="palabras">Si necesitas hablar con alguien <em>ahora</em></h1>
+  <p class="m-bajada" data-aparecer>Gratuitas. Confidenciales. Disponibles las 24 horas del día, los 365 días del año. No tienes que estar "suficientemente mal" para pedir ayuda.</p>
+  <div class="m-acciones" style="margin-top: 2rem;">
+    <a href="tel:8009112000" class="m-btn m-btn-crisis" style="min-height: 58px; font-size: 1.05rem; padding: 0 2rem;">
+      <i class="fa-solid fa-phone"></i>
+      <span>México: 800 911 2000 (Línea de la Vida)</span>
+    </a>
   </div>
-</div>
-
+</x-marca.hero>
 <div class="container" style="padding-top: 3.5rem; padding-bottom: 4rem;">
 
   <!-- COUNTRY FILTER -->
@@ -52,7 +39,7 @@
   @else
     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; margin-bottom: 3.5rem;">
       @foreach($crisisLines as $line)
-        <div class="card" style="border: 1.5px solid rgba(169, 50, 38, 0.25); background: linear-gradient(145deg, #FFFFFF, #FFF5F4);">
+        <div class="card" data-foco style="--tono: #A93226; border: 1px solid rgba(169, 50, 38, 0.2); background: linear-gradient(160deg, #FFFFFF 40%, #FFF3F1);">
           <div class="card-body">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
               <span class="mono-tag" style="color: #A93226;">{{ $line->country }}</span>

@@ -23,7 +23,7 @@
 
 @section('content')
 <div class="admin-content-canvas">
-  <div style="margin-bottom: 1.25rem;">
+  <div class="cabecera-atl" data-aparecer style="margin-bottom: 1.25rem;">
     <div class="crumbs-atl">Consola A Tu Lado &rsaquo; <b>Cola de atención</b></div>
     <h1 class="titulo-atl">Cola de atención</h1>
     <p class="sub-atl">Casos de crisis abiertos, del más grave al más reciente. <b>No se envían avisos automáticos:</b> revisen esta pantalla con la frecuencia que acordó el equipo.</p>

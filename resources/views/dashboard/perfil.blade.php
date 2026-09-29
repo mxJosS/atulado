@@ -9,25 +9,26 @@
 @section('content')
 <div style="max-width: 800px; margin: 0 auto;">
 
-  <div style="margin-bottom: 1.75rem;">
-    <span class="mono-tag" style="color: var(--sage-base);">— CONFIGURACIÓN DE CUENTA</span>
-    <h1 style="font-size: 1.85rem; margin-top: 0.15rem; color: var(--text-near-black); display: flex; align-items: center; gap: 8px;">
-      <span>Mi Perfil</span>
+  <x-marca.portada eyebrow="Configuración de cuenta" icono="fa-solid fa-user-gear">
+    <h1 class="m-portada-titulo" style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+      <span>Mi <em>Perfil</em></span>
       @if($user->is_admin)
-        <span style="background: rgba(46, 93, 75, 0.15); color: #2E5D4B; font-size: 0.72rem; font-weight: 700; padding: 3px 10px; border-radius: 9999px; font-family: var(--font-mono); letter-spacing: 0.05em; display: inline-flex; align-items: center; gap: 4px;">
+        <span style="background: rgba(168, 230, 192, 0.14); color: #A8E6C0; font-size: 0.72rem; font-weight: 700; padding: 3px 10px; border-radius: 9999px; font-family: var(--font-mono); letter-spacing: 0.05em; display: inline-flex; align-items: center; gap: 4px;">
           <i class="fa-solid fa-shield-halved"></i> ADMINISTRADOR
         </span>
       @elseif($user->isProfessional())
         <x-verified-badge size="22" />
       @endif
     </h1>
-    <p style="color: var(--text-medium-gray); font-size: 0.9rem;">
+    <p class="m-portada-texto">
       @if($user->is_admin)
         Administra tus credenciales de acceso, nombre de usuario y seguridad de cuenta.
       @else
         Personaliza tu experiencia, contactos de emergencia y credenciales de acceso.
       @endif
     </p>
+  </x-marca.portada>
+  <div>
   </div>
 
   @if($user->isProfessional())

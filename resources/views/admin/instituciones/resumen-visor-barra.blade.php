@@ -3,14 +3,14 @@
   documento guardado; no se imprime. $emitirOtro sólo existe en el panel.
 --}}
 <style>
-  .barra-visor { position: sticky; top: 0; z-index: 10; background: #1A2620; color: #E6ECE8; font: 13px/1.45 'Manrope', system-ui, sans-serif; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+  .barra-visor { position: sticky; top: 0; z-index: 10; background: #0A1410 radial-gradient(circle at 10% 0%, rgba(46, 93, 75, 0.8), rgba(10, 20, 16, 0) 55%); color: #E6ECE8; font: 13px/1.45 'Manrope', system-ui, sans-serif; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
   .barra-visor .fila { max-width: 210mm; margin: 0 auto; padding: 12px 16px; display: flex; gap: 16px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
   .barra-visor .titulo { font: 700 11px 'IBM Plex Mono', monospace; letter-spacing: .08em; text-transform: uppercase; color: #A8E6C0; }
   .barra-visor h1 { font: 700 17px 'Fraunces', serif; margin: 2px 0; color: #FFFFFF; }
   .barra-visor .meta { font-size: 12px; color: #B9C9C0; }
   .barra-visor .botones { display: flex; gap: 8px; flex-wrap: wrap; }
-  .barra-visor a, .barra-visor button { font: 700 13px 'Manrope', sans-serif; padding: 8px 14px; border-radius: 8px; border: 1px solid #3C5247; background: transparent; color: #FFFFFF; cursor: pointer; text-decoration: none; }
-  .barra-visor button.primario { background: #2E5D4B; border-color: #2E5D4B; }
+  .barra-visor a, .barra-visor button { font: 700 13px 'Manrope', sans-serif; padding: 8px 16px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.18); background: rgba(255, 255, 255, 0.06); color: #FFFFFF; cursor: pointer; text-decoration: none; }
+  .barra-visor button.primario { background: #A8E6C0; border-color: #A8E6C0; color: #0A1410; }
   .barra-visor .aviso-destino { max-width: 210mm; margin: 0 auto; padding: 0 16px 12px; font-size: 12px; color: #B9C9C0; }
   @media print { .barra-visor { display: none !important; } }
 </style>

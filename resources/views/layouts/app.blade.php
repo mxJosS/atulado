@@ -12,6 +12,8 @@
   
   <!-- CSS & Official Fonts with Cache Buster -->
   <link rel="stylesheet" href="{{ asset('css/style.css') }}?v={{ file_exists(public_path('css/style.css')) ? filemtime(public_path('css/style.css')) : time() }}">
+  {{-- Lenguaje visual de la marca (el de Inicio) para todo el proyecto --}}
+  <link rel="stylesheet" href="{{ asset('css/marca.css') }}?v={{ filemtime(public_path('css/marca.css')) }}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600..700;1,9..144,400&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Instrument+Serif:ital@0;1&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -24,8 +26,10 @@
   <script src="{{ asset('vendor/iconify/iconify-icon.min.js') }}" defer></script>
   <script src="{{ asset('js/game-icons-pack.js') }}?v={{ file_exists(public_path('js/game-icons-pack.js')) ? filemtime(public_path('js/game-icons-pack.js')) : time() }}" defer></script>
   @stack('styles')
+  @include('partials.movimiento-cabeza')
 </head>
-<body style="background: #F8FAF9; color: #1A2620;">
+<body style="background: #FBF9F4; color: #14201A;">
+  @include('partials.suplantacion')
 
   <div class="dashboard-layout">
 
@@ -189,7 +193,8 @@
           <!-- Interactive Streak / Tree Badge Button -->
           @php
             $userStreak = auth()->user()?->calculateStreak() ?? 0;
-            $userTreeLevel = min(5, max(1, intdiv($userStreak, 3) + 1));
+            // Nivel real del árbol del juego (se guarda en la cuenta; 1 si aún no ha jugado).
+            $userTreeLevel = auth()->user()?->jardin?->nivelArbol() ?? 1;
           @endphp
           <button type="button" onclick="(typeof window.openTreeGame === 'function' && document.getElementById('treeGameModalOverlay')) ? window.openTreeGame() : (window.location.href='{{ route('dashboard') }}?open_game=1')" class="topbar-streak-pill" title="Tu racha activa y árbol de bienestar (Click para abrir)">
             <div class="streak-flame-segment">
@@ -244,8 +249,14 @@
   <script src="{{ asset('js/main.js') }}?v={{ file_exists(public_path('js/main.js')) ? filemtime(public_path('js/main.js')) : time() }}"></script>
   <script>
     window.ATULADO_USER_ID = {{ auth()->id() ? auth()->id() : "'guest'" }};
+    {{-- Juego del árbol: estado guardado en la cuenta y adónde guardarlo (game-engine.js) --}}
+    @auth
+      window.ATULADO_JARDIN = @json(auth()->user()->jardin?->estado);
+      window.ATULADO_JARDIN_URL = @json(route('jardin.guardar'));
+    @endauth
   </script>
   <script src="{{ asset('js/game-engine.js') }}?v={{ file_exists(public_path('js/game-engine.js')) ? filemtime(public_path('js/game-engine.js')) : time() }}"></script>
+  @include('partials.movimiento-scripts')
   @stack('scripts')
 </body>
 </html>

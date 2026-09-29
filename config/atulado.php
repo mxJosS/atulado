@@ -15,6 +15,16 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | «Entrar como»
+    |--------------------------------------------------------------------------
+    | Las cuentas de superadmin_emails pueden abrir la sesión de cualquier otra
+    | cuenta desde Usuarios, para probar la plataforma como la ve esa persona.
+    | Queda en la bitácora de administración. false = apagado.
+    */
+    'suplantacion' => (bool) env('ATULADO_SUPLANTACION', true),
+
+    /*
+    |--------------------------------------------------------------------------
     | Catálogos del Alta de Institución
     |--------------------------------------------------------------------------
     | Una sola lista para el formulario de alta, el de edición y la validación.

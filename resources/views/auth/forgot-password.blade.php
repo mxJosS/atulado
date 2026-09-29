@@ -3,31 +3,20 @@
 @section('title', 'Recuperar Contraseña — A tu lado')
 
 @section('content')
-<div class="auth-page-wrapper" style="min-height: 90vh; background: #080C0A !important; color: #FFFFFF !important; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2.5rem 1.5rem; position: relative; overflow: hidden;">
+<div class="acceso">
+  <x-marca.acceso-panel eyebrow="Recupera tu acceso">
+    <h2>Todos olvidamos <em>algo</em></h2>
+    <p>Te enviamos un enlace a tu correo para que crees una contraseña nueva.</p>
+  </x-marca.acceso-panel>
 
-  <!-- Ambient Halos -->
-  <div style="position: absolute; width: 600px; height: 600px; border-radius: 50%; background: radial-gradient(circle, rgba(90, 181, 110, 0.22) 0%, transparent 68%); top: 50%; left: 50%; transform: translate(-50%, -60%); pointer-events: none;"></div>
-  <div style="position: absolute; width: 450px; height: 450px; border-radius: 50%; background: radial-gradient(circle, rgba(91, 74, 138, 0.2) 0%, transparent 68%); bottom: -10%; right: -5%; pointer-events: none;"></div>
-
-  <div style="width: 100%; max-width: 440px; position: relative; z-index: 2;">
-
-    <!-- Back to Login Link -->
-    <a href="{{ route('login') }}" class="auth-back-link" style="display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; color: #8EADA4; text-decoration: none; margin-bottom: 1.5rem; transition: all 0.2s;">
-      <i class="fa-solid fa-arrow-left"></i>
-      <span>Volver a iniciar sesión</span>
-    </a>
-
-    <!-- Main Card -->
-    <div style="background: #FFFFFF !important; border-radius: 24px; padding: 2.25rem 2rem; box-shadow: var(--shadow-lg); border: 1.5px solid #DCE8E0; color: #1A2620;">
+  <div class="acceso-formulario">
+  <div class="acceso-tarjeta" data-aparecer>
+    <div class="m-tarjeta" style="padding: clamp(1.75rem, 3vw, 2.5rem); color: #14201A;">
       
       <!-- Card Header -->
       <div style="text-align: center; margin-bottom: 1.5rem;">
-        <a href="{{ route('home') }}" style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none; margin-bottom: 0.85rem;">
-          <x-logo :size="32" />
-          <span style="font-family: var(--font-display); font-size: 1.35rem; color: #2E5D4B; font-weight: 700;">a tu <em class="editorial-italic" style="color: #5AB56E;">lado</em></span>
-        </a>
 
-        <h1 style="font-family: var(--font-display); font-size: 1.65rem; font-weight: 700; color: #1A2620; line-height: 1.2; margin-bottom: 0.45rem;">
+        <h1 class="acceso-tarjeta-titulo">
           ¿Olvidaste tu contraseña?
         </h1>
         <p style="font-size: 0.88rem; color: #556860; line-height: 1.5;">
@@ -63,7 +52,7 @@
             required 
             autocomplete="email"
             autofocus
-            style="background: #FFFFFF; border: 1.5px solid #DCE8E0; border-radius: 12px; padding: 0.75rem 1rem; font-size: 0.92rem; color: #1A2620; width: 100%; box-sizing: border-box;"
+            style="background: #FFFFFF; border: 1px solid rgba(20, 32, 26, 0.12); border-radius: 14px; padding: 0.75rem 1rem; font-size: 0.92rem; color: #1A2620; width: 100%; box-sizing: border-box;"
           >
           @error('email')
             <div class="form-error" style="color: #C0392B; font-size: 0.8rem; margin-top: 0.3rem;">{{ $message }}</div>
@@ -92,5 +81,6 @@
 
   </div>
 
+</div>
 </div>
 @endsection

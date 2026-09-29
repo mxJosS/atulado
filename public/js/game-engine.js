@@ -6,6 +6,13 @@
 (function(window) {
   'use strict';
 
+  // Nivel máximo de cada planta. El árbol del logo crece visiblemente hasta aquí.
+  const NIVEL_MAXIMO = 50;
+
+  function limitarNivel(n) {
+    return Math.max(1, Math.min(NIVEL_MAXIMO, parseInt(n, 10) || 1));
+  }
+
   let soundEnabled = true;
   let audioCtx = null;
   let activeTool = 'water';
@@ -82,7 +89,7 @@
       Object.keys(plantLevels).forEach(k => {
         if (parsed[k]) {
           plantLevels[k] = {
-            level: Math.max(1, Math.min(100, parseInt(parsed[k].level, 10) || 1)),
+            level: limitarNivel(parsed[k].level),
             xp: Math.max(0, parseInt(parsed[k].xp, 10) || 0)
           };
         }
@@ -94,10 +101,11 @@
     try {
       localStorage.setItem(getZenStorageKey('plant_levels'), JSON.stringify(plantLevels));
     } catch(e) {}
+    guardarEnServidor();
   }
 
   function getXpRequired(level) {
-    if (level >= 100) return 0;
+    if (level >= NIVEL_MAXIMO) return 0;
     const base = 40;
     const growth = Math.pow(1 + (level - 1) * 0.082, 2.25);
     return Math.round(base * growth + (level * 10));
@@ -109,8 +117,8 @@
     }
 
     const p = plantLevels[plantKey];
-    if (p.level >= 100) {
-      p.level = 100;
+    if (p.level >= NIVEL_MAXIMO) {
+      p.level = NIVEL_MAXIMO;
       p.xp = 0;
       saveZenPlantLevels();
       updatePlantHudDisplay();
@@ -122,15 +130,15 @@
     let req = getXpRequired(p.level);
     let leveledUp = false;
 
-    while (p.xp >= req && p.level < 100) {
+    while (p.xp >= req && p.level < NIVEL_MAXIMO) {
       p.xp -= req;
       p.level += 1;
       leveledUp = true;
       req = getXpRequired(p.level);
     }
 
-    if (p.level >= 100) {
-      p.level = 100;
+    if (p.level >= NIVEL_MAXIMO) {
+      p.level = NIVEL_MAXIMO;
       p.xp = 0;
     }
 
@@ -143,6 +151,7 @@
     }
 
     if (leveledUp) {
+      if (plantKey === 'tree' && (zenInventory.activePlant || 'tree') === 'tree') renderActivePlant();
       triggerLevelUpCelebration(plantKey, p.level);
     }
   }
@@ -154,17 +163,21 @@
     createFertilizerFx();
 
     const plantName = SPECIES_NAMES[plantKey] || 'Tu árbol';
-    if (newLevel >= 100) {
+    if (newLevel >= NIVEL_MAXIMO) {
       window.showZenNotification(
-        "¡Nivel 100 Máximo!",
-        `¡Felicidades! ${plantName} ha alcanzado el nivel 100 máximo tras tu constancia y cuidado diario. Has cultivado la máxima serenidad y armonía.`,
+        plantKey === 'tree' ? '¡El Árbol de la Sabiduría!' : `¡Nivel ${NIVEL_MAXIMO} Máximo!`,
+        plantKey === 'tree'
+          ? `Tu árbol llegó al nivel ${NIVEL_MAXIMO}: ${alturaArbol(newLevel)} de altura y frutos dorados. Lo cultivaste con constancia y cuidado diario.`
+          : `¡Felicidades! ${plantName} ha alcanzado el nivel ${NIVEL_MAXIMO} máximo tras tu constancia y cuidado diario. Has cultivado la máxima serenidad y armonía.`,
         "game-icons:laurel-crown",
         "#F1C40F"
       );
     } else {
       window.showZenNotification(
         `¡${plantName} Subió a Nivel ${newLevel}!`,
-        `Tu constancia da frutos. Cada nivel requiere más cuidado y dedicación. Sigue cuidando tu árbol para llevarlo al Nivel 100.`,
+        plantKey === 'tree'
+          ? `Tu árbol ya mide ${alturaArbol(newLevel)}. Cada nivel requiere más cuidado; sigue cuidándolo para llevarlo al Nivel ${NIVEL_MAXIMO}.`
+          : `Tu constancia da frutos. Cada nivel requiere más cuidado y dedicación. Sigue cuidando tu planta para llevarla al Nivel ${NIVEL_MAXIMO}.`,
         "game-icons:party-popper",
         "#5AB56E"
       );
@@ -185,17 +198,25 @@
     if (levelElem) levelElem.innerText = pData.level;
 
     if (levelTag) {
-      if (pData.level >= 100) {
+      if (pData.level >= NIVEL_MAXIMO) {
         levelTag.classList.add('max-level');
-        levelTag.innerHTML = '<i class="fa-solid fa-crown"></i> Nv. <strong>100 MAX</strong>';
+        levelTag.innerHTML = `<i class="fa-solid fa-crown"></i> Nv. <strong>${NIVEL_MAXIMO} MAX</strong>`;
       } else {
         levelTag.classList.remove('max-level');
         levelTag.innerHTML = `Nv. <strong id="pvzCurrentTreeLevel">${pData.level}</strong>`;
       }
     }
 
+    // Altura del árbol del logo, como los «pies» del Árbol de la Sabiduría
+    const alturaElem = document.getElementById('pvzAlturaArbol');
+    if (alturaElem) {
+      alturaElem.style.display = activeKey === 'tree' ? '' : 'none';
+      alturaElem.innerHTML = `<i class="fa-solid fa-ruler-vertical"></i> ${alturaArbol(pData.level)}`;
+    }
+    pintarVistasPrevias();
+
     let percent = 0;
-    if (pData.level >= 100) {
+    if (pData.level >= NIVEL_MAXIMO) {
       percent = 100;
     } else {
       const req = getXpRequired(pData.level);
@@ -217,7 +238,7 @@
     const activeKey = (typeof zenInventory !== 'undefined' && zenInventory.activePlant) || 'tree';
     const pData = plantLevels[activeKey] || { level: 1, xp: 0 };
     document.querySelectorAll('.tree-level-label').forEach(el => {
-      el.textContent = pData.level >= 100 ? 'Nvl 100' : `Nvl ${pData.level}`;
+      el.textContent = `Nvl ${pData.level}`;
     });
   }
 
@@ -242,14 +263,104 @@
     try {
       localStorage.setItem(getZenStorageKey('inventory'), JSON.stringify(zenInventory));
     } catch(e) {}
+    guardarEnServidor();
   }
 
   function saveZenEconomy() {
+    guardarCacheEconomia();
+    guardarEnServidor();
+  }
+
+  function guardarCacheEconomia() {
     try {
       localStorage.setItem(getZenStorageKey('total_calm'), totalCalmPoints.toString());
       localStorage.setItem(getZenStorageKey('daily_tasks'), dailyTasksCompleted.toString());
       localStorage.setItem(getZenStorageKey('daily_date'), new Date().toISOString().slice(0, 10));
     } catch(e) {}
+  }
+
+  /* ── Jardín guardado en la cuenta ─────────────────────────────────────────
+     El estado vive en el servidor (POST /jardin, tabla jardines) y sigue a la
+     persona en cualquier dispositivo; localStorage queda sólo como caché.
+     Si la cuenta aún no tiene jardín, se sube lo que hubiera en este navegador. */
+  function exportarEstado() {
+    const plantas = {};
+    Object.keys(plantLevels).forEach(k => {
+      plantas[k] = { nivel: limitarNivel(plantLevels[k].level), xp: Math.max(0, Math.floor(plantLevels[k].xp) || 0) };
+    });
+    return {
+      plantas,
+      soles: Math.max(0, Math.floor(totalCalmPoints) || 0),
+      tareas_fecha: new Date().toISOString().slice(0, 10),
+      tareas_hechas: Math.max(0, dailyTasksCompleted | 0),
+      inventario: {
+        escudo: !!zenInventory.shield,
+        plantas: zenInventory.unlockedPlants,
+        planta_activa: zenInventory.activePlant || 'tree',
+        macetas: zenInventory.unlockedPots,
+        maceta_activa: zenInventory.activePot || 'terracotta'
+      }
+    };
+  }
+
+  function aplicarEstado(estado) {
+    if (!estado || typeof estado !== 'object') return;
+    Object.keys(plantLevels).forEach(k => {
+      const p = estado.plantas && estado.plantas[k];
+      if (p) plantLevels[k] = { level: limitarNivel(p.nivel), xp: Math.max(0, parseInt(p.xp, 10) || 0) };
+    });
+    if (Number.isFinite(estado.soles)) totalCalmPoints = estado.soles;
+    const hoy = new Date().toISOString().slice(0, 10);
+    dailyTasksCompleted = estado.tareas_fecha === hoy ? (parseInt(estado.tareas_hechas, 10) || 0) : 0;
+    const inv = estado.inventario || {};
+    zenInventory = Object.assign(zenInventory, {
+      shield: !!inv.escudo,
+      unlockedPlants: Array.isArray(inv.plantas) && inv.plantas.length ? inv.plantas : zenInventory.unlockedPlants,
+      activePlant: inv.planta_activa || zenInventory.activePlant,
+      unlockedPots: Array.isArray(inv.macetas) && inv.macetas.length ? inv.macetas : zenInventory.unlockedPots,
+      activePot: inv.maceta_activa || zenInventory.activePot
+    });
+    try {
+      localStorage.setItem(getZenStorageKey('plant_levels'), JSON.stringify(plantLevels));
+      localStorage.setItem(getZenStorageKey('inventory'), JSON.stringify(zenInventory));
+    } catch(e) {}
+    guardarCacheEconomia();
+  }
+
+  let guardadoPendiente = null;
+
+  function guardarEnServidor(inmediato = false) {
+    if (!window.ATULADO_JARDIN_URL) return;
+    clearTimeout(guardadoPendiente);
+    const enviar = () => {
+      guardadoPendiente = null;
+      const token = document.querySelector('meta[name="csrf-token"]');
+      fetch(window.ATULADO_JARDIN_URL, {
+        method: 'POST',
+        credentials: 'same-origin',
+        keepalive: true,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRF-TOKEN': token ? token.getAttribute('content') : ''
+        },
+        body: JSON.stringify(exportarEstado())
+      }).catch(() => {});
+    };
+    if (inmediato) enviar();
+    else guardadoPendiente = setTimeout(enviar, 1500);
+  }
+
+  // Al cerrar o cambiar de pestaña no se pierde el último cambio.
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden' && guardadoPendiente) guardarEnServidor(true);
+  });
+
+  if (window.ATULADO_JARDIN) {
+    aplicarEstado(window.ATULADO_JARDIN);
+  } else if (window.ATULADO_JARDIN_URL) {
+    guardarEnServidor();
   }
 
   const TOOL_SPECS = {
@@ -765,6 +876,359 @@
     potWrapper.className = 'pvz-pot-wrapper pot-' + (zenInventory.activePot || 'terracotta');
   }
 
+  /* ══ Árbol del logo que crece nivel a nivel (1–50) ═══════════════════════
+     Pixel art procedural en una rejilla fija de 48×72, con el estilo del logo:
+     copa redonda con contorno oscuro y sombreado, destello verde claro,
+     racimos rojos y tronco café con su rama. Cada nivel conserva todo lo del
+     anterior: flores y frutos tienen posiciones fijas y un nivel de aparición.
+       1       brote de dos hojas
+       2–5     retoño: el tallo sube y echa hojas
+       6–15    arbolito: tronco y copa; aparecen los primeros racimos rojos
+       16–25   la silueta completa del logo
+       26–40   más alto: copa en capas, raíces y más racimos
+       41–49   frondoso: flores rosas y luciérnagas
+       50      frutos dorados y aura: el Árbol de la Sabiduría
+     En el escenario, la «cámara» se aleja conforme crece (como en el juego
+     original): de brote grande y pixelado a árbol alto y lleno de detalle. */
+  const ARBOL_ANCHO = 48;
+  const ARBOL_ALTO = 72;
+  const TONO = {
+    borde: '#0B2E16', sombra: '#1F6B35', base: '#2A8744', luz: '#35A354', brillo: '#72D98A',
+    tallo: '#3F9C4A', hoja: '#6CCB5F',
+    tronco: '#7A3E1C', troncoLuz: '#9A5426', troncoSombra: '#552810', troncoBorde: '#2E1406',
+    rojo: '#E62E2E', rojoOscuro: '#A91E1E', rojoBrillo: '#FF6B5E',
+    oro: '#F4C542', oroOscuro: '#B8860B', oroBrillo: '#FFF3B0',
+    rosa: '#F8BBD0', rosaOscuro: '#EC407A',
+    luciernaga: '#FFE680',
+    pasto: '#34A853', pastoLuz: '#6FDB86', pastoSombra: '#1F7A3A'
+  };
+  let contadorArboles = 0;
+
+  function azarConSemilla(semilla) {
+    let a = semilla >>> 0;
+    return function() {
+      a = (a + 0x6D2B79F5) >>> 0;
+      let t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  // Puntos fijos en un disco unitario, separados entre sí; cada uno aparece en su nivel.
+  function puntosFijos(semilla, cuantos, radio2, separacion2, desde, hasta) {
+    const azar = azarConSemilla(semilla);
+    const puntos = [];
+    for (let i = 0; puntos.length < cuantos && i < 8000; i++) {
+      const u = azar() * 2 - 1, v = azar() * 2 - 1;
+      if (u * u + v * v > radio2) continue;
+      if (puntos.some(p => (p.u - u) ** 2 + (p.v - v) ** 2 < separacion2)) continue;
+      puntos.push({ u, v });
+    }
+    const n = puntos.length;
+    return puntos.map((p, i) => Object.assign(p, { desde: Math.round(desde + (hasta - desde) * (n > 1 ? i / (n - 1) : 0)) }));
+  }
+
+  const RACIMOS = puntosFijos(20260928, 16, 0.58, 0.13, 8, 38);
+  const RACIMOS_MEDIO = puntosFijos(1717, 8, 0.45, 0.18, 27, 45);
+  const RACIMOS_CORONA = puntosFijos(4242, 3, 0.3, 0.25, 41, 48);
+  const FLORES = puntosFijos(909, 12, 0.75, 0.06, 41, 49);
+  const LUCIERNAGAS = [[0.1, 0.34], [0.88, 0.26], [0.14, 0.6], [0.86, 0.55], [0.3, 0.12], [0.72, 0.1]]
+    .map((p, i) => ({ x: p[0], y: p[1], desde: 44 + i }));
+
+  function alturaArbol(nivel) {
+    return (0.1 + (limitarNivel(nivel) - 1) * 0.24).toFixed(1).replace('.', ',') + ' m';
+  }
+
+  /**
+   * SVG del árbol en su nivel.
+   *   opciones.id / clase   atributos del <svg>
+   *   opciones.suelo        dibuja la franja de pasto del logo
+   *   opciones.recorte      encuadra sólo el árbol (vistas previas pequeñas)
+   */
+  function dibujarArbol(nivel, opciones = {}) {
+    const L = limitarNivel(nivel);
+    const W = ARBOL_ANCHO, H = ARBOL_ALTO;
+    const rej = Array.from({ length: H }, () => new Array(W).fill(null));
+    const dentro = (x, y) => x >= 0 && x < W && y >= 0 && y < H;
+    const pon = (x, y, c) => { x = Math.round(x); y = Math.round(y); if (dentro(x, y)) rej[y][x] = c; };
+    const lleno = (x, y) => dentro(x, y) && rej[y][x] !== null;
+    const esTronco = c => c === TONO.tronco || c === TONO.troncoLuz || c === TONO.troncoSombra;
+    const esCopa = c => c === TONO.base || c === TONO.luz || c === TONO.sombra || c === TONO.brillo;
+
+    const pie = opciones.suelo ? H - 6 : H - 1;   // última fila del árbol
+    const cx = 24;
+    let copaCentro = null;                         // para el aura del nivel 50
+    let copaMasAlta = null;
+
+    if (L <= 5) {
+      // Brote y retoño: tallo verde (leñoso abajo desde el nivel 4) y hojas alternadas
+      const alto = [0, 3, 4, 6, 8, 10][L];
+      const x = 23;
+      for (let i = 0; i < alto; i++) pon(x, pie - i, (L >= 4 && i < 2) ? TONO.tronco : TONO.tallo);
+      const tope = pie - alto + 1;
+      const hoja = (y, lado) => {
+        pon(x + lado, y, TONO.hoja);
+        pon(x + 2 * lado, y, TONO.hoja);
+        pon(x + 2 * lado, y - 1, TONO.hoja);
+        pon(x + 3 * lado, y - 1, TONO.brillo);
+      };
+      hoja(tope, -1);
+      hoja(tope, 1);
+      if (L >= 3) pon(x, tope - 1, TONO.brillo);
+      for (let y = pie - 2, lado = -1; y > tope + 1; y -= 3, lado = -lado) hoja(y, lado);
+    } else {
+      const rx = Math.min(20, 4.2 + L * 0.34);
+      const ry = rx * 0.84;
+      const tAncho = L < 12 ? 2 : L < 24 ? 3 : L < 38 ? 4 : 5;
+      const tAlto = Math.round(3 + L * 0.2);
+      const baseCopa = pie - tAlto;
+      const cy = baseCopa - ry + 2;
+
+      const copas = [{ x: cx, y: cy, rx, ry, capa: 0 }];
+      if (L >= 16) {
+        copas.push({ x: cx - rx * 0.55, y: cy + ry * 0.28, rx: rx * 0.5, ry: ry * 0.46, capa: 0 });
+        copas.push({ x: cx + rx * 0.55, y: cy + ry * 0.28, rx: rx * 0.5, ry: ry * 0.46, capa: 0 });
+      }
+      // Copa que se ensancha hacia arriba en lóbulos redondos (como el logo, más grande)
+      let izquierda = null, derecha = null, corona = null;
+      if (L >= 26) {
+        izquierda = { x: cx - rx * 0.3, y: cy - ry * 0.72, rx: rx * 0.6, ry: ry * 0.62, capa: 1 };
+        derecha = { x: cx + rx * 0.3, y: cy - ry * 0.72, rx: rx * 0.6, ry: ry * 0.62, capa: 1 };
+        copas.push(izquierda, derecha);
+      }
+      if (L >= 40) { corona = { x: cx, y: cy - ry * 1.12, rx: rx * 0.5, ry: ry * 0.45, capa: 2 }; copas.push(corona); }
+      copaCentro = copas[0];
+      copaMasAlta = corona || izquierda || copas[0];
+
+      // Tronco: sube dos filas dentro de la copa
+      const x0 = Math.round(cx - tAncho / 2);
+      for (let y = baseCopa - 2; y <= pie; y++) {
+        for (let i = 0; i < tAncho; i++) {
+          const c = i === tAncho - 1 ? TONO.troncoSombra : (i === 1 || (tAncho === 2 && i === 0)) ? TONO.troncoLuz : TONO.tronco;
+          pon(x0 + i, y, c);
+        }
+      }
+      // Rama a la derecha, como en el logo
+      if (L >= 10) {
+        const by = baseCopa + Math.max(1, Math.round(tAlto * 0.3));
+        const largo = 2 + Math.floor(L / 12);
+        for (let i = 0; i < largo; i++) {
+          pon(x0 + tAncho + i, by, TONO.tronco);
+          pon(x0 + tAncho + i, by + 1, TONO.troncoSombra);
+        }
+        pon(x0 + tAncho + largo - 1, by - 1, TONO.tronco);
+      }
+      // Raíces
+      if (L >= 26) {
+        pon(x0 - 1, pie, TONO.tronco);
+        pon(x0 + tAncho, pie, TONO.troncoSombra);
+      }
+      if (L >= 34) {
+        pon(x0 - 2, pie, TONO.tronco);
+        pon(x0 - 1, pie - 1, TONO.tronco);
+        pon(x0 + tAncho + 1, pie, TONO.troncoSombra);
+        pon(x0 + tAncho, pie - 1, TONO.troncoSombra);
+      }
+
+      // Copa: la capa más alta queda encima; luz desde arriba a la izquierda
+      for (let y = 0; y < H; y++) {
+        for (let x = 0; x < W; x++) {
+          let mejor = null, mejorD = 2;
+          for (const c of copas) {
+            const d = ((x + 0.5 - c.x) / c.rx) ** 2 + ((y + 0.5 - c.y) / c.ry) ** 2;
+            if (d <= 1 && (mejor === null || c.capa > mejor.capa || (c.capa === mejor.capa && d < mejorD))) { mejor = c; mejorD = d; }
+          }
+          if (!mejor) continue;
+          const nx = (x + 0.5 - mejor.x) / mejor.rx;
+          const ny = (y + 0.5 - mejor.y) / mejor.ry;
+          const luz = -0.55 * nx - 0.8 * ny;
+          rej[y][x] = (ny > 0.6 || luz < -0.55) ? TONO.sombra : luz > 0.45 ? TONO.luz : TONO.base;
+        }
+      }
+
+      // Destello verde claro del logo (arriba a la izquierda de la copa más alta)
+      if (L >= 12) {
+        const w = L >= 25 ? 4 : 3, h = L >= 25 ? 3 : 2;
+        const hx = Math.round(copaMasAlta.x - copaMasAlta.rx * 0.45);
+        const hy = Math.round(copaMasAlta.y - copaMasAlta.ry * 0.55);
+        for (let j = 0; j < h; j++) for (let i = 0; i < w; i++) if (lleno(hx + i, hy + j)) pon(hx + i, hy + j, TONO.brillo);
+      }
+
+      // Racimos rojos (dorados algunos en el nivel 50)
+      const racimo = (px, py, grande, dorado) => {
+        const R = dorado ? TONO.oro : TONO.rojo;
+        const O = dorado ? TONO.oroOscuro : TONO.rojoOscuro;
+        const B = dorado ? TONO.oroBrillo : TONO.rojoBrillo;
+        const forma = grande
+          ? [[1, 0, R], [2, 0, R], [0, 1, R], [1, 1, B], [2, 1, R], [3, 1, R], [0, 2, R], [1, 2, R], [2, 2, R], [3, 2, O], [1, 3, R], [2, 3, O]]
+          : [[1, 0, R], [0, 1, R], [1, 1, B], [2, 1, R], [1, 2, O]];
+        const ox = Math.round(px) - (grande ? 2 : 1), oy = Math.round(py) - (grande ? 2 : 1);
+        forma.forEach(([dx, dy, c]) => {
+          const x = ox + dx, y = oy + dy;
+          if (lleno(x, y) && esCopa(rej[y][x])) rej[y][x] = c;
+        });
+      };
+      const sembrar = (lista, copa, inicio) => {
+        if (!copa) return;
+        lista.forEach((r, i) => {
+          if (L >= r.desde) racimo(copa.x + r.u * copa.rx * 0.95, copa.y + r.v * copa.ry * 0.95, L >= 20, L >= NIVEL_MAXIMO && (i + inicio) % 3 === 0);
+        });
+      };
+      sembrar(RACIMOS, copas[0], 0);
+      sembrar(RACIMOS_MEDIO.filter((r, i) => i % 2 === 0), izquierda, 1);
+      sembrar(RACIMOS_MEDIO.filter((r, i) => i % 2 === 1), derecha, 2);
+      sembrar(RACIMOS_CORONA, corona, 0);
+
+      // Flores rosas del árbol frondoso
+      FLORES.forEach(f => {
+        if (L < f.desde) return;
+        const x = Math.round(cx + f.u * rx), y = Math.round(cy + f.v * ry);
+        if (lleno(x, y) && esCopa(rej[y][x]) && lleno(x, y + 1) && esCopa(rej[y + 1][x])) {
+          rej[y][x] = TONO.rosa;
+          rej[y + 1][x] = TONO.rosaOscuro;
+        }
+      });
+    }
+
+    // Franja de pasto del logo (vistas previas): un poco más ancha que el árbol
+    if (opciones.suelo) {
+      let izq = W, der = 0;
+      for (let y = 0; y <= pie; y++) for (let x = 0; x < W; x++) if (rej[y][x]) { izq = Math.min(izq, x); der = Math.max(der, x); }
+      const desde = Math.max(2, izq - 4), hasta = Math.min(W - 3, der + 4);
+      for (let y = pie + 1; y <= H - 2; y++) {
+        for (let x = desde; x <= hasta; x++) {
+          rej[y][x] = y === pie + 1 ? TONO.pastoLuz : y === H - 2 ? TONO.pastoSombra : TONO.pasto;
+        }
+      }
+    }
+
+    // Contorno oscuro de una celda alrededor de todo, como en el logo
+    const contorno = [];
+    for (let y = 0; y < H; y++) {
+      for (let x = 0; x < W; x++) {
+        if (rej[y][x] !== null) continue;
+        const vecinos = [[1, 0], [-1, 0], [0, 1], [0, -1]]
+          .map(([dx, dy]) => (lleno(x + dx, y + dy) ? rej[y + dy][x + dx] : null))
+          .filter(Boolean);
+        if (vecinos.length) contorno.push([x, y, vecinos.every(esTronco) ? TONO.troncoBorde : TONO.borde]);
+      }
+    }
+    contorno.forEach(([x, y, c]) => { rej[y][x] = c; });
+
+    // Corona de destellos dorados en el nivel máximo
+    let arriba = H;
+    for (let y = 0; y < H && arriba === H; y++) if (rej[y].some(Boolean)) arriba = y;
+    if (L >= NIVEL_MAXIMO) {
+      [[cx, arriba - 3], [cx - 6, arriba - 1], [cx + 6, arriba - 1]].forEach(([sx, sy]) => {
+        [[0, 0], [1, 0], [-1, 0], [0, 1], [0, -1]].forEach(([dx, dy]) => {
+          if (dentro(sx + dx, sy + dy) && !lleno(sx + dx, sy + dy)) pon(sx + dx, sy + dy, dx || dy ? TONO.oro : TONO.oroBrillo);
+        });
+      });
+      arriba = Math.max(0, arriba - 4);
+    }
+
+    // Filas de <rect>: une las celdas iguales contiguas
+    let rects = '';
+    for (let y = 0; y < H; y++) {
+      for (let x = 0; x < W;) {
+        const c = rej[y][x];
+        if (!c) { x++; continue; }
+        let x2 = x + 1;
+        while (x2 < W && rej[y][x2] === c) x2++;
+        rects += `<rect x="${x}" y="${y}" width="${x2 - x}" height="1" fill="${c}"/>`;
+        x = x2;
+      }
+    }
+
+    // Luciérnagas (titilan con css/style.css) y aura dorada del nivel 50
+    let luces = '';
+    LUCIERNAGAS.forEach(l => {
+      const x = Math.round(l.x * W), y = Math.round(arriba + l.y * (H - arriba));
+      if (L >= l.desde && !lleno(x, y)) luces += `<rect class="arbol-luciernaga" x="${x}" y="${y}" width="1" height="1" fill="${TONO.luciernaga}"/>`;
+    });
+    let defs = '', aura = '';
+    if (L >= NIVEL_MAXIMO && copaCentro) {
+      const idAura = 'auraArbol' + (++contadorArboles);
+      defs = `<defs><radialGradient id="${idAura}"><stop offset="0%" stop-color="#FFE680" stop-opacity="0.55"/><stop offset="100%" stop-color="#FFE680" stop-opacity="0"/></radialGradient></defs>`;
+      aura = `<circle cx="${cx}" cy="${(copaCentro.y - copaCentro.ry * 0.6).toFixed(1)}" r="${(copaCentro.rx * 1.45).toFixed(1)}" fill="url(#${idAura})" shape-rendering="auto"/>`;
+    }
+
+    // Encuadre
+    let vb;
+    if (opciones.recorte) {
+      let minX = W, maxX = 0, minY = H, maxY = 0;
+      for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (rej[y][x]) {
+        minX = Math.min(minX, x); maxX = Math.max(maxX, x); minY = Math.min(minY, y); maxY = Math.max(maxY, y);
+      }
+      const lado = Math.max(maxX - minX + 1, maxY - minY + 1) + 2;
+      const mx = (minX + maxX + 1) / 2, my = (minY + maxY + 1) / 2;
+      vb = `${(mx - lado / 2).toFixed(2)} ${(my - lado / 2).toFixed(2)} ${lado} ${lado}`;
+    } else {
+      // Escenario: la «cámara» se aleja conforme el árbol crece
+      const fraccion = 0.3 + 0.62 * Math.pow((L - 1) / (NIVEL_MAXIMO - 1), 0.85);
+      const filas = Math.min(H, (H - arriba) / fraccion);
+      const columnas = filas * W / H;
+      vb = `${(cx - columnas / 2).toFixed(2)} ${(H - filas).toFixed(2)} ${columnas.toFixed(2)} ${filas.toFixed(2)}`;
+    }
+
+    const id = opciones.id ? ` id="${opciones.id}"` : '';
+    return `<svg${id} class="${opciones.clase || ''}" viewBox="${vb}" preserveAspectRatio="xMidYMax meet" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Árbol de A tu lado, nivel ${L}">${defs}${aura}${rects}${luces}</svg>`;
+  }
+
+  // Vistas previas del árbol (tablero y tienda): elementos con data-arbol-vista
+  function pintarVistasPrevias() {
+    const nivel = (plantLevels.tree || { level: 1 }).level;
+    document.querySelectorAll('[data-arbol-vista]').forEach(el => {
+      if (el.getAttribute('data-arbol-vista') === String(nivel)) return;
+      el.setAttribute('data-arbol-vista', String(nivel));
+      el.innerHTML = dibujarArbol(nivel, { recorte: true, suelo: true, clase: 'arbol-vista-svg' });
+    });
+    document.querySelectorAll('.arbol-nivel-texto').forEach(el => { el.textContent = nivel; });
+  }
+
+  // El árbol ocupa el alto disponible del escenario (sobre la maceta)
+  function ajustarAlturaArbol() {
+    const svg = document.getElementById('interactiveTreeSvg');
+    const escenario = document.getElementById('pvzStageCanvas');
+    if (!svg || !escenario || !svg.classList.contains('arbol-crece')) return;
+    const alto = Math.max(110, Math.min(380, escenario.clientHeight - 70));
+    svg.style.setProperty('height', alto + 'px', 'important');
+    svg.style.setProperty('width', Math.round(alto * ARBOL_ANCHO / ARBOL_ALTO) + 'px', 'important');
+  }
+  window.addEventListener('resize', ajustarAlturaArbol);
+
+  /** Herramienta de prueba de las cuentas principales: sube o baja un nivel al instante. */
+  window.ajustarNivelPlanta = function(delta) {
+    const activeKey = zenInventory.activePlant || 'tree';
+    const p = plantLevels[activeKey] || (plantLevels[activeKey] = { level: 1, xp: 0 });
+    const nuevo = limitarNivel(p.level + delta);
+    if (nuevo === p.level) {
+      playPvzTone(260, 'sawtooth', 0.15);
+      return;
+    }
+    p.level = nuevo;
+    p.xp = 0;
+    saveZenPlantLevels();
+    renderActivePlant();
+    updatePlantHudDisplay();
+    updateShopUI();
+    if (delta > 0) {
+      playCollectChime();
+      createSunFx();
+    } else {
+      playPvzTone(392, 'sine', 0.25);
+    }
+    const svg = document.getElementById('interactiveTreeSvg');
+    if (svg) {
+      svg.classList.remove('pvz-plant-joy');
+      void svg.getBoundingClientRect();
+      svg.classList.add('pvz-plant-joy');
+    }
+  };
+
+  window.dibujarArbolAtulado = dibujarArbol;
+
   function renderActivePlant() {
     const container = document.getElementById('pvzPlantSvgContainer');
     const plantNameDisplay = document.getElementById('activePlantNameDisplay');
@@ -881,26 +1345,16 @@
         </svg>
       `;
     } else {
-      if (plantNameDisplay) plantNameDisplay.innerText = 'Árbol Sabiduría';
-      svgHtml = `
-        <svg id="interactiveTreeSvg" class="ptree" viewBox="0 0 32 32" width="130" height="130" xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); filter: drop-shadow(0 12px 24px rgba(0,0,0,0.65)); margin-bottom: -5px; z-index: 5;">
-          <rect id="treeTrunk" x="14" y="18" width="4" height="10" fill="#6B3A1F"/>
-          <rect x="13" y="21" width="1" height="6" fill="#4A2710"/>
-          <rect x="17" y="22" width="1" height="5" fill="#4A2710"/>
-          <rect id="foliage1" x="7" y="6" width="18" height="14" fill="#2D6B3A"/>
-          <rect id="foliage2" x="5" y="8" width="22" height="12" fill="#2D6B3A"/>
-          <rect id="foliage3" x="8" y="7" width="16" height="12" fill="#3D8C4F"/>
-          <rect id="foliage4" x="10" y="5" width="12" height="14" fill="#5AB56E"/>
-          <rect id="foliage5" x="12" y="4" width="8" height="3" fill="#3D8C4F"/>
-          <rect id="foliage6" x="11" y="7" width="5" height="3" fill="#7FD68A"/>
-          <rect id="apple1" x="9" y="12" width="2" height="2" fill="#C0392B"/>
-          <rect id="apple2" x="20" y="11" width="2" height="2" fill="#C0392B"/>
-          <rect id="apple3" x="15" y="15" width="2" height="2" fill="#C0392B"/>
-        </svg>
-      `;
+      // El árbol del logo: la planta principal, que crece con cada nivel
+      if (plantNameDisplay) plantNameDisplay.innerText = SPECIES_NAMES.tree;
+      svgHtml = dibujarArbol((plantLevels.tree || { level: 1 }).level, { id: 'interactiveTreeSvg', clase: 'ptree arbol-crece' });
     }
 
     container.innerHTML = svgHtml;
+
+    const escenario = document.getElementById('pvzStageCanvas');
+    if (escenario) escenario.classList.toggle('escenario-arbol', !!document.querySelector('#pvzPlantSvgContainer .arbol-crece'));
+    ajustarAlturaArbol();
   }
 
   function updateShopUI() {
@@ -936,9 +1390,9 @@
 
       const pData = plantLevels[p.key] || { level: 1, xp: 0 };
       const req = getXpRequired(pData.level);
-      const pct = pData.level >= 100 ? 100 : (req > 0 ? Math.min(99, Math.floor((pData.xp / req) * 100)) : 0);
+      const pct = pData.level >= NIVEL_MAXIMO ? 100 : (req > 0 ? Math.min(99, Math.floor((pData.xp / req) * 100)) : 0);
 
-      if (levelLabel) levelLabel.innerText = pData.level >= 100 ? 'Nv. 100 MAX' : `Nv. ${pData.level}`;
+      if (levelLabel) levelLabel.innerText = pData.level >= NIVEL_MAXIMO ? `Nv. ${NIVEL_MAXIMO} MAX` : `Nv. ${pData.level}`;
       if (percentLabel) percentLabel.innerText = `${pct}%`;
       if (levelFill) levelFill.style.width = `${pct}%`;
 
@@ -1200,9 +1654,14 @@
   }
 
   // Auto-open game check
+  // Tras navegar sin recargar (main.js), el tablero trae vistas previas nuevas.
+  document.addEventListener('spa:navegado', () => {
+    try { pintarVistasPrevias(); actualizarPildoraNivel(); } catch(e) {}
+  });
+
   document.addEventListener('DOMContentLoaded', () => {
-    // Nivel real del árbol en la píldora superior, en cualquier página.
-    try { actualizarPildoraNivel(); } catch(e) {}
+    // Nivel real del árbol en la píldora superior y en las vistas previas, en cualquier página.
+    try { actualizarPildoraNivel(); pintarVistasPrevias(); } catch(e) {}
 
     try {
       const urlParams = new URLSearchParams(window.location.search);

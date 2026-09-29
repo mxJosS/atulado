@@ -23,6 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'professional' => \App\Http\Middleware\EnsureUserIsProfessional::class,
             'verified.code' => \App\Http\Middleware\EnsureEmailIsVerified::class,
             'consentimiento' => \App\Http\Middleware\EnsureConsentimiento::class,
+            'sin.suplantacion' => \App\Http\Middleware\BloquearEnSuplantacion::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

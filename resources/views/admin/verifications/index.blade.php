@@ -6,7 +6,7 @@
 <div style="max-width: 1080px; margin: 0 auto;">
 
   <!-- HEADER -->
-  <div style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap;">
+  <div class="m-cabecera" data-aparecer style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap;">
     <div>
       <span class="mono-tag" style="color: var(--sage-base);">— DIRECCIÓN CLÍNICA & AUDITORÍA</span>
       <h1 style="font-size: 1.95rem; margin-top: 0.2rem; color: #1A2620; display: flex; align-items: center; gap: 10px;">

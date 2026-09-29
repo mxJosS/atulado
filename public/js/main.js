@@ -699,8 +699,14 @@ class SpaRouter {
 
       // Smooth swap animation
       currentSpaContent.classList.add('spa-transitioning');
-      await new Promise(r => setTimeout(r, 60));
+      await Promise.all([
+        new Promise(r => setTimeout(r, 60)),
+        // Hojas de estilo propias de la página nueva (p. ej. portada.css en
+        // Inicio): sin ellas llegaba sin su diseño.
+        this.syncPageStyles(doc),
+      ]);
 
+      document.body.classList.toggle('sitio-publico', doc.body.classList.contains('sitio-publico'));
       currentSpaContent.innerHTML = newSpaContent.innerHTML;
 
       if (doc.title) {
@@ -746,6 +752,8 @@ class SpaRouter {
       } catch (compErr) {}
 
       currentSpaContent.classList.remove('spa-transitioning');
+      // Aviso para js/animaciones.js: hay contenido nuevo que animar.
+      document.dispatchEvent(new CustomEvent('spa:navegado'));
       this.setProgressBar(100);
 
     } catch (err) {
@@ -872,6 +880,25 @@ class SpaRouter {
     }
   }
 
+  /** Agrega las hojas de estilo del <head> nuevo que aún no están cargadas y espera a que carguen. */
+  syncPageStyles(doc) {
+    const sinVersion = (href) => new URL(href, window.location.href).href.split('?')[0];
+    const cargadas = new Set(
+      [...document.querySelectorAll('link[rel="stylesheet"]')].map(l => sinVersion(l.getAttribute('href')))
+    );
+    const nuevas = [...doc.querySelectorAll('head link[rel="stylesheet"]')]
+      .filter(l => l.getAttribute('href') && !cargadas.has(sinVersion(l.getAttribute('href'))));
+
+    return Promise.all(nuevas.map(original => new Promise(resolve => {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = new URL(original.getAttribute('href'), window.location.href).href;
+      link.onload = link.onerror = resolve;
+      setTimeout(resolve, 2500); // una hoja lenta no detiene la navegación
+      document.head.appendChild(link);
+    })));
+  }
+
   executePageScripts(doc) {
     const pageScripts = doc.querySelectorAll('script:not([src])');
     pageScripts.forEach(oldScript => {
@@ -965,14 +992,9 @@ function initAllComponents() {
   document.querySelectorAll('.home-emo-btn').forEach(btn => {
     btn.onclick = (e) => {
       e.preventDefault();
-      document.querySelectorAll('.home-emo-btn').forEach(b => {
-        b.style.background = '#FFFFFF';
-        b.style.color = '#1A2620';
-        b.style.borderColor = '#DCE8E0';
-      });
-      btn.style.background = '#2E5D4B';
-      btn.style.color = '#FFFFFF';
-      btn.style.borderColor = '#2E5D4B';
+      // El aspecto del estado elegido lo da la clase «activo» (css/portada.css).
+      document.querySelectorAll('.home-emo-btn').forEach(b => b.classList.remove('activo'));
+      btn.classList.add('activo');
 
       const tool = btn.getAttribute('data-tool');
       const tip = btn.getAttribute('data-tip');

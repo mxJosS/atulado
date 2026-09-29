@@ -4,11 +4,13 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\BitacoraAdmin;
+use App\Models\DispositivoConfiable;
 use App\Models\Institucion;
 use App\Services\EliminacionCuentaService;
 use App\Models\Membresia;
 use App\Models\ProfessionalVerification;
 use App\Models\User;
+use App\Support\Suplantacion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -224,6 +226,7 @@ class AdminUserController extends Controller
         // sin la casilla (p. ej. el autocompletado del navegador) se ignora.
         if ($request->boolean('cambiar_password') && filled($request->password)) {
             $user->password = Hash::make($request->password);
+            DispositivoConfiable::olvidarTodos($user);
         }
 
         // Campos específicos de profesional
@@ -326,6 +329,24 @@ class AdminUserController extends Controller
                 'activado_en' => $estado === 'activo' ? now() : null,
             ]);
         }
+    }
+
+    /**
+     * «Entrar como»: la cuenta principal abre la sesión de esta persona para
+     * probar la plataforma. Se vuelve con «Volver a mi cuenta» o al cerrar sesión.
+     */
+    public function entrar(User $user)
+    {
+        $admin = Auth::user();
+
+        if (!$admin->puedeEntrarComo($user)) {
+            return back()->with('error', 'Sólo las cuentas principales de administración pueden entrar a otra cuenta, y no a otra cuenta principal.');
+        }
+
+        Suplantacion::iniciar($admin, $user);
+
+        return redirect()->route($user->is_admin ? 'admin.dashboard' : 'dashboard')
+            ->with('info', "Entraste como {$user->name}. Para regresar usa «Volver a mi cuenta».");
     }
 
     public function destroy(User $user)

@@ -3,32 +3,18 @@
 @section('title', 'Publicar Artículo Científico — Revista A tu lado')
 
 @section('content')
-<div style="background: #F8FAF9; padding: 3rem 1.25rem 5rem;">
-  <div class="container-narrow" style="max-width: 860px; margin: 0 auto;">
+<x-marca.hero eyebrow="Portal de publicación científica y psicoeducación" icono="fa-solid fa-microscope">
+  <h1 class="m-titulo" data-aparecer="palabras">Publicar Artículo o Investigación</h1>
+  <p class="m-bajada" data-aparecer>Comparte evidencia clínica, protocolos de regulación emocional, nutrición, medicina, revisiones científicas o reflexiones para la comunidad y el bienestar integral.</p>
+  <div class="m-acciones" data-aparecer>
+    <a href="{{ route('revista.index') }}" class="m-btn m-btn-vidrio m-btn-chico"><i class="fa-solid fa-arrow-left"></i><span>Volver a la Revista</span></a>
+  </div>
+</x-marca.hero>
 
-    <!-- Breadcrumb & Back Link -->
-    <div style="margin-bottom: 1.25rem; font-family: var(--font-mono); font-size: 0.82rem;">
-      <a href="{{ route('revista.index') }}" style="color: #2E5D4B; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-weight: 600;">
-        <i class="fa-solid fa-arrow-left"></i> <span>Volver a la Revista</span>
-      </a>
-    </div>
-
-    <!-- Header Card -->
-    <div style="background: linear-gradient(135deg, #111A14 0%, #1E2A22 100%) !important; color: #FFFFFF !important; border-radius: 20px; padding: 2rem 2.25rem; margin-bottom: 2rem; border: 1px solid rgba(255,255,255,0.08); box-shadow: var(--shadow-md);">
-      <div style="display: inline-flex; align-items: center; gap: 6px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); padding: 0.25rem 0.75rem; border-radius: 9999px; font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: #A8E6C0; margin-bottom: 0.75rem;">
-        <i class="fa-solid fa-microscope"></i>
-        <span>Portal de Publicación Científica & Psicoeducación</span>
-      </div>
-      <h1 style="color: #FFFFFF !important; font-size: clamp(1.6rem, 3.5vw, 2.2rem); margin-bottom: 0.4rem; line-height: 1.2;">
-        Publicar Artículo o Investigación
-      </h1>
-      <p style="color: #C8DDD1 !important; font-size: 0.92rem; line-height: 1.5; margin: 0;">
-        Comparte evidencia clínica, protocolos de regulación emocional, nutrición, medicina, revisiones científicas o reflexiones para la comunidad y el bienestar integral.
-      </p>
-    </div>
-
+<div style="padding: 0 1.25rem 5rem;">
+  <div class="container-narrow" style="max-width: 860px; margin: -2.5rem auto 0; position: relative; z-index: 2;">
     <!-- Main Creation Form Card -->
-    <div class="card" style="border-top: 5px solid #2E5D4B; border-radius: 16px; box-shadow: var(--shadow-sm); overflow: hidden;">
+    <div class="card" data-aparecer style="border-radius: 28px; overflow: hidden;">
       <div class="card-body" style="padding: 2.5rem 2rem;">
 
         <form method="POST" action="{{ route('revista.store') }}" id="publishArticleForm" enctype="multipart/form-data">

@@ -4,9 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Mail\EmailVerificationCodeMail;
 use App\Models\Ajuste;
+use App\Models\DispositivoConfiable;
 use App\Models\User;
+use App\Support\Navegador;
+use App\Support\Suplantacion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -179,13 +183,22 @@ class AuthController extends Controller
 
         $remember = $request->boolean('remember');
 
-        // Administración y equipo clínico: la contraseña correcta no basta. Se
-        // manda un código al correo y la sesión se abre hasta escribirlo.
+        // Administración y equipo clínico: desde un dispositivo nuevo (otra IP,
+        // otro navegador u otro equipo) la contraseña correcta no basta. Se manda
+        // un código al correo y la sesión se abre hasta escribirlo.
         $cuenta = User::where('email', $credentials['email'])->first();
         if ($cuenta && $cuenta->requiereSegundoFactor() && config('atulado.segundo_factor') && Auth::validate($credentials)) {
+            if ($dispositivo = DispositivoConfiable::reconoce($cuenta, $request)) {
+                $dispositivo->update(['ultimo_uso_en' => now()]);
+                Auth::login($cuenta, $remember);
+                $request->session()->regenerate();
+
+                return $this->despuesDeEntrar($cuenta);
+            }
+
             $request->session()->regenerate();
             $request->session()->put('dos_pasos', ['user_id' => $cuenta->id, 'remember' => $remember, 'intentos' => 0]);
-            $this->enviarCodigoAcceso($cuenta);
+            $this->enviarCodigoAcceso($cuenta, $request);
 
             return redirect()->route('acceso.codigo');
         }
@@ -205,7 +218,7 @@ class AuthController extends Controller
 
     public const MAX_INTENTOS_CODIGO = 5;
 
-    private function enviarCodigoAcceso(User $user): void
+    private function enviarCodigoAcceso(User $user, Request $request): void
     {
         $codigo = (string) random_int(100000, 999999);
         $user->forceFill([
@@ -214,7 +227,9 @@ class AuthController extends Controller
         ])->save();
 
         try {
-            Mail::to($user->email)->send(new EmailVerificationCodeMail($codigo, $user->name, 'acceso'));
+            Mail::to($user->email)->send(new EmailVerificationCodeMail(
+                $codigo, $user->name, 'acceso', Navegador::nombre($request->userAgent()), $request->ip(),
+            ));
         } catch (\Throwable $e) {
             Log::error('No se pudo enviar el código de acceso: ' . $e->getMessage());
         }
@@ -277,6 +292,13 @@ class AuthController extends Controller
         Auth::login($user, $recordar);
         $request->session()->regenerate();
 
+        // Este dispositivo queda confirmado: desde aquí (misma IP y navegador) ya no se pide código.
+        Cookie::queue(Cookie::make(
+            DispositivoConfiable::COOKIE,
+            DispositivoConfiable::confiar($user, $request),
+            60 * 24 * 365, null, null, null, true, false, 'lax',
+        ));
+
         return $this->despuesDeEntrar($user);
     }
 
@@ -287,7 +309,7 @@ class AuthController extends Controller
             return redirect()->route('login');
         }
 
-        $this->enviarCodigoAcceso($user);
+        $this->enviarCodigoAcceso($user, $request);
         $request->session()->put('dos_pasos.intentos', 0);
 
         return back()->with('status', 'Te enviamos un código nuevo. El anterior ya no sirve.');
@@ -535,6 +557,11 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
+        // Dentro de otra cuenta con «Entrar como», salir regresa a la cuenta principal.
+        if (Suplantacion::activa() && Suplantacion::terminar()) {
+            return redirect()->route('admin.users.index')->with('success', 'Volviste a tu cuenta.');
+        }
+
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
@@ -608,6 +635,8 @@ class AuthController extends Controller
         Auth::user()->update([
             'password' => Hash::make($validated['password']),
         ]);
+        // Con contraseña nueva, cada dispositivo vuelve a confirmarse con código.
+        DispositivoConfiable::olvidarTodos(Auth::user());
 
         return back()->with('success', 'Tu contraseña ha sido modificada con éxito.');
     }
@@ -675,6 +704,7 @@ class AuthController extends Controller
                 ])->setRememberToken(Str::random(60));
 
                 $user->save();
+                DispositivoConfiable::olvidarTodos($user);
 
                 event(new \Illuminate\Auth\Events\PasswordReset($user));
             }

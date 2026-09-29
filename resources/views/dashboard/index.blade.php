@@ -6,8 +6,9 @@
 <div style="max-width: 1080px; margin: 0 auto;">
 
   <!-- ════ CLEAN MODERN GREETING BANNER ════ -->
-  <div style="background: linear-gradient(135deg, #0D1410 0%, #1E2A22 100%) !important; color: #FFFFFF !important; border-radius: 24px; padding: 1.5rem 1.75rem; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 1.75rem; border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: var(--shadow-sm);">
-    <div style="display: flex; align-items: center; gap: 1.15rem; flex: 1; min-width: 260px;">
+  <div data-aparecer style="background: #0A1410 !important; color: #FFFFFF !important; border-radius: 28px; padding: clamp(1.5rem, 3vw, 2.25rem); display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 1.75rem; position: relative; overflow: hidden; isolation: isolate; box-shadow: 0 30px 60px -34px rgba(10, 20, 16, 0.7);">
+    <div class="m-fondo" aria-hidden="true"><span class="m-aurora m-aurora-1"></span><span class="m-aurora m-aurora-2"></span></div>
+    <div style="display: flex; align-items: center; gap: 1.15rem; flex: 1; min-width: 260px; position: relative; z-index: 1;">
       <div style="width: 52px; height: 52px; min-width: 52px; min-height: 52px; max-width: 52px; max-height: 52px; border-radius: 50%; background: linear-gradient(135deg, rgba(90, 181, 110, 0.35), rgba(46, 93, 75, 0.5)); border: 2.5px solid #A8E6C0; display: flex; align-items: center; justify-content: center; font-size: 1.35rem; font-weight: 700; color: #FFFFFF; flex-shrink: 0; aspect-ratio: 1 / 1; overflow: hidden; box-shadow: 0 0 16px rgba(168, 230, 192, 0.25);">
         @if($user->avatar_url)
           <img src="{{ $user->avatar_url }}" alt="{{ $user->name }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;" loading="lazy" decoding="async">
@@ -17,7 +18,7 @@
       </div>
       <div style="flex: 1; min-width: 0;">
         <div class="mono-tag" style="color: #A8E6C0; font-size: 0.68rem; letter-spacing: 0.08em;">{{ $greeting }}</div>
-        <h1 style="color: #FFFFFF !important; font-size: clamp(1.35rem, 2.5vw, 1.85rem); margin: 0; line-height: 1.2; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+        <h1 style="color: #FFFFFF !important; font-size: clamp(1.7rem, 3.2vw, 2.4rem); font-weight: 600; letter-spacing: -0.028em; margin: 0.2rem 0 0; line-height: 1.1; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
           <span>Hola, {{ $user->name }}</span>
           @if($user->isProfessional())
             <x-verified-badge size="20" />
@@ -34,7 +35,7 @@
     </div>
 
     <!-- Quick Tool Button -->
-    <a href="{{ route('tools.respiracion') }}" class="btn btn-sm btn-outline-white" style="gap: 8px; border-radius: 12px; padding: 0.5rem 1rem;">
+    <a href="{{ route('tools.respiracion') }}" class="m-btn m-btn-vidrio m-btn-chico" style="position: relative; z-index: 1;">
       <i class="fa-solid fa-lungs" style="color: #A8E6C0;"></i>
       <span>Respira 1 min</span>
     </a>
@@ -237,9 +238,10 @@
         <!-- Dynamic Pixel Tree Preview with JUGAR BUTTON (ITEM 5) -->
         <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.85rem; background: rgba(255, 255, 255, 0.85); border-radius: 16px; padding: 0.85rem 1.1rem; border: 1.5px solid rgba(200, 184, 122, 0.35); box-shadow: 0 2px 8px rgba(0,0,0,0.03); flex-wrap: wrap;">
           <div style="display: flex; align-items: center; gap: 0.75rem;">
-            <x-logo :size="34" style="filter: drop-shadow(0 2px 4px rgba(45, 107, 58, 0.2));" />
+            {{-- Vista previa del árbol en su nivel (la dibuja game-engine.js; sin JS queda el logo) --}}
+            <span data-arbol-vista style="display: inline-block; width: 46px; height: 46px; flex-shrink: 0;"><x-logo :size="34" /></span>
             <div style="font-size: 0.82rem; color: #1A2620;">
-              <strong>Árbol de bienestar:</strong> <span style="color: #2E5D4B; font-weight: 700;">Nivel {{ min(5, max(1, intdiv($streak, 3) + 1)) }}</span>
+              <strong>Árbol de bienestar:</strong> <span style="color: #2E5D4B; font-weight: 700;">Nivel <span class="arbol-nivel-texto">{{ auth()->user()->jardin?->nivelArbol() ?? 1 }}</span></span>
               <div style="font-size: 0.74rem; color: #556860;">Raíces fuertes y follaje activo</div>
             </div>
           </div>
@@ -327,7 +329,7 @@
         <div id="loaderProgressFill" class="loader-progress-fill"></div>
       </div>
       <div style="font-family: var(--font-mono); font-size: 0.74rem; color: #8EADA4; letter-spacing: 0.08em; text-transform: uppercase;">
-        <i class="fa-solid fa-seedling"></i> Sincronizando racha diaria · Nivel {{ min(5, max(1, intdiv($streak, 3) + 1)) }}
+        <i class="fa-solid fa-seedling"></i> Sincronizando tu jardín · Nivel <span class="arbol-nivel-texto">{{ auth()->user()->jardin?->nivelArbol() ?? 1 }}</span>
       </div>
     </div>
 
@@ -364,7 +366,7 @@
         <div class="pvz-plant-level-hud" style="display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0;">
           <span id="activePlantNameDisplay" style="font-weight: 700; font-size: 0.88rem; color: #FFFFFF; white-space: nowrap;">Árbol Sabiduría</span>
 
-          <span class="pvz-hud-level-tag" id="pvzHudLevelTag" title="Nivel actual del árbol (Nivel máximo: 100)">
+          <span class="pvz-hud-level-tag" id="pvzHudLevelTag" title="Nivel actual del árbol (Nivel máximo: 50)">
             Nv. <strong id="pvzCurrentTreeLevel">1</strong>
           </span>
 
@@ -449,6 +451,18 @@
             </span>
             <span id="thoughtText">¡Tengo sed! Ríegame con la regadera</span>
           </div>
+
+          {{-- Altura del árbol (como los «pies» del Árbol de la Sabiduría) --}}
+          <span class="pvz-altura-arbol" id="pvzAlturaArbol" title="Altura de tu árbol"></span>
+
+          @if(auth()->user()?->tieneHerramientasDePrueba())
+            {{-- Herramienta de prueba: sólo cuentas principales (también con «Entrar como») --}}
+            <div class="pvz-ajuste-nivel" title="Prueba: subir o bajar un nivel al instante">
+              <span>Prueba</span>
+              <button type="button" onclick="event.stopPropagation(); ajustarNivelPlanta(-1)" aria-label="Bajar un nivel">−1</button>
+              <button type="button" onclick="event.stopPropagation(); ajustarNivelPlanta(1)" aria-label="Subir un nivel">+1</button>
+            </div>
+          @endif
 
           <!-- Interactive Plant Pot & Tree Container -->
           <div class="pvz-pot-wrapper pot-terracotta" id="pvzTreePot" onclick="applyActiveToolToTree(event)" title="Haz clic para cuidar con la herramienta seleccionada">
@@ -560,7 +574,7 @@
               <div class="pvz-carousel-track" id="plantsCarouselTrack">
                 <!-- Planta 1: Árbol Sabiduría -->
                 <div class="pvz-carousel-card owned" id="cardPlantTree">
-                  <div class="pvz-cosmetic-preview">
+                  <div class="pvz-cosmetic-preview" data-arbol-vista>
                     <svg width="56" height="56" viewBox="0 0 32 32">
                       <rect x="14" y="20" width="4" height="8" fill="#6B3A1F"/>
                       <rect x="6" y="8" width="20" height="14" rx="3" fill="#2D6B3A"/>

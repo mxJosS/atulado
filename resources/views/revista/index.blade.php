@@ -3,54 +3,40 @@
 @section('title', 'Revista & Foro Científico de Bienestar — A tu lado')
 
 @section('content')
-<!-- HERO SECTION -->
-<section style="padding: 4rem 1.5rem; background: #080C0A !important; color: #FFFFFF !important; text-align: center; position: relative; overflow: hidden;">
-  <div style="position: absolute; width: 500px; height: 500px; border-radius: 50%; background: radial-gradient(circle, rgba(90,181,110,0.2) 0%, transparent 70%); top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none;"></div>
+<x-marca.hero eyebrow="Comunidad profesional y evidencia clínica" icono="fa-solid fa-microscope">
+  <h1 class="m-titulo" data-aparecer="palabras">Revista de <em>Salud Mental</em></h1>
+  <p class="m-bajada" data-aparecer>Un espacio abierto donde profesionales de la psicología, psiquiatría y neurociencia comparten artículos, protocolos DBT y psicoeducación rigurosa.</p>
 
-  <div style="position: relative; z-index: 2; max-width: 780px; margin: 0 auto;">
-    <div style="display: inline-flex; align-items: center; gap: 6px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); padding: 0.35rem 0.95rem; border-radius: 9999px; font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: #A8E6C0; margin-bottom: 1.25rem;">
-      <i class="fa-solid fa-microscope"></i>
-      <span>Comunidad Profesional & Evidencia Clínica</span>
-    </div>
-    <h1 style="color: #FFFFFF !important; font-size: clamp(2rem, 4.5vw, 3.2rem); margin-bottom: 0.85rem; font-weight: 700;">
-      Revista de <em class="editorial-italic" style="color: #A8E6C0 !important;">Salud Mental</em>
-    </h1>
-    <p style="color: #C8DDD1 !important; font-size: 0.95rem; max-width: 640px; margin: 0 auto 2rem; line-height: 1.6;">
-      Un espacio abierto donde profesionales de la psicología, psiquiatría y neurociencia comparten artículos, protocolos DBT y psicoeducación rigurosa.
-    </p>
-
-    <!-- ACTION BUTTONS: SEARCH & PUBLISH -->
-    <div style="display: flex; gap: 0.85rem; justify-content: center; align-items: center; flex-wrap: wrap;">
-      @auth
-        @if(auth()->user()->isProfessional())
-          <a href="{{ route('revista.create') }}" class="btn btn-primary btn-lg" style="gap: 8px;">
-            <i class="fa-solid fa-pen-nib"></i>
-            <span>Publicar Artículo Científico</span>
-          </a>
-        @else
-          <a href="{{ route('profile.show') }}#solicitud-profesional" class="btn btn-primary btn-lg" style="gap: 8px; background: #2E5D4B;" title="Verifícate como profesional para publicar">
-            <i class="fa-solid fa-id-card-clip"></i>
-            <span>Verificarme como Profesional</span>
-          </a>
-        @endif
-      @else
-        <a href="{{ route('login') }}" class="btn btn-primary btn-lg" style="gap: 8px;" title="Inicia sesión para publicar">
-          <i class="fa-solid fa-right-to-bracket"></i>
-          <span>Acceder para Publicar</span>
+  <div class="m-acciones" data-aparecer-grupo>
+    @auth
+      @if(auth()->user()->isProfessional())
+        <a href="{{ route('revista.create') }}" class="m-btn m-btn-menta">
+          <i class="fa-solid fa-pen-nib"></i>
+          <span>Publicar Artículo Científico</span>
         </a>
-      @endauth
-      <a href="#articulosGrid" class="btn btn-outline-white btn-lg" style="gap: 8px;">
-        <i class="fa-solid fa-book-open-reader"></i>
-        <span>Explorar Artículos</span>
+      @else
+        <a href="{{ route('profile.show') }}#solicitud-profesional" class="m-btn m-btn-menta" title="Verifícate como profesional para publicar">
+          <i class="fa-solid fa-id-card-clip"></i>
+          <span>Verificarme como Profesional</span>
+        </a>
+      @endif
+    @else
+      <a href="{{ route('login') }}" class="m-btn m-btn-menta" title="Inicia sesión para publicar">
+        <i class="fa-solid fa-right-to-bracket"></i>
+        <span>Acceder para Publicar</span>
       </a>
-    </div>
+    @endauth
+    <a href="#articulosGrid" class="m-btn m-btn-vidrio">
+      <i class="fa-solid fa-book-open-reader"></i>
+      <span>Explorar Artículos</span>
+    </a>
   </div>
-</section>
+</x-marca.hero>
 
 <div class="container" id="articulosGrid" style="padding-top: 3.5rem; padding-bottom: 5rem;">
 
   <!-- TOP SEARCH & FILTER BAR -->
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+  <div data-aparecer style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
     <!-- SEARCH FORM -->
     <form method="GET" action="{{ route('revista.index') }}" style="display: flex; gap: 0.5rem; flex: 1; max-width: 480px;">
       @if(request('topic_area'))
@@ -98,7 +84,7 @@
 
   <!-- FEATURED ARTICLE HERO CARD -->
   @if($featuredArticle && !request('search'))
-    <div class="card" style="margin-bottom: 3rem; background: linear-gradient(145deg, #FFFFFF, #EBF5FF); border: 1.5px solid #1877F2; border-radius: 16px; overflow: hidden; box-shadow: var(--shadow-sm);">
+    <div class="card" data-aparecer style="margin-bottom: 3rem; background: linear-gradient(145deg, #FFFFFF, #EEF6F0); border: 1.5px solid #2E5D4B; border-radius: 16px; overflow: hidden; box-shadow: var(--shadow-sm);">
       <div class="card-body" style="padding: 2.5rem 2rem;">
         <div style="max-width: 850px;">
           <div style="display: flex; gap: 0.75rem; align-items: center; margin-bottom: 1rem; flex-wrap: wrap;">
@@ -108,7 +94,7 @@
             <span class="badge-fb-verified">
               <i class="fa-solid fa-circle-check"></i> Autor Profesional Verificado
             </span>
-            <span class="mono-tag" style="background: rgba(24, 119, 242, 0.08); color: #1877F2; border-radius: 9999px; padding: 0.2rem 0.6rem; font-size: 0.72rem; font-weight: 700;">
+            <span class="mono-tag" style="background: rgba(46, 93, 75, 0.08); color: #2E5D4B; border-radius: 9999px; padding: 0.2rem 0.6rem; font-size: 0.72rem; font-weight: 700;">
               {{ $featuredArticle->publication_type_label }}
             </span>
             <span class="mono-tag" style="color: #556860; display: flex; align-items: center; gap: 4px;">
@@ -144,7 +130,7 @@
               </div>
             </div>
 
-            <a href="{{ route('revista.show', $featuredArticle->slug) }}" class="btn btn-primary" style="gap: 6px; background: #1877F2; border-color: #1877F2; border-radius: 10px;">
+            <a href="{{ route('revista.show', $featuredArticle->slug) }}" class="btn btn-primary" style="gap: 6px; background: #2E5D4B; border-color: #2E5D4B; border-radius: 10px;">
               <span>Leer investigación completa</span>
               <i class="fa-solid fa-arrow-right"></i>
             </a>
@@ -155,15 +141,15 @@
   @endif
 
   <!-- TOPIC AREA FILTER PILLS -->
-  <div style="display: flex; gap: 0.5rem; margin-bottom: 2.5rem; flex-wrap: wrap; justify-content: center;">
-    <a href="{{ route('revista.index') }}" class="btn btn-sm {{ (!request('topic_area') && !request('category')) ? 'btn-primary' : 'btn-secondary' }}" style="border-radius: 9999px; {{ (!request('topic_area') && !request('category')) ? 'background: #1877F2; border-color: #1877F2;' : '' }}">
+  <div data-aparecer-grupo style="display: flex; gap: 0.5rem; margin-bottom: 2.5rem; flex-wrap: wrap; justify-content: center;">
+    <a href="{{ route('revista.index') }}" class="btn btn-sm {{ (!request('topic_area') && !request('category')) ? 'btn-primary' : 'btn-secondary' }}" style="border-radius: 9999px; {{ (!request('topic_area') && !request('category')) ? 'background: #2E5D4B; border-color: #2E5D4B;' : '' }}">
       Todos los temas
     </a>
     @foreach($topicAreas as $area)
       @php
         $isSelected = request('topic_area') === $area->slug || request('category') === $area->name || request('category') === $area->slug;
       @endphp
-      <a href="{{ route('revista.index', ['topic_area' => $area->slug, 'search' => request('search')]) }}" class="btn btn-sm {{ $isSelected ? 'btn-primary' : 'btn-secondary' }}" style="border-radius: 9999px; {{ $isSelected ? 'background: #1877F2; border-color: #1877F2;' : '' }}">
+      <a href="{{ route('revista.index', ['topic_area' => $area->slug, 'search' => request('search')]) }}" class="btn btn-sm {{ $isSelected ? 'btn-primary' : 'btn-secondary' }}" style="border-radius: 9999px; {{ $isSelected ? 'background: #2E5D4B; border-color: #2E5D4B;' : '' }}">
         {{ $area->name }}
       </a>
     @endforeach
@@ -171,7 +157,7 @@
 
   <!-- ARTICLES FORUM GRID -->
   @if($articles->isEmpty())
-    <div class="card" style="text-align: center; padding: 3.5rem 1.5rem; border-radius: 16px;">
+    <div class="card" data-aparecer style="text-align: center; padding: 3.5rem 1.5rem; border-radius: 16px;">
       <i class="fa-solid fa-newspaper" style="font-size: 2.5rem; color: #8EADA4;"></i>
       <h3 style="margin-top: 1rem; margin-bottom: 0.5rem; font-size: 1.25rem;">No se encontraron artículos</h3>
       <p style="color: #556860; font-size: 0.9rem;">Prueba con otros términos de búsqueda o publica un nuevo artículo.</p>
@@ -189,7 +175,7 @@
       </div>
     </div>
   @else
-    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; margin-bottom: 3.5rem;">
+    <div data-aparecer-grupo style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; margin-bottom: 3.5rem;">
       @foreach($articles as $art)
         <div class="article-forum-card" style="border-radius: 16px; overflow: hidden; display: flex; flex-direction: column;">
           @if($art->cover_image_path)
@@ -241,7 +227,7 @@
                 </div>
               </div>
 
-              <a href="{{ route('revista.show', $art->slug) }}" class="btn btn-sm btn-secondary" style="gap: 4px; font-size: 0.8rem; padding: 0.35rem 0.75rem; white-space: nowrap; color: #1877F2; border-color: rgba(24, 119, 242, 0.3); border-radius: 8px;">
+              <a href="{{ route('revista.show', $art->slug) }}" class="btn btn-sm btn-secondary" style="gap: 4px; font-size: 0.8rem; padding: 0.35rem 0.75rem; white-space: nowrap; color: #2E5D4B; border-color: rgba(46, 93, 75, 0.3); border-radius: 8px;">
                 <span>Leer</span>
                 <i class="fa-solid fa-arrow-right"></i>
               </a>

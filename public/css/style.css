@@ -2464,6 +2464,86 @@ nav[role="navigation"] span[aria-current="page"] span {
   height: 125px !important;
 }
 
+/* Árbol del logo que crece con el nivel (game-engine.js › dibujarArbol).
+   Su alto lo pone el JS según el escenario; aquí sólo se ancla a la maceta. */
+.pvz-greenhouse-stage.escenario-arbol {
+  justify-content: flex-end;
+  padding-bottom: 22px;
+}
+.pvz-pot-wrapper svg.ptree.arbol-crece {
+  display: block;
+  margin-bottom: -2px;
+  filter: drop-shadow(0 14px 22px rgba(0, 0, 0, 0.55));
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.arbol-luciernaga { animation: arbolLuciernaga 2.6s ease-in-out infinite; }
+.arbol-luciernaga:nth-of-type(2n) { animation-delay: -1.3s; }
+.arbol-luciernaga:nth-of-type(3n) { animation-duration: 3.4s; }
+@keyframes arbolLuciernaga {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 1; }
+}
+.arbol-vista-svg { display: block; width: 100%; height: 100%; }
+
+/* Altura del árbol (esquina izquierda) y herramientas de prueba (+1 / −1,
+   esquina derecha), flotando sobre el escenario */
+.pvz-altura-arbol {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 21;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(8, 14, 11, 0.6);
+  border: 1px solid rgba(168, 230, 192, 0.22);
+  color: #E8F0EA;
+  font: 700 0.78rem var(--font-mono);
+  white-space: nowrap;
+  pointer-events: none;
+}
+.pvz-altura-arbol:empty { display: none; }
+.pvz-altura-arbol i { color: #A8E6C0; font-size: 0.72rem; }
+.pvz-ajuste-nivel {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 31;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 3px 3px 9px;
+  border-radius: 11px;
+  background: rgba(8, 14, 11, 0.7);
+  border: 1px dashed rgba(241, 196, 15, 0.6);
+}
+.pvz-ajuste-nivel span {
+  color: #F1C40F;
+  font: 700 0.64rem var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.pvz-ajuste-nivel button {
+  min-width: 30px;
+  height: 24px;
+  padding: 0 6px;
+  border: 0;
+  border-radius: 7px;
+  background: #F1C40F;
+  color: #1A2620;
+  font: 800 0.74rem var(--font-mono);
+  cursor: pointer;
+}
+.pvz-ajuste-nivel button:hover { background: #FFE066; }
+.pvz-ajuste-nivel button:active { transform: scale(0.94); }
+@media (prefers-reduced-motion: reduce) {
+  .arbol-luciernaga { animation: none; opacity: 0.8; }
+}
+
 .pvz-pot-base {
   width: 118px;
   height: 24px;

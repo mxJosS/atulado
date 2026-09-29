@@ -3,22 +3,15 @@
 @section('title', 'Crear Cuenta — A tu lado')
 
 @section('content')
-<div class="auth-page-wrapper" style="min-height: 90vh; background: #080C0A !important; color: #FFFFFF !important; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2.5rem 1.5rem; position: relative; overflow: hidden;">
+<div class="acceso">
+  <x-marca.acceso-panel eyebrow="Crea tu cuenta gratis">
+    <h2>Empieza a cultivar tu <em>paz interior</em></h2>
+    <p>Lleva tu diario de bienestar, registra momentos de gratitud y ten listo tu Plan de Seguridad personal.</p>
+  </x-marca.acceso-panel>
 
-  <!-- Ambient Halos -->
-  <div style="position: absolute; width: 600px; height: 600px; border-radius: 50%; background: radial-gradient(circle, rgba(90, 181, 110, 0.22) 0%, transparent 68%); top: 50%; left: 50%; transform: translate(-50%, -60%); pointer-events: none;"></div>
-  <div style="position: absolute; width: 450px; height: 450px; border-radius: 50%; background: radial-gradient(circle, rgba(91, 74, 138, 0.2) 0%, transparent 68%); bottom: -10%; right: -5%; pointer-events: none;"></div>
-
-  <div style="width: 100%; max-width: 480px; position: relative; z-index: 2;">
-
-    <!-- Back Link -->
-    <a href="{{ route('home') }}" class="auth-back-link" style="display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; color: #8EADA4; text-decoration: none; margin-bottom: 1.5rem; transition: all 0.2s;">
-      <i class="fa-solid fa-arrow-left"></i>
-      <span>Volver al inicio</span>
-    </a>
-
-    <!-- Main Card -->
-    <div style="background: #FFFFFF !important; border-radius: 24px; padding: 2.5rem 2.25rem; box-shadow: var(--shadow-lg); border: 1.5px solid #DCE8E0; color: #1A2620;">
+  <div class="acceso-formulario">
+  <div class="acceso-tarjeta" data-aparecer>
+    <div class="m-tarjeta" style="padding: clamp(1.75rem, 3vw, 2.5rem); color: #14201A;">
 
       <div style="text-align: center; margin-bottom: 1.75rem;">
         <a href="{{ route('home') }}" style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none; margin-bottom: 1rem;">
@@ -26,7 +19,7 @@
           <span style="font-family: var(--font-display); font-size: 1.35rem; color: #2E5D4B; font-weight: 700;">a tu <em class="editorial-italic" style="color: #5AB56E;">lado</em></span>
         </a>
 
-        <h1 style="font-family: var(--font-display); font-size: 1.75rem; font-weight: 700; color: #1A2620; line-height: 1.2; margin-bottom: 0.35rem;">
+        <h1 class="acceso-tarjeta-titulo">
           Crea tu espacio seguro
         </h1>
         <p style="font-size: 0.88rem; color: #556860; font-style: italic;">
@@ -101,7 +94,7 @@
             required 
             autocomplete="name"
             autofocus
-            style="background: #FFFFFF; border: 1.5px solid #DCE8E0; border-radius: 12px; padding: 0.75rem 1rem; font-size: 0.92rem; color: #1A2620;"
+            style="background: #FFFFFF; border: 1px solid rgba(20, 32, 26, 0.12); border-radius: 14px; padding: 0.75rem 1rem; font-size: 0.92rem; color: #1A2620;"
           >
           @error('name') <div class="form-error" style="color: #C0392B; font-size: 0.8rem; margin-top: 0.3rem;">{{ $message }}</div> @enderror
         </div>
@@ -121,7 +114,7 @@
             placeholder="tu@correo.com" 
             required 
             autocomplete="email"
-            style="background: #FFFFFF; border: 1.5px solid #DCE8E0; border-radius: 12px; padding: 0.75rem 1rem; font-size: 0.92rem; color: #1A2620;"
+            style="background: #FFFFFF; border: 1px solid rgba(20, 32, 26, 0.12); border-radius: 14px; padding: 0.75rem 1rem; font-size: 0.92rem; color: #1A2620;"
           >
           @error('email') <div class="form-error" style="color: #C0392B; font-size: 0.8rem; margin-top: 0.3rem;">{{ $message }}</div> @enderror
         </div>
@@ -138,7 +131,7 @@
             placeholder="••••••••" 
             required 
             autocomplete="new-password"
-            style="background: #FFFFFF; border: 1.5px solid #DCE8E0; border-radius: 12px; padding: 0.75rem 1rem; font-size: 0.92rem; color: #1A2620;"
+            style="background: #FFFFFF; border: 1px solid rgba(20, 32, 26, 0.12); border-radius: 14px; padding: 0.75rem 1rem; font-size: 0.92rem; color: #1A2620;"
           >
           @error('password') <div class="form-error" style="color: #C0392B; font-size: 0.8rem; margin-top: 0.3rem;">{{ $message }}</div> @enderror
         </div>
@@ -155,7 +148,7 @@
             placeholder="••••••••" 
             required 
             autocomplete="new-password"
-            style="background: #FFFFFF; border: 1.5px solid #DCE8E0; border-radius: 12px; padding: 0.75rem 1rem; font-size: 0.92rem; color: #1A2620;"
+            style="background: #FFFFFF; border: 1px solid rgba(20, 32, 26, 0.12); border-radius: 14px; padding: 0.75rem 1rem; font-size: 0.92rem; color: #1A2620;"
           >
           @error('password_confirmation') <div class="form-error" style="color: #C0392B; font-size: 0.8rem; margin-top: 0.3rem;">{{ $message }}</div> @enderror
         </div>
@@ -190,7 +183,7 @@
 
         @include('auth.partials.consentimiento')
 
-        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 0.85rem; font-size: 0.95rem; border-radius: 12px; background: #2E5D4B !important; color: #FFFFFF !important; box-shadow: 0 4px 14px rgba(46, 93, 75, 0.35); gap: 8px;">
+        <button type="submit" class="m-btn m-btn-verde m-btn-ancho">
           <span>Crear mi cuenta gratis</span>
           <i class="fa-solid fa-arrow-right"></i>
         </button>
@@ -205,6 +198,7 @@
     </div>
 
   </div>
+</div>
 </div>
 @endsection
 

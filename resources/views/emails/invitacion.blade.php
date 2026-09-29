@@ -27,14 +27,14 @@
   <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 26px;">
     <tr>
       <td align="center">
-        <a href="{{ $url }}" target="_blank" style="background-color: #2E5D4B; color: #FFFFFF; text-decoration: none; padding: 14px 32px; border-radius: 50px; font-size: 15px; font-weight: 600; display: inline-block; box-shadow: 0 3px 12px rgba(46, 93, 75, 0.25);">
+        <a href="{{ $url }}" target="_blank" style="background-color: #2E5D4B; color: #FFFFFF; text-decoration: none; padding: 14px 32px; border-radius: 999px; font-size: 15px; font-weight: 600; display: inline-block; box-shadow: 0 3px 12px rgba(46, 93, 75, 0.25);">
           Activar mi cuenta
         </a>
       </td>
     </tr>
   </table>
 
-  <div style="background-color: #F8FAF9; border: 1px solid #E2ECE7; border-radius: 10px; padding: 12px 16px; margin-bottom: 24px;">
+  <div style="background-color: #F3EFE6; border: 1px solid rgba(20, 32, 26, 0.08); border-radius: 14px; padding: 12px 16px; margin-bottom: 24px;">
     <p style="font-size: 13px; color: #5B6F65; margin: 0; line-height: 1.5; text-align: center;">
       ⏱️ Este enlace es personal y vence en <strong>{{ $dias }} días</strong>. Si vence, pide a tu área de Recursos Humanos que te lo reenvíen.
     </p>

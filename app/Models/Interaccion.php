@@ -33,7 +33,8 @@ class Interaccion extends Model
     public static function registrar(string $modulo): void
     {
         $user = Auth::user();
-        if (!$user || !in_array($modulo, self::MODULOS, true)) {
+        // Con «Entrar como» la visita es de administración, no de la persona.
+        if (!$user || !in_array($modulo, self::MODULOS, true) || \App\Support\Suplantacion::activa()) {
             return;
         }
 

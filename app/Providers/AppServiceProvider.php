@@ -35,6 +35,11 @@ class AppServiceProvider extends ServiceProvider
         // Una cuenta del padrón queda «activa» la primera vez que la persona entra,
         // por cualquier vía: contraseña, Google, invitación o «recordarme».
         Event::listen(Login::class, function (Login $evento): void {
+            // «Entrar como» no es la persona entrando.
+            if (\App\Support\Suplantacion::activa()) {
+                return;
+            }
+
             Membresia::where('user_id', $evento->user->getAuthIdentifier())
                 ->where('estado', 'invitado')
                 ->update(['estado' => 'activo', 'activado_en' => now()]);

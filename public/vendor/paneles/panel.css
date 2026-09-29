@@ -6,16 +6,16 @@
 :root {
   /* ── Fondos oficiales ── */
   --bg-primary: #080C0A;
-  --bg-panel: #0D1410;
+  --bg-panel: #0A1410;
   --bg-cards: #111A14;
-  --bg-canvas: #F8FAF9;
+  --bg-canvas: #FBF9F4;
   --bg-surface: #FFFFFF;
-  --bg-subtle: #EEF4F0;
-  --bg-subtler: #F3F8F5;
+  --bg-subtle: #F3EFE6;
+  --bg-subtler: #F8F5EE;
 
   /* ── Bordes ── */
-  --border-light: #DCE8E0;
-  --border-subtle: #C2D6CA;
+  --border-light: rgba(20, 32, 26, 0.09);
+  --border-subtle: rgba(20, 32, 26, 0.16);
   --border-hairline: rgba(26, 38, 32, 0.10);
   --border-dark: rgba(255, 255, 255, 0.08);
 
@@ -31,8 +31,8 @@
   --text-off-white: #E8F0EA;
   --text-pale-mint: #C8DDD1;
   --text-light-gray: #8EADA4;
-  --text-medium-gray: #556860;
-  --text-near-black: #1A2620;
+  --text-medium-gray: #4D5D55;
+  --text-near-black: #14201A;
   --ink-muted: #5B7369; /* 4.9:1 sobre el fondo claro (antes #7C908A, 3.4:1) */
 
   /* ── Acentos ── */
@@ -66,8 +66,8 @@
   --cat-otros: #8EADA4;
 
   /* ── Chrome de gráficas ── */
-  --grid-line: #E4EDE8;
-  --axis-line: #C2D6CA;
+  --grid-line: #ECE6DA;
+  --axis-line: #D6CEBF;
   --chart-surface: #FFFFFF;
 
   /* ── Tipografías ── */
@@ -78,15 +78,15 @@
 
   /* ── Radios ── */
   --radius-xs: 6px;
-  --radius-sm: 10px;
-  --radius-md: 16px;
-  --radius-lg: 24px;
+  --radius-sm: 12px;
+  --radius-md: 22px;
+  --radius-lg: 28px;
   --radius-full: 9999px;
 
   /* ── Sombras ── */
-  --shadow-xs: 0 1px 3px rgba(10, 21, 15, 0.04);
-  --shadow-sm: 0 4px 14px -2px rgba(10, 21, 15, 0.07);
-  --shadow-md: 0 12px 28px -4px rgba(10, 21, 15, 0.12);
+  --shadow-xs: 0 1px 2px rgba(20, 32, 26, 0.04), 0 12px 32px -18px rgba(20, 32, 26, 0.16);
+  --shadow-sm: 0 1px 2px rgba(20, 32, 26, 0.04), 0 16px 36px -18px rgba(20, 32, 26, 0.2);
+  --shadow-md: 0 30px 60px -28px rgba(20, 32, 26, 0.3);
   --shadow-lg: 0 24px 48px -8px rgba(10, 21, 15, 0.20);
 
   --transition-fast: 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -807,4 +807,19 @@ table.data .actions { text-align: right; white-space: nowrap; }
   body { background: #fff; }
   .page { padding: 0; }
   .doc-preview { box-shadow: none; border: none; padding: 0; }
+}
+
+/* ════════════ Marca (css/marca.css): botones en cápsula, títulos editoriales ════════════ */
+.btn { border-radius: 999px; font-weight: 700; transition: transform 250ms cubic-bezier(0.22, 1, 0.36, 1), background 200ms ease, border-color 200ms ease, box-shadow 250ms ease; }
+.btn-sm { border-radius: 999px; }
+.btn:hover { transform: translateY(-1px); }
+.btn-primary { box-shadow: 0 10px 24px -10px rgba(46, 93, 75, 0.55); }
+.page-title { font-size: clamp(1.9rem, 3.4vw, 2.6rem); letter-spacing: -0.028em; line-height: 1.06; }
+.section-title { font-size: 1.2rem; letter-spacing: -0.015em; }
+.kpi-value { letter-spacing: -0.02em; }
+.inst-card:hover { transform: translateY(-4px); }
+table.data tbody tr:hover { background: #FDFCF8; }
+@media (prefers-reduced-motion: reduce) {
+  .btn, .inst-card { transition: none; }
+  .btn:hover, .inst-card:hover { transform: none; }
 }

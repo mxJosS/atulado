@@ -3,19 +3,16 @@
 @section('title', 'Técnica Sensorial 5-4-3-2-1 (Grounding) — A tu lado')
 
 @section('content')
-<div style="max-width: 780px; margin: 3.5rem auto; padding: 0 1.5rem;">
+<x-marca.hero eyebrow="Anclaje sensorial">
+  <h1 class="m-titulo" data-aparecer="palabras">La regla <em>5-4-3-2-1</em></h1>
+  <p class="m-bajada" data-aparecer>Cuando la ansiedad sobrecarga tu mente, tus 5 sentidos son el ancla más rápida para regresar al aquí y ahora.</p>
+</x-marca.hero>
 
-  <div style="text-align: center; margin-bottom: 2.5rem;">
-    <span class="mono-tag" style="color: var(--sage-base);">— ANCLAJE SENSORIAL</span>
-    <h1 style="font-size: 2.4rem; margin-top: 0.3rem; color: var(--text-near-black);">La Regla 5-4-3-2-1</h1>
-    <p style="color: var(--text-medium-gray); max-width: 540px; margin: 0.5rem auto 0; font-size: 0.95rem;">
-      Cuando la ansiedad sobrecarga tu mente, tus 5 sentidos son el ancla más rápida para regresar al aquí y ahora.
-    </p>
-  </div>
+<div style="max-width: 780px; margin: -2.5rem auto 4.5rem; padding: 0 1.5rem; position: relative; z-index: 2;">
 
   <!-- PROGRESS BAR -->
-  <div style="background: var(--bg-subtle); height: 8px; border-radius: var(--radius-full); margin-bottom: 2rem; overflow: hidden; border: 1px solid var(--border-light);">
-    <div id="groundingProgressBar" style="width: 20%; height: 100%; background: var(--sage-base); transition: width 0.4s ease;"></div>
+  <div data-aparecer style="background: #FFFFFF; height: 12px; border-radius: 999px; margin-bottom: 1.5rem; overflow: hidden; border: 1px solid rgba(20, 32, 26, 0.09); box-shadow: 0 12px 30px -14px rgba(20, 32, 26, 0.3); padding: 2px;">
+    <div id="groundingProgressBar" style="width: 20%; height: 100%; border-radius: 999px; background: linear-gradient(90deg, #2E5D4B, #5AB56E); transition: width 0.4s ease;"></div>
   </div>
 
   <!-- STEP 1: 5 COSAS QUE VES -->

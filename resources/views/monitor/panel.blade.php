@@ -12,11 +12,11 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
   <style>
     :root {
-      --fondo: #0B110E; --tarjeta: #131B17; --tarjeta2: #18221D; --linea: #24312A; --texto: #E6ECE8; --suave: #8EA59A;
+      --fondo: #0A1410; --tarjeta: #10201A; --tarjeta2: #15271F; --linea: #20352B; --texto: #E6ECE8; --suave: #8EA59A;
       --verde: #5AB56E; --azul: #4AA3DF; --ambar: #E0A33A; --rojo: #E05A4A; --morado: #A78BDA; --cian: #3FC1C9;
     }
     * { box-sizing: border-box; }
-    body { margin: 0; background: var(--fondo); color: var(--texto); font: 13px/1.45 'Manrope', system-ui, sans-serif; }
+    body { margin: 0; background: var(--fondo) radial-gradient(circle at 0% 0%, rgba(46, 93, 75, 0.45), rgba(10, 20, 16, 0) 45%) fixed; color: var(--texto); font: 13px/1.45 'Manrope', system-ui, sans-serif; }
     .mono { font-family: 'IBM Plex Mono', monospace; }
     .muted { color: var(--suave); }
     header { position: sticky; top: 0; z-index: 5; background: rgba(11, 17, 14, .94); backdrop-filter: blur(6px); border-bottom: 1px solid var(--linea); }
@@ -28,13 +28,13 @@
     .info-host { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--suave); }
     .info-host b { color: var(--texto); font-weight: 600; }
     .controles { display: flex; gap: 8px; align-items: center; }
-    .controles select, .controles button { background: var(--tarjeta2); color: var(--texto); border: 1px solid var(--linea); border-radius: 8px; padding: 6px 10px; font: inherit; cursor: pointer; }
+    .controles select, .controles button { background: var(--tarjeta2); color: var(--texto); border: 1px solid var(--linea); border-radius: 999px; padding: 6px 14px; font: inherit; cursor: pointer; }
     main { max-width: 1480px; margin: 0 auto; padding: 16px; display: grid; gap: 14px; }
     .fila { display: grid; gap: 14px; }
     .kpis { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
     .dos { grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); }
     .tres { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
-    .tarjeta { background: var(--tarjeta); border: 1px solid var(--linea); border-radius: 12px; padding: 14px; min-width: 0; }
+    .tarjeta { background: var(--tarjeta); border: 1px solid var(--linea); border-radius: 20px; padding: 14px; min-width: 0; }
     .tarjeta h2 { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--suave); margin: 0 0 10px; display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
     .tarjeta h2 span { text-transform: none; letter-spacing: 0; font-weight: 600; color: var(--texto); font-family: 'IBM Plex Mono', monospace; font-size: 12px; }
     .kpi .valor { font: 700 24px 'IBM Plex Mono', monospace; margin: 2px 0; }

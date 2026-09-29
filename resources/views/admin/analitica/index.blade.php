@@ -48,7 +48,7 @@
 
 <div class="admin-content-canvas">
 
-  <div class="ana-cabecera">
+  <div class="ana-cabecera cabecera-atl" data-aparecer>
     <div>
       <div class="crumbs-atl">
         Consola A Tu Lado &rsaquo; <a href="{{ route('admin.instituciones.index') }}">Instituciones</a> &rsaquo;

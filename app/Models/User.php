@@ -126,6 +126,12 @@ class User extends Authenticatable
         return $this->hasMany(Membresia::class);
     }
 
+    /** Juego del árbol (niveles, soles e inventario). */
+    public function jardin(): HasOne
+    {
+        return $this->hasOne(Jardin::class);
+    }
+
     public function membresiaActiva(): HasOne
     {
         return $this->hasOne(Membresia::class)->whereIn('estado', ['invitado', 'activo']);
@@ -336,6 +342,27 @@ class User extends Authenticatable
         $email = strtolower(trim($this->email ?? ''));
 
         return $email !== '' && in_array($email, config('atulado.superadmin_emails', []), true);
+    }
+
+    /**
+     * Herramientas de prueba (p. ej. subir o bajar el nivel del árbol al
+     * instante): cuentas principales, también mientras usan «Entrar como».
+     */
+    public function tieneHerramientasDePrueba(): bool
+    {
+        return $this->isSuperAdmin() || (bool) \App\Support\Suplantacion::adminOriginal()?->isSuperAdmin();
+    }
+
+    /**
+     * «Entrar como»: sólo las cuentas principales, y nunca a sí mismas ni a
+     * otra cuenta principal.
+     */
+    public function puedeEntrarComo(User $otra): bool
+    {
+        return config('atulado.suplantacion')
+            && $this->isSuperAdmin()
+            && !$otra->isSuperAdmin()
+            && $otra->id !== $this->id;
     }
 
     /**

@@ -245,6 +245,27 @@
       .print-sheet { border: none !important; box-shadow: none !important; padding: 0 !important; max-width: 100% !important; }
       .step-box, .crisis-ribbon, .pocket-card { page-break-inside: avoid; }
     }
+    /* ══ Marca (el lenguaje de Inicio): papel cálido y cabecera noche en pantalla;
+       al imprimir se queda en blanco para no gastar tinta. ══ */
+    body { background: #F3EFE6; }
+    .print-sheet { border: 1px solid rgba(20, 32, 26, 0.08); border-radius: 28px; box-shadow: 0 30px 60px -30px rgba(20, 32, 26, 0.3); overflow: hidden; }
+    .btn-print-action { border-radius: 999px; background: #2E5D4B; box-shadow: 0 12px 28px -10px rgba(46, 93, 75, 0.6); }
+    .back-link { padding: 0.5rem 1rem; border-radius: 999px; background: #FFFFFF; border: 1px solid rgba(20, 32, 26, 0.1); }
+    .step-box { border-color: rgba(20, 32, 26, 0.1); border-radius: 18px; }
+    .step-num { border-radius: 999px; }
+    .pocket-card { border-radius: 20px; background: #F8F5EE; }
+    @media screen {
+      .doc-header {
+        margin: -2.5rem -2.5rem 1.75rem;
+        padding: 2rem 2.5rem;
+        border-bottom: 0;
+        background: #0A1410 radial-gradient(circle at 12% 0%, rgba(46, 93, 75, 0.85), rgba(10, 20, 16, 0) 60%);
+      }
+      .doc-header .brand-title { color: #F4F8F5; font-weight: 600; letter-spacing: -0.02em; }
+      .doc-header .meta-tag { color: #A8E6C0; }
+      .doc-header div[style*="--text-muted"] { color: #B9CFC3 !important; }
+      .doc-header strong { color: #FFFFFF !important; }
+    }
   </style>
 </head>
 <body>

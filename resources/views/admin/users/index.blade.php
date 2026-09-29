@@ -17,6 +17,7 @@
     border: 1px solid transparent;
     text-decoration: none;
     line-height: 1.2;
+    white-space: nowrap;
   }
   .btn-user-edit {
     background: #F0FDF4;
@@ -29,6 +30,18 @@
     border-color: #86EFAC;
     transform: translateY(-1px);
     box-shadow: 0 2px 6px rgba(22, 101, 52, 0.12);
+  }
+  .btn-user-enter {
+    background: #EFF6FF;
+    color: #1E40AF;
+    border-color: #BFDBFE;
+  }
+  .btn-user-enter:hover {
+    background: #DBEAFE;
+    color: #1E3A8A;
+    border-color: #93C5FD;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(30, 64, 175, 0.12);
   }
   .btn-user-delete {
     background: #FEF2F2;
@@ -49,7 +62,7 @@
 <div style="max-width: 1140px; margin: 0 auto;">
 
   <!-- HEADER -->
-  <div style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: flex-start; gap: 1.5rem; flex-wrap: wrap;">
+  <div class="m-cabecera" data-aparecer style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: flex-start; gap: 1.5rem; flex-wrap: wrap;">
     <div>
       <span class="mono-tag" style="color: var(--sage-base);">— CONTROL DE ACCESOS Y EQUIPO</span>
       <h1 style="font-size: 2rem; margin-top: 0.2rem; color: #1A2620; display: flex; align-items: center; gap: 12px; font-family: 'Fraunces', serif;">
@@ -218,7 +231,7 @@
                 @endif
               </td>
 
-              <!-- Acciones (Editar, Eliminar) -->
+              {{-- Acciones (Entrar como, Editar, Eliminar) --}}
               <td style="padding: 1rem 1.25rem; text-align: right;">
                 <div style="display: inline-flex; align-items: center; gap: 6px; justify-content: flex-end;">
                   @php
@@ -241,6 +254,19 @@
                         }
                     }
                   @endphp
+
+                  @if(auth()->user()?->puedeEntrarComo($user))
+                    <form method="POST" action="{{ route('admin.users.entrar', $user) }}" data-no-spa style="margin: 0;">
+                      @csrf
+                      <button type="submit"
+                              class="btn-user-action btn-user-enter"
+                              title="Usar la plataforma con la cuenta de {{ $user->name }}"
+                              aria-label="Entrar como {{ $user->name }}">
+                        <i class="fa-solid fa-right-to-bracket"></i>
+                        <span>Entrar como</span>
+                      </button>
+                    </form>
+                  @endif
 
                   @if($canEdit)
                     <button type="button" 

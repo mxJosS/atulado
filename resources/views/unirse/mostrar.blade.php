@@ -4,15 +4,19 @@
 
 @section('content')
 @php
-  $campo = 'border: 1.5px solid #DCE8E0; border-radius: 12px; padding: 0.75rem 1rem; width: 100%; box-sizing: border-box; font-size: 0.92rem; color: #1A2620; background: #FFFFFF;';
+  $campo = 'border: 1px solid rgba(20, 32, 26, 0.12); border-radius: 14px; padding: 0.8rem 1rem; width: 100%; box-sizing: border-box; font-size: 0.92rem; color: #1A2620; background: #FFFFFF;';
   $etiqueta = 'font-size: 0.86rem; font-weight: 600; margin-bottom: 0.35rem; display: block; color: #1A2620;';
   $error = 'color: #C0392B; font-size: 0.8rem; margin-top: 0.3rem;';
 @endphp
-<div class="auth-page-wrapper" style="min-height: 90vh; background: #080C0A !important; color: #FFFFFF !important; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2.5rem 1.5rem; position: relative; overflow: hidden;">
-  <div style="position: absolute; width: 600px; height: 600px; border-radius: 50%; background: radial-gradient(circle, rgba(90, 181, 110, 0.22) 0%, transparent 68%); top: 50%; left: 50%; transform: translate(-50%, -60%); pointer-events: none;"></div>
+<div class="acceso">
+  <x-marca.acceso-panel eyebrow="Invitación de {{ $institucion->nombre_corto }}">
+    <h2>Un espacio que es <em>sólo tuyo</em></h2>
+    <p>Tu organización nunca ve lo que escribes: sólo porcentajes del total, para cuidar mejor a todo el equipo.</p>
+  </x-marca.acceso-panel>
 
-  <div style="width: 100%; max-width: 480px; position: relative; z-index: 2;">
-    <div style="background: #FFFFFF !important; border-radius: 24px; padding: 2.25rem 2rem; box-shadow: var(--shadow-lg); border: 1.5px solid #DCE8E0; color: #1A2620;">
+  <div class="acceso-formulario">
+  <div class="acceso-tarjeta" data-aparecer>
+    <div class="m-tarjeta" style="padding: clamp(1.75rem, 3vw, 2.5rem); color: #14201A;">
 
       <div style="text-align: center; margin-bottom: 1.5rem;">
         <span style="display: inline-flex; width: 52px; height: 52px; border-radius: 14px; align-items: center; justify-content: center; font-weight: 800; font-size: 1.15rem; color: #FFFFFF; background: {{ $institucion->color ?: '#2E5D4B' }};">{{ $institucion->iniciales }}</span>
@@ -31,7 +35,7 @@
         </p>
         <form method="POST" action="{{ route('unirse.unir', $token) }}">
           @csrf
-          <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 0.85rem; border-radius: 12px; background: #2E5D4B !important; color: #FFFFFF !important;">
+          <button type="submit" class="m-btn m-btn-verde m-btn-ancho">
             Unirme a {{ $institucion->nombre_corto }}
           </button>
         </form>
@@ -85,7 +89,7 @@
 
           @include('auth.partials.consentimiento')
 
-          <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 0.85rem; border-radius: 12px; background: #2E5D4B !important; color: #FFFFFF !important;">
+          <button type="submit" class="m-btn m-btn-verde m-btn-ancho">
             Crear mi cuenta y unirme
           </button>
         </form>
@@ -97,6 +101,7 @@
         </div>
       @endauth
     </div>
+  </div>
   </div>
 </div>
 @endsection

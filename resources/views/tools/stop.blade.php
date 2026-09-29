@@ -3,17 +3,14 @@
 @section('title', 'Técnica STOP (DBT) para Desbordamiento — A tu lado')
 
 @section('content')
-<div style="max-width: 860px; margin: 3.5rem auto; padding: 0 1.5rem;">
+<x-marca.hero eyebrow="Terapia Dialéctico Conductual (DBT)">
+  <h1 class="m-titulo" data-aparecer="palabras">La Técnica STOP</h1>
+  <p class="m-bajada" data-aparecer>Cuando una emoción intensa te empuja a reaccionar impulsivamente, aplica los 4 pasos para proteger tus vínculos y tu bienestar.</p>
+</x-marca.hero>
 
-  <div style="text-align: center; margin-bottom: 2.5rem;">
-    <span class="mono-tag" style="color: var(--clinical-red);">— TERAPIA DIALÉCTICO CONDUCTUAL (DBT)</span>
-    <h1 style="font-size: 2.4rem; margin-top: 0.3rem; color: var(--text-near-black);">La Técnica STOP</h1>
-    <p style="color: var(--text-medium-gray); max-width: 560px; margin: 0.5rem auto 0; font-size: 0.95rem;">
-      Cuando una emoción intensa te empuja a reaccionar impulsivamente, aplica los 4 pasos para proteger tus vínculos y tu bienestar.
-    </p>
-  </div>
+<div style="max-width: 900px; margin: 3.5rem auto 4.5rem; padding: 0 1.5rem;">
 
-  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1.25rem;">
+  <div data-aparecer-grupo style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 1.25rem;">
 
     <!-- S -->
     <div class="card" style="border-left: 5px solid var(--clinical-red);">

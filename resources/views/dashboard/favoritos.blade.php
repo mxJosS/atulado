@@ -5,17 +5,13 @@
 @section('content')
 <div style="max-width: 1080px; margin: 0 auto;">
 
-  <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.75rem; flex-wrap: wrap; gap: 1rem;">
-    <div>
-      <span class="mono-tag" style="color: var(--sage-base);">— TU COLECCIÓN PERSONAL</span>
-      <h1 style="font-size: 1.85rem; margin-top: 0.15rem; color: var(--text-near-black);">Recursos & Ejercicios Guardados</h1>
-      <p style="color: var(--text-medium-gray); font-size: 0.9rem;">Tus herramientas predilectas para acceder rápidamente cuando las necesites.</p>
-    </div>
-    <a href="{{ route('recursos.index') }}" class="btn btn-primary btn-sm" style="gap: 6px;">
-      <i class="fa-solid fa-plus"></i>
-      <span>Explorar más recursos</span>
-    </a>
-  </div>
+  <x-marca.portada eyebrow="Tu colección personal" icono="fa-solid fa-star">
+    <h1 class="m-portada-titulo" data-aparecer="palabras">Recursos y ejercicios <em>guardados</em></h1>
+    <p class="m-portada-texto">Tus herramientas predilectas para acceder rápidamente cuando las necesites.</p>
+    <x-slot:acciones>
+      <a href="{{ route('recursos.index') }}" class="m-btn m-btn-menta m-btn-chico"><i class="fa-solid fa-plus"></i><span>Explorar más recursos</span></a>
+    </x-slot:acciones>
+  </x-marca.portada>
 
   @if($favorites->isEmpty())
     <div class="card" style="text-align: center; padding: 3.5rem 1.5rem;">

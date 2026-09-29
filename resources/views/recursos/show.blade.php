@@ -3,7 +3,15 @@
 @section('title', $resource->title . ' — A tu lado')
 
 @section('content')
-<div class="container-narrow" style="padding-top: 3.5rem; padding-bottom: 5rem;">
+<x-marca.hero :eyebrow="$resource->category_label" icono="fa-solid fa-book-bookmark">
+  <h1 class="m-titulo" data-aparecer="palabras">{{ $resource->title }}</h1>
+  <p class="m-bajada" data-aparecer><i class="fa-regular fa-clock" style="color: #A8E6C0;"></i> Tiempo estimado: {{ $resource->estimated_time ?? '3 min' }}</p>
+  <div class="m-acciones" data-aparecer>
+    <a href="{{ route('recursos.index') }}" class="m-btn m-btn-vidrio m-btn-chico"><i class="fa-solid fa-arrow-left"></i><span>Todos los recursos</span></a>
+  </div>
+</x-marca.hero>
+
+<div class="container-narrow" style="padding-top: 3rem; padding-bottom: 5rem;">
 
   <!-- BREADCRUMB -->
   <div style="margin-bottom: 1.5rem; font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-medium-gray);">
@@ -13,7 +21,7 @@
   </div>
 
   <!-- ARTICLE CARD -->
-  <div class="card" style="margin-bottom: 3rem; overflow: hidden;">
+  <div class="card" data-aparecer style="margin-bottom: 3rem; overflow: hidden;">
     <div class="card-header-banner" style="height: 180px; background: var(--bg-subtle); display: flex; align-items: center; justify-content: center; position: relative;">
       <span class="mono-tag" style="position: absolute; top: 18px; left: 20px; background: rgba(255,255,255,0.9); color: var(--sage-base); padding: 0.35rem 0.85rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light);">
         {{ $resource->category_label }}
@@ -33,9 +41,6 @@
     </div>
 
     <div class="card-body" style="padding: 2.5rem 2rem;">
-      <h1 style="font-size: clamp(1.8rem, 4vw, 2.5rem); margin-bottom: 1rem; line-height: 1.2; color: var(--text-near-black);">
-        {{ $resource->title }}
-      </h1>
 
       <p style="font-size: 1.1rem; color: var(--text-medium-gray); font-style: italic; line-height: 1.7; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-light);">
         {{ $resource->summary }}

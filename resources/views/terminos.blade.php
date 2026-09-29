@@ -198,6 +198,45 @@ p.entrada{color:var(--text-medium-gray); font-size:1rem; margin:0}
   .pagina{padding-top:0}
   .legal table,.destacado{break-inside:avoid}
 }
+
+/* ══ Marca (el lenguaje de Inicio): menú flotante, portada con aurora y pie en tarjeta ══ */
+body{background:#FBF9F4}
+.site-navbar{
+  position:fixed; top:14px; left:50%; translate:-50% 0; width:min(1240px,calc(100% - 28px));
+  border:1px solid rgba(255,255,255,.1); border-radius:20px; background:rgba(10,20,16,.86);
+  -webkit-backdrop-filter:saturate(170%) blur(16px); backdrop-filter:saturate(170%) blur(16px);
+  box-shadow:0 10px 30px -12px rgba(0,0,0,.45);
+}
+.nav-btn-access,.nav-link{border-radius:999px}
+.portada-legal{
+  position:relative; overflow:hidden; isolation:isolate; background:#0A1410; color:#E8F0EA;
+  padding:clamp(8rem,12vw,9.5rem) 0 3.5rem;
+  background-image:radial-gradient(rgba(255,255,255,.06) 1px,transparent 1px); background-size:26px 26px;
+}
+.portada-legal .aurora{position:absolute; z-index:-1; border-radius:50%; filter:blur(80px); opacity:.55; animation:aurora 20s ease-in-out infinite alternate}
+.portada-legal .a1{width:520px; height:520px; background:#2E5D4B; top:-200px; left:-120px}
+.portada-legal .a2{width:440px; height:440px; background:#1E7A55; bottom:-220px; right:-120px; animation-delay:-8s}
+@keyframes aurora{0%{transform:translate(0,0) scale(1)}50%{transform:translate(60px,40px) scale(1.12)}100%{transform:translate(-40px,20px) scale(.94)}}
+.portada-legal .volver{
+  display:inline-flex; padding:.38rem .85rem; border-radius:999px; text-decoration:none;
+  background:rgba(168,230,192,.08); border:1px solid rgba(168,230,192,.22); color:#CFEBDB;
+}
+.portada-legal h1.titulo{color:#F4F8F5; font-size:clamp(2.4rem,5vw,3.8rem); letter-spacing:-.03em; line-height:1.04; margin:1rem 0 .8rem}
+.portada-legal p.entrada{color:#B9CFC3; font-size:1.06rem; max-width:62ch}
+.portada-legal .meta{color:#9FB8AB; border-color:rgba(255,255,255,.1)}
+.pagina{padding-top:3rem}
+.indice{background:#FFFFFF; border-color:rgba(20,32,26,.09); border-radius:22px; box-shadow:0 12px 32px -18px rgba(20,32,26,.2)}
+.destacado{background:#F3EFE6; border-radius:0 14px 14px 0}
+.legal table{border-radius:16px}
+.site-footer{margin:0 14px 14px; border-radius:32px; border:0; background:#0A1410}
+@media(max-width:560px){.site-navbar{top:10px; width:calc(100% - 20px)}.site-footer{margin:0 8px 8px; border-radius:24px}}
+@media(prefers-reduced-motion:reduce){.portada-legal .aurora{animation:none}}
+@media print{
+  .portada-legal{background:#fff; color:#000; padding:0}
+  .portada-legal .aurora,.portada-legal .volver{display:none}
+  .portada-legal h1.titulo{color:#000}
+  .portada-legal p.entrada,.portada-legal .meta{color:#333}
+}
 </style>
 </head>
 <body>
@@ -225,7 +264,10 @@ p.entrada{color:var(--text-medium-gray); font-size:1rem; margin:0}
 </nav>
 
 <main>
-  <div class="container-narrow pagina">
+  <header class="portada-legal">
+  <div class="aurora a1" aria-hidden="true"></div>
+  <div class="aurora a2" aria-hidden="true"></div>
+  <div class="container-narrow">
     <a href="{{ route('home') }}" class="volver">&larr; Inicio</a>
     <h1 class="titulo">Condiciones del Servicio</h1>
     <p class="entrada">Términos bajo los cuales puedes usar <strong>A tu lado</strong>. Léelos antes de crear tu cuenta.</p>
@@ -234,6 +276,9 @@ p.entrada{color:var(--text-medium-gray); font-size:1rem; margin:0}
       <span>·</span><span>Versión 1.1</span>
       <span>·</span><span>Vigente desde su publicación</span>
     </div>
+  </div>
+</header>
+  <div class="container-narrow pagina">
     <div class="legal">
 
       <div class="indice">

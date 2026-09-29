@@ -15,7 +15,7 @@
 <div class="admin-content-canvas">
 
   {{-- Encabezado --}}
-  <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+  <div class="cabecera-atl" data-aparecer style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
     <div>
       <div class="crumbs-atl">
         Consola A Tu Lado &rsaquo; <a href="{{ route('admin.instituciones.index') }}">Instituciones</a> &rsaquo; <b>{{ $institucion->nombre_corto }}</b>

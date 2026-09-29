@@ -9,7 +9,7 @@
 @section('content')
 <div class="admin-content-canvas">
 
-  <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+  <div class="cabecera-atl" data-aparecer style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
     <div>
       <div class="crumbs-atl">Consola A Tu Lado &rsaquo; <b>Instituciones</b></div>
       <h1 class="titulo-atl">Instituciones</h1>

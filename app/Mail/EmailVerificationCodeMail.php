@@ -12,7 +12,8 @@ use Illuminate\Queue\SerializesModels;
 /**
  * Código de 6 dígitos por correo. Dos usos:
  *   verificacion  confirmar el correo al crear la cuenta
- *   acceso        segundo factor de administración y equipo clínico
+ *   acceso        administración y equipo clínico entrando desde un dispositivo,
+ *                 navegador o red nuevos ($dispositivo e $ip dicen desde dónde)
  */
 class EmailVerificationCodeMail extends Mailable
 {
@@ -22,6 +23,8 @@ class EmailVerificationCodeMail extends Mailable
         public string $code,
         public string $name,
         public string $proposito = 'verificacion',
+        public ?string $dispositivo = null,
+        public ?string $ip = null,
     ) {}
 
     /**
@@ -49,6 +52,8 @@ class EmailVerificationCodeMail extends Mailable
                 'code' => $this->code,
                 'name' => $this->name,
                 'acceso' => $this->proposito === 'acceso',
+                'dispositivo' => $this->dispositivo,
+                'ip' => $this->ip,
             ],
         );
     }

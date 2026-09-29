@@ -5,18 +5,13 @@
 @section('content')
 <div style="max-width: 1080px; margin: 0 auto;">
 
-  <!-- PAGE HEADER -->
-  <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.75rem; flex-wrap: wrap; gap: 1rem;">
-    <div>
-      <span class="mono-tag" style="color: var(--sage-base);">— EVOLUCIÓN PERSONAL</span>
-      <h1 style="font-size: 1.85rem; margin-top: 0.15rem; color: var(--text-near-black);">Historial & Analíticas</h1>
-      <p style="color: var(--text-medium-gray); font-size: 0.9rem;">Observa tus patrones emocionales, tus anclas de gratitud y tu constancia.</p>
-    </div>
-    <a href="{{ route('dashboard') }}" class="btn btn-secondary btn-sm" style="gap: 6px;">
-      <i class="fa-solid fa-arrow-left"></i>
-      <span>Volver al Dashboard</span>
-    </a>
-  </div>
+  <x-marca.portada eyebrow="Evolución personal" icono="fa-solid fa-chart-line">
+    <h1 class="m-portada-titulo" data-aparecer="palabras">Historial y <em>analíticas</em></h1>
+    <p class="m-portada-texto">Observa tus patrones emocionales, tus anclas de gratitud y tu constancia.</p>
+    <x-slot:acciones>
+      <a href="{{ route('dashboard') }}" class="m-btn m-btn-vidrio m-btn-chico"><i class="fa-solid fa-arrow-left"></i><span>Volver al Dashboard</span></a>
+    </x-slot:acciones>
+  </x-marca.portada>
 
   <!-- STATS OVERVIEW CARDS -->
   <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.75rem;">

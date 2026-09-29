@@ -3,7 +3,12 @@
 @section('title', $article->title . ' — Revista A tu lado')
 
 @section('content')
-<div class="container-narrow" style="padding-top: 3.5rem; padding-bottom: 5rem; max-width: 820px; margin: 0 auto;">
+<x-marca.hero :eyebrow="$article->topicArea?->name ?? $article->category" icono="fa-solid fa-microscope">
+  <h1 class="m-titulo" data-aparecer="palabras" style="font-size: clamp(2.1rem, 4.6vw, 3.6rem);">{{ $article->title }}</h1>
+  <p class="m-bajada" data-aparecer><i class="fa-regular fa-clock" style="color: #A8E6C0;"></i> {{ $article->read_time }} de lectura · {{ $article->formatted_date }}</p>
+</x-marca.hero>
+
+<div class="container-narrow" style="padding-top: 3rem; padding-bottom: 5rem; max-width: 820px; margin: 0 auto;">
 
   <!-- BREADCRUMB -->
   <div style="margin-bottom: 1.5rem; font-family: var(--font-mono); font-size: 0.82rem; color: #556860;">
@@ -40,9 +45,6 @@
       <span class="mono-tag" style="color: #556860; font-size: 0.76rem;">· {{ $article->formatted_date }}</span>
     </div>
 
-    <h1 style="font-size: clamp(2rem, 4.5vw, 3rem); line-height: 1.15; margin-bottom: 1.25rem; color: #1A2620; font-weight: 700;">
-      {{ $article->title }}
-    </h1>
 
     <div style="background: #F4F8F5; border-left: 4px solid #2E5D4B; padding: 1.2rem 1.4rem; border-radius: 0 12px 12px 0; margin-bottom: 1.5rem;">
       <div style="font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; color: #2E5D4B; font-weight: 700; letter-spacing: 0.08em; margin-bottom: 0.35rem;">

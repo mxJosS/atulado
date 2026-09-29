@@ -1,12 +1,17 @@
 A TU LADO - Espacio seguro de bienestar emocional
 
 @if($acceso ?? false)
-Tu código para entrar
+Confirma este nuevo acceso
 =================================
 
 Hola {{ $name }},
 
-Alguien escribió tu contraseña para entrar a la consola de A Tu Lado. Si fuiste tú, escribe este código de 6 dígitos en la pantalla de acceso:
+Alguien escribió tu contraseña para entrar a A Tu Lado desde un dispositivo, navegador o red que tu cuenta no había usado.
+@if($dispositivo ?? null)
+Desde: {{ $dispositivo }}@if($ip ?? null) · IP {{ $ip }}@endif
+
+@endif
+Si fuiste tú, escribe este código de 6 dígitos en la pantalla de acceso. Desde ese dispositivo ya no te lo volveremos a pedir:
 
 CÓDIGO DE ACCESO: {{ $code }}
 

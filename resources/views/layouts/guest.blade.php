@@ -10,7 +10,9 @@
   
   <!-- Favicon / Brand CSS with Cache Buster -->
   <link rel="stylesheet" href="{{ asset('css/style.css') }}?v={{ file_exists(public_path('css/style.css')) ? filemtime(public_path('css/style.css')) : time() }}">
-  {{-- Pulido visual de las páginas públicas del menú (sólo con body.sitio-publico) --}}
+  {{-- Lenguaje visual de la marca (el de Inicio) para todo el proyecto --}}
+  <link rel="stylesheet" href="{{ asset('css/marca.css') }}?v={{ filemtime(public_path('css/marca.css')) }}">
+  {{-- Barra flotante, pie y pulido de las páginas del layout público (body.sitio-publico) --}}
   <link rel="stylesheet" href="{{ asset('css/publico.css') }}?v={{ filemtime(public_path('css/publico.css')) }}">
   <!-- Google Fonts: Fraunces, Instrument Serif, Manrope, IBM Plex Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -24,8 +26,10 @@
   <script src="{{ asset('vendor/iconify/iconify-icon.min.js') }}" defer></script>
   <script src="{{ asset('js/game-icons-pack.js') }}?v={{ file_exists(public_path('js/game-icons-pack.js')) ? filemtime(public_path('js/game-icons-pack.js')) : time() }}" defer></script>
   @stack('styles')
+  @include('partials.movimiento-cabeza')
 </head>
-<body @class(['sitio-publico' => request()->routeIs('home', 'sientes', 'tools.*', 'recursos.*', 'revista.index', 'revista.show', 'crisis')]) style="background-color: #F8FAF9; color: #1A2620;">
+<body class="sitio-publico" style="background-color: #FBF9F4; color: #14201A;">
+  @include('partials.suplantacion')
 
   <!-- PUBLIC NAVBAR -->
   <nav class="site-navbar" id="siteNavbar">
@@ -190,9 +194,12 @@
         *Este servicio es complementario y no sustituye la psicoterapia profesional individualizada. En emergencias severas, comunícate de inmediato a la Línea de la Vida.
       </p>
     </div>
+    {{-- Firma gigante del pie: sólo en las páginas públicas (css/publico.css) --}}
+    <div class="footer-firma" aria-hidden="true">a tu <em>lado</em></div>
   </footer>
 
   <script src="{{ asset('js/main.js') }}?v={{ file_exists(public_path('js/main.js')) ? filemtime(public_path('js/main.js')) : time() }}"></script>
+  @include('partials.movimiento-scripts')
   @stack('scripts')
 </body>
 </html>

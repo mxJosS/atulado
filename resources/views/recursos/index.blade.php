@@ -3,44 +3,21 @@
 @section('title', 'Biblioteca de Recursos y Herramientas — A tu lado')
 
 @section('content')
-<!-- HERO SECTION -->
-<section style="padding: 4rem 1.5rem; background: #080C0A !important; color: #FFFFFF !important; text-align: center; position: relative; overflow: hidden;">
-  <div style="position: absolute; width: 500px; height: 500px; border-radius: 50%; background: radial-gradient(circle, rgba(90,181,110,0.2) 0%, transparent 70%); top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none;"></div>
+<x-marca.hero eyebrow="Biblioteca de bienestar y DBT" icono="fa-solid fa-book-bookmark">
+  <h1 class="m-titulo" data-aparecer="palabras">Herramientas para <em>hoy</em></h1>
+  <p class="m-bajada" data-aparecer>Tips rápidos, ejercicios mentales, técnicas terapéuticas de regulación y protocolos de seguridad.</p>
 
-  <div style="position: relative; z-index: 2; max-width: 760px; margin: 0 auto;">
-    <div style="display: inline-flex; align-items: center; gap: 6px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); padding: 0.35rem 0.95rem; border-radius: 9999px; font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: #A8E6C0; margin-bottom: 1.5rem;">
-      <i class="fa-solid fa-book-bookmark"></i>
-      <span>Biblioteca de Bienestar y DBT</span>
-    </div>
-    <h1 style="color: #FFFFFF !important; font-size: clamp(2rem, 4.5vw, 3.2rem); margin-bottom: 0.85rem; font-weight: 700;">
-      Herramientas para <em class="editorial-italic" style="color: #A8E6C0 !important;">hoy</em>
-    </h1>
-    <p style="color: #C8DDD1 !important; font-size: 0.95rem; margin-bottom: 2rem;">
-      Tips rápidos, ejercicios mentales, técnicas terapéuticas de regulación y protocolos de seguridad.
-    </p>
-
-    <!-- SEARCH BAR -->
-    <form method="GET" action="{{ route('recursos.index') }}" style="max-width: 520px; margin: 0 auto; display: flex; gap: 0.5rem;">
-      <input 
-        type="text" 
-        name="search" 
-        value="{{ request('search') }}" 
-        class="form-control" 
-        placeholder="Buscar técnica, emoción o ejercicio..."
-        style="background: #FFFFFF; border-radius: 9999px; padding: 0.8rem 1.4rem; color: #1A2620;"
-      >
-      <button type="submit" class="btn btn-primary" style="border-radius: 9999px; padding: 0.8rem 1.4rem; gap: 6px;">
-        <i class="fa-solid fa-magnifying-glass"></i>
-        <span>Buscar</span>
-      </button>
-    </form>
-  </div>
-</section>
+  <form method="GET" action="{{ route('recursos.index') }}" class="m-buscador" data-aparecer>
+    <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+    <input type="text" name="search" value="{{ request('search') }}" placeholder="Buscar técnica, emoción o ejercicio..." aria-label="Buscar recursos">
+    <button type="submit" class="m-btn m-btn-menta m-btn-chico">Buscar</button>
+  </form>
+</x-marca.hero>
 
 <div class="container" style="padding-top: 3rem; padding-bottom: 4.5rem;">
 
   <!-- CATEGORY FILTER PILLS -->
-  <div style="display: flex; gap: 0.5rem; margin-bottom: 2.5rem; flex-wrap: wrap; justify-content: center;">
+  <div data-aparecer-grupo style="display: flex; gap: 0.5rem; margin-bottom: 2.5rem; flex-wrap: wrap; justify-content: center;">
     @php
       $categories = [
         'todos' => 'Todos los recursos',
@@ -61,7 +38,7 @@
 
   <!-- RESOURCES GRID -->
   @if($resources->isEmpty())
-    <div class="card" style="text-align: center; padding: 3.5rem 1.5rem;">
+    <div class="card" data-aparecer style="text-align: center; padding: 3.5rem 1.5rem;">
       <i class="fa-solid fa-magnifying-glass" style="font-size: 2.5rem; color: #8EADA4;"></i>
       <h3 style="margin-top: 1rem; margin-bottom: 0.35rem; font-size: 1.25rem;">No se encontraron recursos</h3>
       <p style="color: #556860; max-width: 450px; margin: 0 auto 1.5rem; font-size: 0.9rem;">
@@ -70,14 +47,15 @@
       <a href="{{ route('recursos.index') }}" class="btn btn-secondary btn-sm">Ver todos los recursos</a>
     </div>
   @else
-    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.25rem; margin-bottom: 3.5rem;">
+    <div data-aparecer-grupo style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.25rem; margin-bottom: 3.5rem;">
       @foreach($resources as $res)
-        <div class="card">
-          <div class="card-header-banner" style="background: #EEF4F0; height: 110px; display: flex; align-items: center; justify-content: center; position: relative;">
+        <div class="card" data-foco>
+          @php($tonoRecurso = ['sage' => '#CBE9D6', 'sky' => '#CFE5F4', 'lav' => '#DDD5F2', 'terra' => '#F6D9C9', 'amber' => '#F7E7B8'][$res->color_theme] ?? '#E7F1EA')
+          <div class="card-header-banner" style="background: radial-gradient(circle at 50% 75%, {{ $tonoRecurso }} 0%, #F7F4EC 75%); height: 130px; display: flex; align-items: center; justify-content: center; position: relative;">
             <span class="badge badge-sage" style="position: absolute; top: 12px; left: 14px;">
               {{ $res->category_label }}
             </span>
-            <span style="font-size: 2rem; color: #2E5D4B;">
+            <span style="font-size: 2.4rem; color: #2E5D4B; filter: drop-shadow(0 8px 10px rgba(20, 32, 26, 0.15));">
               @if($res->color_theme === 'sage') <i class="fa-solid fa-seedling"></i>
               @elseif($res->color_theme === 'sky') <i class="fa-solid fa-water"></i>
               @elseif($res->color_theme === 'lav') <i class="fa-solid fa-spa"></i>

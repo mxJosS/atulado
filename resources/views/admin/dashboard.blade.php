@@ -43,7 +43,7 @@
 <div class="admin-content-canvas">
 
   {{-- Encabezado y filtro de periodo --}}
-  <div class="dash-cabecera">
+  <div class="dash-cabecera cabecera-atl" data-aparecer>
     <div>
       <div class="crumbs-atl">Consola A Tu Lado &rsaquo; <b>Dashboard</b></div>
       <h1 class="titulo-atl">Estado de la plataforma</h1>

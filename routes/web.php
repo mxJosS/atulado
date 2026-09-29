@@ -96,13 +96,16 @@ Route::middleware('auth')->group(function () {
     // o tenía cuenta antes de que se pidiera) y baja de la cuenta. Quedan fuera
     // del grupo con consentimiento: se puede eliminar la cuenta sin aceptar nada.
     Route::get('/consentimiento', [AuthController::class, 'showConsentimiento'])->name('consentimiento.show');
-    Route::post('/consentimiento', [AuthController::class, 'guardarConsentimiento'])->name('consentimiento.guardar');
-    Route::delete('/perfil', [\App\Http\Controllers\CuentaController::class, 'eliminar'])->name('profile.destroy')->middleware('throttle:5,1');
+    Route::post('/consentimiento', [AuthController::class, 'guardarConsentimiento'])->name('consentimiento.guardar')->middleware('sin.suplantacion');
+    Route::delete('/perfil', [\App\Http\Controllers\CuentaController::class, 'eliminar'])->name('profile.destroy')->middleware(['throttle:5,1', 'sin.suplantacion']);
 
     // Verified Users Only
     Route::middleware(['verified.code', 'consentimiento'])->group(function () {
         // Dashboard Hub
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+        // Juego del árbol: el jardín se guarda en la cuenta
+        Route::post('/jardin', [\App\Http\Controllers\JardinController::class, 'guardar'])->name('jardin.guardar')->middleware('throttle:60,1');
 
         // Mood Tracking & History
         Route::post('/mood/checkin', [MoodTrackerController::class, 'store'])->name('mood.store');
@@ -134,7 +137,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/perfil', [AuthController::class, 'showProfile'])->name('profile.show');
         Route::put('/perfil', [AuthController::class, 'updateProfile'])->name('profile.update');
         Route::put('/perfil/password', [AuthController::class, 'updatePassword'])->name('profile.password');
-        Route::put('/perfil/datos', [AuthController::class, 'updatePreferenciasDatos'])->name('profile.datos');
+        Route::put('/perfil/datos', [AuthController::class, 'updatePreferenciasDatos'])->name('profile.datos')->middleware('sin.suplantacion');
 
         // Professional Healthcare Accreditation (Client Submission)
         Route::post('/perfil/solicitud-profesional', [ProfessionalVerificationController::class, 'store'])->name('profile.verification.store');
@@ -193,6 +196,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/usuarios', [\App\Http\Controllers\Admin\AdminUserController::class, 'store'])->name('users.store');
     Route::put('/usuarios/{user}', [\App\Http\Controllers\Admin\AdminUserController::class, 'update'])->name('users.update');
     Route::delete('/usuarios/{user}', [\App\Http\Controllers\Admin\AdminUserController::class, 'destroy'])->name('users.destroy');
+    // «Entrar como» (sólo cuentas principales; se vuelve cerrando sesión)
+    Route::post('/usuarios/{user}/entrar', [\App\Http\Controllers\Admin\AdminUserController::class, 'entrar'])->name('users.entrar');
 
     // Foros & Revista
     Route::get('/foros', [\App\Http\Controllers\Admin\AdminForumController::class, 'index'])->name('forums.index');

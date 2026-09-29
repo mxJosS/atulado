@@ -66,7 +66,7 @@ class AppFlowTest extends TestCase
         ]);
 
         // Home
-        $this->get('/')->assertStatus(200)->assertSee('a tu lado');
+        $this->get('/')->assertStatus(200)->assertSee('Un árbol siempre está ahí.')->assertSee('800 911 2000');
 
         // Recursos index & show
         $this->get('/recursos')->assertStatus(200)->assertSee('Respiración 4-7-8');

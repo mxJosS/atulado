@@ -3,28 +3,15 @@
 @section('title', 'Página no encontrada — A tu lado')
 
 @section('content')
-<div style="min-height: 70vh; display: flex; align-items: center; justify-content: center; padding: 2rem;">
-  <div style="text-align: center; max-width: 520px;">
-    <div style="width: 72px; height: 72px; margin: 0 auto 1.5rem; background: rgba(46,93,75,0.1); color: #2E5D4B; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem;">
-      <i class="fa-solid fa-compass"></i>
-    </div>
-    <span class="mono-tag" style="color: var(--sage-base); margin-bottom: 0.5rem; display: inline-block;">ERROR 404</span>
-    <h1 style="font-family: 'Fraunces', serif; font-size: 2.2rem; color: #1A2620; margin-bottom: 0.85rem;">
-      No encontramos esta página
-    </h1>
-    <p style="color: #556860; font-size: 0.95rem; line-height: 1.6; margin-bottom: 2rem;">
-      El recurso que buscas puede haber sido movido o ya no estar disponible. Te acompañamos de regreso a un lugar seguro.
-    </p>
-    <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
-      <a href="{{ route('home') }}" class="btn btn-primary" style="padding: 0.75rem 1.5rem; border-radius: 10px;">
-        <i class="fa-solid fa-house"></i>
-        <span>Ir al Inicio</span>
-      </a>
-      <a href="{{ route('crisis') }}" class="btn btn-secondary" style="padding: 0.75rem 1.5rem; border-radius: 10px;">
-        <i class="fa-solid fa-life-ring"></i>
-        <span>Líneas de Crisis</span>
-      </a>
-    </div>
+<x-marca.hero eyebrow="Error 404" icono="fa-solid fa-compass" style="min-height: 100svh; display: flex; align-items: center; justify-content: center;">
+  <div data-aparecer style="display: flex; justify-content: center;">
+    <x-logo :size="140" data-flotar style="filter: drop-shadow(0 18px 26px rgba(0, 0, 0, 0.5));" />
   </div>
-</div>
+  <h1 class="m-titulo" data-aparecer="palabras">No encontramos <em>esta página</em></h1>
+  <p class="m-bajada" data-aparecer>El recurso que buscas puede haber sido movido o ya no estar disponible. Te acompañamos de regreso a un lugar seguro.</p>
+  <div class="m-acciones" data-aparecer-grupo style="margin-top: 2rem;">
+    <a href="{{ route('home') }}" class="m-btn m-btn-menta"><i class="fa-solid fa-house"></i><span>Ir al Inicio</span></a>
+    <a href="{{ route('crisis') }}" class="m-btn m-btn-vidrio"><i class="fa-solid fa-life-ring"></i><span>Líneas de Crisis</span></a>
+  </div>
+</x-marca.hero>
 @endsection

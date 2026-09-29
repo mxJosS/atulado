@@ -12,6 +12,8 @@
   
   <!-- CSS & Official Fonts -->
   <link rel="stylesheet" href="{{ asset('css/style.css') }}?v={{ file_exists(public_path('css/style.css')) ? filemtime(public_path('css/style.css')) : time() }}">
+  {{-- Lenguaje visual de la marca (el de Inicio) para todo el proyecto --}}
+  <link rel="stylesheet" href="{{ asset('css/marca.css') }}?v={{ filemtime(public_path('css/marca.css')) }}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600..700;1,9..144,400&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Instrument+Serif:ital@0;1&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -19,6 +21,7 @@
   <!-- FontAwesome Free Kit -->
   <script src="https://kit.fontawesome.com/6244811c40.js" crossorigin="anonymous" defer></script>
   @stack('styles')
+  @include('partials.movimiento-cabeza')
   <style>
     .admin-nav-item {
       display: flex;
@@ -112,7 +115,8 @@
     }
   </style>
 </head>
-<body style="background: #F8FAF9; color: #1A2620;">
+<body style="background: #FBF9F4; color: #14201A;">
+  @include('partials.suplantacion')
 
   <div class="dashboard-layout">
 
@@ -535,6 +539,7 @@
     })();
   </script>
 
+  @include('partials.movimiento-scripts')
   @stack('scripts')
 </body>
 </html>

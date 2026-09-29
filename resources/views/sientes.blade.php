@@ -3,32 +3,24 @@
 @section('title', '¿Cómo te sientes hoy? — A tu lado')
 
 @section('content')
-<!-- ════ HERO SECTION OFICIAL (ITEM 3) ════ -->
-<section class="hero-forest-green" style="background: #1E2A22 !important; color: #FFFFFF !important; padding: clamp(4rem, 6.5vw, 5.5rem) 1.5rem; text-align: center; position: relative; overflow: hidden;">
-  <div style="position: absolute; width: 600px; height: 600px; border-radius: 50%; background: radial-gradient(circle, rgba(90, 181, 110, 0.2) 0%, transparent 70%); top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none;"></div>
-
-  <div style="position: relative; z-index: 2; max-width: 820px; margin: 0 auto;">
-    <h1 style="color: #FFFFFF !important; font-size: clamp(2.4rem, 5.2vw, 3.8rem); line-height: 1.1; margin-bottom: 1rem; font-weight: 700;">
-      ¿Cómo te sientes <em class="editorial-italic" style="color: #A8E6C0 !important; font-weight: 400;">hoy?</em>
-    </h1>
-    <p style="color: #C8DDD1 !important; font-size: clamp(1rem, 2vw, 1.2rem); line-height: 1.7; font-weight: 300; max-width: 660px; margin: 0 auto;">
-      Sin juicios. Sin análisis. Solo un momento para reconocerte y encontrar lo que necesitas ahora.
-    </p>
+{{-- ════ PORTADA (ITEM 3) ════ --}}
+<x-marca.hero eyebrow="Un momento para ti">
+  <h1 class="m-titulo" data-aparecer="palabras">¿Cómo te sientes <em>hoy?</em></h1>
+  <p class="m-bajada" data-aparecer>Sin juicios. Sin análisis. Solo un momento para reconocerte y encontrar lo que necesitas ahora.</p>
+  <div class="m-acciones" data-aparecer-grupo>
+    <a href="#feelingsGrid8" class="m-btn m-btn-vidrio m-btn-vidrio-menta"><i class="fa-solid fa-heart-pulse"></i><span>Elegir cómo me siento</span></a>
+    <a href="#respiraConmigoSection" class="m-btn m-btn-vidrio"><i class="fa-solid fa-lungs"></i><span>Respirar un minuto</span></a>
   </div>
-</section>
+</x-marca.hero>
 
 <div class="container" style="padding-top: 3.5rem; padding-bottom: 5rem;">
 
   <!-- ════ SECCIÓN 1: ESTADO EMOCIONAL (8 CARDS EN GRID 4x2) ════ -->
   <div style="margin-bottom: 4.5rem;">
-    <div style="text-align: center; max-width: 680px; margin: 0 auto 2.5rem;">
-      <span class="mono-tag" style="color: #2E5D4B; display: block; margin-bottom: 0.35rem;">— ESTADO EMOCIONAL</span>
-      <h2 style="font-size: clamp(1.5rem, 2.8vw, 2.1rem); margin-bottom: 0.4rem; color: #1A2620;">
-        Elige lo que más se acerca a lo que sientes
-      </h2>
-      <p style="color: #556860; font-size: 0.94rem;">
-        Puedes cambiar cuando quieras. No hay respuesta incorrecta.
-      </p>
+    <div class="m-encabezado" data-aparecer>
+      <span class="m-etiqueta">Estado emocional <img src="{{ asset('images/pixel/hojas-brote.png') }}" alt="" width="24" height="17"></span>
+      <h2 class="m-h2">Elige lo que más se acerca a <em>lo que sientes</em></h2>
+      <p class="m-sub">Puedes cambiar cuando quieras. No hay respuesta incorrecta.</p>
     </div>
 
     @php
@@ -117,9 +109,9 @@
     @endphp
 
     <!-- 8 Emotions Grid Explicit 4-column layout -->
-    <div class="emotion-grid-8" id="feelingsGrid8" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; width: 100%;">
+    <div class="emotion-grid-8" id="feelingsGrid8" data-aparecer-grupo style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; width: 100%;">
       @foreach($emotions8 as $emo)
-        <div class="emotion-card-8" data-id="{{ $emo['id'] }}" data-tool="{{ $emo['tool'] }}" data-url="{{ $emo['url'] }}" data-tip="{{ $emo['tip'] }}" data-name="{{ $emo['name'] }}" style="background: #FFFFFF !important; border: 1.5px solid #DCE8E0; border-radius: 16px; padding: 1.6rem 1.15rem; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 0.65rem; cursor: pointer; box-shadow: 0 4px 14px rgba(10, 21, 15, 0.04);">
+        <div class="emotion-card-8" data-id="{{ $emo['id'] }}" data-tool="{{ $emo['tool'] }}" data-url="{{ $emo['url'] }}" data-tip="{{ $emo['tip'] }}" data-name="{{ $emo['name'] }}" data-foco style="--tono: {{ $emo['color'] }}; background: #FFFFFF !important; border: 1px solid rgba(20, 32, 26, 0.09); border-radius: 24px; padding: 1.75rem 1.15rem; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 0.65rem; cursor: pointer; box-shadow: 0 1px 2px rgba(20, 32, 26, 0.04), 0 12px 32px -16px rgba(20, 32, 26, 0.16);">
           <div class="emo-icon-ring" style="width: 56px; height: 56px; border-radius: 50%; background: rgba({{ hexdec(substr($emo['color'],1,2)) }}, {{ hexdec(substr($emo['color'],3,2)) }}, {{ hexdec(substr($emo['color'],5,2)) }}, 0.14); color: {{ $emo['color'] }}; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
             <i class="{{ $emo['icon'] }}"></i>
           </div>
@@ -130,16 +122,16 @@
     </div>
 
     <!-- DYNAMIC RECOMMENDATION BOX (EXPANDS ON CLICK) -->
-    <div id="feelingRecommendationBox" class="card" style="display: none; background: #D4EDE2; border: 2px solid #5AB56E; margin-top: 2rem; animation: slideUpFade 0.4s ease;">
+    <div id="feelingRecommendationBox" class="card" style="display: none; background: #14201A; border: 0; color: #FFFFFF; margin-top: 2rem; animation: slideUpFade 0.4s ease;">
       <div class="card-body" style="padding: 1.75rem 2rem;">
         <div style="display: flex; justify-content: space-between; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
           <div>
-            <span class="mono-tag" style="color: #2E5D4B;">Recomendación para cuando te sientes <strong id="recEmotionName"></strong></span>
-            <h3 id="recTitle" style="font-size: 1.4rem; margin-top: 0.25rem; color: #1A2620;"></h3>
-            <p id="recTip" style="font-size: 0.95rem; color: #1A2620; max-width: 680px; line-height: 1.65; margin-top: 0.35rem;"></p>
+            <span class="m-etiqueta m-etiqueta-clara">Para cuando te sientes <strong id="recEmotionName"></strong></span>
+            <h3 id="recTitle" style="font-size: 1.45rem; margin-top: 0.4rem; color: #FFFFFF;"></h3>
+            <p id="recTip" style="font-size: 0.95rem; color: #C8DDD1; max-width: 680px; line-height: 1.65; margin-top: 0.35rem;"></p>
           </div>
           <div>
-            <a id="recActionBtn" href="#" class="btn btn-primary btn-lg" style="gap: 8px;">
+            <a id="recActionBtn" href="#" class="m-btn m-btn-menta">
               <span>Abrir herramienta</span>
               <i class="fa-solid fa-arrow-right"></i>
             </a>
@@ -150,12 +142,12 @@
   </div>
 
   <!-- ════ SECCIÓN 2: MINIJUEGO "RESPIRA CONMIGO" (ITEM 3 OBLIGATORIO) ════ -->
-  <div class="breathing-module-container" id="respiraConmigoSection" style="background: #0D1410 !important; color: #FFFFFF !important; border-radius: 24px; padding: 3.5rem 2rem; position: relative; overflow: hidden; text-align: center; border: 1px solid rgba(255, 255, 255, 0.08);">
+  <div class="breathing-module-container" id="respiraConmigoSection" data-aparecer style="background: #0A1410 !important; color: #FFFFFF !important; border-radius: 36px; padding: 3.5rem 2rem; position: relative; overflow: hidden; isolation: isolate; text-align: center; box-shadow: 0 40px 80px -40px rgba(10, 20, 16, 0.7);">
+    <div class="m-fondo" aria-hidden="true"><span class="m-aurora m-aurora-1"></span><span class="m-aurora m-aurora-2"></span></div>
     
     <div style="max-width: 640px; margin: 0 auto; position: relative; z-index: 2;">
-      <h2 style="color: #FFFFFF !important; font-size: clamp(2rem, 4vw, 2.8rem); margin-bottom: 0.5rem; font-weight: 700;">
-        Respira conmigo
-      </h2>
+      <span class="m-etiqueta m-etiqueta-clara">Un minuto de calma</span>
+      <h2 class="m-titulo" style="font-size: clamp(2.1rem, 4vw, 3rem); margin: 0.6rem 0 0.5rem;">Respira <em>conmigo</em></h2>
       <p style="color: #C8DDD1 !important; font-size: 1rem; line-height: 1.6; margin-bottom: 1.75rem;">
         Haz clic para iniciar una guía de respiración. Solo un minuto.
       </p>
@@ -200,18 +192,14 @@
 
   <!-- ════ SECCIÓN 3: EXPERIENCIAS SENSORIALES COMPLEMENTARIAS ════ -->
   <div style="margin-top: 4.5rem;">
-    <div style="text-align: center; max-width: 700px; margin: 0 auto 2.5rem;">
-      <span class="mono-tag" style="color: #2E5D4B;">Otras Experiencias Sensoriales</span>
-      <h2 style="font-size: clamp(1.4rem, 2.5vw, 1.9rem); margin-top: 0.25rem; color: #1A2620;">
-        ¿Prefieres otro ejercicio relajante?
-      </h2>
-      <p style="color: #556860; font-size: 0.92rem;">
-        Herramientas interactivas diseñadas para aliviar la tensión y restablecer tu equilibrio.
-      </p>
+    <div class="m-encabezado" data-aparecer>
+      <span class="m-etiqueta">Otras experiencias sensoriales</span>
+      <h2 class="m-h2">¿Prefieres otro <em>ejercicio relajante?</em></h2>
+      <p class="m-sub">Herramientas interactivas diseñadas para aliviar la tensión y restablecer tu equilibrio.</p>
     </div>
 
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem;">
-      
+    <div data-aparecer-grupo style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem;">
+
       <!-- Grounding -->
       <div class="card" style="border-top: 4px solid #2E5D4B;">
         <div class="card-body">

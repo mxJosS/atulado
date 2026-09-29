@@ -4,33 +4,28 @@
 @section('title', $acceso ? 'Código de acceso — A tu lado' : 'Verificación de Correo — A tu lado')
 
 @section('content')
-<div class="auth-page-wrapper" style="min-height: 90vh; background: #080C0A !important; color: #FFFFFF !important; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2.5rem 1.5rem; position: relative; overflow: hidden;">
+<div class="acceso">
+  <x-marca.acceso-panel :eyebrow="$acceso ? 'Confirma que eres tú' : 'Activa tu cuenta'">
+    <h2>@if($acceso) Confirma este <em>nuevo acceso</em> @else Un paso más para <em>activar tu cuenta</em> @endif</h2>
+    <p>@if($acceso) Entraste desde un dispositivo, navegador o red que tu cuenta no había usado. Te enviamos un código a tu correo. @else Te enviamos un código de 6 dígitos a tu correo para confirmar que es tuyo. @endif</p>
+  </x-marca.acceso-panel>
 
-  <!-- Ambient Halos -->
-  <div style="position: absolute; width: 600px; height: 600px; border-radius: 50%; background: radial-gradient(circle, rgba(90, 181, 110, 0.22) 0%, transparent 68%); top: 50%; left: 50%; transform: translate(-50%, -60%); pointer-events: none;"></div>
-  <div style="position: absolute; width: 450px; height: 450px; border-radius: 50%; background: radial-gradient(circle, rgba(91, 74, 138, 0.2) 0%, transparent 68%); bottom: -10%; right: -5%; pointer-events: none;"></div>
-
-  <div style="width: 100%; max-width: 480px; position: relative; z-index: 2;">
-
-    <!-- Main Card -->
-    <div style="background: #FFFFFF !important; border-radius: 24px; padding: 2.5rem 2.25rem; box-shadow: var(--shadow-lg); border: 1.5px solid #DCE8E0; color: #1A2620;">
+  <div class="acceso-formulario">
+  <div class="acceso-tarjeta" data-aparecer>
+    <div class="m-tarjeta" style="padding: clamp(1.75rem, 3vw, 2.5rem); color: #14201A;">
       
       <!-- Card Header -->
       <div style="text-align: center; margin-bottom: 1.75rem;">
-        <a href="{{ route('home') }}" style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none; margin-bottom: 1rem;">
-          <x-logo :size="32" />
-          <span style="font-family: var(--font-display); font-size: 1.35rem; color: #2E5D4B; font-weight: 700;">a tu <em class="editorial-italic" style="color: #5AB56E;">lado</em></span>
-        </a>
 
         <div style="width: 52px; height: 52px; background: #E8F5E9; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 0.75rem; color: #2E5D4B; font-size: 1.5rem;">
           <i class="fa-solid {{ $acceso ? 'fa-shield-halved' : 'fa-envelope-circle-check' }}"></i>
         </div>
 
-        <h1 style="font-family: var(--font-display); font-size: 1.65rem; font-weight: 700; color: #1A2620; line-height: 1.25; margin-bottom: 0.5rem;">
+        <h1 class="acceso-tarjeta-titulo">
           {{ $acceso ? 'Confirma que eres tú' : 'Verifica tu correo electrónico' }}
         </h1>
         <p style="font-size: 0.9rem; color: #556860; line-height: 1.5;">
-          Hemos enviado un código de 6 dígitos a:<br>
+          @if($acceso) Estás entrando desde un dispositivo, navegador o red nuevos. @endif Hemos enviado un código de 6 dígitos a:<br>
           <strong style="color: #1A2620; font-weight: 600;">{{ $acceso ? $correo : auth()->user()->email }}</strong>
         </p>
       </div>
@@ -134,6 +129,7 @@
     </div>
 
   </div>
+</div>
 </div>
 
 <script>

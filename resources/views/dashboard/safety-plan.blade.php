@@ -5,24 +5,20 @@
 @section('content')
 <div style="max-width: 960px; margin: 0 auto;">
 
-  <!-- PAGE HEADER -->
-  <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.75rem; flex-wrap: wrap; gap: 1rem;">
-    <div>
-      <span class="mono-tag" style="color: var(--sage-base);">— PROTOCOLO DE RESPALDO</span>
-      <h1 style="font-size: 1.85rem; margin-top: 0.15rem; color: var(--text-near-black);">Mi Plan de Seguridad Digital</h1>
-      <p style="color: var(--text-medium-gray); font-size: 0.9rem;">Un documento vivo basado en evidencia para acompañarte y protegerte en momentos de alta vulnerabilidad.</p>
-    </div>
-    <div style="display: flex; gap: 0.75rem;">
-      <a href="{{ route('safety-plan.print') }}" target="_blank" class="btn btn-secondary btn-sm" style="gap: 6px;">
+  <x-marca.portada eyebrow="Protocolo de respaldo" icono="fa-solid fa-shield-heart">
+    <h1 class="m-portada-titulo" data-aparecer="palabras">Mi Plan de Seguridad <em>Digital</em></h1>
+    <p class="m-portada-texto">Un documento vivo basado en evidencia para acompañarte y protegerte en momentos de alta vulnerabilidad.</p>
+    <x-slot:acciones>
+      <a href="{{ route('safety-plan.print') }}" target="_blank" class="m-btn m-btn-vidrio m-btn-chico">
         <i class="fa-solid fa-print"></i>
         <span>Imprimir / PDF</span>
       </a>
-      <a href="tel:8009112000" class="btn btn-crisis btn-sm" style="gap: 6px;">
+      <a href="tel:8009112000" class="m-btn m-btn-crisis m-btn-chico">
         <i class="fa-solid fa-phone"></i>
         <span>SOS 800 911 2000</span>
       </a>
-    </div>
-  </div>
+    </x-slot:acciones>
+  </x-marca.portada>
 
   {{-- Revisión del mes: bloques cortos que la persona responde a su ritmo --}}
   @if(!empty($revisionPendiente) || !empty($sugerencias))

@@ -98,4 +98,54 @@
   .padron-tabla td.mono { font-family: 'IBM Plex Mono', monospace; font-size: 0.76rem; }
 
   .grid-fichas { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.25rem; margin-bottom: 1.5rem; }
+
+  /* ══ Marca (css/marca.css): el lenguaje de Inicio en el panel ══ */
+  /* Portada oscura con aurora al inicio de cada pantalla del panel */
+  .cabecera-atl {
+    position: relative; overflow: hidden; isolation: isolate;
+    padding: clamp(1.5rem, 3vw, 2.4rem) !important;
+    margin-bottom: 1.75rem !important;
+    border-radius: 28px;
+    background-color: #0A1410;
+    background-image: radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+    background-size: 26px 26px;
+    color: #E8F0EA;
+    box-shadow: 0 30px 60px -34px rgba(10, 20, 16, 0.7);
+  }
+  .cabecera-atl::before, .cabecera-atl::after {
+    content: ""; position: absolute; z-index: -1; border-radius: 50%; filter: blur(70px); opacity: 0.5; pointer-events: none;
+    animation: m-aurora 22s ease-in-out infinite alternate;
+  }
+  .cabecera-atl::before { width: 380px; height: 380px; background: #2E5D4B; top: -200px; left: -80px; }
+  .cabecera-atl::after { width: 340px; height: 340px; background: #1E7A55; bottom: -220px; right: 8%; animation-delay: -8s; }
+  .cabecera-atl .titulo-atl { color: #F4F8F5; font-size: clamp(1.9rem, 3.6vw, 2.8rem); font-weight: 600; letter-spacing: -0.028em; line-height: 1.06; margin-top: 0.8rem; }
+  .cabecera-atl .crumbs-atl {
+    display: inline-flex; flex-wrap: wrap; gap: 0.3rem; align-items: center;
+    padding: 0.38rem 0.85rem; border-radius: 999px;
+    background: rgba(168, 230, 192, 0.08); border: 1px solid rgba(168, 230, 192, 0.22);
+    color: #CFEBDB; font-size: 0.7rem; margin-bottom: 0;
+  }
+  .cabecera-atl .crumbs-atl b { color: #FFFFFF; }
+  .cabecera-atl .crumbs-atl a:hover { color: #A8E6C0; }
+  .cabecera-atl .sub-atl, .cabecera-atl .section-note { color: #B9CFC3 !important; }
+  .cabecera-atl .sub-atl b { color: #FFFFFF; }
+  .cabecera-atl .chip-atl.gris { background: rgba(255, 255, 255, 0.08); color: #E8F0EA; }
+  .cabecera-atl .btn-atl.linea { background: rgba(255, 255, 255, 0.06); color: #FFFFFF; border-color: rgba(255, 255, 255, 0.18); }
+  .cabecera-atl .btn-atl.primario { background: #A8E6C0; color: #0A1410; }
+  .cabecera-atl .btn-atl.primario:hover { background: #BFF1D1; }
+  @media (prefers-reduced-motion: reduce) { .cabecera-atl::before, .cabecera-atl::after { animation: none; } }
+
+  .btn-atl { border-radius: 999px; font-weight: 700; transition: transform 250ms cubic-bezier(0.22, 1, 0.36, 1), background 200ms ease, border-color 200ms ease; }
+  .btn-atl:hover { transform: translateY(-1px); }
+  .btn-atl.sm { border-radius: 999px; }
+  .btn-atl.linea { border-color: rgba(20, 32, 26, 0.12); color: #14201A; }
+  .btn-atl.suave { background: #E7F1EA; }
+  .card-atl { border-radius: 24px; border: 1px solid rgba(20, 32, 26, 0.09); box-shadow: 0 1px 2px rgba(20, 32, 26, 0.04), 0 12px 32px -16px rgba(20, 32, 26, 0.16); }
+  .card-atl-head h3 { font-weight: 600; letter-spacing: -0.015em; }
+  .chip-atl { border-radius: 999px; }
+  .form-input-styled { border: 1px solid rgba(20, 32, 26, 0.14); border-radius: 12px; }
+  .nota-protocolo { background: #F8F5EE; border-color: rgba(20, 32, 26, 0.09); border-radius: 14px; }
+  .modal-atl .modal-head { background: #0A1410 radial-gradient(circle at 10% 0%, rgba(46, 93, 75, 0.7), transparent 55%); }
+  .modal-atl .modal-foot { background: #F8F5EE; }
+  .area-macro, .padron-paso { border: 1px solid rgba(20, 32, 26, 0.1); border-radius: 16px; background: #FDFCF8; }
 </style>
