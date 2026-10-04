@@ -74,7 +74,7 @@ em,.editorial-italic{font-family:var(--font-editorial);font-style:italic;font-we
   text-decoration:none; white-space:nowrap; transition:all var(--transition-fast);
 }
 .nav-btn-access:hover{background:#8FD8AC}
-@media(max-width:1080px){.nav-menu{display:none}}
+@media(max-width:1280px){.nav-menu{display:none}}
 @media(max-width:560px){
   .site-navbar{padding:.75rem 1rem}
   .nav-brand{font-size:1.15rem}
@@ -251,6 +251,7 @@ body{background:#FBF9F4}
       <li><a href="{{ route('recursos.index') }}" class="nav-link">Recursos</a></li>
       <li><a href="{{ route('revista.index') }}" class="nav-link">Revista</a></li>
       <li><a href="{{ route('crisis') }}" class="nav-link">L&iacute;neas de Ayuda</a></li>
+      <li><a href="{{ route('contacto') }}" class="nav-link">Contacto</a></li>
     </ul>
     <div class="nav-actions">
       <a href="tel:8002900024" class="nav-crisis-pill" title="Llamar a la l&iacute;nea de crisis 24/7"><svg viewBox="0 0 16 16" width="11" height="11" fill="currentColor" aria-hidden="true"><path d="M3.1 1.4a1.2 1.2 0 0 1 1.7.2l1.3 1.7a1.2 1.2 0 0 1-.1 1.6l-.8.8c.6 1.3 1.8 2.5 3.1 3.1l.8-.8a1.2 1.2 0 0 1 1.6-.1l1.7 1.3a1.2 1.2 0 0 1 .2 1.7l-.8 1c-.5.6-1.3.8-2 .6C6.5 11.3 4.7 9.5 3.4 6.2c-.3-.8 0-1.6.6-2.1l-.9-2.7z"/></svg><span>CRISIS: 800 290 0024</span></a>
@@ -620,6 +621,7 @@ body{background:#FBF9F4}
         <li><a href="{{ route('sientes') }}"><span class="ch">&rsaquo;</span> &iquest;C&oacute;mo te sientes hoy?</a></li>
         <li><a href="{{ route('recursos.index') }}"><span class="ch">&rsaquo;</span> Biblioteca de Recursos</a></li>
         <li><a href="{{ route('revista.index') }}"><span class="ch">&rsaquo;</span> Revista de Salud Mental</a></li>
+        <li><a href="{{ route('contacto') }}"><span class="ch">&rsaquo;</span> Contacto para empresas</a></li>
       </ul>
     </div>
     <div>
@@ -647,7 +649,8 @@ body{background:#FBF9F4}
       <a href="{{ route('privacidad') }}">Aviso de Privacidad</a><span class="sep">&middot;</span>
       <a href="{{ route('terminos') }}">Condiciones del Servicio</a><span class="sep">&middot;</span>
       <a href="{{ route('privacidad') }}#cookies">Cookies</a><span class="sep">&middot;</span>
-      <a href="mailto:privacidad@atulado.com.mx">privacidad@atulado.com.mx</a>
+      <a href="mailto:privacidad@atulado.com.mx">privacidad@atulado.com.mx</a><span class="sep">&middot;</span>
+      <a href="mailto:{{ config('atulado.contacto.correo') }}">Contacto corporativo</a>
     </p>
     <p class="footer-nota">*Este servicio es de acompa&ntilde;amiento emocional: no diagnostica, no da tratamiento y no sustituye la atenci&oacute;n de un profesional de la salud. En una emergencia, comun&iacute;cate de inmediato a la L&iacute;nea de la Vida: 800 911 2000.</p>
   </div>

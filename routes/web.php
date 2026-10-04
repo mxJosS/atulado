@@ -45,6 +45,10 @@ Route::view('/terminos', 'terminos')->name('terminos');
 Route::redirect('/privacidad.html', '/privacidad');
 Route::redirect('/terminos.html', '/terminos');
 
+// Contacto corporativo: empresas e instituciones que piden una prueba piloto o un plan.
+Route::get('/contacto', [\App\Http\Controllers\ContactoController::class, 'mostrar'])->name('contacto');
+Route::post('/contacto', [\App\Http\Controllers\ContactoController::class, 'enviar'])->name('contacto.enviar')->middleware('throttle:contacto');
+
 // «Invitar por link»: enlace público de cada institución para registrarse y quedar en su padrón.
 Route::get('/unirse/{token}', [\App\Http\Controllers\UnirseController::class, 'mostrar'])->name('unirse.mostrar')->middleware('throttle:60,1');
 Route::get('/unirse/{token}/google', [\App\Http\Controllers\UnirseController::class, 'google'])->name('unirse.google')->middleware(['guest', 'throttle:20,1']);

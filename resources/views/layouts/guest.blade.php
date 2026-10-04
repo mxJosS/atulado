@@ -49,6 +49,7 @@
         <li><a href="{{ route('recursos.index') }}" class="nav-link {{ request()->routeIs('recursos.*') ? 'active' : '' }}">Recursos</a></li>
         <li><a href="{{ route('revista.index') }}" class="nav-link {{ request()->routeIs('revista.*') ? 'active' : '' }}">Revista</a></li>
         <li><a href="{{ route('crisis') }}" class="nav-link {{ request()->routeIs('crisis') ? 'active' : '' }}">Líneas de Ayuda</a></li>
+        <li><a href="{{ route('contacto') }}" class="nav-link {{ request()->routeIs('contacto') ? 'active' : '' }}">Contacto</a></li>
       </ul>
 
       <!-- Action Buttons -->
@@ -86,6 +87,7 @@
     <a href="{{ route('recursos.index') }}" class="nav-mobile-link"><i class="fa-solid fa-book-bookmark" style="margin-right: 8px; color: #A8E6C0;"></i> Recursos y Ejercicios</a>
     <a href="{{ route('revista.index') }}" class="nav-mobile-link"><i class="fa-solid fa-newspaper" style="margin-right: 8px; color: #A8E6C0;"></i> Revista de Bienestar</a>
     <a href="{{ route('crisis') }}" class="nav-mobile-link" style="color: #FFA59C;"><i class="fa-solid fa-phone-volume" style="margin-right: 8px;"></i> Directorio de Crisis 24/7</a>
+    <a href="{{ route('contacto') }}" class="nav-mobile-link"><i class="fa-solid fa-handshake" style="margin-right: 8px; color: #A8E6C0;"></i> Contacto para empresas</a>
     @auth
       <a href="{{ route('dashboard') }}" class="btn btn-primary" style="margin-top: 1rem;"><i class="fa-solid fa-user-shield"></i> Ir a Mi Espacio</a>
     @else
@@ -152,6 +154,7 @@
           <li><a href="{{ route('sientes') }}"><i class="fa-solid fa-chevron-right" style="font-size: 0.65rem; color: #A8E6C0;"></i> ¿Cómo te sientes hoy?</a></li>
           <li><a href="{{ route('recursos.index') }}"><i class="fa-solid fa-chevron-right" style="font-size: 0.65rem; color: #A8E6C0;"></i> Biblioteca de Recursos</a></li>
           <li><a href="{{ route('revista.index') }}"><i class="fa-solid fa-chevron-right" style="font-size: 0.65rem; color: #A8E6C0;"></i> Revista de Salud Mental</a></li>
+          <li><a href="{{ route('contacto') }}"><i class="fa-solid fa-chevron-right" style="font-size: 0.65rem; color: #A8E6C0;"></i> Contacto para empresas</a></li>
         </ul>
       </div>
 
@@ -188,7 +191,8 @@
         <a href="{{ route('privacidad') }}" style="color: #A8E6C0; text-decoration: none; margin: 0 0.5rem;">Aviso de Privacidad</a> ·
         <a href="{{ route('terminos') }}" style="color: #A8E6C0; text-decoration: none; margin: 0 0.5rem;">Condiciones del Servicio</a> ·
         <a href="{{ route('privacidad') }}#cookies" style="color: #A8E6C0; text-decoration: none; margin: 0 0.5rem;">Política de cookies</a> ·
-        <a href="mailto:privacidad@atulado.com.mx" style="color: #A8E6C0; text-decoration: none; margin: 0 0.5rem;">Contacto Legal</a>
+        <a href="mailto:privacidad@atulado.com.mx" style="color: #A8E6C0; text-decoration: none; margin: 0 0.5rem;">Contacto Legal</a> ·
+        <a href="mailto:{{ config('atulado.contacto.correo') }}" style="color: #A8E6C0; text-decoration: none; margin: 0 0.5rem;">Contacto Corporativo</a>
       </p>
       <p style="font-size: 0.76rem; opacity: 0.75; max-width: 600px;">
         *Este servicio es complementario y no sustituye la psicoterapia profesional individualizada. En emergencias severas, comunícate de inmediato a la Línea de la Vida.

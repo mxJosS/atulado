@@ -108,6 +108,15 @@ class AppServiceProvider extends ServiceProvider
                 ->response($demasiados('Espera un minuto antes de pedir otro código.')),
         ]);
 
+        // Formulario público de /contacto: cada solicitud es un correo al buzón
+        // corporativo. Cuenta también los envíos con errores, por eso deja margen.
+        RateLimiter::for('contacto', fn (Request $r) => [
+            Limit::perMinutes(10, 5)->by('contacto:' . $correo($r) . '|' . $r->ip())
+                ->response($demasiados('Ya recibimos tus solicitudes. Espera unos minutos antes de enviar otra.')),
+            Limit::perHour(20)->by('contacto:' . $ip($r))
+                ->response($demasiados('Recibimos muchas solicitudes desde tu red. Inténtalo más tarde o escríbenos por correo.')),
+        ]);
+
         // El límite corre antes de resolver el modelo: la ruta todavía trae el id.
         RateLimiter::for('invitacion', fn (Request $r) => [
             Limit::perMinute(10)->by('invitacion:' . (is_object($m = $r->route('membresia')) ? $m->getKey() : $m) . '|' . $r->ip()),

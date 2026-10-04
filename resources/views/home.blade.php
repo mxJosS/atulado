@@ -35,6 +35,15 @@
       ['violeta', '02', 'rocas', 'Sensorial', 'Grounding 5-4-3-2-1', 'Desactiva la respuesta de pánico anclando tu corteza prefrontal en tus 5 sentidos reales paso a paso.', 'Abrir asistente sensorial', route('tools.grounding')],
       ['rojo', '03', 'stop', 'Tolerancia al malestar', 'Técnica STOP (DBT)', 'Para momentos de enojo o impulsividad: Stop, Take a breath, Observe y Proceed con mente sabia.', 'Aprender técnica STOP', route('tools.stop')],
   ];
+
+  // Para empresas e instituciones, con el mismo formato que $herramientas.
+  // Caen directo en el formulario de /contacto con el interés ya elegido.
+  $correoCorporativo = config('atulado.contacto.correo');
+  $organizaciones = [
+      ['verde', '01', 'hojas-brote', 'Prueba piloto', 'Prueba piloto de 90 días', 'Empieza con un grupo de tu empresa o escuela y conoce la plataforma con tu equipo antes de decidir.', 'Solicitar prueba piloto', route('contacto', ['interes' => 'piloto']) . '#formulario'],
+      ['violeta', '02', 'escudo-corazon', 'Planes', 'Un plan para tu organización', 'Planes para empresas, colegios y universidades, a la medida del tamaño de tu equipo.', 'Contratar un plan', route('contacto', ['interes' => 'plan']) . '#formulario'],
+      ['verde', '03', 'pluma', 'Contacto', 'Escríbenos directo', 'Resolvemos tus dudas por correo en ' . $correoCorporativo . '.', 'Enviar un correo', 'mailto:' . $correoCorporativo],
+  ];
 @endphp
 
 @section('content')
@@ -299,6 +308,38 @@
           <p>Sé el primero en compartir psicoeducación basada en evidencia con la comunidad.</p>
         </div>
       @endforelse
+    </div>
+  </div>
+</section>
+
+{{-- ════ PARA EMPRESAS E INSTITUCIONES: lleva a /contacto ════ --}}
+<section class="inicio-seccion inicio-organizaciones">
+  <div class="container">
+    <header class="inicio-encabezado" data-aparecer>
+      <span class="inicio-etiqueta">
+        <img src="{{ $px('hojas-brote') }}" alt="" width="22" height="16">
+        Para empresas e instituciones
+      </span>
+      <h2 class="inicio-h2">Lleva A Tu Lado a <em>tu organización</em></h2>
+      <p class="inicio-sub">Acompañamiento emocional para colaboradores, estudiantes y docentes. Empieza con una prueba piloto o contrata un plan.</p>
+    </header>
+
+    {{-- data-no-spa: la navegación sin recarga de main.js descarta el #formulario --}}
+    <div class="inicio-tarjetas" data-aparecer-grupo>
+      @foreach($organizaciones as [$tono, $numero, $ilustracion, $insignia, $titulo, $texto, $accion, $destino])
+        <a href="{{ $destino }}" class="inicio-tarjeta tono-{{ $tono }}" data-foco data-no-spa>
+          <div class="inicio-tarjeta-arte">
+            <span class="inicio-tarjeta-num">{{ $numero }}</span>
+            <img src="{{ $px($ilustracion) }}" alt="">
+          </div>
+          <div class="inicio-tarjeta-cuerpo">
+            <span class="inicio-insignia">{{ $insignia }}</span>
+            <h3>{{ $titulo }}</h3>
+            <p>{{ $texto }}</p>
+            <span class="inicio-tarjeta-accion">{{ $accion }} <i class="fa-solid fa-arrow-right"></i></span>
+          </div>
+        </a>
+      @endforeach
     </div>
   </div>
 </section>

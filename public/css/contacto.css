@@ -1,0 +1,100 @@
+/* ==========================================================================
+   A TU LADO — Contacto para empresas e instituciones (resources/views/contacto.blade.php)
+   Sólo lo propio de esta página; botones, tarjetas y campos vienen de
+   marca.css y publico.css.
+   ========================================================================== */
+
+.contacto-rejilla {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: clamp(1.25rem, 3vw, 2rem);
+  align-items: start;
+}
+
+/* ── Columna de información ──────────────────────────────────────────────── */
+.contacto-info { display: grid; gap: 1.25rem; }
+.contacto-info p { margin: 0.5rem 0 0; color: var(--m-tinta-suave); font-size: 0.95rem; line-height: 1.65; }
+.contacto-info .m-tarjeta-noche p { color: #B9CFC3; }
+.contacto-ico { display: block; height: auto; margin-bottom: 0.9rem; }
+.contacto-correo,
+.contacto-correo:visited {
+  display: inline-block;
+  margin-top: 0.75rem;
+  color: var(--m-menta);
+  font-family: var(--font-display);
+  font-size: clamp(1.1rem, 2vw, 1.3rem);
+  font-weight: 600;
+  overflow-wrap: anywhere; /* en celular el correo baja de línea en lugar de salirse */
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.contacto-correo:hover { color: var(--m-menta-claro); }
+
+/* ── Formulario ──────────────────────────────────────────────────────────── */
+.contacto-nota { margin: 0.4rem 0 1.5rem; color: var(--m-tinta-suave); font-size: 0.9rem; }
+
+.contacto-intereses { margin: 0 0 1.4rem; padding: 0; border: 0; }
+.contacto-intereses legend { margin-bottom: 0.65rem; padding: 0; }
+.contacto-opciones { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.contacto-opcion { position: relative; cursor: pointer; }
+.contacto-opcion input { position: absolute; opacity: 0; pointer-events: none; }
+.contacto-opcion span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 1.1rem;
+  border: 1.5px solid var(--m-linea);
+  border-radius: 999px;
+  background: #FFFFFF;
+  color: var(--m-tinta);
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: border-color 200ms ease, background 200ms ease, color 200ms ease;
+}
+.contacto-opcion:hover span { border-color: rgba(46, 93, 75, 0.4); }
+.contacto-opcion input:checked + span { background: var(--m-verde); border-color: var(--m-verde); color: #FFFFFF; }
+.contacto-opcion input:focus-visible + span { outline: 3px solid rgba(46, 93, 75, 0.35); outline-offset: 2px; }
+
+.contacto-campos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 1rem; }
+.contacto-campo-ancho { grid-column: 1 / -1; }
+.contacto textarea.form-control { min-height: 120px; resize: vertical; }
+.contacto .form-control.is-invalid { border-color: #C0392B; }
+.contacto .form-error { color: #C0392B; font-size: 0.8rem; }
+
+.contacto-aviso { display: flex; gap: 9px; align-items: flex-start; margin: 0.25rem 0 0.4rem; color: #33413B; font-size: 0.84rem; line-height: 1.45; cursor: pointer; }
+.contacto-aviso input { flex: none; margin-top: 3px; accent-color: var(--m-verde); }
+.contacto-aviso a { color: var(--m-verde); font-weight: 600; text-decoration: underline; }
+.contacto-formulario form > .m-btn { margin-top: 1.25rem; }
+
+.contacto-alerta {
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-start;
+  margin-bottom: 1.25rem;
+  padding: 0.85rem 1rem;
+  border-left: 4px solid #C0392B;
+  border-radius: 8px;
+  background: #FDECEA;
+  color: #922B21;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+/* Trampa para bots: fuera de la vista sin display:none, que algunos bots detectan */
+.contacto-trampa { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+
+/* ── Solicitud enviada ───────────────────────────────────────────────────── */
+.contacto-gracias { padding: 1.5rem 0.5rem; text-align: center; }
+.contacto-gracias > i { color: var(--m-verde); font-size: 2.6rem; }
+.contacto-gracias h2 { margin-top: 1rem; }
+.contacto-gracias p { max-width: 440px; margin: 0.6rem auto 1.5rem; color: var(--m-tinta-suave); line-height: 1.65; }
+.contacto-gracias p a { color: var(--m-verde); font-weight: 600; }
+
+/* ── Pantallas medianas y celular ────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .contacto-rejilla { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 640px) {
+  .contacto-campos { grid-template-columns: minmax(0, 1fr); }
+  .contacto-opcion, .contacto-opcion span { width: 100%; }
+}

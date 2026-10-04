@@ -50,6 +50,30 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Contacto corporativo
+    |--------------------------------------------------------------------------
+    | Empresas e instituciones que piden una prueba piloto o un plan desde
+    | /contacto. Cada solicitud llega a este correo con «Responder a» de quien
+    | la envía. Una sola lista de intereses y de tamaños para el formulario
+    | y la validación.
+    */
+    'contacto' => [
+        'correo' => env('ATULADO_CONTACTO_CORPORATIVO', 'Corporativo@atulado.com.mx'),
+        'intereses' => [
+            'piloto' => 'Prueba piloto de 90 días',
+            'plan' => 'Contratar un plan',
+            'otro' => 'Otra consulta',
+        ],
+        'personas' => [
+            '1 a 50',
+            '51 a 250',
+            '251 a 1,000',
+            'Más de 1,000',
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Guardia clínica de A Tu Lado
     |--------------------------------------------------------------------------
     | Destinatario alterno del resumen clínico cuando la institución no tiene un
