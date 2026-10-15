@@ -437,12 +437,15 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'name' => User::REGLAS_NOMBRE,
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'confirmed', Password::min(8)],
             'avatar_color' => ['nullable', 'string', 'in:sage,mint,terra,lav,sky,amber,dark'],
         ] + self::reglasConsentimiento(), [
             'name.required' => 'Por favor escribe tu nombre.',
+            'name.not_regex' => 'Tu nombre no puede parecer una dirección web.',
+            'name.regex' => 'Tu nombre sólo puede llevar letras, espacios, puntos, apóstrofos y guiones.',
+            'name.max' => 'Tu nombre puede tener como máximo 80 caracteres.',
             'email.required' => 'El correo electrónico es obligatorio.',
             'email.email' => 'Por favor ingresa un correo electrónico válido.',
             'email.unique' => 'Este correo electrónico ya está registrado.',
@@ -591,7 +594,7 @@ class AuthController extends Controller
         $user = Auth::user();
 
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'name' => User::REGLAS_NOMBRE,
             'email' => ['required', 'email', 'max:255', 'unique:users,email,' . $user->id],
             'avatar' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:4096'],
             'remove_avatar' => ['nullable'],
@@ -600,6 +603,9 @@ class AuthController extends Controller
             'crisis_contact_phone' => ['nullable', 'string', 'max:50'],
         ], [
             'name.required' => 'El nombre o apodo es obligatorio.',
+            'name.not_regex' => 'El nombre no puede parecer una dirección web.',
+            'name.regex' => 'El nombre sólo puede llevar letras, espacios, puntos, apóstrofos y guiones.',
+            'name.max' => 'El nombre puede tener como máximo 80 caracteres.',
             'email.required' => 'El correo electrónico es obligatorio.',
             'email.email' => 'Ingresa un formato de correo válido.',
             'email.unique' => 'Este correo electrónico ya pertenece a otro usuario.',

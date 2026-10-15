@@ -71,7 +71,7 @@
 
         <!-- Profile Photo Upload -->
         <div class="form-group" style="margin-bottom: 1.5rem;">
-          <label class="form-label" style="display: flex; align-items: center; justify-content: space-between;">
+          <label class="form-label" style="display: flex; flex-wrap: wrap; gap: 0.25rem 0.75rem; align-items: center; justify-content: space-between;">
             <span>Foto de Perfil</span>
             <span style="font-size: 0.76rem; color: #556860; font-weight: normal;">Visible en tu cuenta y artículos publicados</span>
           </label>

@@ -29,6 +29,7 @@ class ContactoTest extends TestCase
             'telefono' => '+52 999 123 4567',
             'mensaje' => "Queremos empezar con la cuadrilla de Mérida.\nSomos 120 personas.",
             'acepto_aviso' => '1',
+            'cargado' => encrypt(now()->subSeconds(30)->timestamp),
         ], $cambios);
     }
 
@@ -133,6 +134,40 @@ class ContactoTest extends TestCase
             ->assertSessionHas('contacto_enviado');
 
         Mail::assertNothingSent();
+    }
+
+    public function test_a_form_sent_instantly_or_without_its_timestamp_gets_no_email_sent(): void
+    {
+        Mail::fake();
+
+        foreach ([encrypt(now()->timestamp), 'manipulado', null] as $cargado) {
+            $this->post('/contacto', $this->solicitud(['cargado' => $cargado]))
+                ->assertRedirect(route('contacto'))
+                ->assertSessionHas('contacto_enviado');
+        }
+
+        Mail::assertNothingSent();
+    }
+
+    public function test_text_in_other_alphabets_or_with_links_is_rejected(): void
+    {
+        Mail::fake();
+
+        foreach ([
+            ['nombre' => 'Ayşe Yılmaz'],
+            ['organizacion' => 'Şirket Güvenliği'],
+            ['nombre' => 'Иван Петров'],
+            ['mensaje' => 'Revisa tu factura en https://pago-seguro.example'],
+            ['mensaje' => 'Confirma tus datos en www.banco-falso.mx'],
+            ['organizacion' => 'Premios estafa.link'],
+        ] as $i => $cambio) {
+            $this->post('/contacto', $this->solicitud($cambio + ['email' => "caso{$i}@empresa.mx"]))->assertSessionHasErrors(array_keys($cambio));
+        }
+        Mail::assertNothingSent();
+
+        $this->post('/contacto', $this->solicitud(['nombre' => "José Ñúñez O'Brien", 'organizacion' => 'Grupo Peñón S.A. de C.V.']))
+            ->assertSessionHasNoErrors();
+        Mail::assertSentCount(1);
     }
 
     public function test_the_contact_form_is_rate_limited(): void

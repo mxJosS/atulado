@@ -33,9 +33,9 @@ class ContactoController extends Controller
 
     public function enviar(EnviarContactoRequest $request)
     {
-        // Trampa para bots: el campo está oculto y una persona nunca lo llena.
+        // Trampas para bots (campo oculto y envío instantáneo).
         // Se les responde como a todos para no darles pistas.
-        if ($request->filled('sitio_web')) {
+        if ($request->pareceBot()) {
             return redirect()->route('contacto')->with('contacto_enviado', true);
         }
 

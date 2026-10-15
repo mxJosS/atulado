@@ -1610,11 +1610,11 @@ em, .editorial-italic {
     left: 0;
     z-index: 90;
     transform: translateX(-100%);
-    box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
     transition: transform var(--transition-normal);
   }
   .dashboard-sidebar.mobile-open {
     transform: translateX(0);
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
   }
   .mobile-sidebar-toggle {
     display: inline-flex !important;
@@ -1684,12 +1684,16 @@ em, .editorial-italic {
     gap: 2rem;
   }
   .streak-day-bubbles {
-    flex-wrap: wrap;
-    gap: 0.4rem;
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 0.3rem;
+    justify-items: center;
   }
   .day-circle-bubble {
-    width: 32px;
-    height: 32px;
+    width: 100% !important;
+    max-width: 34px;
+    height: auto !important;
+    aspect-ratio: 1;
     font-size: 0.8rem;
   }
 }

@@ -162,6 +162,7 @@
               <label for="sitio_web">Sitio web</label>
               <input type="text" id="sitio_web" name="sitio_web" tabindex="-1" autocomplete="off">
             </div>
+            <input type="hidden" name="cargado" value="{{ encrypt(now()->timestamp) }}">
 
             <label class="contacto-aviso">
               <input type="checkbox" name="acepto_aviso" value="1" @checked(old('acepto_aviso')) required>

@@ -226,7 +226,7 @@ table { border-collapse: collapse; width: 100%; }
 .page-sub { color: var(--text-medium-gray); font-size: 0.9rem; margin: 0; max-width: 78ch; }
 
 .section-head {
-  display: flex; align-items: baseline; gap: 0.8rem;
+  display: flex; align-items: baseline; gap: 0.8rem; flex-wrap: wrap;
   margin: 2.1rem 0 0.9rem;
 }
 .section-title {
@@ -246,7 +246,7 @@ table { border-collapse: collapse; width: 100%; }
 }
 .card-pad { padding: 1.15rem 1.25rem; }
 .card-head {
-  display: flex; align-items: center; gap: 0.7rem;
+  display: flex; align-items: center; gap: 0.7rem; flex-wrap: wrap;
   padding: 1rem 1.25rem 0.85rem;
   border-bottom: 1px solid var(--border-light);
 }
@@ -800,6 +800,10 @@ table.data .actions { text-align: right; white-space: nowrap; }
   .topbar-actions { margin-left: 0; width: 100%; }
   .modal-body { padding: 1rem; }
   .doc-preview { padding: 1.2rem 1rem; }
+  .alert { flex-wrap: wrap; }
+  .alert .txt { flex: 1 1 0; min-width: 0; }
+  .alert .when { flex-basis: 100%; margin-left: calc(28px + 0.85rem); }
+  .card-head, .card-body { padding-left: 1rem; padding-right: 1rem; }
 }
 
 @media print {

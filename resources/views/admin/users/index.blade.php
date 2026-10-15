@@ -117,7 +117,7 @@
   <!-- FILTROS & BÚSQUEDA -->
   <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
     <!-- Tabs de Rol -->
-    <div style="display: flex; gap: 6px; background: #E8EFEA; padding: 4px; border-radius: 10px;">
+    <div style="display: flex; flex-wrap: wrap; gap: 6px; background: #E8EFEA; padding: 4px; border-radius: 10px;">
       <a href="{{ route('admin.users.index', array_merge(request()->except('rol', 'page'), [])) }}" 
          style="padding: 0.4rem 0.85rem; border-radius: 7px; font-size: 0.82rem; font-weight: 600; text-decoration: none; {{ !request('rol') ? 'background: white; color: #1A2620; box-shadow: var(--shadow-xs);' : 'color: #556860;' }}">
         Todos ({{ $counts['todos'] }})
@@ -137,14 +137,14 @@
     </div>
 
     <!-- Buscador -->
-    <form method="GET" action="{{ route('admin.users.index') }}" style="display: flex; gap: 8px; margin: 0;">
+    <form method="GET" action="{{ route('admin.users.index') }}" style="display: flex; gap: 8px; margin: 0; max-width: 100%;">
       @if(request('rol'))
         <input type="hidden" name="rol" value="{{ request('rol') }}">
       @endif
-      <div style="position: relative;">
+      <div style="position: relative; flex: 0 1 280px; min-width: 0;">
         <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #8CA399; font-size: 0.85rem;"></i>
         <input type="text" name="buscar" value="{{ request('buscar') }}" placeholder="Buscar por nombre o correo..." 
-               class="form-control" style="padding-left: 34px; width: 280px; font-size: 0.85rem; border-radius: 9px; height: 38px;">
+               class="form-control" style="padding-left: 34px; width: 100%; font-size: 0.85rem; border-radius: 9px; height: 38px;">
       </div>
       <button type="submit" class="btn btn-secondary btn-sm" style="height: 38px; border-radius: 9px; padding: 0 1rem;">
         Buscar

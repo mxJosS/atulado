@@ -98,6 +98,14 @@ class User extends Authenticatable
     /** Versión vigente del aviso de privacidad; cambiarla vuelve a pedir el consentimiento. */
     public const VERSION_AVISO = '2026-09-26';
 
+    /**
+     * El nombre viaja en los correos que la app manda a la dirección que se
+     * escriba al registrarse. Sólo letras, espacios, punto, apóstrofo y guion:
+     * así nadie puede usar el registro para mandar enlaces o «ganaste $5000»
+     * desde nuestro dominio a un tercero.
+     */
+    public const REGLAS_NOMBRE = ['required', 'string', 'max:80', "regex:/^[\pL\pM\s'.\-]+$/u", 'not_regex:/\.\pL{2,}/u'];
+
     public function tieneConsentimiento(): bool
     {
         return $this->consentimiento_en !== null;

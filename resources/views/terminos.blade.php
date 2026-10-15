@@ -144,7 +144,7 @@ p.entrada{color:var(--text-medium-gray); font-size:1rem; margin:0}
 @media(max-width:640px){
   .indice ol{columns:1}
   .legal table{font-size:.82rem}
-  .legal th,.legal td{padding:.5rem .55rem}
+  .legal th,.legal td{padding:.5rem .55rem;overflow-wrap:anywhere}
 }
 
 /* ── Pie ── */

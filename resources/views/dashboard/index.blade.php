@@ -48,7 +48,7 @@
     <div>
       <div class="card" style="border-top: 5px solid #2E5D4B;">
         <div class="card-body">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+          <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
             <div>
               <span class="mono-tag" style="color: #2E5D4B;">— REGISTRO EMOCIONAL</span>
               <h2 style="font-size: 1.4rem; margin-top: 0.2rem; color: #1A2620;">¿Cómo estuvo tu día hoy?</h2>

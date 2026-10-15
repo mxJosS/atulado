@@ -50,7 +50,7 @@
   .form-fila.c2-1 { grid-template-columns: 2fr 1fr; }
   .form-fila.c1-1 { grid-template-columns: 1fr 1fr; }
   .form-fila.c3 { grid-template-columns: 1fr 1fr 1fr; }
-  @media (max-width: 640px) { .form-fila.c2-1, .form-fila.c1-1, .form-fila.c3 { grid-template-columns: 1fr; } }
+  @media (max-width: 640px) { .form-fila.c2-1, .form-fila.c1-1, .form-fila.c3 { grid-template-columns: 1fr; } .titulo-atl { font-size: 1.4rem; } }
   .nota-protocolo { background: #F8FAF9; border: 1px solid #DCE8E0; border-radius: 8px; padding: 0.65rem 0.85rem; display: flex; gap: 8px; align-items: flex-start; font-size: 0.75rem; color: #556860; line-height: 1.35; }
   .nota-protocolo i { color: #2E5D4B; margin-top: 2px; }
 

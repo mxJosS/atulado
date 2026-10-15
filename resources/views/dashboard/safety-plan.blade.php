@@ -79,7 +79,7 @@
     <!-- PASO 1: SEÑALES DE ALERTA -->
     <div class="card" style="margin-bottom: 1.5rem; border-top: 4px solid var(--clinical-red);">
       <div class="card-body">
-        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.75rem; margin-bottom: 0.5rem;">
           <span class="badge badge-crisis" style="font-size: 0.78rem;">Paso 1</span>
           <h2 style="font-size: 1.25rem; margin: 0; color: var(--text-near-black);">Mis Señales de Alerta Tempranas</h2>
         </div>
@@ -111,7 +111,7 @@
     <!-- PASO 2: ESTRATEGIAS INTERNAS -->
     <div class="card" style="margin-bottom: 1.5rem; border-top: 4px solid var(--sage-base);">
       <div class="card-body">
-        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.75rem; margin-bottom: 0.5rem;">
           <span class="badge badge-sage" style="font-size: 0.78rem;">Paso 2</span>
           <h2 style="font-size: 1.25rem; margin: 0; color: var(--text-near-black);">Estrategias Internas de Afrontamiento</h2>
         </div>
@@ -143,7 +143,7 @@
     <!-- PASO 3: PERSONAS Y LUGARES DE DISTRACCIÓN -->
     <div class="card" style="margin-bottom: 1.5rem; border-top: 4px solid var(--violet-base);">
       <div class="card-body">
-        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.75rem; margin-bottom: 0.5rem;">
           <span class="badge badge-violet" style="font-size: 0.78rem;">Paso 3</span>
           <h2 style="font-size: 1.25rem; margin: 0; color: var(--text-near-black);">Lugares y Contactos de Distracción Social</h2>
         </div>
@@ -200,7 +200,7 @@
     <!-- PASO 4: RED DE APOYO DE CONFIANZA (ITEM 6: ACCIONES LLAMADA & WHATSAPP) -->
     <div class="card" style="margin-bottom: 1.5rem; border-top: 4px solid #8A7332;">
       <div class="card-body">
-        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.75rem; margin-bottom: 0.5rem;">
           <span class="badge badge-gold" style="font-size: 0.78rem;">Paso 4</span>
           <h2 style="font-size: 1.25rem; margin: 0; color: var(--text-near-black);">Red de Apoyo Personal (A quién pedir auxilio)</h2>
         </div>
@@ -273,7 +273,7 @@
     <!-- PASO 5: RAZONES PARA VIVIR -->
     <div class="card" style="margin-bottom: 2rem; border-top: 4px solid var(--mint-accent); background: linear-gradient(145deg, #FFFFFF, var(--sage-pale));">
       <div class="card-body">
-        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.75rem; margin-bottom: 0.5rem;">
           <span class="badge badge-mint" style="font-size: 0.78rem;">Paso 5</span>
           <h2 style="font-size: 1.25rem; margin: 0; color: var(--text-near-black);">Mis Razones para Vivir y Seguir Adelante</h2>
         </div>

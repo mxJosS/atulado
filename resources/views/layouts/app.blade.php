@@ -22,7 +22,6 @@
   <script src="https://kit.fontawesome.com/6244811c40.js" crossorigin="anonymous" defer></script>
   
   <!-- RPG Awesome & Game Icons Library (Deferred) -->
-  <link rel="stylesheet" href="{{ asset('vendor/rpg-awesome/css/rpg-awesome.min.css') }}">
   <script src="{{ asset('vendor/iconify/iconify-icon.min.js') }}" defer></script>
   <script src="{{ asset('js/game-icons-pack.js') }}?v={{ file_exists(public_path('js/game-icons-pack.js')) ? filemtime(public_path('js/game-icons-pack.js')) : time() }}" defer></script>
   @stack('styles')

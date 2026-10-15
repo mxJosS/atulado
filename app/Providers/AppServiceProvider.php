@@ -50,6 +50,8 @@ class AppServiceProvider extends ServiceProvider
             }
         });
 
+        // Fuera de producción, una consulta N+1 truena en vez de hacer lenta la página.
+        \Illuminate\Database\Eloquent\Model::preventLazyLoading(!$this->app->isProduction());
         $this->limitesDeIntentos();
 
         // Custom Spanish & Branded Password Reset Email for A Tu Lado
@@ -85,9 +87,12 @@ class AppServiceProvider extends ServiceProvider
             Limit::perMinute(100)->by($ip($r)),
         ]);
 
+        // Cada registro manda un correo a la dirección escrita: el tope por hora
+        // por IP frena a los bots que usan el alta para escribirle a terceros.
         RateLimiter::for('registro', fn (Request $r) => [
             Limit::perMinute(5)->by($correo($r)),
             Limit::perMinute(100)->by($ip($r)),
+            Limit::perHour(60)->by('registro:' . $ip($r)),
         ]);
 
         RateLimiter::for('recuperar', fn (Request $r) => [

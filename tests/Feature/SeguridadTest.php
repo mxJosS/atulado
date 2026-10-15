@@ -28,6 +28,26 @@ class SeguridadTest extends TestCase
 {
     use RefreshDatabase;
 
+    /* ─────────── Registro como relevo de phishing ─────────── */
+
+    public function test_registration_rejects_names_that_carry_links_or_spam(): void
+    {
+        Mail::fake();
+        $datos = fn (string $nombre, string $correo) => [
+            'name' => $nombre, 'email' => $correo,
+            'password' => 'secreta123', 'password_confirmation' => 'secreta123',
+            'acepto_aviso' => '1', 'acepto_sensibles' => '1', 'mayor_de_edad' => '1',
+        ];
+
+        foreach (['Gana $5000 en https://estafa.mx', 'Visita estafa.link', 'Premio 2026'] as $i => $nombre) {
+            $this->post('/registro', $datos($nombre, "victima{$i}@ejemplo.com"))->assertSessionHasErrors('name');
+        }
+        Mail::assertNothingSent();
+
+        $this->post('/registro', $datos("María Ma. José O'Neil-Pérez", 'real@ejemplo.com'))->assertSessionHasNoErrors();
+        Mail::assertSent(EmailVerificationCodeMail::class);
+    }
+
     /* ─────────── Subida de archivos ─────────── */
 
     public function test_a_cover_image_keeps_the_extension_of_its_real_content(): void
