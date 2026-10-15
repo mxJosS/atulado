@@ -87,12 +87,11 @@ class AppServiceProvider extends ServiceProvider
             Limit::perMinute(100)->by($ip($r)),
         ]);
 
-        // Cada registro manda un correo a la dirección escrita: el tope por hora
-        // por IP frena a los bots que usan el alta para escribirle a terceros.
+        // Sin tope por hora por IP: un colegio registra salón tras salón desde la
+        // misma IP. Lo que frena el abuso del alta es User::REGLAS_NOMBRE.
         RateLimiter::for('registro', fn (Request $r) => [
             Limit::perMinute(5)->by($correo($r)),
             Limit::perMinute(100)->by($ip($r)),
-            Limit::perHour(60)->by('registro:' . $ip($r)),
         ]);
 
         RateLimiter::for('recuperar', fn (Request $r) => [

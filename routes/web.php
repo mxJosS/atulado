@@ -50,8 +50,8 @@ Route::get('/contacto', [\App\Http\Controllers\ContactoController::class, 'mostr
 Route::post('/contacto', [\App\Http\Controllers\ContactoController::class, 'enviar'])->name('contacto.enviar')->middleware('throttle:contacto');
 
 // «Invitar por link»: enlace público de cada institución para registrarse y quedar en su padrón.
-Route::get('/unirse/{token}', [\App\Http\Controllers\UnirseController::class, 'mostrar'])->name('unirse.mostrar')->middleware('throttle:60,1');
-Route::get('/unirse/{token}/google', [\App\Http\Controllers\UnirseController::class, 'google'])->name('unirse.google')->middleware(['guest', 'throttle:20,1']);
+Route::get('/unirse/{token}', [\App\Http\Controllers\UnirseController::class, 'mostrar'])->name('unirse.mostrar')->middleware('throttle:200,1');
+Route::get('/unirse/{token}/google', [\App\Http\Controllers\UnirseController::class, 'google'])->name('unirse.google')->middleware(['guest', 'throttle:100,1']);
 Route::post('/unirse/{token}', [\App\Http\Controllers\UnirseController::class, 'unir'])->name('unirse.unir')->middleware(['auth', 'throttle:10,1']);
 
 /*

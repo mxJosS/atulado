@@ -48,6 +48,22 @@ class SeguridadTest extends TestCase
         Mail::assertSent(EmailVerificationCodeMail::class);
     }
 
+    public function test_a_whole_classroom_can_register_from_the_same_school_ip(): void
+    {
+        Mail::fake();
+
+        foreach (range(1, 60) as $i) {
+            auth()->logout();
+            $this->withServerVariables(['REMOTE_ADDR' => '200.10.20.30'])->post('/registro', [
+                'name' => 'Alumno Prueba', 'email' => "alumno{$i}@escuela.mx",
+                'password' => 'secreta123', 'password_confirmation' => 'secreta123',
+                'acepto_aviso' => '1', 'acepto_sensibles' => '1', 'mayor_de_edad' => '1',
+            ])->assertSessionHasNoErrors();
+        }
+
+        $this->assertSame(60, User::where('email', 'like', '%@escuela.mx')->count());
+    }
+
     /* ─────────── Subida de archivos ─────────── */
 
     public function test_a_cover_image_keeps_the_extension_of_its_real_content(): void

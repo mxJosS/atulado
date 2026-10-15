@@ -21,6 +21,7 @@
 
 [DEFAULT]
 # Tu IP de oficina para no bloquearte a ti mismo (separadas por espacio).
+# Agrega también la IP pública de cada escuela o empresa cliente.
 ignoreip = 127.0.0.1/8 ::1
 # Quien reincide recibe bloqueos cada vez más largos (hasta 1 semana).
 bantime.increment = true
@@ -36,7 +37,7 @@ maxretry = 2
 findtime = 10m
 bantime = 1d
 
-# Muchos 403/404/429 seguidos: escáner o script. 30 en 5 minutos.
+# Muchos 403/404 seguidos: escáner o script. 30 en 5 minutos.
 [atulado-rechazos]
 enabled = true
 port = http,https
