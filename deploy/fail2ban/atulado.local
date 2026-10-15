@@ -1,0 +1,54 @@
+# fail2ban para A Tu Lado: bloquea en el firewall del servidor las IPs que
+# escanean en busca de vulnerabilidades o que insisten después de ser frenadas.
+#
+# Instalación (una vez, como root):
+#   sudo apt install fail2ban
+#   sudo cp deploy/fail2ban/filter.d/atulado-*.conf /etc/fail2ban/filter.d/
+#   sudo cp deploy/fail2ban/atulado.local /etc/fail2ban/jail.d/atulado.local
+#   sudo systemctl enable --now fail2ban && sudo systemctl restart fail2ban
+#
+# Probar un filtro contra el log real ANTES de confiar en él (no bloquea nada):
+#   sudo fail2ban-regex /var/log/nginx/access.log /etc/fail2ban/filter.d/atulado-sondas.conf
+#
+# Ver y quitar bloqueos:
+#   sudo fail2ban-client status atulado-sondas
+#   sudo fail2ban-client set atulado-rechazos unbanip 1.2.3.4
+#
+# IMPORTANTE: con Cloudflare delante, primero configura la IP real en Nginx
+# (ver deploy/nginx-limites.conf). Además, el bloqueo por firewall ya no
+# frena el tráfico web (llega desde Cloudflare); en ese caso los bloqueos web
+# se hacen en el panel de Cloudflare y aquí queda útil sobre todo [sshd].
+
+[DEFAULT]
+# Tu IP de oficina para no bloquearte a ti mismo (separadas por espacio).
+ignoreip = 127.0.0.1/8 ::1
+# Quien reincide recibe bloqueos cada vez más largos (hasta 1 semana).
+bantime.increment = true
+bantime.maxtime = 1w
+
+# Pedir /.env, /wp-admin, /.git…: 2 intentos y fuera un día.
+[atulado-sondas]
+enabled = true
+port = http,https
+filter = atulado-sondas
+logpath = /var/log/nginx/access.log
+maxretry = 2
+findtime = 10m
+bantime = 1d
+
+# Muchos 403/404/429 seguidos: escáner o script. 30 en 5 minutos.
+[atulado-rechazos]
+enabled = true
+port = http,https
+filter = atulado-rechazos
+logpath = /var/log/nginx/access.log
+maxretry = 30
+findtime = 5m
+bantime = 1h
+
+# Fuerza bruta contra SSH (filtro incluido en fail2ban).
+[sshd]
+enabled = true
+maxretry = 5
+findtime = 10m
+bantime = 1h
