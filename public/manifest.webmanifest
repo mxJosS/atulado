@@ -1,0 +1,23 @@
+{
+  "name": "A tu lado — Apoyo emocional",
+  "short_name": "A tu lado",
+  "description": "Acompañamiento emocional, herramientas de regulación, plan de seguridad y líneas de crisis 24/7.",
+  "lang": "es-MX",
+  "id": "/",
+  "start_url": "/dashboard",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FBF9F4",
+  "theme_color": "#2E5D4B",
+  "categories": ["health", "medical", "lifestyle"],
+  "icons": [
+    { "src": "/images/marca/logo-atulado-128.png", "sizes": "128x128", "type": "image/png", "purpose": "any" },
+    { "src": "/images/marca/logo-atulado-256.png", "sizes": "256x256", "type": "image/png", "purpose": "any" },
+    { "src": "/images/marca/logo-atulado-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ],
+  "shortcuts": [
+    { "name": "Líneas de crisis 24/7", "short_name": "Crisis", "url": "/crisis", "icons": [{ "src": "/images/marca/logo-atulado-128.png", "sizes": "128x128" }] },
+    { "name": "Respira conmigo", "short_name": "Respirar", "url": "/herramientas/respiracion", "icons": [{ "src": "/images/marca/logo-atulado-128.png", "sizes": "128x128" }] }
+  ]
+}

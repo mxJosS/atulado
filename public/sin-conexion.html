@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#2E5D4B">
+  <title>Sin conexión — A tu lado</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background: #FBF9F4; color: #14201A; display: flex; align-items: center; justify-content: center; padding: 24px 16px; }
+    main { width: 100%; max-width: 420px; text-align: center; }
+    img { width: 64px; height: 64px; }
+    h1 { font-size: 1.5rem; margin: 12px 0 6px; }
+    p { color: #556860; line-height: 1.5; margin: 0 0 20px; }
+    .llamar { display: flex; flex-direction: column; gap: 2px; text-decoration: none; border-radius: 18px; padding: 16px; margin-bottom: 12px; font-weight: 700; }
+    .llamar small { font-weight: 500; opacity: 0.85; }
+    .vida { background: #A93226; color: #fff; font-size: 1.25rem; }
+    .emergencia { background: #fff; color: #A93226; border: 2px solid #A93226; font-size: 1.1rem; }
+    .respira { margin-top: 28px; padding: 20px; border-radius: 18px; background: #E7F1EA; }
+    .respira h2 { font-size: 1.05rem; margin: 0 0 14px; }
+    .circulo { width: 110px; height: 110px; margin: 0 auto 12px; border-radius: 50%; background: #2E5D4B; opacity: 0.85; animation: respirar 12s ease-in-out infinite; }
+    #paso { font-weight: 600; color: #2E5D4B; margin: 0; }
+    button { margin-top: 24px; border: none; border-radius: 999px; padding: 12px 24px; font-size: 1rem; font-weight: 600; background: #2E5D4B; color: #fff; cursor: pointer; }
+    @keyframes respirar { 0%, 100% { transform: scale(0.6); } 33%, 50% { transform: scale(1); } }
+    @media (prefers-reduced-motion: reduce) { .circulo { animation: none; } }
+  </style>
+</head>
+<body>
+  <main>
+    <img src="/images/marca/logo-atulado-128.png" alt="A tu lado">
+    <h1>No hay conexión a internet</h1>
+    <p>Las llamadas funcionan aunque no tengas datos. Si estás en crisis, no esperes: llama ahora. No estás solo(a).</p>
+
+    <a class="llamar vida" href="tel:8009112000">800 911 2000<small>Línea de la Vida · gratuita · 24 horas</small></a>
+    <a class="llamar emergencia" href="tel:911">911<small>Emergencias</small></a>
+
+    <section class="respira" aria-label="Ejercicio de respiración">
+      <h2>Mientras tanto, respira conmigo</h2>
+      <div class="circulo" aria-hidden="true"></div>
+      <p id="paso" aria-live="polite">Inhala…</p>
+    </section>
+
+    <button type="button" onclick="location.reload()">Volver a intentar</button>
+  </main>
+  <script>
+    // Inhala 4 s, sostén 2 s, exhala 6 s (12 s, igual que la animación).
+    const pasos = [['Inhala…', 4000], ['Sostén…', 2000], ['Exhala despacio…', 6000]];
+    let i = 0;
+    (function siguiente() {
+      document.getElementById('paso').textContent = pasos[i][0];
+      setTimeout(siguiente, pasos[i][1]);
+      i = (i + 1) % pasos.length;
+    })();
+    addEventListener('online', () => location.reload());
+  </script>
+</body>
+</html>
