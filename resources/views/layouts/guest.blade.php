@@ -87,6 +87,7 @@
     <a href="{{ route('revista.index') }}" class="nav-mobile-link"><i class="fa-solid fa-newspaper" style="margin-right: 8px; color: #A8E6C0;"></i> Revista de Bienestar</a>
     <a href="{{ route('crisis') }}" class="nav-mobile-link" style="color: #FFA59C;"><i class="fa-solid fa-phone-volume" style="margin-right: 8px;"></i> Directorio de Crisis 24/7</a>
     <a href="{{ route('contacto') }}" class="nav-mobile-link"><i class="fa-solid fa-handshake" style="margin-right: 8px; color: #A8E6C0;"></i> Contacto para empresas</a>
+    <a href="#" class="nav-mobile-link" data-pwa-instalar role="button" style="color: #A8E6C0; font-weight: 700;"><i class="fa-solid fa-mobile-screen" style="margin-right: 8px;"></i> Instalar app en tu celular</a>
     @auth
       <a href="{{ route('dashboard') }}" class="btn btn-primary" style="margin-top: 1rem;"><i class="fa-solid fa-user-shield"></i> Ir a Mi Espacio</a>
     @else

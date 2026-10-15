@@ -79,6 +79,11 @@
           <span>Mis Favoritos</span>
         </a>
 
+        <a href="#" class="sidebar-item" data-pwa-instalar role="button" style="color: #A8E6C0;">
+          <div class="sidebar-item-icon"><i class="fa-solid fa-mobile-screen" style="color: #A8E6C0;"></i></div>
+          <span>Instalar app</span>
+        </a>
+
         <div class="sidebar-section-title">Terapia & Herramientas DBT</div>
 
         <a href="{{ route('tools.respiracion') }}" class="sidebar-item {{ request()->routeIs('tools.respiracion') ? 'active' : '' }}">
