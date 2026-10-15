@@ -181,6 +181,7 @@
             <li><a href="{{ route('register') }}"><i class="fa-solid fa-chevron-right" style="font-size: 0.65rem; color: #A8E6C0;"></i> Crear Cuenta Gratis</a></li>
             <li><a href="{{ route('login') }}"><i class="fa-solid fa-chevron-right" style="font-size: 0.65rem; color: #A8E6C0;"></i> Diario Personal</a></li>
           @endauth
+          <li><a href="#" data-pwa-instalar role="button" style="color: #A8E6C0; font-weight: 700;"><i class="fa-solid fa-mobile-screen" style="font-size: 0.8rem;"></i> Instalar la app</a></li>
         </ul>
       </div>
     </div>

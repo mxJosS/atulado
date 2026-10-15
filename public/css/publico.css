@@ -70,7 +70,8 @@ body.sitio-publico .site-navbar {
   position: fixed;
   top: 14px;
   left: 50%;
-  width: min(1240px, calc(100% - 28px));
+  /* Logo + 7 enlaces + crisis + Acceder ocupan ~1285 px: la cápsula debe alcanzarlos. */
+  width: min(1340px, calc(100% - 28px));
   translate: -50% 0;
   padding: 0.55rem 0.6rem 0.55rem 1.1rem;
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -156,6 +157,12 @@ body.sitio-publico .nav-hamburger { border-radius: 12px; }
 body.sitio-publico .nav-actions { flex-shrink: 0; }
 body.sitio-publico .nav-btn-access,
 body.sitio-publico .nav-crisis-pill { white-space: nowrap; }
+
+/* Celulares muy angostos (iPhone SE): menos aire para que ☰ no pise el borde. */
+@media (max-width: 360px) {
+  body.sitio-publico .nav-container { gap: 0.5rem; }
+  body.sitio-publico .nav-actions { gap: 0.4rem; }
+}
 
 /* Laptops (1281–1440 px): enlaces más compactos para que los 7 quepan con margen. */
 @media (max-width: 1440px) {
