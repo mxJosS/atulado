@@ -25,3 +25,6 @@ _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Caché de graphify (se regenera con `graphify update .`)
+/graphify-out
