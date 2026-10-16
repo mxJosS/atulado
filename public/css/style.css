@@ -1799,11 +1799,67 @@ em, .editorial-italic {
   background: #F4F9F6;
 }
 
-.clinical-radio-btn.selected {
+.clinical-radio-btn.selected,
+.clinical-radio-btn:has(input:checked) {
   border-color: #2E5D4B;
   background: #2E5D4B;
   color: #FFFFFF;
   font-weight: 600;
+}
+
+/* El radio queda invisible pero enfocable: así funciona el teclado y el aviso
+   del navegador cuando falta una respuesta (con display:none el envío fallaba en silencio). */
+.clinical-radio-btn { position: relative; }
+.clinical-radio-btn input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  margin: 0;
+  pointer-events: none;
+}
+.clinical-radio-btn:has(input:focus-visible) {
+  outline: 2px solid #2E5D4B;
+  outline-offset: 2px;
+}
+
+/* Encabezado y botones fijos dentro de la tarjeta: siempre a la vista al desplazarse. */
+.clinical-modal-card { --cm-pad: clamp(1.25rem, 3vw, 2rem); padding: var(--cm-pad); max-height: 90dvh; }
+.clinical-modal-head,
+.clinical-modal-actions {
+  position: sticky;
+  z-index: 2;
+  background: #FFFFFF;
+  margin-inline: calc(-1 * var(--cm-pad));
+  padding-inline: var(--cm-pad);
+}
+.clinical-modal-head {
+  top: calc(-1 * var(--cm-pad));
+  margin-top: calc(-1 * var(--cm-pad));
+  padding-top: var(--cm-pad);
+  padding-bottom: 0.75rem;
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+.clinical-modal-actions {
+  bottom: calc(-1 * var(--cm-pad));
+  margin-bottom: calc(-1 * var(--cm-pad));
+  padding-block: 0.85rem var(--cm-pad);
+  margin-top: 1.25rem;
+  border-top: 1px solid #E2ECE6;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+@media (max-width: 480px) {
+  .clinical-modal-overlay { padding: 0.5rem; }
+  .clinical-question-item { padding: 0.85rem; }
+  .clinical-options-grid { grid-template-columns: repeat(3, 1fr); }
+  .clinical-radio-btn { min-height: 52px; }
+  .clinical-modal-actions .btn { flex: 1; justify-content: center; }
 }
 
 /* Pantalla de Contención (Safe Containment - ROJO / ROJO AGUDO) */

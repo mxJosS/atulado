@@ -236,7 +236,7 @@
             <button type="submit" role="switch" aria-checked="{{ $googleActivo ? 'true' : 'false' }}"
                     aria-label="{{ $googleActivo ? 'Desactivar' : 'Activar' }} el acceso con Google"
                     class="interruptor {{ $googleActivo ? 'encendido' : '' }}"
-                    @if($googleActivo) onclick="return confirm('¿Desactivar el acceso con Google? El botón desaparecerá del inicio de sesión y del registro para todos.')" @endif>
+                    @if($googleActivo) onclick="event.preventDefault(); showAdminNoticeModal({ title: '¿Desactivar el acceso con Google?', message: 'El botón desaparecerá del inicio de sesión y del registro para todos. Sólo se podrá entrar con correo.', showCancel: true, confirmText: 'Desactivar', onConfirm: () => this.form.submit() })" @endif>
               <span class="perilla"></span>
             </button>
           </form>

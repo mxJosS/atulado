@@ -4,7 +4,7 @@
 {{-- Bloque 1 --}}
 <div id="preguntasBloque1" class="clinical-modal-overlay" style="display: none;">
   <div class="clinical-modal-card">
-    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem;">
+    <div class="clinical-modal-head">
       <div>
         <span class="mono-tag" style="color: #2E5D4B; font-size: 0.72rem;">— UN MOMENTO PARA TI</span>
         <h2 style="font-size: 1.35rem; color: #1A2620; margin-top: 0.25rem; font-family: var(--font-display);">Unas preguntas para conocerte mejor</h2>
@@ -48,7 +48,7 @@
           <div class="clinical-options-grid">
             @foreach($escala1 as $val => $label)
               <label class="clinical-radio-btn" onclick="selectClinicalRadio(this)">
-                <input type="radio" name="i{{ $num }}" value="{{ $val }}" required style="display: none;">
+                <input type="radio" name="i{{ $num }}" value="{{ $val }}" required>
                 <span style="font-weight: 700; font-size: 0.95rem;">{{ $val }}</span>
                 <span style="font-size: 0.72rem; line-height: 1.2; margin-top: 2px;">{{ $label }}</span>
               </label>
@@ -57,7 +57,7 @@
         </div>
       @endforeach
 
-      <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem; justify-content: flex-end;">
+      <div class="clinical-modal-actions">
         <button type="button" onclick="closeClinicalModals()" class="btn btn-secondary">Cancelar</button>
         <button type="submit" id="bloque1Enviar" class="btn btn-primary" style="gap: 8px;">
           <span>Continuar</span>
@@ -71,7 +71,7 @@
 {{-- Bloque 2 --}}
 <div id="preguntasBloque2" class="clinical-modal-overlay" style="display: none;">
   <div class="clinical-modal-card">
-    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem;">
+    <div class="clinical-modal-head">
       <div>
         <span class="mono-tag" style="color: #2E5D4B; font-size: 0.72rem;">— UNAS PREGUNTAS MÁS</span>
         <h2 style="font-size: 1.35rem; color: #1A2620; margin-top: 0.25rem; font-family: var(--font-display);">Un poco más sobre cómo te has sentido</h2>
@@ -120,7 +120,7 @@
           <div class="clinical-options-grid">
             @foreach($escala2 as $val => $label)
               <label class="clinical-radio-btn" onclick="selectClinicalRadio(this)">
-                <input type="radio" name="{{ $key }}" value="{{ $val }}" required style="display: none;">
+                <input type="radio" name="{{ $key }}" value="{{ $val }}" required>
                 <span style="font-weight: 700; font-size: 0.9rem;">{{ $val }}</span>
                 <span style="font-size: 0.7rem; line-height: 1.15; margin-top: 2px;">{{ $label }}</span>
               </label>
@@ -129,7 +129,7 @@
         </div>
       @endforeach
 
-      <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem; justify-content: flex-end;">
+      <div class="clinical-modal-actions">
         <button type="button" onclick="closeClinicalModals()" class="btn btn-secondary">Cancelar</button>
         <button type="submit" id="bloque2Enviar" class="btn btn-primary" style="gap: 8px;">
           <span>Continuar</span>
@@ -143,7 +143,7 @@
 {{-- Bloque 3 --}}
 <div id="preguntasBloque3" class="clinical-modal-overlay" style="display: none;">
   <div class="clinical-modal-card">
-    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem;">
+    <div class="clinical-modal-head">
       <div>
         <span class="mono-tag" style="color: #922B21; font-size: 0.72rem;">— ESTAMOS CONTIGO</span>
         <h2 style="font-size: 1.35rem; color: #1A2620; margin-top: 0.25rem; font-family: var(--font-display);">Queremos asegurarnos de que estés bien</h2>
@@ -171,17 +171,17 @@
             <span style="font-weight: 600; font-size: 0.92rem; color: #1A2620;">{{ $pData['q'] }}</span>
             <span class="badge badge-sage" style="font-size: 0.72rem;">{{ $pData['period'] }}</span>
           </div>
-          <div class="clinical-options-grid" style="grid-template-columns: repeat(3, 1fr);">
+          <div class="clinical-options-grid">
             <label class="clinical-radio-btn" onclick="selectClinicalRadio(this)">
-              <input type="radio" name="{{ $pKey }}" value="si" required style="display: none;">
+              <input type="radio" name="{{ $pKey }}" value="si" required>
               <span style="font-weight: 600;">Sí</span>
             </label>
             <label class="clinical-radio-btn" onclick="selectClinicalRadio(this)">
-              <input type="radio" name="{{ $pKey }}" value="no" required style="display: none;">
+              <input type="radio" name="{{ $pKey }}" value="no" required>
               <span style="font-weight: 600;">No</span>
             </label>
             <label class="clinical-radio-btn" onclick="selectClinicalRadio(this)">
-              <input type="radio" name="{{ $pKey }}" value="prefiero_no_contestar" required style="display: none;">
+              <input type="radio" name="{{ $pKey }}" value="prefiero_no_contestar" required>
               <span style="font-weight: 500; font-size: 0.75rem;">Prefiero no contestar</span>
             </label>
           </div>
@@ -194,23 +194,23 @@
           <span style="font-weight: 700; font-size: 0.94rem; color: #922B21;">5. ¿Está pensando en suicidarse en este momento?</span>
           <span class="badge" style="background: #C0392B; color: #FFFFFF; font-size: 0.72rem;">En este momento</span>
         </div>
-        <div class="clinical-options-grid" style="grid-template-columns: repeat(3, 1fr);">
+        <div class="clinical-options-grid">
           <label class="clinical-radio-btn" onclick="selectClinicalRadio(this)">
-            <input type="radio" name="p5" value="si" style="display: none;">
+            <input type="radio" name="p5" value="si">
             <span style="font-weight: 600; color: #C0392B;">Sí</span>
           </label>
           <label class="clinical-radio-btn" onclick="selectClinicalRadio(this)">
-            <input type="radio" name="p5" value="no" style="display: none;">
+            <input type="radio" name="p5" value="no">
             <span style="font-weight: 600;">No</span>
           </label>
           <label class="clinical-radio-btn" onclick="selectClinicalRadio(this)">
-            <input type="radio" name="p5" value="prefiero_no_contestar" style="display: none;">
+            <input type="radio" name="p5" value="prefiero_no_contestar">
             <span style="font-weight: 500; font-size: 0.75rem;">Prefiero no contestar</span>
           </label>
         </div>
       </div>
 
-      <div style="margin-top: 1.5rem; display: flex; justify-content: flex-end;">
+      <div class="clinical-modal-actions">
         <button type="submit" id="bloque3Enviar" class="btn btn-primary" style="background: #2E5D4B; gap: 8px; width: 100%; justify-content: center; padding: 0.85rem;">
           <span>Enviar respuestas</span>
           <i class="fa-solid fa-heart-pulse"></i>
@@ -223,7 +223,7 @@
 {{-- Bloque 4: revisión mensual repartida. Se muestra un grupo a la vez (A, B, C o D). --}}
 <div id="preguntasBloque4" class="clinical-modal-overlay" style="display: none;">
   <div class="clinical-modal-card">
-    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem;">
+    <div class="clinical-modal-head">
       <div>
         <span class="mono-tag" style="color: #2E5D4B; font-size: 0.72rem;">— UN MOMENTO PARA TI</span>
         <h2 style="font-size: 1.35rem; color: #1A2620; margin-top: 0.25rem; font-family: var(--font-display);">¿Cómo te has sentido últimamente?</h2>
@@ -249,10 +249,10 @@
               <div style="font-weight: 600; font-size: 0.9rem; color: #1A2620; margin-bottom: 0.45rem;">
                 {{ \App\Services\PucholService::ITEMS[$item] }}
               </div>
-              <div class="clinical-options-grid" style="grid-template-columns: repeat(5, 1fr);">
+              <div class="clinical-options-grid">
                 @foreach(\App\Services\PucholService::ESCALA as $valor => $texto)
                   <label class="clinical-radio-btn" onclick="selectClinicalRadio(this)">
-                    <input type="radio" name="{{ $item }}" value="{{ $valor }}" style="display: none;">
+                    <input type="radio" name="{{ $item }}" value="{{ $valor }}">
                     <span style="font-weight: 700; font-size: 0.9rem;">{{ $valor }}</span>
                     <span style="font-size: 0.68rem; line-height: 1.15; margin-top: 2px;">{{ $texto }}</span>
                   </label>
@@ -263,7 +263,7 @@
         </div>
       @endforeach
 
-      <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem; justify-content: flex-end;">
+      <div class="clinical-modal-actions">
         <button type="button" onclick="closeClinicalModals()" class="btn btn-secondary">Ahora no</button>
         <button type="submit" id="bloque4Enviar" class="btn btn-primary" style="gap: 8px;">
           <span>Enviar</span>
