@@ -41,14 +41,20 @@
           </div>
           <div style="margin-bottom: 1rem;">
             <label for="password" style="font-size: 0.86rem; font-weight: 600; margin-bottom: 0.35rem; display: block;">Contraseña</label>
+            <div style="position: relative;">
             <input type="password" name="password" id="password" required autocomplete="new-password" autofocus placeholder="Al menos 8 caracteres"
-                   class="form-control" style="border: 1px solid rgba(20, 32, 26, 0.12); border-radius: 14px; padding: 0.75rem 1rem; width: 100%; box-sizing: border-box;">
+                   class="form-control" style="border: 1px solid rgba(20, 32, 26, 0.12); border-radius: 14px; padding: 0.75rem 2.75rem 0.75rem 1rem; width: 100%; box-sizing: border-box;">
+              <x-ver-contrasena />
+            </div>
             @error('password')<div style="color: #C0392B; font-size: 0.8rem; margin-top: 0.3rem;">{{ $message }}</div>@enderror
           </div>
           <div style="margin-bottom: 1rem;">
             <label for="password_confirmation" style="font-size: 0.86rem; font-weight: 600; margin-bottom: 0.35rem; display: block;">Confirmar contraseña</label>
+            <div style="position: relative;">
             <input type="password" name="password_confirmation" id="password_confirmation" required autocomplete="new-password"
-                   class="form-control" style="border: 1px solid rgba(20, 32, 26, 0.12); border-radius: 14px; padding: 0.75rem 1rem; width: 100%; box-sizing: border-box;">
+                   class="form-control" style="border: 1px solid rgba(20, 32, 26, 0.12); border-radius: 14px; padding: 0.75rem 2.75rem 0.75rem 1rem; width: 100%; box-sizing: border-box;">
+              <x-ver-contrasena />
+            </div>
           </div>
           <label style="display: flex; gap: 8px; align-items: flex-start; font-size: 0.8rem; color: #556860; margin-bottom: 1.25rem; cursor: pointer;">
             <input type="checkbox" name="acepto" value="1" @checked(old('acepto')) style="margin-top: 2px;">

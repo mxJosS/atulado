@@ -40,6 +40,27 @@ class PasswordResetTest extends TestCase
         Notification::assertSentTo($user, ResetPasswordNotification::class);
     }
 
+    public function test_unknown_email_gets_account_created_and_link_sent(): void
+    {
+        Notification::fake();
+
+        $this->post(route('password.email'), ['email' => ' Alumno@Escuela.edu.mx '])
+            ->assertSessionHas('status');
+
+        $user = User::where('email', 'alumno@escuela.edu.mx')->firstOrFail();
+        $this->assertNull($user->email_verified_at);
+        Notification::assertSentTo($user, ResetPasswordNotification::class);
+
+        $this->post(route('password.update'), [
+            'token' => Password::createToken($user),
+            'email' => $user->email,
+            'password' => 'nueva-clave-123',
+            'password_confirmation' => 'nueva-clave-123',
+        ])->assertRedirect(route('login'));
+
+        $this->assertNotNull($user->fresh()->email_verified_at);
+    }
+
     public function test_reset_password_screen_can_be_rendered(): void
     {
         $response = $this->get(route('password.reset', ['token' => 'sample-token', 'email' => 'test@atulado.com.mx']));

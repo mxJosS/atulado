@@ -56,6 +56,7 @@
           <label for="password" style="font-size: 0.86rem; font-weight: 600; color: #1A2620; margin-bottom: 0.35rem; display: block;">
             Nueva Contraseña
           </label>
+          <div style="position: relative;">
           <input 
             type="password" 
             name="password" 
@@ -65,8 +66,10 @@
             required 
             autocomplete="new-password"
             autofocus
-            style="background: #FFFFFF; border: 1px solid rgba(20, 32, 26, 0.12); border-radius: 14px; padding: 0.75rem 1rem; font-size: 0.92rem; color: #1A2620; width: 100%; box-sizing: border-box;"
+            style="background: #FFFFFF; border: 1px solid rgba(20, 32, 26, 0.12); border-radius: 14px; padding: 0.75rem 2.75rem 0.75rem 1rem; font-size: 0.92rem; color: #1A2620; width: 100%; box-sizing: border-box;"
           >
+            <x-ver-contrasena />
+          </div>
           @error('password')
             <div class="form-error" style="color: #C0392B; font-size: 0.8rem; margin-top: 0.3rem;">{{ $message }}</div>
           @enderror
@@ -76,6 +79,7 @@
           <label for="password_confirmation" style="font-size: 0.86rem; font-weight: 600; color: #1A2620; margin-bottom: 0.35rem; display: block;">
             Confirmar Contraseña
           </label>
+          <div style="position: relative;">
           <input 
             type="password" 
             name="password_confirmation" 
@@ -84,8 +88,10 @@
             placeholder="Repite la nueva contraseña" 
             required 
             autocomplete="new-password"
-            style="background: #FFFFFF; border: 1px solid rgba(20, 32, 26, 0.12); border-radius: 14px; padding: 0.75rem 1rem; font-size: 0.92rem; color: #1A2620; width: 100%; box-sizing: border-box;"
+            style="background: #FFFFFF; border: 1px solid rgba(20, 32, 26, 0.12); border-radius: 14px; padding: 0.75rem 2.75rem 0.75rem 1rem; font-size: 0.92rem; color: #1A2620; width: 100%; box-sizing: border-box;"
           >
+            <x-ver-contrasena />
+          </div>
         </div>
 
         <button 

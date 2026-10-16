@@ -674,8 +674,23 @@ class AuthController extends Controller
             'email.email' => 'Ingresa un correo electrónico válido.',
         ]);
 
+        // ponytail: TEMPORAL para alta rápida de salones. Si el correo no tiene cuenta
+        // se crea aquí y el enlace sirve para definir la contraseña. Cualquiera puede
+        // crear cuentas con correos ajenos (sin verificar): quitar al tener otro flujo.
+        $correo = mb_strtolower(trim($request->input('email')));
+        if (!User::where('email', $correo)->exists()) {
+            User::create([
+                'name' => Str::limit(Str::before($correo, '@'), 60, ''),
+                'email' => $correo,
+                'password' => Hash::make(Str::random(32)),
+                'role' => 'usuario',
+                'avatar_color' => 'sage',
+                'email_verified_at' => null,
+            ]);
+        }
+
         $status = \Illuminate\Support\Facades\Password::sendResetLink(
-            $request->only('email')
+            ['email' => $correo]
         );
 
         if ($status !== \Illuminate\Support\Facades\Password::RESET_LINK_SENT) {
@@ -717,6 +732,8 @@ class AuthController extends Controller
             function ($user, string $password) {
                 $user->forceFill([
                     'password' => Hash::make($password),
+                    // Abrir el enlace del correo ya demuestra que el correo es suyo.
+                    'email_verified_at' => $user->email_verified_at ?? now(),
                 ])->setRememberToken(Str::random(60));
 
                 $user->save();
