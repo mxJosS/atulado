@@ -62,6 +62,7 @@ window.seguirPreguntas = function(data) {
   }
   window.closeClinicalModals();
   if (data.mensaje) window.showZenToast(data.mensaje, 'success', 5000);
+  setTimeout(() => window.invitarInstalarPWA?.(), 1500);
 };
 
 window.abrirBloque1 = function() {

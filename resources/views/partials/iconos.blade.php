@@ -24,11 +24,19 @@
         html.dataset.pwa = 'ios';
       }
       addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); instalador = e; html.dataset.pwa = 'instalable'; });
-      addEventListener('appinstalled', () => { instalador = null; delete html.dataset.pwa; });
+      addEventListener('appinstalled', () => {
+        instalador = null;
+        delete html.dataset.pwa;
+        window.showZenAlert?.({
+          title: '¡Listo, ya tienes A tu lado!',
+          message: 'La app quedó instalada. Búscala en tu pantalla de inicio con el ícono de <strong>A tu lado</strong>: se abre directo, sin navegador.',
+          buttonText: 'Genial',
+          type: 'success',
+          icon: 'fa-circle-check',
+        });
+      });
 
-      document.addEventListener('click', async (e) => {
-        if (!e.target.closest('[data-pwa-instalar]')) return;
-        e.preventDefault();
+      const instalar = async () => {
         if (instalador) {
           instalador.prompt();
           await instalador.userChoice;
@@ -36,10 +44,38 @@
           delete html.dataset.pwa;
           return;
         }
-        const pasos = 'Abre esta página en Safari, toca el botón Compartir (el cuadro con una flecha hacia arriba) y elige «Agregar a inicio».';
-        window.showZenConfirm
-          ? showZenConfirm({ title: 'Instala A tu lado en tu iPhone', message: pasos, confirmText: 'Entendido', cancelText: 'Cerrar', type: 'success', icon: 'fa-mobile-screen' })
-          : alert(pasos);
+        // iPhone no deja instalar desde la página: se guía en 3 pasos.
+        const pasos = '<span style="display:block;text-align:left;line-height:1.9">'
+          + '<strong>1.</strong> Toca el botón <strong>Compartir</strong> <i class="fa-solid fa-arrow-up-from-bracket"></i> (abajo en Safari, arriba en Chrome).<br>'
+          + '<strong>2.</strong> Desliza y elige <strong>«Agregar a inicio»</strong> <i class="fa-regular fa-square-plus"></i>.<br>'
+          + '<strong>3.</strong> Toca <strong>«Agregar»</strong>. ¡Listo! Aparecerá en tu pantalla de inicio.</span>';
+        window.showZenAlert
+          ? showZenAlert({ title: 'Instala A tu lado en tu iPhone', message: pasos, buttonText: 'Entendido', type: 'success', icon: 'fa-mobile-screen' })
+          : alert('Toca Compartir y elige «Agregar a inicio».');
+      };
+
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('[data-pwa-instalar]')) return;
+        e.preventDefault();
+        instalar();
       });
+
+      // Invitación única al terminar un cuestionario: si dice «Ahora no», no vuelve a salir.
+      window.invitarInstalarPWA = async () => {
+        if (!html.dataset.pwa || !window.showZenConfirm) return;
+        try {
+          if (localStorage.getItem('pwa-invitacion')) return;
+          localStorage.setItem('pwa-invitacion', '1');
+        } catch (e) { return; }
+        const si = await showZenConfirm({
+          title: '¿Quieres tenerla a un toque?',
+          message: 'Instala A tu lado en tu pantalla de inicio para abrirla rápido cuando la necesites, como cualquier otra app.',
+          confirmText: 'Instalar',
+          cancelText: 'Ahora no',
+          type: 'success',
+          icon: 'fa-mobile-screen',
+        });
+        if (si) instalar();
+      };
     })();
   </script>
