@@ -19,7 +19,9 @@ return [
     ],
 
     'resend' => [
-        'key' => env('RESEND_API_KEY'),
+        // La contraseña SMTP de Resend es la misma API key. Railway bloquea el
+        // SMTP de salida, ahí se usa MAIL_MAILER=resend (API por HTTPS).
+        'key' => env('RESEND_API_KEY', env('MAIL_PASSWORD')),
     ],
 
     'ses' => [

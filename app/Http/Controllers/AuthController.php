@@ -689,9 +689,14 @@ class AuthController extends Controller
             ]);
         }
 
-        $status = \Illuminate\Support\Facades\Password::sendResetLink(
-            ['email' => $correo]
-        );
+        try {
+            $status = \Illuminate\Support\Facades\Password::sendResetLink(
+                ['email' => $correo]
+            );
+        } catch (\Throwable $e) {
+            report($e);
+            return back()->withInput()->withErrors(['email' => 'No pudimos enviar el correo en este momento. Intenta de nuevo en unos minutos.']);
+        }
 
         if ($status !== \Illuminate\Support\Facades\Password::RESET_LINK_SENT) {
             Log::info("Recuperación de contraseña sin envío ({$status}).");

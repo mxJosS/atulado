@@ -61,6 +61,15 @@ class PasswordResetTest extends TestCase
         $this->assertNotNull($user->fresh()->email_verified_at);
     }
 
+    public function test_mail_failure_shows_message_instead_of_500(): void
+    {
+        Password::shouldReceive('sendResetLink')->andThrow(new \RuntimeException('smtp caído'));
+
+        $this->post(route('password.email'), ['email' => 'alguien@escuela.edu.mx'])
+            ->assertRedirect()
+            ->assertSessionHasErrors('email');
+    }
+
     public function test_reset_password_screen_can_be_rendered(): void
     {
         $response = $this->get(route('password.reset', ['token' => 'sample-token', 'email' => 'test@atulado.com.mx']));
