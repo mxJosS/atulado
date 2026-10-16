@@ -123,6 +123,7 @@
           <label for="password" style="font-size: 0.86rem; font-weight: 600; color: #1A2620; margin-bottom: 0.35rem; display: block;">
             Contraseña (mínimo 8 caracteres)
           </label>
+          <div style="position: relative;">
           <input 
             type="password" 
             name="password" 
@@ -131,8 +132,10 @@
             placeholder="••••••••" 
             required 
             autocomplete="new-password"
-            style="background: #FFFFFF; border: 1px solid rgba(20, 32, 26, 0.12); border-radius: 14px; padding: 0.75rem 1rem; font-size: 0.92rem; color: #1A2620;"
+            style="background: #FFFFFF; border: 1px solid rgba(20, 32, 26, 0.12); border-radius: 14px; padding: 0.75rem 2.75rem 0.75rem 1rem; font-size: 0.92rem; color: #1A2620;"
           >
+            <x-ver-contrasena />
+          </div>
           @error('password') <div class="form-error" style="color: #C0392B; font-size: 0.8rem; margin-top: 0.3rem;">{{ $message }}</div> @enderror
         </div>
 
@@ -140,6 +143,7 @@
           <label for="password_confirmation" style="font-size: 0.86rem; font-weight: 600; color: #1A2620; margin-bottom: 0.35rem; display: block;">
             Confirma tu contraseña
           </label>
+          <div style="position: relative;">
           <input 
             type="password" 
             name="password_confirmation" 
@@ -148,8 +152,10 @@
             placeholder="••••••••" 
             required 
             autocomplete="new-password"
-            style="background: #FFFFFF; border: 1px solid rgba(20, 32, 26, 0.12); border-radius: 14px; padding: 0.75rem 1rem; font-size: 0.92rem; color: #1A2620;"
+            style="background: #FFFFFF; border: 1px solid rgba(20, 32, 26, 0.12); border-radius: 14px; padding: 0.75rem 2.75rem 0.75rem 1rem; font-size: 0.92rem; color: #1A2620;"
           >
+            <x-ver-contrasena />
+          </div>
           @error('password_confirmation') <div class="form-error" style="color: #C0392B; font-size: 0.8rem; margin-top: 0.3rem;">{{ $message }}</div> @enderror
         </div>
 

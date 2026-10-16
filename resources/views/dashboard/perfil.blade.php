@@ -184,19 +184,28 @@
 
         <div class="form-group">
           <label for="current_password" class="form-label">Contraseña actual</label>
-          <input type="password" name="current_password" id="current_password" class="form-control" required>
+          <div style="position: relative;">
+            <input type="password" name="current_password" id="current_password" class="form-control" style="padding-right: 2.75rem;" required>
+            <x-ver-contrasena />
+          </div>
           @error('current_password') <div class="form-error">{{ $message }}</div> @enderror
         </div>
 
         <div class="form-group">
           <label for="new_password" class="form-label">Nueva contraseña</label>
-          <input type="password" name="password" id="new_password" class="form-control" required>
+          <div style="position: relative;">
+            <input type="password" name="password" id="new_password" class="form-control" style="padding-right: 2.75rem;" required>
+            <x-ver-contrasena />
+          </div>
           @error('password') <div class="form-error">{{ $message }}</div> @enderror
         </div>
 
         <div class="form-group">
           <label for="password_confirmation" class="form-label">Confirmar nueva contraseña</label>
-          <input type="password" name="password_confirmation" id="password_confirmation" class="form-control" required>
+          <div style="position: relative;">
+            <input type="password" name="password_confirmation" id="password_confirmation" class="form-control" style="padding-right: 2.75rem;" required>
+            <x-ver-contrasena />
+          </div>
         </div>
 
         <div style="margin-top: 1.5rem; text-align: right;">
