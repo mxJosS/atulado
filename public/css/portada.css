@@ -714,3 +714,26 @@
   .inicio-btn:hover, .inicio-estado:hover, .inicio-tarjeta:hover, .inicio-articulo:hover,
   .inicio-tarjeta:hover .inicio-tarjeta-arte img, .inicio-leer:hover { transform: none; }
 }
+
+/* ══ APP INSTALABLE ══════════════════════════════════════════════════════ */
+.inicio-app { background: var(--ini-papel); padding: clamp(3rem, 6vw, 4.5rem) 0; }
+.inicio-app-tarjeta {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: clamp(1.25rem, 3vw, 2.5rem);
+  background: var(--ini-papel-claro);
+  border: 1px solid var(--ini-linea);
+  border-radius: 28px;
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+}
+.inicio-app-icono img { display: block; width: 72px; height: 72px; border-radius: 18px; box-shadow: 0 12px 28px rgba(46, 93, 75, 0.22); }
+.inicio-app-texto .inicio-h2 { margin-bottom: 0.4rem; }
+.inicio-app-texto .inicio-sub { margin: 0 0 0.9rem; }
+.inicio-app-lista { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.4rem 1.25rem; color: var(--ini-tinta-suave); font-size: 0.92rem; }
+.inicio-app-lista i { color: var(--ini-verde); margin-right: 4px; }
+@media (max-width: 760px) {
+  .inicio-app-tarjeta { grid-template-columns: 1fr; text-align: center; justify-items: center; }
+  .inicio-app-lista { justify-content: center; }
+  .inicio-app .inicio-btn { width: 100%; justify-content: center; }
+}

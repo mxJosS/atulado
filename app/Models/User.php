@@ -85,6 +85,7 @@ class User extends Authenticatable
             'acepta_boletin' => 'boolean',
             'password' => 'hashed',
             'is_admin' => 'boolean',
+            'admin_solo_lectura' => 'boolean',
             'is_clinico_atulado' => 'boolean',
         ];
     }

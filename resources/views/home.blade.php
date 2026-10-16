@@ -344,6 +344,34 @@
   </div>
 </section>
 
+{{-- ════ APP INSTALABLE: se oculta sola si el navegador ya la tiene instalada ════ --}}
+<section class="inicio-seccion inicio-app pwa-solo-instalable">
+  <div class="container">
+    <div class="inicio-app-tarjeta" data-aparecer>
+      <div class="inicio-app-icono" aria-hidden="true">
+        <img src="/images/marca/logo-atulado-128.png" alt="" width="72" height="72">
+      </div>
+      <div class="inicio-app-texto">
+        <span class="inicio-etiqueta">
+          <i class="fa-solid fa-mobile-screen"></i>
+          App para celular y computadora
+        </span>
+        <h2 class="inicio-h2">Ten A Tu Lado <em>a un toque</em></h2>
+        <p class="inicio-sub">Instálala gratis en tu pantalla de inicio, sin pasar por la tienda de apps.</p>
+        <ul class="inicio-app-lista">
+          <li><i class="fa-solid fa-check"></i> Se abre directo, como cualquier app</li>
+          <li><i class="fa-solid fa-check"></i> Ocupa muy poco espacio</li>
+          <li><i class="fa-solid fa-check"></i> Las líneas de crisis funcionan aun sin internet</li>
+        </ul>
+      </div>
+      <a href="#" class="inicio-btn inicio-btn-verde" data-pwa-instalar role="button">
+        <i class="fa-solid fa-download"></i>
+        <span>Instalar la app</span>
+      </a>
+    </div>
+  </div>
+</section>
+
 {{-- ════ LLAMADO FINAL ════ --}}
 <section class="inicio-seccion inicio-cierre">
   <div class="container">

@@ -155,6 +155,7 @@ class AdminUserController extends Controller
             'role' => ['required', 'in:admin,profesional,usuario'],
             'perfil_profesional' => ['nullable', 'in:publica,clinico,ambos'], // sin valor: sólo publica, como antes
             'clinico_admin' => ['nullable', 'boolean'],
+            'admin_solo_lectura' => ['nullable', 'boolean'],
             'status' => ['required', 'in:activo,pendiente'],
             'cambiar_password' => ['nullable', 'boolean'],
             'password' => ['exclude_unless:cambiar_password,1,true', 'required', 'string', 'min:8'],
@@ -206,11 +207,17 @@ class AdminUserController extends Controller
         }
 
         $role = $request->role;
-        $antes = ['permisos' => self::permisos($user), 'invita' => self::invitaPorLink($user), 'email' => $user->email, 'verificado' => (bool) $user->email_verified_at];
+        $antes = ['solo_lectura' => (bool) $user->admin_solo_lectura, 'permisos' => self::permisos($user), 'invita' => self::invitaPorLink($user), 'email' => $user->email, 'verificado' => (bool) $user->email_verified_at];
 
         $user->name = trim($request->name);
         $user->email = trim($request->email);
         $user->asignarRol($role, $request->perfil_profesional, $request->boolean('clinico_admin'));
+
+        // Sólo la cuenta principal decide quién administra en sólo lectura; nunca a sí misma.
+        // ponytail: por ahora sólo se guarda; falta bloquear las acciones de escritura.
+        if ($currentUser?->isSuperAdmin() && !$user->isSuperAdmin()) {
+            $user->admin_solo_lectura = $role === 'admin' && $request->boolean('admin_solo_lectura');
+        }
 
         // Gestión del Estado (Activo vs Pendiente). Es el mismo estado que ve el
         // padrón: «Activo» también activa su lugar en el padrón y «Pendiente»
@@ -267,6 +274,7 @@ class AdminUserController extends Controller
             $antes['email'] !== $user->email ? "correo {$antes['email']} → {$user->email}" : null,
             $antes['verificado'] !== (bool) $user->email_verified_at ? 'estado → ' . $request->status : null,
             $request->boolean('cambiar_password') ? 'contraseña cambiada por administración' : null,
+            $antes['solo_lectura'] !== (bool) $user->admin_solo_lectura ? 'sólo lectura → ' . ($user->admin_solo_lectura ? 'sí' : 'no') : null,
         ]);
         BitacoraAdmin::registrar($cambios === [] ? 'usuario_editado' : 'usuario_permisos', $user,
             "Edición de {$user->email}" . ($cambios ? ': ' . implode('; ', $cambios) : ' sin cambios de permisos') . '.');

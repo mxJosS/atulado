@@ -316,6 +316,7 @@
                                 'asignadas' => $user->institucionesAsignadas->pluck('id')->all(),
                                 'invita_por_link' => $user->institucionesAsignadas->filter(fn ($i) => (bool) $i->pivot->puede_invitar_por_link)->pluck('id')->values()->all(),
                                 'is_clinico' => (bool) $user->is_clinico_atulado,
+                                'solo_lectura' => (bool) $user->admin_solo_lectura,
                                 'institution_text' => (string) ($user->getRawOriginal('institution') ?? ''),
                                 'is_self' => $isSelf,
                                 'is_super_admin' => $isTargetSuperAdmin,
@@ -712,6 +713,18 @@
             </span>
           </label>
         </div>
+        @if(auth()->user()->isSuperAdmin())
+        <div id="editSoloLecturaBox" style="display: none; margin-bottom: 1.25rem; background: #EFF6FF; border: 1.5px solid #93C5FD; border-radius: 12px; padding: 0.9rem 1rem;">
+          <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer;">
+            <input type="hidden" name="admin_solo_lectura" value="0">
+            <input type="checkbox" name="admin_solo_lectura" value="1" id="editSoloLectura" style="margin-top: 3px;">
+            <span>
+              <b style="font-size: 0.86rem; color: #1E40AF;"><i class="fa-solid fa-eye"></i> Sólo lectura</b>
+              <span style="display: block; font-size: 0.75rem; color: #1E40AF;">Podrá ver el panel, pero no crear, editar ni borrar nada. <em>Se guarda desde ahora; el bloqueo se activa en la próxima actualización.</em></span>
+            </span>
+          </label>
+        </div>
+        @endif
         <!-- Campos de Profesional (Cédula / Institución) -->
         <div id="editProFieldsContainer" style="display: none; margin-bottom: 1.25rem; background: #F0FDF4; padding: 1rem; border-radius: 10px; border: 1px solid #BBF7D0;">
           <div style="margin-bottom: 1rem;">
@@ -935,6 +948,11 @@
     document.querySelectorAll('.edit-chk-invita').forEach(c => { c.checked = (user.invita_por_link || []).includes(Number(c.value)); });
     document.querySelectorAll('.edit-chk-asignada').forEach(syncInvitaPorLink);
     document.getElementById('editClinicoAdmin').checked = !!user.is_clinico;
+    const soloLecturaBox = document.getElementById('editSoloLecturaBox');
+    if (soloLecturaBox) {
+      soloLecturaBox.dataset.oculto = user.is_super_admin ? '1' : '';
+      document.getElementById('editSoloLectura').checked = !!user.solo_lectura;
+    }
 
     // La contraseña nunca viaja salvo que se pida cambiarla expresamente.
     document.getElementById('editCambiarPassword').checked = false;
@@ -972,6 +990,8 @@
       document.getElementById('editBloqueVincular').style.display = clinico ? 'none' : 'block';
     }
     document.getElementById('editClinicoAdminBox').style.display = isAdmin ? 'block' : 'none';
+    const soloBox = document.getElementById('editSoloLecturaBox');
+    if (soloBox) soloBox.style.display = isAdmin && !soloBox.dataset.oculto ? 'block' : 'none';
 
     proContainer.style.display = isPro ? 'block' : 'none';
 
