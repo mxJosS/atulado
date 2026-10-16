@@ -838,6 +838,8 @@ class SpaRouter {
       } catch (compErr) {}
 
       currentSpaContent.classList.remove('spa-transitioning');
+      // Sin este aviso, lo marcado con data-aparecer se queda en opacity 0 (página en blanco).
+      document.dispatchEvent(new CustomEvent('spa:navegado'));
       this.setProgressBar(100);
 
     } catch (err) {

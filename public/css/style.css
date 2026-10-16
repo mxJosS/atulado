@@ -1036,6 +1036,8 @@ em, .editorial-italic {
 .dashboard-sidebar {
   width: 260px;
   height: 100vh;
+  /* En iPhone 100vh mide más que lo visible y la barra de Safari tapaba el pie (cerrar sesión). */
+  height: 100dvh;
   position: sticky;
   top: 0;
   background: #0D1410;
