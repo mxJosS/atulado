@@ -111,6 +111,43 @@
                 <span>Te escucho… toca el micrófono para terminar</span>
               </div>
 
+              {{-- Permiso del micrófono: el botón abre la ventana nativa del navegador; si ya está bloqueado, explica cómo desbloquearlo --}}
+              <style>
+                #modalMicrofono[data-paso="pedir"] .mic-bloqueado, #modalMicrofono[data-paso="bloqueado"] .mic-pedir { display: none; }
+              </style>
+              <div id="modalMicrofono" class="clinical-modal-overlay" data-paso="pedir" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="modalMicrofonoTitulo">
+                <div class="clinical-modal-card" style="max-width: 440px; text-align: center;">
+                  <div style="width: 64px; height: 64px; margin: 0.25rem auto 1rem; border-radius: 50%; background: #E8F2EC; color: #2E5D4B; display: flex; align-items: center; justify-content: center; font-size: 1.6rem;">
+                    <i class="fa-solid fa-microphone mic-pedir"></i>
+                    <i class="fa-solid fa-microphone-slash mic-bloqueado" style="color: #C0392B;"></i>
+                  </div>
+                  <h2 id="modalMicrofonoTitulo" style="font-size: 1.3rem; color: #1A2620; font-family: var(--font-display);">
+                    <span class="mic-pedir">¿Dictamos tu registro?</span>
+                    <span class="mic-bloqueado">El micrófono está bloqueado</span>
+                  </h2>
+                  <div class="mic-pedir" style="font-size: 0.9rem; color: #556860; line-height: 1.55; margin: 0.6rem 0 1.4rem;">
+                    <p>Para escribir lo que dices necesitamos usar tu micrófono. Al tocar <strong>Permitir</strong>, tu navegador te preguntará si nos das acceso.</p>
+                    <p style="margin-top: 0.6rem; font-size: 0.82rem;"><i class="fa-solid fa-lock" style="margin-right: 4px;"></i>Sólo escuchamos mientras el botón está en rojo y no guardamos audio.</p>
+                  </div>
+                  <div class="mic-bloqueado" style="font-size: 0.9rem; color: #556860; line-height: 1.55; margin: 0.6rem 0 1.4rem; text-align: left;">
+                    <p style="text-align: center;">Tu navegador no nos deja usarlo. Para activarlo:</p>
+                    <ol style="margin: 0.75rem 0 0 1.2rem; display: grid; gap: 0.35rem;">
+                      <li>Toca el <strong>candado</strong> <i class="fa-solid fa-lock"></i> o el ícono junto a la dirección del sitio.</li>
+                      <li>Busca <strong>Micrófono</strong> y elige <strong>Permitir</strong>.</li>
+                      <li>Vuelve aquí y toca <strong>Reintentar</strong>.</li>
+                    </ol>
+                  </div>
+                  <div style="display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap;">
+                    <button type="button" class="btn btn-secondary" onclick="closeClinicalModals()">Ahora no</button>
+                    <button type="button" class="btn btn-primary" id="btnPermitirMicrofono" style="background: #2E5D4B; border: none;">
+                      <i class="fa-solid fa-microphone"></i>
+                      <span class="mic-pedir">Permitir micrófono</span>
+                      <span class="mic-bloqueado">Reintentar</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
               {{-- Mensaje de apoyo: el servidor decide si se muestra; el navegador no conoce la lista de términos --}}
               <div id="crisisEmpathicAlert" class="crisis-empathic-alert" @if($todayLog?->bandera_lexica) style="display: block;" @endif>
                 <div style="display: flex; align-items: flex-start; gap: 0.85rem;">
@@ -1204,9 +1241,12 @@
       };
 
       rec.onerror = (e) => {
-        if (['not-allowed', 'service-not-allowed', 'audio-capture'].includes(e.error)) {
+        if (e.error === 'not-allowed') {
           detener();
-          window.showZenToast?.('No pudimos usar el micrófono. Revisa el permiso del navegador para este sitio.', 'error');
+          verModalMicrofono(true);
+        } else if (['service-not-allowed', 'audio-capture'].includes(e.error)) {
+          detener();
+          window.showZenToast?.('No pudimos usar el micrófono. Revisa que esté conectado y que ninguna otra app lo esté usando.', 'error');
         }
         // «no-speech» y «aborted»: sólo fue silencio; onend vuelve a escuchar.
       };
@@ -1221,14 +1261,52 @@
       rec.start();
     };
 
-    btnDictar.addEventListener('click', () => {
-      if (activo) return detener();
+    const empezar = () => {
       fijarBase();
       try {
         escuchar();
         pintar(true);
       } catch (err) {
         window.showZenToast?.('Tu navegador no pudo iniciar el dictado.', 'error');
+      }
+    };
+
+    // Permiso del micrófono: sólo el navegador lo concede; aquí se explica y se
+    // abre su ventana con getUserMedia (el audio se suelta de inmediato).
+    function verModalMicrofono(bloqueado) {
+      const modal = document.getElementById('modalMicrofono');
+      if (!modal) return;
+      modal.dataset.paso = bloqueado ? 'bloqueado' : 'pedir';
+      window.abrirModalClinico('modalMicrofono');
+    }
+
+    const estadoMicrofono = async () => {
+      try { return (await navigator.permissions.query({ name: 'microphone' })).state; }
+      catch (err) { return 'prompt'; } // Safari viejo no sabe responder: se pregunta
+    };
+
+    // Sin mediaDevices (sitio sin HTTPS) no hay a quién pedirlo: el dictado lo intenta solo.
+    const puedePedir = !!navigator.mediaDevices?.getUserMedia;
+
+    btnDictar.addEventListener('click', async () => {
+      if (activo) return detener();
+      if (!puedePedir) return empezar();
+      const estado = await estadoMicrofono();
+      if (estado === 'granted') return empezar();
+      verModalMicrofono(estado === 'denied');
+    });
+
+    document.getElementById('btnPermitirMicrofono')?.addEventListener('click', async () => {
+      try {
+        const audio = await navigator.mediaDevices.getUserMedia({ audio: true });
+        audio.getTracks().forEach(t => t.stop());
+        window.closeClinicalModals();
+        empezar();
+      } catch (err) {
+        // NotAllowedError: lo negó o ya estaba bloqueado. Otro error: no hay micrófono.
+        if (err.name === 'NotAllowedError') return verModalMicrofono(true);
+        window.closeClinicalModals();
+        window.showZenToast?.('No encontramos un micrófono en este dispositivo.', 'error');
       }
     });
   }
