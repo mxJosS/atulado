@@ -181,14 +181,16 @@ em, .editorial-italic {
   opacity: 1;
 }
 
+/* El cambio de página sólo se desvanece. Aquí no van transform, filter ni
+   will-change: harían de #spaContent el marco de los position: fixed de adentro
+   y los modales (cuestionarios, juego) quedarían pegados a la página y no a la
+   pantalla: en el celular se descuadran y se desplaza todo el sitio. */
 #spaContent {
-  transition: opacity 0.18s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
-  will-change: opacity, transform;
+  transition: opacity 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 #spaContent.spa-transitioning {
   opacity: 0;
-  transform: translateY(8px);
 }
 
 /* ════ CONTENEDORES ════ */
@@ -1729,11 +1731,23 @@ em, .editorial-italic {
   -webkit-backdrop-filter: blur(12px);
   z-index: 120;
   display: flex;
-  align-items: center;
+  /* Arriba y no «center»: con center, lo que no cabe en la pantalla se cortaba por
+     arriba y no se podía alcanzar. El margin: auto del hijo lo centra si sí cabe. */
+  align-items: flex-start;
   justify-content: center;
   padding: 1rem;
   overflow-y: auto;
+  /* El desplazamiento se queda en el modal y no pasa a la página de fondo */
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
+
+.clinical-modal-overlay > * { margin: auto; }
+
+/* Con un modal clínico abierto la página de fondo no se desplaza (abrirModalClinico
+   en main.js). Va sólo en <body> para que el overflow pase a la ventana y la barra
+   superior y el menú (sticky) no salten detrás del modal. */
+html.modal-clinico-abierto body { overflow: hidden; }
 
 .clinical-modal-card {
   background: #FFFFFF;
@@ -1742,6 +1756,8 @@ em, .editorial-italic {
   max-width: 680px;
   max-height: 90vh;
   overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
   border: 1px solid #DCE8E0;
   padding: clamp(1.25rem, 3vw, 2rem);
@@ -1856,8 +1872,17 @@ em, .editorial-italic {
   justify-content: flex-end;
 }
 
-@media (max-width: 480px) {
+/* Celular (también acostado): la tarjeta usa casi toda la altura visible.
+   dvh descuenta las barras del navegador; vh queda para navegadores viejos. */
+@media (max-width: 480px), (max-height: 520px) {
   .clinical-modal-overlay { padding: 0.5rem; }
+  .clinical-modal-card {
+    max-height: calc(100vh - 1rem);
+    max-height: calc(100dvh - 1rem);
+  }
+}
+
+@media (max-width: 480px) {
   .clinical-question-item { padding: 0.85rem; }
   .clinical-options-grid { grid-template-columns: repeat(3, 1fr); }
   .clinical-radio-btn { min-height: 52px; }

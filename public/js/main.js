@@ -38,12 +38,33 @@ window.finishGrounding = function() {
 };
 
 /* ════ BLOQUES DE PREGUNTAS Y PANTALLA DE APOYO ════ */
+// Todo modal clínico se abre con esta función. Se mueve a <body> para que ningún
+// contenedor con transform/filter lo deje pegado a la página en vez de a la pantalla,
+// y se bloquea el fondo: en el celular sólo se desplaza el cuestionario.
+window.abrirModalClinico = function(id) {
+  const modal = document.getElementById(id);
+  if (!modal) return null;
+  if (modal.parentElement !== document.body) document.body.appendChild(modal);
+  document.documentElement.classList.add('modal-clinico-abierto');
+  modal.style.display = 'flex';
+  // Cada bloque empieza desde arriba
+  modal.scrollTop = 0;
+  const tarjeta = modal.querySelector('.clinical-modal-card');
+  if (tarjeta) tarjeta.scrollTop = 0;
+  return modal;
+};
+
 window.closeClinicalModals = function() {
-  const modals = ['preguntasBloque1', 'preguntasBloque2', 'preguntasBloque3', 'preguntasBloque4', 'apoyoInmediato'];
-  modals.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = 'none';
-  });
+  document.querySelectorAll('.clinical-modal-overlay').forEach(el => { el.style.display = 'none'; });
+  document.documentElement.classList.remove('modal-clinico-abierto');
+};
+
+// La navegación sin recarga (SpaRouter) llama esto antes de cambiar la página: los modales
+// movidos a <body> se van con ella (la nueva trae los suyos, sin ids repetidos) y se libera el fondo.
+// También el del juego del árbol, que game-engine.js monta en <body> al abrirlo.
+window.retirarModalesClinicos = function() {
+  document.querySelectorAll('body > .clinical-modal-overlay, body > #treeGameModalOverlay').forEach(el => el.remove());
+  document.documentElement.classList.remove('modal-clinico-abierto');
 };
 
 // El servidor sólo dice qué pantalla sigue; la decisión se toma allá.
@@ -67,21 +88,18 @@ window.seguirPreguntas = function(data) {
 
 window.abrirBloque1 = function() {
   window.closeClinicalModals();
-  const modal = document.getElementById('preguntasBloque1');
-  if (modal) modal.style.display = 'flex';
+  window.abrirModalClinico('preguntasBloque1');
 };
 
 window.abrirBloque2 = function() {
   window.closeClinicalModals();
-  const modal = document.getElementById('preguntasBloque2');
-  if (modal) modal.style.display = 'flex';
+  window.abrirModalClinico('preguntasBloque2');
 };
 
 window.abrirBloque3 = function() {
   window.closeClinicalModals();
   window.mostrarPreguntaExtra(false);
-  const modal = document.getElementById('preguntasBloque3');
-  if (modal) modal.style.display = 'flex';
+  window.abrirModalClinico('preguntasBloque3');
 };
 
 // Bloque 4: sólo se muestra el grupo que el servidor pidió (A, B, C o D).
@@ -97,7 +115,7 @@ window.abrirBloque4 = function(grupo) {
     g.style.display = visible ? 'block' : 'none';
     g.querySelectorAll('input[type="radio"]').forEach(r => { r.required = visible; });
   });
-  document.getElementById('preguntasBloque4').style.display = 'flex';
+  window.abrirModalClinico('preguntasBloque4');
 };
 
 // Un solo manejador para el tablero y el plan de seguridad (sobrevive a la navegación sin recarga).
@@ -129,8 +147,7 @@ document.addEventListener('submit', async (e) => {
 
 window.abrirApoyo = function() {
   window.closeClinicalModals();
-  const modal = document.getElementById('apoyoInmediato');
-  if (modal) modal.style.display = 'flex';
+  window.abrirModalClinico('apoyoInmediato');
 };
 
 window.selectClinicalRadio = function(labelEl) {
@@ -153,7 +170,12 @@ window.mostrarPreguntaExtra = function(mostrar = true) {
     if (!mostrar) r.checked = false;
   });
   if (!mostrar) extra.querySelectorAll('.clinical-radio-btn').forEach(b => b.classList.remove('selected'));
-  if (mostrar) extra.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  // Se centra la pregunta desplazando sólo la tarjeta (scrollIntoView movía también la página de fondo).
+  const tarjeta = extra.closest('.clinical-modal-card');
+  if (mostrar && tarjeta) {
+    const arriba = extra.getBoundingClientRect().top - tarjeta.getBoundingClientRect().top;
+    tarjeta.scrollBy({ top: arriba - (tarjeta.clientHeight - extra.offsetHeight) / 2, behavior: 'smooth' });
+  }
 };
 
 window.registrarCrisisAccion = async function(tipoAccion) {
@@ -708,6 +730,7 @@ class SpaRouter {
       ]);
 
       document.body.classList.toggle('sitio-publico', doc.body.classList.contains('sitio-publico'));
+      window.retirarModalesClinicos();
       currentSpaContent.innerHTML = newSpaContent.innerHTML;
 
       if (doc.title) {
@@ -812,6 +835,7 @@ class SpaRouter {
       currentSpaContent.classList.add('spa-transitioning');
       await new Promise(r => setTimeout(r, 60));
 
+      window.retirarModalesClinicos();
       currentSpaContent.innerHTML = newSpaContent.innerHTML;
 
       if (doc.title) {
@@ -905,11 +929,17 @@ class SpaRouter {
   executePageScripts(doc) {
     const pageScripts = doc.querySelectorAll('script:not([src])');
     pageScripts.forEach(oldScript => {
+      // Los bloques de datos (type="application/json"…) no se ejecutan.
+      const tipo = (oldScript.getAttribute('type') || '').trim().toLowerCase();
+      if (tipo && !['text/javascript', 'application/javascript'].includes(tipo)) return;
       const code = oldScript.textContent.trim();
       if (code) {
         try {
           const scriptElem = document.createElement('script');
-          scriptElem.textContent = code;
+          // Dentro de un bloque: un «const» de nivel superior ya declarado en la
+          // primera carga no falla al volver a la página; las funciones siguen
+          // quedando globales para los onclick.
+          scriptElem.textContent = '{\n' + code + '\n}';
           document.body.appendChild(scriptElem);
           setTimeout(() => scriptElem.remove(), 150);
         } catch (scriptErr) {}
