@@ -73,6 +73,7 @@
                 .dictado-caja { position: relative; }
                 .dictado-caja textarea { padding-right: 3.4rem; }
                 .dictado-btn { position: absolute; right: 0.55rem; bottom: 0.6rem; width: 2.5rem; height: 2.5rem; border-radius: 50%; border: none; background: #2E5D4B; color: #FFFFFF; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.2s, background 0.2s; }
+                .dictado-btn[hidden] { display: none; }
                 .dictado-btn:hover { transform: scale(1.06); }
                 .dictado-btn.grabando { background: #D9534F; transform: scale(1.15); }
                 .dictado-btn.grabando::before, .dictado-btn.grabando::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: #D9534F; z-index: -1; animation: dictadoOnda 1.6s ease-out infinite; }

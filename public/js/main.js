@@ -826,7 +826,11 @@ class SpaRouter {
       const currentSpaContent = document.getElementById('spaContent');
       const newSpaContent = doc.getElementById('spaContent');
 
-      if (!newSpaContent || !currentSpaContent) {
+      // Como en navigate(): si la respuesta trae otro layout (p. ej. del código de
+      // acceso al panel), se carga completa; si no, quedaba la barra pública sin sidebar.
+      const cambiaLayout = !!document.querySelector('.dashboard-layout') !== !!doc.querySelector('.dashboard-layout');
+
+      if (!newSpaContent || !currentSpaContent || cambiaLayout) {
         window.location.href = targetUrl;
         return;
       }
