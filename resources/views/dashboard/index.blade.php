@@ -68,14 +68,47 @@
 
             <!-- 1. TEXTAREA: ESCRIBE CÓMO TE SIENTES... (OPCIONAL) -->
             <div class="form-group" style="margin-top: 1.25rem;">
-              <textarea 
-                name="journal_entry" 
-                id="journal_entry" 
-                rows="3" 
-                class="form-control" 
-                placeholder="Escribe cómo te sientes... (opcional)"
-                style="resize: vertical; font-size: 0.92rem; line-height: 1.6; background: #FFFFFF; color: #1A2620;"
-              >{{ old('journal_entry', $todayLog?->journal_entry) }}</textarea>
+              {{-- Dictado por voz: aquí y no en @push('styles') para que llegue también con la navegación sin recarga --}}
+              <style>
+                .dictado-caja { position: relative; }
+                .dictado-caja textarea { padding-right: 3.4rem; }
+                .dictado-btn { position: absolute; right: 0.55rem; bottom: 0.6rem; width: 2.5rem; height: 2.5rem; border-radius: 50%; border: none; background: #2E5D4B; color: #FFFFFF; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.2s, background 0.2s; }
+                .dictado-btn:hover { transform: scale(1.06); }
+                .dictado-btn.grabando { background: #D9534F; transform: scale(1.15); }
+                .dictado-btn.grabando::before, .dictado-btn.grabando::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: #D9534F; z-index: -1; animation: dictadoOnda 1.6s ease-out infinite; }
+                .dictado-btn.grabando::after { animation-delay: 0.8s; }
+                @keyframes dictadoOnda { from { transform: scale(1); opacity: 0.45; } to { transform: scale(2.1); opacity: 0; } }
+                .dictado-estado { display: none; align-items: center; gap: 0.6rem; margin-top: 0.5rem; padding: 0.45rem 0.85rem; border-radius: 999px; background: #FDECEA; color: #8A2C29; font-size: 0.82rem; font-weight: 600; width: fit-content; }
+                .dictado-estado.activo { display: flex; }
+                .dictado-punto { width: 9px; height: 9px; border-radius: 50%; background: #D9534F; animation: dictadoLatido 1s ease-in-out infinite; }
+                .dictado-barras { display: flex; align-items: center; gap: 3px; height: 16px; }
+                .dictado-barras i { width: 3px; height: 100%; border-radius: 2px; background: #D9534F; animation: dictadoBarra 0.9s ease-in-out infinite; }
+                .dictado-barras i:nth-child(2) { animation-delay: 0.15s; } .dictado-barras i:nth-child(3) { animation-delay: 0.3s; }
+                .dictado-barras i:nth-child(4) { animation-delay: 0.45s; } .dictado-barras i:nth-child(5) { animation-delay: 0.6s; }
+                @keyframes dictadoLatido { 50% { opacity: 0.25; } }
+                @keyframes dictadoBarra { 0%, 100% { transform: scaleY(0.3); } 50% { transform: scaleY(1); } }
+                @media (prefers-reduced-motion: reduce) { .dictado-btn.grabando::before, .dictado-btn.grabando::after, .dictado-punto, .dictado-barras i { animation: none; } }
+              </style>
+              <div class="dictado-caja">
+                <textarea
+                  name="journal_entry"
+                  id="journal_entry"
+                  rows="3"
+                  class="form-control"
+                  placeholder="Escribe cómo te sientes... (opcional)"
+                  style="resize: vertical; font-size: 0.92rem; line-height: 1.6; background: #FFFFFF; color: #1A2620;"
+                >{{ old('journal_entry', $todayLog?->journal_entry) }}</textarea>
+                {{-- Oculto hasta que el script confirma que el navegador sabe dictar --}}
+                <button type="button" id="btnDictar" class="dictado-btn" hidden aria-label="Dictar por voz" aria-pressed="false" title="Dictar por voz">
+                  <i class="fa-solid fa-microphone"></i>
+                </button>
+              </div>
+              <div id="dictadoEstado" class="dictado-estado" role="status" aria-live="polite">
+                <span class="dictado-punto"></span>
+                <span data-tiempo>0:00</span>
+                <span class="dictado-barras" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+                <span>Te escucho… toca el micrófono para terminar</span>
+              </div>
 
               {{-- Mensaje de apoyo: el servidor decide si se muestra; el navegador no conoce la lista de términos --}}
               <div id="crisisEmpathicAlert" class="crisis-empathic-alert" @if($todayLog?->bandera_lexica) style="display: block;" @endif>
@@ -1110,6 +1143,93 @@
       espera = setTimeout(revisarTexto, 700);
     }));
     journalInput.addEventListener('blur', revisarTexto);
+  }
+
+  // Dictado por voz con el reconocimiento del propio navegador (sin librerías).
+  // Cada frase es una sesión corta que se reinicia sola mientras el botón siga
+  // activo: «continuous» repite palabras en Chrome para Android.
+  const Reconocimiento = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const btnDictar = document.getElementById('btnDictar');
+  const dictadoEstado = document.getElementById('dictadoEstado');
+
+  if (Reconocimiento && btnDictar && journalInput && dictadoEstado) {
+    btnDictar.hidden = false;
+    const tiempo = dictadoEstado.querySelector('[data-tiempo]');
+    let rec = null, activo = false, base = '', inicio = 0, reloj = null;
+
+    const fijarBase = () => {
+      const texto = journalInput.value.replace(/\s+$/, '');
+      base = texto ? texto + ' ' : '';
+    };
+
+    const pintar = (estado) => {
+      activo = estado;
+      btnDictar.classList.toggle('grabando', estado);
+      btnDictar.setAttribute('aria-pressed', String(estado));
+      btnDictar.setAttribute('aria-label', estado ? 'Detener dictado' : 'Dictar por voz');
+      btnDictar.innerHTML = `<i class="fa-solid ${estado ? 'fa-stop' : 'fa-microphone'}"></i>`;
+      dictadoEstado.classList.toggle('activo', estado);
+      clearInterval(reloj);
+      if (estado) {
+        inicio = Date.now();
+        tiempo.textContent = '0:00';
+        reloj = setInterval(() => {
+          const s = Math.floor((Date.now() - inicio) / 1000);
+          tiempo.textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+        }, 500);
+      }
+    };
+
+    const detener = () => {
+      pintar(false);
+      rec?.stop();
+      // Que la revisión de apoyo vea lo dictado.
+      journalInput.dispatchEvent(new Event('change'));
+    };
+
+    const escuchar = () => {
+      rec = new Reconocimiento();
+      rec.lang = 'es-MX';
+      rec.interimResults = true;
+      rec.continuous = false;
+
+      rec.onresult = (e) => {
+        // Si se cambió de página sin recarga, el cuadro ya no existe.
+        if (!journalInput.isConnected) return detener();
+        const dicho = [...e.results].map(r => r[0].transcript).join('').trim();
+        journalInput.value = base + dicho;
+        journalInput.scrollTop = journalInput.scrollHeight;
+        journalInput.dispatchEvent(new Event('input'));
+      };
+
+      rec.onerror = (e) => {
+        if (['not-allowed', 'service-not-allowed', 'audio-capture'].includes(e.error)) {
+          detener();
+          window.showZenToast?.('No pudimos usar el micrófono. Revisa el permiso del navegador para este sitio.', 'error');
+        }
+        // «no-speech» y «aborted»: sólo fue silencio; onend vuelve a escuchar.
+      };
+
+      rec.onend = () => {
+        fijarBase();
+        if (activo && journalInput.isConnected) {
+          try { rec.start(); } catch (err) { detener(); }
+        }
+      };
+
+      rec.start();
+    };
+
+    btnDictar.addEventListener('click', () => {
+      if (activo) return detener();
+      fijarBase();
+      try {
+        escuchar();
+        pintar(true);
+      } catch (err) {
+        window.showZenToast?.('Tu navegador no pudo iniciar el dictado.', 'error');
+      }
+    });
   }
 
   // Smilies selector & Emotion tag buttons

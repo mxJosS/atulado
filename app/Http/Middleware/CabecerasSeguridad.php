@@ -49,7 +49,7 @@ class CabecerasSeguridad
         $poner('X-Content-Type-Options', 'nosniff');
         $poner('X-Frame-Options', 'SAMEORIGIN');
         $poner('Referrer-Policy', 'strict-origin-when-cross-origin');
-        $poner('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=(), usb=()');
+        $poner('Permissions-Policy', 'camera=(), microphone=(self), geolocation=(), payment=(), usb=()');
         $poner('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
 
         if ($request->isSecure()) {
